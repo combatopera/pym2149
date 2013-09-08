@@ -18,9 +18,9 @@ class BinMix(Node):
     # AND and OR have the same frequency spectrum so either is good.
     # We choose OR as that's what Steem appears to use:
     self.blockbuf.fill(0, self.block.framecount, 0)
-    if self.toneflagreg.value:
+    if not self.toneflagreg.value:
       self.blockbuf.orbuf(self.tone(self.block))
-    if self.noiseflagreg.value:
+    if not self.noiseflagreg.value:
       self.blockbuf.orbuf(self.noise(self.block))
 
 class Mixer(Node):
