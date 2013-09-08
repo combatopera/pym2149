@@ -214,6 +214,6 @@ class PsgWriteBuffer:
 
 if '__main__' == __name__:
   psg_reg[8] = 15
-  psg_reg[0] = 1000
+  psg_reg[0] = 255
   psg_write_buffer(0, PSG_CHANNEL_BUF_LENGTH)
   print psg_channels_buf
