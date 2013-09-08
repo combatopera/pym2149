@@ -1,19 +1,19 @@
-void psg_write_buffer(int abc,DWORD to_t)
-{
-  //buffer starts at time time_of_last_vbl
-  //we've written up to psg_buf_pointer[abc]
-  //so start at pointer and write to to_t,
-  int psg_tonemodulo_2,psg_noisemodulo;
-  int psg_tonecountdown,psg_noisecountdown;
-  int psg_noisecounter;
-  double af,bf;
-  bool psg_tonetoggle=true,psg_noisetoggle;
-  int *p=psg_channels_buf+psg_buf_pointer[abc];
-  DWORD t=(psg_time_of_last_vbl_for_writing+psg_buf_pointer[abc]);
-  to_t=max(to_t,t);
-  to_t=min(to_t,psg_time_of_last_vbl_for_writing+PSG_CHANNEL_BUF_LENGTH);
-  int count=max(min((int)(to_t-t),PSG_CHANNEL_BUF_LENGTH-psg_buf_pointer[abc]),0);
-  int toneperiod=(((int)psg_reg[abc*2+1] & 0xf) << 8) + psg_reg[abc*2];
+def psg_write_buffer(abc, to_t):
+  # buffer starts at time time_of_last_vbl
+  # we've written up to psg_buf_pointer[abc]
+  # so start at pointer and write to to_t,
+  psg_tonemodulo_2 = psg_noisemodulo = None
+  psg_tonecountdown = psg_noisecountdown = None
+  psg_noisecounter = None
+  af = bf = None
+  psg_tonetoggle = True
+  psg_noisetoggle = None
+  p = psg_channels_buf + psg_buf_pointer[abc]
+  t = psg_time_of_last_vbl_for_writing + psg_buf_pointer[abc]
+  to_t = max(to_t, t)
+  to_t = min(to_t, psg_time_of_last_vbl_for_writing + PSG_CHANNEL_BUF_LENGTH)
+  count = max(min(int(to_t - t), PSG_CHANNEL_BUF_LENGTH - psg_buf_pointer[abc]), 0)
+  toneperiod = ((int(psg_reg[abc * 2 + 1]) & 0xf) << 8) + psg_reg[abc * 2]
 
   if ((psg_reg[abc+8] & BIT_4)==0){ // Not Enveloped
     int vol=psg_flat_volume_level[psg_reg[abc+8] & 15];
