@@ -9,6 +9,7 @@ class WavWriter(AbstractNode):
       'sox',
       '-c', str(channels),
       '-r', str(infreq),
+      # TODO: Get format from signal node, or standardise on SoX native.
       '-e', 'unsigned',
       '-b', '32',
       '-t', 'raw',
@@ -17,6 +18,7 @@ class WavWriter(AbstractNode):
       '-e', 'signed',
       '-b', '16',
       path,
+      # TODO: Find out whether DC filter here would be authentic.
     ], stdin = subprocess.PIPE)
     self.signal = signal
 
