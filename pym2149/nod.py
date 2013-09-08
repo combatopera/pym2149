@@ -28,7 +28,7 @@ class Node(AbstractNode):
 
   def __init__(self, dtype):
     AbstractNode.__init__(self)
-    masterbuf = MasterBuf(0, dtype)
+    masterbuf = MasterBuf(dtype)
     callimpl = self.callimpl
     def callimploverride():
       self.blockbuf = masterbuf.ensureandcrop(self.block.framecount)

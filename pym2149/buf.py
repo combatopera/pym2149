@@ -41,10 +41,10 @@ class Buf:
       return self
     return Buf(self.buf[:framecount])
 
-  def tolist(self):
+  def tolist(self): # For tests.
     return list(self.buf)
 
 class MasterBuf(Buf):
 
-  def __init__(self, framecount, dtype):
-    Buf.__init__(self, np.empty(framecount, dtype))
+  def __init__(self, dtype):
+    Buf.__init__(self, np.empty(0, dtype))
