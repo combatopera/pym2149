@@ -33,6 +33,7 @@ def main():
     x.noiseflags[i].value = 1
   x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
   x.noiseperiod.value = int(round(clock / (16 * noisenote)))
+  x.envperiod.value = int(round(clock / (256 * tonenote)))
   x.fixedlevels[0].value = 15
   def dump(path):
     print >> sys.stderr, path
@@ -47,6 +48,10 @@ def main():
   dump('5knoise.wav')
   x.toneflags[0].value = 0
   dump('1ktone5knoise.wav')
+  x.noiseflags[0].value = 1 # Noise off.
+  x.levelmodes[0].value = 1 # Envelope on.
+  x.toneperiods[0].value = (1 << 12) - 1 # Max period.
+  dump('1kenvelope.wav')
 
 if '__main__' == __name__:
   main()
