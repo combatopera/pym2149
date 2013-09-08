@@ -17,8 +17,8 @@ class Buf:
   def mulbuf(self, that):
     self.buf *= that.buf
 
-  def transform(self, f):
-    f(self.buf, self.buf)
+  def mapbuf(self, that, lookup):
+    np.take(lookup, that.buf, out = self.buf)
 
   def add(self, value):
     self.buf += value
