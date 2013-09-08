@@ -82,9 +82,9 @@ def psg_write_buffer(abc, to_t):
     envdeath = -1
     if (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_CONT) == 0 or (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_HOLD):
       if psg_reg[PSGR_ENVELOPE_SHAPE] == 11 or psg_reg[PSGR_ENVELOPE_SHAPE] == 13:
-        envdeath=psg_flat_volume_level[15]
+        envdeath = psg_flat_volume_level[15]
       else:
-        envdeath=psg_flat_volume_level[0]
+        envdeath = psg_flat_volume_level[0]
     envshape = psg_reg[PSGR_ENVELOPE_SHAPE] & 7
     if psg_envstage >= 32 and envdeath != -1:
       envvol = envdeath
@@ -103,6 +103,15 @@ def psg_write_buffer(abc, to_t):
       if psg_noisecounter >= PSG_NOISE_ARRAY:
         psg_noisecounter = 0
       psg_noisetoggle = psg_noise[psg_noisecounter]
+  def PSG_ENVELOPE_ADVANCE():
+    psg_envcountdown -= TWO_TO_SEVENTEEN
+    while psg_envcountdown < 0:
+      psg_envcountdown += psg_envmodulo
+      psg_envstage += 1
+      if psg_envstage >= 32 and envdeath != -1:
+        envvol = envdeath
+      else:
+        envvol = psg_envelope_level[envshape][psg_envstage & 63]
   if not psg_reg.variablelevel(abc):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
     if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
