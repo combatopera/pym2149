@@ -17,6 +17,12 @@ class psg_reg(list):
   def __init__(self):
     list.__init__(self, [0] * 14)
 
+  def mixertone(self, channel):
+    return not (self[7] & (0x01 << channel))
+
+  def mixernoise(self, channel):
+    return not (self[7] & (0x08 << channel))
+
   def variablelevel(self, channel):
     return self[8 + channel] & 0x10
 
@@ -38,9 +44,9 @@ def psg_write_buffer(abc, to_t):
   toneperiod = ((int(psg_reg[abc * 2 + 1]) & 0xf) << 8) + psg_reg[abc * 2]
   if not psg_reg.variablelevel(abc):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
-    if (psg_reg[PSGR_MIXER] & (1 << abc)) == 0 and toneperiod > 9: # tone enabled
+    if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
       PSG_PREPARE_TONE()
-      if (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+      if psg_reg.mixernoise(abc): # noise enabled
         PSG_PREPARE_NOISE()
         while count > 0:
           if not (psg_tonetoggle or psg_noisetoggle):
@@ -56,7 +62,7 @@ def psg_write_buffer(abc, to_t):
           q += 1
           PSG_TONE_ADVANCE()
           count -= 1
-    elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+    elif psg_reg.mixernoise(abc): # noise enabled
       PSG_PREPARE_NOISE()
       while count > 0:
         if not psg_noisetoggle:
@@ -69,13 +75,13 @@ def psg_write_buffer(abc, to_t):
         psg_channels_buf[q] += vol
         q += 1
         count -= 1
-  else: # Enveloped
+  else:
     envdeath = psg_envstage = envshape = None
     psg_envmodulo = envvol = psg_envcountdown = None
     PSG_PREPARE_ENVELOPE()
-    if (psg_reg[PSGR_MIXER] & (1 << abc)) == 0 and toneperiod > 9: # tone enabled
+    if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
       PSG_PREPARE_TONE()
-      if (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+      if psg_reg.mixernoise(abc): # noise enabled
         PSG_PREPARE_NOISE()
         while count > 0:
           if not (psg_tonetoggle or psg_noisetoggle):
@@ -93,7 +99,7 @@ def psg_write_buffer(abc, to_t):
           PSG_TONE_ADVANCE()
           PSG_ENVELOPE_ADVANCE()
           count -= 1
-    elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+    elif psg_reg.mixernoise(abc): # noise enabled
       PSG_PREPARE_NOISE()
       while count > 0:
         if not psg_noisetoggle:
