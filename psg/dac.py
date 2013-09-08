@@ -2,27 +2,34 @@ from __future__ import division
 from nod import Node
 import numpy as np
 
-class Dac(Node):
+class Level(Node):
 
-  headroom = int(2 ** 31 - 2 ** 30.5) # Very close to 3 dB.
-
-  def __init__(self, signal, modereg, volreg, env, ampshare):
-    Node.__init__(self, np.uint32)
-    maxamp = 2 ** 31.5 / ampshare
-    def createlookup(maxvol, halfvol):
-      return dict([v, int(2 ** ((v - maxvol) / (maxvol - halfvol)) * maxamp)] for v in xrange(maxvol + 1))
-    self.fixedamps = createlookup(15, 13)
-    varamps = createlookup(31, 27)
-    self.varamps = np.frompyfunc(lambda x: varamps[x], 1, 1)
-    self.signal = signal
+  def __init__(self, modereg, fixedreg, env, signal):
+    Node.__init__(self, Node.commondtype(env, signal)) # XXX: Or just env?
     self.modereg = modereg
-    self.volreg = volreg
+    self.fixedreg = fixedreg
     self.env = env
+    self.signal = signal
 
   def callimpl(self):
-    self.blockbuf.copybuf(self.signal(self.block))
     if self.modereg.value:
-      self.blockbuf.mulbuf(self.env(self.block))
-      self.blockbuf.transform(self.varamps)
+      self.blockbuf.copybuf(self.env(self.block))
     else:
-      self.blockbuf.scale(self.fixedamps[self.volreg.value])
+      # Convert to equivalent 5-bit level:
+      level = self.fixedreg.value * 2 + 1 # That's right, 4-bit 0 is 5-bit 1.
+      self.blockbuf.fill(0, self.block.framecount, level)
+    self.blockbuf.mulbuf(self.signal(self.block))
+
+class Dac(Node):
+
+  dtype = np.uint32
+  headroom = int(2 ** 31 - 2 ** 30.5) # Very close to 3 dB.
+
+  def __init__(self, level, ampshare):
+    Node.__init__(self, self.dtype)
+    maxamp = 2 ** 31.5 / ampshare
+    self.leveltoamp = np.array([self.dtype(2 ** ((v - 31) / 4) * maxamp) for v in xrange(32)])
+    self.level = level
+
+  def callimpl(self):
+    self.blockbuf.mapbuf(self.level(self.block), self.leveltoamp)
