@@ -20,6 +20,13 @@ class Buf:
   def scale(self, start, end, factor):
     self.buf[start:end] *= factor
 
+  def xform(self, start, end, factor, add):
+    self.buf[start:end] *= factor
+    self.buf[start:end] += add
+
+  def tofile(self, start, end, fileobj):
+    self.buf[start:end].tofile(fileobj)
+
 class SimpleBuf(Buf):
 
   def __init__(self):
