@@ -47,5 +47,5 @@ class NoiseOsc(Osc):
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 
   def nextvalue(self, previous, applyperiod):
-    applyperiod() # Unlike for tone, we can change period every half-wave.
+    applyperiod() # Unlike for tone, we can change period every flip.
     return self.lfsr()
