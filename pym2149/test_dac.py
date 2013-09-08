@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import unittest, numpy as np
+import unittest
 from dac import Dac
 from nod import Node, Block
 
