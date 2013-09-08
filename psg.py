@@ -163,7 +163,7 @@ class PsgWriteBuffer:
       if self.envstage >= 32 and envdeath != -1:
         self.envvol = envdeath
       else:
-        self.envvol = psg_envelope_level[self.envshape][self.envstage & 63]
+        self.envvol = psg_envelope_level[self.envshape][self.envstage % 64]
 
   def __call__(self, abc, to_t):
     # buffer starts at time time_of_last_vbl
