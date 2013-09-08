@@ -75,8 +75,7 @@ class PsgWriteBuffer:
     af = self.noisescale * sound_freq * noiseperiod * 16 / float(fMaster)
     self.noisemodulo = int(af)
     bf = self.t * self.noisescale
-    self.noisecounter = int(math.floor(bf / af))
-    self.noisecounter &= (PSG_NOISE_ARRAY - 1)
+    self.noisecounter = int(math.floor(bf / af)) % PSG_NOISE_ARRAY
     bf = bf % af
     self.noisecountdown = self.noisemodulo - int(bf)
     psg_noisetoggle = psg_noise[self.noisecounter]
