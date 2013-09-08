@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 from __future__ import division
-from psg.out import WavWriter
-from psg.nod import Block
-from ym2149 import YM2149
+from pym2149.out import WavWriter
+from pym2149.nod import Block
+from pym2149.ym2149 import YM2149
 import sys
 
 clock = 2000000 # Atari ST.
