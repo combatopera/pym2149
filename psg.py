@@ -169,9 +169,6 @@ class PsgWriteBuffer:
     # buffer starts at time time_of_last_vbl
     # we've written up to psg_buf_pointer[abc]
     # so start at pointer and write to to_t,
-    self.tonemodulo_2 = self.noisemodulo = None
-    self.tonecountdown = self.noisecountdown = None
-    self.noisecounter = None
     self.tonetoggle = True
     psg_noisetoggle = None
     q = psg_buf_pointer[abc]
