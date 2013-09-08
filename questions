@@ -25,7 +25,7 @@ qanlgmix analog mix function
 algos:
 
 qnoispec noise period spectrum
-         confirm noise lfsr
+qnoispec confirm noise lfsr
          mixer off with fixed level
          mixer off with variable level
          binary mixing function effect on env
