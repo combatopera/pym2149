@@ -26,6 +26,20 @@ class TestLastSampler(unittest.TestCase):
     LastSampler(Counter(), .5)(buf, 5)
     self.assertEqual([0, 0, 1, 1, 2], buf[:5])
 
+class TestFirSampler(unittest.TestCase):
+
+  def test_works(self):
+    buf = [None] * 10
+    # Trivially-sized FirSampler behaves same as LastSampler:
+    FirSampler(Counter(), 1, 0)(buf, 10)
+    self.assertEqual(range(10), buf)
+    FirSampler(Counter(), 2, 0)(buf, 5)
+    self.assertEqual([1, 3, 5, 7, 9], buf[:5])
+    FirSampler(Counter(), 1.5, 0)(buf, 5)
+    self.assertEqual([1, 2, 4, 5, 7], buf[:5])
+    FirSampler(Counter(), .5, 0)(buf, 5)
+    self.assertEqual([0, 0, 1, 1, 2], buf[:5])
+
 class TestMeanSampler(unittest.TestCase):
 
   def test_works(self):
