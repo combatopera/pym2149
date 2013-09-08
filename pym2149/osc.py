@@ -26,6 +26,7 @@ class Osc(Node):
         if not self.stepindex:
           self.periodindex += 1
           if oldperiod:
+            # Clamp to 1 is authentic for noise, see qnoispec.
             self.stepsize = self.scale // self.steps * max(1, self.periodreg.value)
             oldperiod = False
         self.value = self.stepvalue(self.stepindex)
@@ -49,7 +50,7 @@ class NoiseOsc(Osc):
   scale = 16
 
   def __init__(self, periodreg):
-    # One step per scale results in expected spectrum (and agrees with Hatari):
+    # One step per scale results in authentic spectrum, see qnoispec:
     Osc.__init__(self, 1, periodreg)
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 

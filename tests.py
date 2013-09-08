@@ -12,7 +12,7 @@ outfreq = 44100
 refreshrate = 60 # Deliberately not a divisor of the clock.
 seconds = 8 / 7 # Deliberately a non-nice number.
 tonenote = 1000 # First peak should have this frequency.
-noisenote = 5000 # First trough should have this frequency. XXX: Is that authentic?
+noisenote = 5000 # First trough should have this frequency, authentic by qnoispec.
 sawnote = 600 # First peak should have this frequency.
 trinote = 1300 # First peak should have half this frequency.
 
