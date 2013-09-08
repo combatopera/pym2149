@@ -45,7 +45,7 @@ class PsgWriteBuffer:
     af = int(toneperiod) * sound_freq
     af *= float(1 << 17) / 15625
     psg_tonemodulo_2 = int(af)
-    bf = t - psg_tone_start_time[abc]
+    bf = self.t - psg_tone_start_time[abc]
     bf *= float(1 << 21)
     bf = bf % (af * 2)
     af = bf - af
@@ -59,7 +59,7 @@ class PsgWriteBuffer:
     af = int(noiseperiod) * sound_freq
     af *= float(1 << 17) / 15625
     psg_noisemodulo = int(af)
-    bf = t
+    bf = self.t
     bf *= float(1 << 20)
     psg_noisecounter = int(math.floor(bf / af))
     psg_noisecounter &= (PSG_NOISE_ARRAY - 1)
@@ -73,7 +73,7 @@ class PsgWriteBuffer:
     af *= sound_freq
     af *= float(1 << 13) / 15625
     psg_envmodulo = int(af)
-    bf = t - psg_envelope_start_time
+    bf = self.t - psg_envelope_start_time
     bf *= float(1 << 17)
     psg_envstage = int(math.floor(bf / af))
     bf = bf % af
@@ -126,10 +126,10 @@ class PsgWriteBuffer:
     psg_tonetoggle = True
     psg_noisetoggle = None
     q = psg_buf_pointer[abc]
-    t = psg_time_of_last_vbl_for_writing + psg_buf_pointer[abc]
-    to_t = max(to_t, t)
+    self.t = psg_time_of_last_vbl_for_writing + psg_buf_pointer[abc]
+    to_t = max(to_t, self.t)
     to_t = min(to_t, psg_time_of_last_vbl_for_writing + PSG_CHANNEL_BUF_LENGTH)
-    count = max(min(int(to_t - t), PSG_CHANNEL_BUF_LENGTH - psg_buf_pointer[abc]), 0)
+    count = max(min(int(to_t - self.t), PSG_CHANNEL_BUF_LENGTH - psg_buf_pointer[abc]), 0)
     toneperiod = ((int(psg_reg[abc * 2 + 1]) & 0xf) << 8) + psg_reg[abc * 2]
     if not psg_reg.variablelevel(abc):
       vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
