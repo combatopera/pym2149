@@ -5,10 +5,10 @@ import numpy as np
 class Mixer(Node):
 
   def __init__(self, *streams):
-    Node.__init__(self, np.float32)
+    Node.__init__(self, np.uint32)
     self.streams = streams
 
   def callimpl(self):
-    self.blockbuf.fill(0, self.blockbuf.framecount(), -Dac.halfpoweramp)
+    self.blockbuf.fill(0, self.block.framecount, Dac.headroom)
     for stream in self.streams:
       self.blockbuf.addbuf(stream(self.block))

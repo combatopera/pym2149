@@ -4,12 +4,12 @@ import numpy as np
 
 class Dac(Node):
 
-  halfpoweramp = 2 ** -.5 # Very close to -3 dB.
+  headroom = int(2 ** 31 - 2 ** 30.5) # Very close to 3 dB.
 
   def __init__(self, signal, volreg, maxvol, halfvol, ampshare):
-    Node.__init__(self, np.float32)
+    Node.__init__(self, np.uint32)
     self.vol = None
-    self.maxamp = self.halfpoweramp * 2 / ampshare
+    self.maxamp = 2 ** 31.5 / ampshare
     self.signal = signal
     self.volreg = volreg
     self.maxvol = maxvol
@@ -17,7 +17,7 @@ class Dac(Node):
 
   def callimpl(self):
     if self.volreg.value != self.vol:
-      self.amp = 2 ** ((self.volreg.value - self.maxvol) / (self.maxvol - self.halfvol)) * self.maxamp
+      self.amp = int(2 ** ((self.volreg.value - self.maxvol) / (self.maxvol - self.halfvol)) * self.maxamp)
       self.vol = self.volreg.value
     self.blockbuf.copybuf(self.signal(self.block))
     self.blockbuf.scale(self.amp)

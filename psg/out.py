@@ -9,7 +9,7 @@ class WavWriter(AbstractNode):
       'sox',
       '-c', str(channels),
       '-r', str(infreq),
-      '-e', 'floating-point',
+      '-e', 'unsigned',
       '-b', '32',
       '-t', 'raw',
       '-',
