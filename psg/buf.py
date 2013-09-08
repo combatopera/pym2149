@@ -18,7 +18,7 @@ class Buf:
     self.buf *= that.buf
 
   def mapbuf(self, that, lookup):
-    np.take(lookup, that.buf, out = self.buf)
+    lookup.take(that.buf, out = self.buf)
 
   def add(self, value):
     self.buf += value
