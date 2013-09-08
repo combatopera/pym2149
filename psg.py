@@ -41,7 +41,7 @@ def psg_write_buffer(abc, to_t):
 
 class PsgWriteBuffer:
 
-  def PSG_PREPARE_TONE():
+  def PSG_PREPARE_TONE(self):
     af = int(toneperiod) * sound_freq
     af *= float(1 << 17) / 15625
     psg_tonemodulo_2 = int(af)
@@ -54,7 +54,7 @@ class PsgWriteBuffer:
       bf = af
     psg_tonecountdown = psg_tonemodulo_2 - int(bf)
 
-  def PSG_PREPARE_NOISE():
+  def PSG_PREPARE_NOISE(self):
     noiseperiod = 1 + psg_reg.noiseperiod()
     af = int(noiseperiod) * sound_freq
     af *= float(1 << 17) / 15625
@@ -67,7 +67,7 @@ class PsgWriteBuffer:
     psg_noisecountdown = psg_noisemodulo - int(bf)
     psg_noisetoggle = psg_noise[psg_noisecounter]
 
-  def PSG_PREPARE_ENVELOPE():
+  def PSG_PREPARE_ENVELOPE(self):
     envperiod = max((int(psg_reg[PSGR_ENVELOPE_PERIOD_HIGH]) << 8) + psg_reg[PSGR_ENVELOPE_PERIOD_LOW], 1)
     af = envperiod
     af *= sound_freq
@@ -90,13 +90,13 @@ class PsgWriteBuffer:
     else:
       envvol = psg_envelope_level[envshape][psg_envstage & 63]
 
-  def PSG_TONE_ADVANCE():
+  def PSG_TONE_ADVANCE(self):
     psg_tonecountdown -= TWO_MILLION
     while psg_tonecountdown < 0:
       psg_tonecountdown += psg_tonemodulo_2
       psg_tonetoggle = not psg_tonetoggle
 
-  def PSG_NOISE_ADVANCE():
+  def PSG_NOISE_ADVANCE(self):
     psg_noisecountdown -= ONE_MILLION
     while psg_noisecountdown < 0:
       psg_noisecountdown += psg_noisemodulo
@@ -105,7 +105,7 @@ class PsgWriteBuffer:
         psg_noisecounter = 0
       psg_noisetoggle = psg_noise[psg_noisecounter]
 
-  def PSG_ENVELOPE_ADVANCE():
+  def PSG_ENVELOPE_ADVANCE(self):
     psg_envcountdown -= TWO_TO_SEVENTEEN
     while psg_envcountdown < 0:
       psg_envcountdown += psg_envmodulo
@@ -201,7 +201,7 @@ class PsgWriteBuffer:
         while count > 0:
           psg_channels_buf[q] += envvol
           q += 1
-          self.PSG_ENVELOPE_ADVANCE
+          self.PSG_ENVELOPE_ADVANCE()
           count -= 1
     psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
 
