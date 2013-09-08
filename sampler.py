@@ -1,6 +1,5 @@
 from __future__ import division
 from buf import *
-import math
 
 class Sampler:
 
@@ -13,7 +12,7 @@ class Sampler:
 
   def load(self):
     self.pos += self.ratio
-    n = int(math.ceil(self.pos - 1 - self.index))
+    n = -int((self.index + 1 - self.pos) // 1) # Cheaper ceil.
     if n:
       self.signal(self.buf.atleast(n), n)
       self.last = self.buf[n - 1]
