@@ -41,5 +41,5 @@ class RingBuf(Buf):
       self.buf[:keep] = self.buf[-keep:]
       return Buf(self.buf[keep:])
 
-  def convolve(self, that):
-    return np.convolve(self.buf, that, mode = 'valid')[0]
+  def convolve(self, taps):
+    return np.convolve(self.buf, taps, mode = 'valid')[0]
