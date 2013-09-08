@@ -5,6 +5,7 @@ class Buf:
 
   def atleast(self, n):
     if len(self.buf) < n:
+      # I think to extend we'd need yet another sequence, so new list is good:
       self.buf = [None] * n
     return self.buf
 
