@@ -1,4 +1,5 @@
 from buf import *
+from dac import *
 
 class Mixer:
 
@@ -12,3 +13,4 @@ class Mixer:
     for stream in self.streams[1:]:
       stream(self.buf, samplecount)
       buf.add(self.buf[:samplecount])
+    buf.xform(0, samplecount, 1, -Dac.halfpoweramp)
