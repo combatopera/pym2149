@@ -15,15 +15,14 @@ class Level(Node):
     if self.modereg.value:
       self.blockbuf.copybuf(self.env(self.block))
     else:
-      # Convert to equivalent 5-bit level:
-      level = self.fixedreg.value * 2 + 1 # That's right, 4-bit 0 is 5-bit 1.
-      self.blockbuf.fill(level)
+      # Convert to equivalent 5-bit level, observe 4-bit 0 is 5-bit 1:
+      self.blockbuf.fill(self.fixedreg.value * 2 + 1)
     self.blockbuf.mulbuf(self.signal(self.block))
 
 class Dac(Node):
 
-  dtype = np.uint32
-  headroom = int(2 ** 31 - 2 ** 30.5) # Very close to 3 dB.
+  dtype = np.uint32 # SoX is 32-bit signed internally, we use unsigned as it's easier.
+  headroom = int(2 ** 31 - 2 ** 30.5) # Half power point, very close to 3 dB.
 
   def __init__(self, level, ampshare):
     Node.__init__(self, self.dtype)
