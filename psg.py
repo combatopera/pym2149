@@ -46,7 +46,7 @@ def psg_write_buffer(abc, to_t):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
     if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
       PSG_PREPARE_TONE()
-      if psg_reg.mixernoise(abc): # noise enabled
+      if psg_reg.mixernoise(abc):
         PSG_PREPARE_NOISE()
         while count > 0:
           if not (psg_tonetoggle or psg_noisetoggle):
@@ -62,7 +62,7 @@ def psg_write_buffer(abc, to_t):
           q += 1
           PSG_TONE_ADVANCE()
           count -= 1
-    elif psg_reg.mixernoise(abc): # noise enabled
+    elif psg_reg.mixernoise(abc):
       PSG_PREPARE_NOISE()
       while count > 0:
         if not psg_noisetoggle:
@@ -81,7 +81,7 @@ def psg_write_buffer(abc, to_t):
     PSG_PREPARE_ENVELOPE()
     if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
       PSG_PREPARE_TONE()
-      if psg_reg.mixernoise(abc): # noise enabled
+      if psg_reg.mixernoise(abc):
         PSG_PREPARE_NOISE()
         while count > 0:
           if not (psg_tonetoggle or psg_noisetoggle):
@@ -99,7 +99,7 @@ def psg_write_buffer(abc, to_t):
           PSG_TONE_ADVANCE()
           PSG_ENVELOPE_ADVANCE()
           count -= 1
-    elif psg_reg.mixernoise(abc): # noise enabled
+    elif psg_reg.mixernoise(abc):
       PSG_PREPARE_NOISE()
       while count > 0:
         if not psg_noisetoggle:
