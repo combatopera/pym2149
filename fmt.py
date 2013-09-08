@@ -30,9 +30,9 @@ class LEFormat:
 class U8Format(LEFormat):
 
   def __init__(self, signal, maxv):
-    Format.__init__(self, False, 8, signal, maxv)
+    LEFormat.__init__(self, False, 8, signal, maxv)
 
 class S16LEFormat(LEFormat):
 
   def __init__(self, signal, maxv):
-    Format.__init__(self, True, 16, signal, maxv)
+    LEFormat.__init__(self, True, 16, signal, maxv)
