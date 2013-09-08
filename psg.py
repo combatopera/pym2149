@@ -1,3 +1,5 @@
+import math
+
 psg_buf_pointer = [0] * 3
 psg_time_of_last_vbl_for_writing = 0
 SCREENS_PER_SOUND_VBL = 1
@@ -42,6 +44,30 @@ def psg_write_buffer(abc, to_t):
   to_t = min(to_t, psg_time_of_last_vbl_for_writing + PSG_CHANNEL_BUF_LENGTH)
   count = max(min(int(to_t - t), PSG_CHANNEL_BUF_LENGTH - psg_buf_pointer[abc]), 0)
   toneperiod = ((int(psg_reg[abc * 2 + 1]) & 0xf) << 8) + psg_reg[abc * 2]
+  def PSG_PREPARE_TONE():
+    af = int(toneperiod) * sound_freq
+    af *= float(1 << 17) / 15625
+    psg_tonemodulo_2 = int(af)
+    bf = t - psg_tone_start_time[abc]
+    bf *= float(1 << 21)
+    bf = bf % (af * 2)
+    af = bf - af
+    if af >= 0:
+      psg_tonetoggle = False
+      bf = af
+    psg_tonecountdown = psg_tonemodulo_2 - int(bf)
+  def PSG_PREPARE_NOISE():
+    noiseperiod = 1 + (psg_reg[PSGR_NOISE_PERIOD] & 0x1f)
+    af = int(noiseperiod) * sound_freq
+    af *= float(1 << 17) / 15625
+    psg_noisemodulo = int(af)
+    bf = t
+    bf *= float(1 << 20)
+    psg_noisecounter = int(math.floor(bf / af))
+    psg_noisecounter &= (PSG_NOISE_ARRAY - 1)
+    bf = bf % af
+    psg_noisecountdown = psg_noisemodulo - int(bf)
+    psg_noisetoggle = psg_noise[psg_noisecounter]
   if not psg_reg.variablelevel(abc):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
     if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
