@@ -66,16 +66,25 @@ class EnvOsc(Osc):
 
   def callimpl(self):
     if self.shapeversion != self.shapereg.version:
-      self.cont = self.shapereg.value & 0x08
-      self.attack = self.shapereg.value & 0x04
-      self.alternate = self.shapereg.value & 0x02
-      self.hold = self.shapereg.value & 0x01
+      self.stepvalue = getattr(self, "stepvalue%02x" % (self.shapereg.value & 0x0f))
       self.shapeversion = self.shapereg.version
       self.reset()
     Osc.callimpl(self)
 
-  def stepvalue(self, stepindex):
-    if self.alternate and (self.periodindex & 1):
+  def stepvalue08(self, stepindex):
+    return 31 - stepindex
+
+  def stepvalue0a(self, stepindex):
+    if not (self.periodindex & 1):
       return 31 - stepindex
     else:
       return stepindex
+
+  def stepvalue0c(self, stepindex):
+    return stepindex
+
+  def stepvalue0e(self, stepindex):
+    if not (self.periodindex & 1):
+      return stepindex
+    else:
+      return 31 - stepindex
