@@ -29,3 +29,17 @@ class SimpleBuf(Buf):
     if len(self) < size:
       self.buf.resize(size)
     return self
+
+class RingBuf(Buf):
+
+  def __init__(self, size):
+    Buf.__init__(self, np.zeros(size))
+
+  def atleast(self, size):
+    keep = len(self) - size
+    if keep >= 0:
+      self.buf[:keep] = self.buf[-keep:]
+      return Buf(self.buf[keep:])
+
+  def convolve(self, that):
+    return np.convolve(self.buf, that, mode = 'valid')[0]
