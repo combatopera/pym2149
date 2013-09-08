@@ -1,19 +1,32 @@
+from __future__ import division
+
 class Sampler:
 
   def __init__(self, signal, ratio):
     self.signal = signal
     self.ratio = ratio
-    self.vindex = -1
-    self.v = 0
+    self.index = -1
     self.pos = 0
 
+class LastSampler(Sampler):
+
   def __call__(self):
-    while True:
-      vfactor = self.pos - self.vindex + 1
-      if vfactor <= 1:
-        break
-      self.u = self.v
-      self.v = self.signal()
-      self.vindex += 1
     self.pos += self.ratio
-    return (1 - vfactor) * self.u + vfactor * self.v
+    while self.index < self.pos - 1:
+      self.last = self.signal()
+      self.index += 1
+    return self.last
+
+class MeanSampler(Sampler):
+
+  def __call__(self):
+    acc = n = 0
+    self.pos += self.ratio
+    while self.index < self.pos - 1:
+      self.last = self.signal()
+      self.index += 1
+      acc += self.last
+      n += 1
+    if not n:
+      return self.last
+    return acc / n
