@@ -15,8 +15,6 @@ PSG_NOISE_ARRAY = 8192
 psg_noise = tuple(random.randint(0, 1) for i in xrange(PSG_NOISE_ARRAY))
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
 psg_channels_buf = [0] * (PSG_CHANNEL_BUF_LENGTH + 16)
-ONE_MILLION = 1048576
-TWO_MILLION = 2097152
 fMaster = 2000000
 
 def singleton(t):
@@ -101,13 +99,13 @@ class PsgWriteBuffer:
       envvol = psg_envelope_level[envshape][psg_envstage & 63]
 
   def PSG_TONE_ADVANCE(self):
-    self.tonecountdown -= TWO_MILLION
+    self.tonecountdown -= self.tonescale * 2
     while self.tonecountdown < 0:
       self.tonecountdown += self.tonemodulo_2
       self.tonetoggle = not self.tonetoggle
 
   def PSG_NOISE_ADVANCE(self):
-    self.noisecountdown -= ONE_MILLION
+    self.noisecountdown -= self.noisescale
     while self.noisecountdown < 0:
       self.noisecountdown += self.noisemodulo
       self.noisecounter += 1
