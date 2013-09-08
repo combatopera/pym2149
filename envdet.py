@@ -11,6 +11,7 @@ class EnvDet:
     self.v = 0 # Logically the value one period ago.
     self.signal = signal
 
-  def __call__(self):
-    self.v = max(self.signal(), self.mul * self.v)
-    return self.v
+  def __call__(self, buf, bufstart, bufstop):
+    self.signal(buf, bufstart, bufstop)
+    for bufindex in xrange(bufstart, bufstop):
+      buf[bufindex] = self.v = max(buf[bufindex], self.mul * self.v)

@@ -8,13 +8,15 @@ class Osc:
     self.value = None
     self.periodreg = periodreg
 
-  def __call__(self):
-    if not self.index:
-      def applyperiod():
-        self.limit = self.unit * self.periodreg.value
-      self.value = self.nextvalue(self.value, applyperiod)
-    self.index = (self.index + 1) % self.limit
-    return self.value
+  def loadperiod(self):
+    self.limit = self.unit * self.periodreg.value
+
+  def __call__(self, buf, bufstart, bufstop):
+    for bufindex in xrange(bufstart, bufstop):
+      if not self.index:
+        self.value = self.nextvalue(self.value, self.loadperiod)
+      self.index = (self.index + 1) % self.limit
+      buf[bufindex] = self.value
 
 class ToneOsc(Osc):
 
