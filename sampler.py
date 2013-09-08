@@ -15,22 +15,22 @@ class Sampler:
     self.pos += self.ratio
     n = int(math.ceil(self.pos - 1 - self.index))
     if n:
-      self.signal(self.buf.atleast(n), 0, n)
+      self.signal(self.buf.atleast(n), n)
       self.last = self.buf[n - 1]
       self.index += n
     return n
 
 class LastSampler(Sampler):
 
-  def __call__(self, buf, bufstart, bufstop):
-    for bufindex in xrange(bufstart, bufstop):
+  def __call__(self, buf, samplecount):
+    for bufindex in xrange(samplecount):
       self.load()
       buf[bufindex] = self.last
 
 class MeanSampler(Sampler):
 
-  def __call__(self, buf, bufstart, bufstop):
-    for bufindex in xrange(bufstart, bufstop):
+  def __call__(self, buf, samplecount):
+    for bufindex in xrange(samplecount):
       n = self.load()
       if n:
         acc = 0
