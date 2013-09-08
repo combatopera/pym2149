@@ -1,4 +1,5 @@
 from __future__ import division
+from buf import *
 import math
 
 class Sampler:
@@ -8,15 +9,13 @@ class Sampler:
     self.ratio = ratio
     self.index = -1
     self.pos = 0
-    self.buf = []
+    self.buf = Buf()
 
   def load(self):
     self.pos += self.ratio
     n = int(math.ceil(self.pos - 1 - self.index))
     if n:
-      if len(self.buf) < n:
-        self.buf = [None] * n
-      self.signal(self.buf, 0, n)
+      self.signal(self.buf.atleast(n), 0, n)
       self.last = self.buf[n - 1]
       self.index += n
     return n
