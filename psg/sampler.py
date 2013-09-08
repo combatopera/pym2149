@@ -1,5 +1,6 @@
 from __future__ import division
 from buf import *
+import scipy.signal
 
 class Sampler:
 
@@ -25,6 +26,19 @@ class LastSampler(Sampler):
     for bufindex in xrange(samplecount):
       self.load()
       buf[bufindex] = self.last
+
+class FirSampler(Sampler):
+
+  def __init__(self, signal, ratio, logtablesize):
+    # The kernel is symmetric so logically we only need to tabulate one side and the central value:
+    self.size = (1 << logtablesize) * 2 - 1
+    Sampler.__init__(self, signal, ratio, lambda: RingBuf(self.size))
+    self.kernel = scipy.signal.firwin(self.size, 1 / ratio)
+
+  def __call__(self, buf, samplecount):
+    for i in xrange(samplecount):
+      self.load()
+      buf[i] = self.buf.convolve(self.kernel)
 
 class MeanSampler(Sampler):
 
