@@ -3,24 +3,28 @@ from nod import Node
 
 class Osc(Node):
 
-  def __init__(self, unit, periodreg):
+  def __init__(self, steps, periodreg):
+    if 0 != (self.scale % steps):
+      raise Exception("Number of steps must divide the scale.")
     Node.__init__(self, np.uint8) # Slightly faster than plain old int.
-    self.index = 0
-    self.value = None
-    self.unit = unit
+    self.indexinstep = 0
+    self.stepindex = -1
+    self.steps = steps
     self.periodreg = periodreg
 
-  def loadperiod(self):
-    self.limit = self.unit * max(1, self.periodreg.value)
-
   def callimpl(self):
+    oldperiod = True
     frameindex = 0
     while frameindex < self.block.framecount:
-      if not self.index:
-        self.value = self.nextvalue(self.value, self.loadperiod)
-      n = min(self.block.framecount - frameindex, self.limit - self.index)
+      if not self.indexinstep:
+        self.stepindex = (self.stepindex + 1) % self.steps
+        if oldperiod and not self.stepindex:
+          self.stepsize = self.scale / self.steps * max(1, self.periodreg.value)
+          oldperiod = False
+        self.value = self.stepvalue(self.stepindex)
+      n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
       self.blockbuf.fill(frameindex, frameindex + n, self.value)
-      self.index = (self.index + n) % self.limit
+      self.indexinstep = (self.indexinstep + n) % self.stepsize
       frameindex += n
 
 class ToneOsc(Osc):
@@ -28,25 +32,19 @@ class ToneOsc(Osc):
   scale = 16
 
   def __init__(self, periodreg):
-    # Divide count by 2 so that the whole wave is 16:
-    Osc.__init__(self, self.scale / 2, periodreg)
+    Osc.__init__(self, 2, periodreg)
 
-  def nextvalue(self, previous, applyperiod):
-    if not previous: # Includes initial case.
-      applyperiod()
-      return 1
-    else:
-      return 0
+  def stepvalue(self, stepindex):
+    return 1 - stepindex
 
 class NoiseOsc(Osc):
 
   scale = 16
 
   def __init__(self, periodreg):
-    # Passing in scale as-is results in expected spectrum (and agrees with Hatari):
-    Osc.__init__(self, self.scale, periodreg)
+    # One step per scale results in expected spectrum (and agrees with Hatari):
+    Osc.__init__(self, 1, periodreg)
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 
-  def nextvalue(self, previous, applyperiod):
-    applyperiod() # Unlike for tone, we can change period every flip.
+  def stepvalue(self, stepindex):
     return self.lfsr()
