@@ -1,5 +1,4 @@
 from nod import Node
-from dac import Dac
 import numpy as np
 
 class BinMix(Node):
@@ -31,9 +30,10 @@ class Mixer(Node):
 
   def __init__(self, *streams):
     Node.__init__(self, np.int32) # SoX internal sample format.
+    self.datum = self.dtype(2 ** 30.5) # Half power point, very close to -3 dB.
     self.streams = streams
 
   def callimpl(self):
-    self.blockbuf.fill(Dac.datum)
+    self.blockbuf.fill(self.datum)
     for stream in self.streams:
       self.blockbuf.subbuf(stream(self.block))

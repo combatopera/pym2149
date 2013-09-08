@@ -23,8 +23,6 @@ class Level(Node):
 
 class Dac(Node):
 
-  datum = int(2 ** 30.5) # Half power point, very close to -3 dB.
-
   def __init__(self, level, ampshare):
     # The level dtype must be such that its values can be used as indices.
     Node.__init__(self, np.uint32)
