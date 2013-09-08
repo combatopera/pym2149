@@ -3,7 +3,7 @@
 import unittest
 from fmt import *
 
-class Signal:
+class Ramps:
 
   def __call__(self, buf, samplecount):
     for i in xrange(samplecount):
@@ -12,7 +12,7 @@ class Signal:
 class TestU8Format(unittest.TestCase):
 
   def test_works(self):
-    f = U8Format(Signal(), 10)
+    f = U8Format(Ramps(), 10)
     v = [None] * (11 + 1)
     f(v, 11)
     self.assertEqual([37, 55, 73, 91, 109, 128, 146, 164, 182, 200, 218], v[:11])
@@ -21,7 +21,7 @@ class TestU8Format(unittest.TestCase):
 class TestS16LEFormat(unittest.TestCase):
 
   def test_works(self):
-    f = S16LEFormat(Signal(), 4)
+    f = S16LEFormat(Ramps(), 4)
     v = [None] * (5 * 2 + 1)
     f(v, 5) # 5 samples, each using 2 cells.
     self.assertEqual([125, 165, 190, 210, 0, 0, 65, 45, 130, 90], v[:10])
