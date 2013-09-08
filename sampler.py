@@ -10,6 +10,10 @@ class Sampler:
     self.pos = 0
     self.buf = []
 
+  def getn(self):
+    self.pos += self.ratio
+    return int(math.ceil(self.pos - 1 - self.index))
+
   def load(self, n):
     if len(self.buf) < n:
       self.buf = [None] * n
@@ -21,17 +25,14 @@ class LastSampler(Sampler):
 
   def __call__(self, buf, bufstart, bufstop):
     for bufindex in xrange(bufstart, bufstop):
-      self.pos += self.ratio
-      n = int(math.ceil(self.pos - 1 - self.index))
-      self.load(n)
+      self.load(self.getn())
       buf[bufindex] = self.last
 
 class MeanSampler(Sampler):
 
   def __call__(self, buf, bufstart, bufstop):
     for bufindex in xrange(bufstart, bufstop):
-      self.pos += self.ratio
-      n = int(math.ceil(self.pos - 1 - self.index))
+      n = self.getn()
       if n:
         self.load(n)
         acc = 0
