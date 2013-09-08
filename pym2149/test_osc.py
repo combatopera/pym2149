@@ -3,12 +3,12 @@
 import unittest, lfsr
 from osc import ToneOsc, NoiseOsc, EnvOsc
 from nod import Block
-from reg import Register
+from reg import Reg
 
 class TestToneOsc(unittest.TestCase):
 
   def test_works(self):
-    o = ToneOsc(Register(3))
+    o = ToneOsc(Reg(3))
     v = o(Block(96)).tolist()
     self.assertEqual([1] * 24, v[:24])
     self.assertEqual([0] * 24, v[24:48])
@@ -19,7 +19,7 @@ class TestToneOsc(unittest.TestCase):
     self.assertEqual([0] * 24, v[24:])
 
   def test_resume(self):
-    o = ToneOsc(Register(3))
+    o = ToneOsc(Reg(3))
     v = o(Block(25)).tolist()
     self.assertEqual([1] * 24, v[:24])
     self.assertEqual([0], v[24:])
@@ -31,7 +31,7 @@ class TestNoiseOsc(unittest.TestCase):
 
   def test_works(self):
     n = 100
-    o = NoiseOsc(Register(3))
+    o = NoiseOsc(Reg(3))
     u = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
     for _ in xrange(2):
       v = o(Block(48 * n)).tolist()
@@ -41,8 +41,8 @@ class TestNoiseOsc(unittest.TestCase):
 class TestEnvOsc(unittest.TestCase):
 
   def test_08(self):
-    shapereg = Register(0x08)
-    periodreg = Register(3)
+    shapereg = Reg(0x08)
+    periodreg = Reg(3)
     o = EnvOsc(periodreg, shapereg)
     for _ in xrange(2):
       v = o(Block(8 * 3 * 32)).tolist()
@@ -51,15 +51,15 @@ class TestEnvOsc(unittest.TestCase):
 
   def test_09(self):
     for shape in xrange(0x04):
-      o = EnvOsc(Register(3), Register(shape))
+      o = EnvOsc(Reg(3), Reg(shape))
       v = o(Block(8 * 3 * 32)).tolist()
       for i in xrange(32):
         self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
       self.assertEqual([0] * (8 * 3 * 34), o(Block(8 * 3 * 34)).tolist())
 
   def test_0a(self):
-    shapereg = Register(0x0a)
-    periodreg = Register(3)
+    shapereg = Reg(0x0a)
+    periodreg = Reg(3)
     o = EnvOsc(periodreg, shapereg)
     v = o(Block(8 * 3 * 32)).tolist()
     for i in xrange(32):
@@ -72,8 +72,8 @@ class TestEnvOsc(unittest.TestCase):
       self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
 
   def test_0c(self):
-    shapereg = Register(0x0c)
-    periodreg = Register(3)
+    shapereg = Reg(0x0c)
+    periodreg = Reg(3)
     o = EnvOsc(periodreg, shapereg)
     for _ in xrange(2):
       v = o(Block(8 * 3 * 32)).tolist()
@@ -81,8 +81,8 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
 
   def test_0e(self):
-    shapereg = Register(0x0e)
-    periodreg = Register(3)
+    shapereg = Reg(0x0e)
+    periodreg = Reg(3)
     o = EnvOsc(periodreg, shapereg)
     v = o(Block(8 * 3 * 32)).tolist()
     for i in xrange(32):
@@ -96,7 +96,7 @@ class TestEnvOsc(unittest.TestCase):
 
   def test_0f(self):
     for shape in xrange(0x04, 0x08):
-      o = EnvOsc(Register(3), Register(shape))
+      o = EnvOsc(Reg(3), Reg(shape))
       v = o(Block(8 * 3 * 32)).tolist()
       for i in xrange(32):
         self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
