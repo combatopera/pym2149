@@ -45,6 +45,12 @@ class psg_reg(list):
   def envelopeperiod(self):
     return ((self[12] & 0xff) << 8) | (self[11] & 0xff)
 
+  def envelopecont(self):
+    return self[13] & 0x08
+
+  def envelopehold(self):
+    return self[13] & 0x01
+
 def psg_write_buffer(abc, to_t):
   PsgWriteBuffer()(abc, to_t)
 
@@ -56,8 +62,7 @@ class PsgWriteBuffer:
   def PSG_PREPARE_TONE(self, abc):
     af = self.tonescale * sound_freq * self.toneperiod * 16 / float(fMaster)
     self.tonemodulo_2 = int(af)
-    bf = self.t - psg_tone_start_time[abc]
-    bf *= float(self.tonescale * 2)
+    bf = (self.t - psg_tone_start_time[abc]) * self.tonescale * 2
     bf = bf % (af * 2)
     af = bf - af
     if af >= 0:
@@ -69,8 +74,7 @@ class PsgWriteBuffer:
     noiseperiod = 1 + psg_reg.noiseperiod()
     af = self.noisescale * sound_freq * noiseperiod * 16 / float(fMaster)
     self.noisemodulo = int(af)
-    bf = self.t
-    bf *= float(self.noisescale)
+    bf = self.t * self.noisescale
     self.noisecounter = int(math.floor(bf / af))
     self.noisecounter &= (PSG_NOISE_ARRAY - 1)
     bf = bf % af
@@ -81,13 +85,12 @@ class PsgWriteBuffer:
     envperiod = max(psg_reg.envelopeperiod(), 1)
     af = self.envelopescale * sound_freq * envperiod * 256 / float(fMaster) / 32
     psg_envmodulo = int(af)
-    bf = self.t - psg_envelope_start_time
-    bf *= float(self.envelopescale)
+    bf = (self.t - psg_envelope_start_time) * self.envelopescale
     psg_envstage = int(math.floor(bf / af))
     bf = bf % af
     psg_envcountdown = psg_envmodulo - int(bf)
     envdeath = -1
-    if (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_CONT) == 0 or (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_HOLD):
+    if (not psg_reg.envelopecont()) or psg_reg.envelopehold():
       if psg_reg[PSGR_ENVELOPE_SHAPE] == 11 or psg_reg[PSGR_ENVELOPE_SHAPE] == 13:
         envdeath = psg_flat_volume_level[15]
       else:
