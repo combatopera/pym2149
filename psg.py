@@ -81,7 +81,7 @@ class PsgWriteBuffer:
 
   def PSG_PREPARE_ENVELOPE(self):
     envperiod = max(psg_reg.envelopeperiod(), 1)
-    af = envperiod * sound_freq * self.envelopescale / float(16 * 15625)
+    af = envperiod * sound_freq * self.envelopescale * 256 / float(fMaster) / 32
     psg_envmodulo = int(af)
     bf = self.t - psg_envelope_start_time
     bf *= float(self.envelopescale)
