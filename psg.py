@@ -53,58 +53,50 @@ def psg_write_buffer(abc, to_t):
         psg_channels_buf[q] += vol
         q += 1
         count -= 1
-    psg_buf_pointer[abc]=to_t-psg_time_of_last_vbl_for_writing;
+    psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
   else: # Enveloped
     envdeath = psg_envstage = envshape = None
     psg_envmodulo = envvol = psg_envcountdown = None
     PSG_PREPARE_ENVELOPE()
-
-    if ((psg_reg[PSGR_MIXER] & (1 << abc))==0 && (toneperiod>9)){ //tone enabled
-      PSG_PREPARE_TONE
-      if ((psg_reg[PSGR_MIXER] & (8 << abc))==0){ //noise enabled
-        PSG_PREPARE_NOISE
-        for (;count>0;count--){
-          if(psg_tonetoggle || psg_noisetoggle){
+    if (psg_reg[PSGR_MIXER] & (1 << abc)) == 0 and toneperiod > 9: # tone enabled
+      PSG_PREPARE_TONE()
+      if (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+        PSG_PREPARE_NOISE()
+        while count > 0:
+          if psg_tonetoggle or psg_noisetoggle:
             q += 1
-          }else{
+          else:
             psg_channels_buf[q] += envvol
             q += 1
-          }
-          PSG_TONE_ADVANCE
-          PSG_NOISE_ADVANCE
-          PSG_ENVELOPE_ADVANCE
-        }
-      }else{ //tone only
-        for (;count>0;count--){
-          if(psg_tonetoggle){
+          PSG_TONE_ADVANCE()
+          PSG_NOISE_ADVANCE()
+          PSG_ENVELOPE_ADVANCE()
+          count -= 1
+      else: # tone only
+        while count > 0:
+          if psg_tonetoggle:
             q += 1
-          }else{
+          else:
             psg_channels_buf[q] += envvol
             q += 1
-          }
-          PSG_TONE_ADVANCE
-          PSG_ENVELOPE_ADVANCE
-        }
-      }
-    }else if ((psg_reg[PSGR_MIXER] & (8 << abc))==0){ //noise enabled
-      PSG_PREPARE_NOISE
-      for (;count>0;count--){
-        if(psg_noisetoggle){
+          PSG_TONE_ADVANCE()
+          PSG_ENVELOPE_ADVANCE()
+          count -= 1
+    elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+      PSG_PREPARE_NOISE()
+      while count > 0:
+        if psg_noisetoggle:
           q += 1
-        }else{
+        else:
           psg_channels_buf[q] += envvol
           q += 1
-        }
-        PSG_NOISE_ADVANCE
-        PSG_ENVELOPE_ADVANCE
-      }
-    }else{ //nothing enabled
-      for (;count>0;count--){
+        PSG_NOISE_ADVANCE()
+        PSG_ENVELOPE_ADVANCE()
+        count -= 1
+    else: # nothing enabled
+      while count > 0:
         psg_channels_buf[q] += envvol
         q += 1
         PSG_ENVELOPE_ADVANCE
-      }
-    }
-    psg_buf_pointer[abc]=to_t-psg_time_of_last_vbl_for_writing;
-  }
-}
+        count -= 1
+    psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
