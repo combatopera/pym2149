@@ -8,11 +8,12 @@ class Dac(Node):
   maxvol = 15
   halfvol = 13
 
-  def __init__(self, signal, volreg, ampshare):
+  def __init__(self, signal, modereg, volreg, ampshare):
     Node.__init__(self, np.uint32)
     self.vol = None
     self.maxamp = 2 ** 31.5 / ampshare
     self.signal = signal
+    self.modereg = modereg
     self.volreg = volreg
 
   def callimpl(self):

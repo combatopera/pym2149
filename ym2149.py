@@ -20,7 +20,7 @@ class YM2149(Mixer):
     self.envshape = Register(0)
     noise = NoiseOsc(self.noiseperiod)
     # FIXME: All nodes should be called even if excluded from the mix.
-    Mixer.__init__(*[self] + [Dac(BinMix(ToneOsc(self.toneperiods[i]), noise, self.toneflags[i], self.noiseflags[i]), self.fixedlevels[i], self.channels) for i in xrange(self.channels)])
+    Mixer.__init__(*[self] + [Dac(BinMix(ToneOsc(self.toneperiods[i]), noise, self.toneflags[i], self.noiseflags[i]), self.levelmodes[i], self.fixedlevels[i], self.channels) for i in xrange(self.channels)])
 
   def update(self, frame):
     self.noiseperiod.value = frame[6] & 0x1f
