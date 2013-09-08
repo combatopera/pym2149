@@ -41,8 +41,8 @@ class NoiseOsc(Osc):
   scale = 16
 
   def __init__(self, periodreg):
-    # Halve the count so that the upper frequency bound is correct:
-    Osc.__init__(self, self.scale / 2, periodreg)
+    # Passing in scale as-is results in expected spectrum (and agrees with Hatari):
+    Osc.__init__(self, self.scale, periodreg)
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 
   def nextvalue(self, previous, applyperiod):
