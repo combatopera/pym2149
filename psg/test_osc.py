@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest, lfsr
-from osc import ToneOsc, NoiseOsc
+from osc import ToneOsc, NoiseOsc, EnvOsc
 from nod import Block
 from reg import Register
 

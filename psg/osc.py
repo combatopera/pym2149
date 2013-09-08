@@ -48,3 +48,13 @@ class NoiseOsc(Osc):
 
   def stepvalue(self, stepindex):
     return self.lfsr()
+
+class EnvOsc(Osc):
+
+  scale = 256
+
+  def __init__(self, periodreg, shapereg):
+    Osc.__init__(self, 32, periodreg)
+
+  def stepvalue(self, stepindex):
+    return stepindex
