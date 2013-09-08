@@ -15,6 +15,14 @@ class YM6File:
     self.f = f
     self.framecount = self.lword()
     self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
+    self.samplecount = self.word()
+    self.clock = self.lword()
+    self.framefreq = self.word()
+    self.loopframe = self.lword()
+    self.skip(self.word()) # Future expansion.
+    for _ in xrange(self.samplecount):
+      self.skip(self.lword())
+    self.info = tuple(self.ntstring() for _ in xrange(3))
 
   def word(self):
     return self.wordstruct.unpack(self.f.read(2))[0]
@@ -55,15 +63,8 @@ def main():
   f = open(path, 'rb')
   try:
     f = YM6File(f)
-    samplecount = f.word()
-    clock = f.lword()
-    framefreq = f.word()
-    loopframe = f.lword()
-    f.skip(f.word()) # Future expansion.
-    for sampleindex in xrange(samplecount):
-      f.skip(f.lword())
-    for _ in xrange(3):
-      print >> sys.stderr, f.ntstring()
+    for info in f.info:
+      print >> sys.stderr, info
     for frameindex in xrange(f.framecount):
       print f.frame()
   finally:
