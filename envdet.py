@@ -10,9 +10,9 @@ class EnvDet:
     self.last = 0 # Logically the value one period ago.
     self.signal = signal
 
-  def __call__(self, buf, bufstart, bufstop):
-    self.signal(buf, bufstart, bufstop) # Temporarily abuse target buffer.
-    for bufindex in xrange(bufstart, bufstop):
+  def __call__(self, buf, samplecount):
+    self.signal(buf, samplecount) # Temporarily abuse target buffer.
+    for bufindex in xrange(samplecount):
       self.last *= self.mul # Simulate discharge over period just gone by.
       if buf[bufindex] < self.last:
         buf[bufindex] = self.last # Discharging will continue.

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import division
 import unittest, math
 from envdet import *
 
@@ -11,16 +12,16 @@ class TestEnvDet(unittest.TestCase):
       self.first = first
       self.second = second
 
-    def __call__(self, buf, bufstart, bufstop):
-      mid = (bufstart + bufstop) / 2
-      for i in xrange(bufstart, mid):
+    def __call__(self, buf, samplecount):
+      mid = samplecount // 2 # Don't care about direction of rounding.
+      for i in xrange(mid):
         buf[i] = self.first
-      for i in xrange(mid, bufstop):
+      for i in xrange(mid, samplecount):
         buf[i] = self.second
 
   def test_discharge(self):
     buf = [None] * 8
-    EnvDet(self.Signal(3, 2.1), 1e5)(buf, 0, 8)
+    EnvDet(self.Signal(3, 2.1), 1e5)(buf, 8)
     self.assertEqual([3] * 4, buf[:4])
     self.assertAlmostEqual(3 * math.exp(-1e-5 / EnvDet.rc), buf[4])
     self.assertAlmostEqual(3 * math.exp(-2e-5 / EnvDet.rc), buf[5])
@@ -29,7 +30,7 @@ class TestEnvDet(unittest.TestCase):
 
   def test_charge(self):
     buf = [None] * 8
-    EnvDet(self.Signal(2.1, 3), 1e5)(buf, 0, 8)
+    EnvDet(self.Signal(2.1, 3), 1e5)(buf, 8)
     self.assertEqual([2.1] * 4, buf[:4])
     self.assertEqual([3] * 4, buf[4:])
 
