@@ -1,6 +1,5 @@
 from nod import Node
 from dac import Dac
-import numpy as np
 
 class BinMix(Node):
 
@@ -18,11 +17,11 @@ class BinMix(Node):
     # AND and OR have the same frequency spectrum so either is good.
     # We use OR as downstream it will prefer envelope shape over zero:
     noiseflag = self.noiseflagreg.value
-    if not self.toneflagreg.value:
+    if self.toneflagreg.value:
       self.blockbuf.copybuf(self.tone(self.block))
-      if not noiseflag:
+      if noiseflag:
         self.blockbuf.orbuf(self.noise(self.block))
-    elif not noiseflag:
+    elif noiseflag:
       self.blockbuf.copybuf(self.noise(self.block))
     else:
       self.blockbuf.fill(0)
