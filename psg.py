@@ -136,11 +136,11 @@ class PsgWriteBuffer:
         envdeath = psg_flat_volume_level[15]
       else:
         envdeath = psg_flat_volume_level[0]
-    envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
+    self.envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
     if self.envstage >= 32 and envdeath != -1:
       envvol = envdeath
     else:
-      envvol = psg_envelope_level[envshape][self.envstage & 63]
+      envvol = psg_envelope_level[self.envshape][self.envstage & 63]
 
   def PSG_TONE_ADVANCE(self):
     self.tonecountdown -= self.tonescale * 2
@@ -165,7 +165,7 @@ class PsgWriteBuffer:
       if self.envstage >= 32 and envdeath != -1:
         envvol = envdeath
       else:
-        envvol = psg_envelope_level[envshape][self.envstage & 63]
+        envvol = psg_envelope_level[self.envshape][self.envstage & 63]
 
   def __call__(self, abc, to_t):
     # buffer starts at time time_of_last_vbl
@@ -216,7 +216,7 @@ class PsgWriteBuffer:
           q += 1
           count -= 1
     else:
-      envdeath = self.envstage = envshape = None
+      envdeath = self.envstage = self.envshape = None
       self.envmodulo = envvol = self.envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
