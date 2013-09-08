@@ -5,9 +5,6 @@ class Buf:
   def __init__(self, buf):
     self.buf = buf
 
-  def framecount(self):
-    return self.buf.shape[0]
-
   def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
 
@@ -36,7 +33,7 @@ class Buf:
     self.buf.tofile(fileobj)
 
   def ensureandcrop(self, framecount):
-    thisframecount = self.framecount()
+    thisframecount = self.buf.shape[0]
     if thisframecount == framecount:
       return self
     if thisframecount < framecount:
