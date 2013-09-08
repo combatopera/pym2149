@@ -17,6 +17,7 @@ PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
 psg_channels_buf = [0] * (PSG_CHANNEL_BUF_LENGTH + 16)
 ONE_MILLION = 1048576
 TWO_MILLION = 2097152
+fMaster = 2000000
 
 def singleton(t):
   return t()
@@ -48,11 +49,14 @@ def psg_write_buffer(abc, to_t):
 
 class PsgWriteBuffer:
 
+  noisescale = tonescale = 1 << 20
+  envelopescale = 1 << 17
+
   def PSG_PREPARE_TONE(self, abc):
-    af = self.toneperiod * sound_freq * float(1 << 17) / 15625
+    af = self.toneperiod * sound_freq * self.tonescale / float(8 * 15625)
     self.tonemodulo_2 = int(af)
     bf = self.t - psg_tone_start_time[abc]
-    bf *= float(1 << 21)
+    bf *= float(self.tonescale * 2)
     bf = bf % (af * 2)
     af = bf - af
     if af >= 0:
@@ -62,10 +66,10 @@ class PsgWriteBuffer:
 
   def PSG_PREPARE_NOISE(self):
     noiseperiod = 1 + psg_reg.noiseperiod()
-    af = int(noiseperiod) * sound_freq * float(1 << 17) / 15625
+    af = int(noiseperiod) * sound_freq * self.noisescale / float(8 * 15625)
     self.noisemodulo = int(af)
     bf = self.t
-    bf *= float(1 << 20)
+    bf *= float(self.noisescale)
     self.noisecounter = int(math.floor(bf / af))
     self.noisecounter &= (PSG_NOISE_ARRAY - 1)
     bf = bf % af
@@ -74,10 +78,10 @@ class PsgWriteBuffer:
 
   def PSG_PREPARE_ENVELOPE(self):
     envperiod = max((int(psg_reg[PSGR_ENVELOPE_PERIOD_HIGH]) << 8) + psg_reg[PSGR_ENVELOPE_PERIOD_LOW], 1)
-    af = envperiod * sound_freq * float(1 << 13) / 15625
+    af = envperiod * sound_freq * self.envelopescale / float(16 * 15625)
     psg_envmodulo = int(af)
     bf = self.t - psg_envelope_start_time
-    bf *= float(1 << 17)
+    bf *= float(self.envelopescale)
     psg_envstage = int(math.floor(bf / af))
     bf = bf % af
     psg_envcountdown = psg_envmodulo - int(bf)
