@@ -38,9 +38,9 @@ class YM6File:
     v = [None] * self.framesize
     for i in xrange(self.framesize - 1):
       v[i] = ord(self.f.read(1))
-      self.f.seek(-1 + self.framecount, 1)
+      self.skip(-1 + self.framecount)
     v[self.framesize - 1] = ord(self.f.read(1))
-    self.f.seek(-(self.framesize - 1) * self.framecount, 1)
+    self.skip(-(self.framesize - 1) * self.framecount)
     return v
 
   def close(self):
