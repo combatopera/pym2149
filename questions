@@ -1,7 +1,7 @@
 buffering:
 
-qtonpbuf period buffering for tone
-qnoipbuf period buffering for noise
+qtonpbuf period buffering for tone # old countdown discarded immediately, toggle not reset
+qnoipbuf period buffering for noise # new period applied after current countdown
 qenvpbuf period buffering for env
          mixer off buffering for tone
          mixer off buffering for noise
@@ -10,9 +10,9 @@ qenvrbuf envelope reset buffering
 
 edge values:
 
-qtonpzer effect of period 0 on tone
-qnoispec effect of period 0 on noise
-qenvpzer effect of period 0 on envelope
+qtonpzer effect of period 0 on tone # result is average amp, assume same as 1
+qnoispec effect of period 0 on noise # visually identical to 1 in time domain
+qenvpzer effect of period 0 on envelope # spectrum confirms same as 1
 
 calibration:
 
