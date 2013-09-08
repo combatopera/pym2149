@@ -24,9 +24,9 @@ class TestMixer(unittest.TestCase):
 
   def test_works(self):
     m = Mixer(Counter(10), Counter())
-    self.assertEqual(expect(10, 12, 14, 16, 18), m(Block(0, 5)).tolist())
+    self.assertEqual(expect(10, 12, 14, 16, 18), m(Block(5)).tolist())
     # Check the buffer is actually cleared first:
-    self.assertEqual(expect(20, 22, 24, 26, 28), m(Block(1, 5)).tolist())
+    self.assertEqual(expect(20, 22, 24, 26, 28), m(Block(5)).tolist())
 
 if __name__ == '__main__':
   unittest.main()

@@ -2,19 +2,18 @@ from buf import MasterBuf
 
 class Block:
 
-  def __init__(self, blockid, framecount):
-    self.blockid = blockid
+  def __init__(self, framecount):
     self.framecount = framecount
 
 class AbstractNode:
 
   def __init__(self):
-    self.blockid = None
+    self.block = None
 
   def __call__(self, block):
-    if self.blockid != block.blockid:
+    if self.block != block:
       self.callimpl(block)
-      self.blockid = block.blockid
+      self.block = block
 
   def callimpl(self, block):
     raise Exception('Implement me!')
