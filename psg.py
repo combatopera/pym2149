@@ -68,6 +68,28 @@ def psg_write_buffer(abc, to_t):
     bf = bf % af
     psg_noisecountdown = psg_noisemodulo - int(bf)
     psg_noisetoggle = psg_noise[psg_noisecounter]
+  def PSG_PREPARE_ENVELOPE():
+    envperiod = max((int(psg_reg[PSGR_ENVELOPE_PERIOD_HIGH]) << 8) + psg_reg[PSGR_ENVELOPE_PERIOD_LOW], 1)
+    af = envperiod
+    af *= sound_freq
+    af *= float(1 << 13) / 15625
+    psg_envmodulo = int(af)
+    bf = t - psg_envelope_start_time
+    bf *= float(1 << 17)
+    psg_envstage = int(math.floor(bf / af))
+    bf = bf % af
+    psg_envcountdown = psg_envmodulo - int(bf)
+    envdeath = -1
+    if (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_CONT) == 0 or (psg_reg[PSGR_ENVELOPE_SHAPE] & PSG_ENV_SHAPE_HOLD):
+      if psg_reg[PSGR_ENVELOPE_SHAPE] == 11 or psg_reg[PSGR_ENVELOPE_SHAPE] == 13:
+        envdeath=psg_flat_volume_level[15]
+      else:
+        envdeath=psg_flat_volume_level[0]
+    envshape = psg_reg[PSGR_ENVELOPE_SHAPE] & 7
+    if psg_envstage >= 32 and envdeath != -1:
+      envvol = envdeath
+    else:
+      envvol = psg_envelope_level[envshape][psg_envstage & 63]
   def PSG_TONE_ADVANCE():
     psg_tonecountdown -= TWO_MILLION
     while psg_tonecountdown < 0:
