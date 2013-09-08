@@ -53,7 +53,7 @@ class PsgWriteBuffer:
   envelopescale = 1 << 17
 
   def PSG_PREPARE_TONE(self, abc):
-    af = self.toneperiod * sound_freq * self.tonescale / float(8 * 15625)
+    af = self.toneperiod * sound_freq * self.tonescale * 16 / float(fMaster)
     self.tonemodulo_2 = int(af)
     bf = self.t - psg_tone_start_time[abc]
     bf *= float(self.tonescale * 2)
@@ -66,7 +66,7 @@ class PsgWriteBuffer:
 
   def PSG_PREPARE_NOISE(self):
     noiseperiod = 1 + psg_reg.noiseperiod()
-    af = int(noiseperiod) * sound_freq * self.noisescale / float(8 * 15625)
+    af = int(noiseperiod) * sound_freq * self.noisescale * 16 / float(fMaster)
     self.noisemodulo = int(af)
     bf = self.t
     bf *= float(self.noisescale)
