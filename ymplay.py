@@ -7,11 +7,13 @@ class YM6File:
   magic = 'YM6!LeOnArD!'
   wordstruct = struct.Struct('>H')
   lwordstruct = struct.Struct('>I')
+  framesize = 16
 
   def __init__(self, f):
     if self.magic != f.read(len(self.magic)):
       raise Exception('Bad magic.')
     self.f = f
+    self.framecount = self.lword()
 
   def word(self):
     return self.wordstruct.unpack(self.f.read(2))[0]
@@ -32,6 +34,15 @@ class YM6File:
     self.skip(1)
     return text
 
+  def frame(self):
+    v = [None] * self.framesize
+    for i in xrange(self.framesize - 1):
+      v[i] = ord(self.f.read(1))
+      self.f.seek(-1 + self.framecount, 1)
+    v[self.framesize - 1] = ord(self.f.read(1))
+    self.f.seek(-(self.framesize - 1) * self.framecount, 1)
+    return v
+
   def close(self):
     self.f.close()
 
@@ -40,7 +51,6 @@ def main():
   f = open(path, 'rb')
   try:
     f = YM6File(f)
-    framecount = f.lword()
     f.lword() # Song attributes.
     samplecount = f.word()
     clock = f.lword()
@@ -51,6 +61,8 @@ def main():
       f.skip(f.lword())
     for _ in xrange(3):
       print >> sys.stderr, f.ntstring()
+    for frameindex in xrange(f.framecount):
+      print f.frame()
   finally:
     f.close()
 
