@@ -15,11 +15,10 @@ class Osc(Node):
 
   def callimpl(self, block):
     frameindex = 0
-    framecount = self.blockbuf.framecount()
-    while frameindex < framecount:
+    while frameindex < block.framecount:
       if not self.index:
         self.value = self.nextvalue(self.value, self.loadperiod)
-      n = min(framecount - frameindex, self.limit - self.index)
+      n = min(block.framecount - frameindex, self.limit - self.index)
       self.blockbuf.fill(frameindex, frameindex + n, self.value)
       self.index = (self.index + n) % self.limit
       frameindex += n
