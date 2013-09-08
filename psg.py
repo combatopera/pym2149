@@ -120,7 +120,7 @@ class PsgWriteBuffer:
     self.noisecounter = int(math.floor(bf / af)) % PSG_NOISE_ARRAY
     bf = bf % af
     self.noisecountdown = self.noisemodulo - int(bf)
-    psg_noisetoggle = psg_noise[self.noisecounter]
+    self.noisetoggle = psg_noise[self.noisecounter]
 
   def PSG_PREPARE_ENVELOPE(self):
     envperiod = max(psg_reg.envelopeperiod(), 1)
@@ -153,7 +153,7 @@ class PsgWriteBuffer:
       self.noisecounter += 1
       if self.noisecounter >= PSG_NOISE_ARRAY:
         self.noisecounter = 0
-      psg_noisetoggle = psg_noise[self.noisecounter]
+      self.noisetoggle = psg_noise[self.noisecounter]
 
   def PSG_ENVELOPE_ADVANCE(self):
     self.envcountdown -= self.envelopescale
@@ -170,7 +170,6 @@ class PsgWriteBuffer:
     # we've written up to psg_buf_pointer[abc]
     # so start at pointer and write to to_t,
     self.tonetoggle = True
-    psg_noisetoggle = None
     q = psg_buf_pointer[abc]
     self.t = psg_time_of_last_vbl_for_writing + psg_buf_pointer[abc]
     to_t = max(to_t, self.t)
@@ -184,7 +183,7 @@ class PsgWriteBuffer:
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
-            if not (self.tonetoggle or psg_noisetoggle):
+            if not (self.tonetoggle or self.noisetoggle):
               psg_channels_buf[q] += vol
             q += 1
             self.PSG_TONE_ADVANCE()
@@ -200,7 +199,7 @@ class PsgWriteBuffer:
       elif psg_reg.mixernoise(abc):
         self.PSG_PREPARE_NOISE()
         while count > 0:
-          if not psg_noisetoggle:
+          if not self.noisetoggle:
             psg_channels_buf[q] += vol
           q += 1
           self.PSG_NOISE_ADVANCE()
@@ -219,7 +218,7 @@ class PsgWriteBuffer:
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
-            if not (self.tonetoggle or psg_noisetoggle):
+            if not (self.tonetoggle or self.noisetoggle):
               psg_channels_buf[q] += self.envvol
             q += 1
             self.PSG_TONE_ADVANCE()
@@ -237,7 +236,7 @@ class PsgWriteBuffer:
       elif psg_reg.mixernoise(abc):
         self.PSG_PREPARE_NOISE()
         while count > 0:
-          if not psg_noisetoggle:
+          if not self.noisetoggle:
             psg_channels_buf[q] += self.envvol
           q += 1
           self.PSG_NOISE_ADVANCE()
