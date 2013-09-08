@@ -1,6 +1,6 @@
 from __future__ import division
 from buf import *
-import math
+import math, array
 
 class Format:
 
@@ -9,7 +9,11 @@ class Format:
     amp = (1 << (bits - 1)) / math.sqrt(2)
     self.scale = 2 * amp / maxv
     self.shift = (1 << (bits - 1)) - amp
+    self.octets = (bits + 7) // 8
     self.signal = signal
+
+  def createoutbuf(self, count):
+    return array.array('B', count * self.octets * [0]) # Unsigned chars as in C.
 
 class U8Format(Format):
 
