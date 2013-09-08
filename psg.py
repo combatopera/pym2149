@@ -130,7 +130,6 @@ class PsgWriteBuffer:
     self.tonemodulo_2 = self.noisemodulo = None
     self.tonecountdown = self.noisecountdown = None
     self.noisecounter = None
-    af = bf = None
     self.tonetoggle = True
     psg_noisetoggle = None
     q = psg_buf_pointer[abc]
