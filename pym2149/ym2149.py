@@ -34,7 +34,7 @@ class YM2149(Mixer):
     if 255 != frame[13]:
       self.envshape.value = frame[13] & 0x0f
     for i in xrange(self.channels):
-      self.toneperiods[i].value = (frame[2 * i] & 0xff) | ((frame[2 * i + 1] & 0x0f) << 8)
+      self.toneperiods[i].value = frame[2 * i] | ((frame[2 * i + 1] & 0x0f) << 8)
       self.toneflags[i].value = frame[7] & (0x01 << i)
       self.noiseflags[i].value = frame[7] & (0x08 << i)
       self.fixedlevels[i].value = frame[8 + i] & 0x0f
