@@ -1,36 +1,36 @@
 buffering:
 
-period buffering for tone
-period buffering for noise
-period buffering for env
-mixer off buffering for tone
-mixer off buffering for noise
-envelope reset buffering
-fixed level change buffering
+         period buffering for tone
+         period buffering for noise
+         period buffering for env
+         mixer off buffering for tone
+         mixer off buffering for noise
+         envelope reset buffering
+         fixed level change buffering
 
 edge values:
 
-effect of period 0 on tone
-effect of period 0 on noise
-effect of period 0 on envelope
+         effect of period 0 on tone
+qnoispec effect of period 0 on noise
+         effect of period 0 on envelope
 
 calibration:
 
-fixed level to amp mapping
-variable level to amp mapping
-analog mix function
-tone initial value
-noise initial value
+         fixed level to amp mapping
+         variable level to amp mapping
+qanlgmix analog mix function
+         tone initial value
+         noise initial value
 
 algos:
 
-noise period spectrum
-confirm noise lfsr
-mixer off with fixed level
-mixer off with variable level
-binary mixing function effect on env
+qnoispec noise period spectrum
+         confirm noise lfsr
+         mixer off with fixed level
+         mixer off with variable level
+         binary mixing function effect on env
 
 resets:
 
-mixer on reset for tone
-mixer on reset for noise
+         mixer on reset for tone
+         mixer on reset for noise
