@@ -6,12 +6,13 @@ from psg.nod import Block
 from ym2149 import YM2149
 import sys
 
-clock = 2000000
+clock = 2000000 # Atari ST.
 outfreq = 44100
-refreshrate = 60
-seconds = .9
-tonenote = 1000
-noisenote = 5000
+refreshrate = 60 # Deliberately not a divisor of the clock.
+seconds = 8 / 7 # Deliberately a non-nice number.
+tonenote = 1000 # First peak should have this frequency.
+noisenote = 5000 # First trough should have this frequency. XXX: Is that authentic?
+sawnote = 600 # First peak should have this frequency.
 
 def blocks():
   framecount = int(round(seconds * clock))
@@ -20,7 +21,7 @@ def blocks():
   while frameindex < framecount:
     blocksize = min(framecount - frameindex, clock // refreshrate)
     carry += clock % refreshrate
-    while carry >= refreshrate:
+    while carry >= refreshrate: # Probably at most once.
       blocksize += 1
       carry -= refreshrate
     yield Block(blocksize)
@@ -33,7 +34,7 @@ def main():
     x.noiseflags[i].value = 1
   x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
   x.noiseperiod.value = int(round(clock / (16 * noisenote)))
-  x.envperiod.value = int(round(clock / (256 * tonenote)))
+  x.envperiod.value = int(round(clock / (256 * sawnote)))
   x.fixedlevels[0].value = 15
   def dump(path):
     print >> sys.stderr, path
@@ -51,7 +52,7 @@ def main():
   x.noiseflags[0].value = 1 # Noise off.
   x.levelmodes[0].value = 1 # Envelope on.
   x.toneperiods[0].value = (1 << 12) - 1 # Max period.
-  dump('1kenvelope.wav')
+  dump('600saw.wav')
 
 if '__main__' == __name__:
   main()
