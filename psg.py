@@ -94,7 +94,7 @@ def psg_write_buffer(abc, to_t):
     psg_tonecountdown -= TWO_MILLION
     while psg_tonecountdown < 0:
       psg_tonecountdown += psg_tonemodulo_2
-      psg_tonetoggle = !psg_tonetoggle
+      psg_tonetoggle = not psg_tonetoggle
   def PSG_NOISE_ADVANCE():
     psg_noisecountdown -= ONE_MILLION
     while psg_noisecountdown < 0:
