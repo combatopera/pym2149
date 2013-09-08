@@ -1,4 +1,3 @@
-from __future__ import division
 from reg import Register
 from osc import ToneOsc, NoiseOsc, EnvOsc
 from dac import Level, Dac
