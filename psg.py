@@ -190,3 +190,6 @@ def psg_write_buffer(abc, to_t):
         PSG_ENVELOPE_ADVANCE
         count -= 1
   psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
+
+if '__main__' == __name__:
+  psg_write_buffer(0, 100)
