@@ -13,4 +13,8 @@ class EnvDet:
   def __call__(self, buf, bufstart, bufstop):
     self.signal(buf, bufstart, bufstop) # Temporarily abuse target buffer.
     for bufindex in xrange(bufstart, bufstop):
-      buf[bufindex] = self.last = max(buf[bufindex], self.mul * self.last)
+      self.last *= self.mul
+      if self.last > buf[bufindex]:
+        buf[bufindex] = self.last
+      else:
+        self.last = buf[bufindex]
