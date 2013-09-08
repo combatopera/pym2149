@@ -2,6 +2,7 @@ import math, random
 
 psg_buf_pointer = [0] * 3
 psg_tone_start_time = [0] * 3
+psg_envelope_start_time = 0xff000000
 psg_time_of_last_vbl_for_writing = 0
 SCREENS_PER_SOUND_VBL = 1
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
@@ -51,6 +52,9 @@ class psg_reg(list):
   def envelopehold(self):
     return self[13] & 0x01
 
+  def envelopeshape(self):
+    return self[13] & 0x0f
+
 def psg_write_buffer(abc, to_t):
   PsgWriteBuffer()(abc, to_t)
 
@@ -90,11 +94,11 @@ class PsgWriteBuffer:
     psg_envcountdown = psg_envmodulo - int(bf)
     envdeath = -1
     if (not psg_reg.envelopecont()) or psg_reg.envelopehold():
-      if psg_reg[PSGR_ENVELOPE_SHAPE] == 11 or psg_reg[PSGR_ENVELOPE_SHAPE] == 13:
+      if psg_reg.envelopeshape() in (11, 13):
         envdeath = psg_flat_volume_level[15]
       else:
         envdeath = psg_flat_volume_level[0]
-    envshape = psg_reg[PSGR_ENVELOPE_SHAPE] & 7
+    envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
     if psg_envstage >= 32 and envdeath != -1:
       envvol = envdeath
     else:
@@ -215,7 +219,7 @@ class PsgWriteBuffer:
     psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
 
 if '__main__' == __name__:
-  psg_reg[8] = 15
+  psg_reg[8] = 16
   psg_reg[0] = 255
   psg_write_buffer(0, PSG_CHANNEL_BUF_LENGTH)
   print psg_channels_buf
