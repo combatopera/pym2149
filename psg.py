@@ -43,7 +43,7 @@ def psg_write_buffer(abc, to_t):
 
 class PsgWriteBuffer:
 
-  def PSG_PREPARE_TONE(self):
+  def PSG_PREPARE_TONE(self, abc):
     af = int(self.toneperiod) * sound_freq
     af *= float(1 << 17) / 15625
     psg_tonemodulo_2 = int(af)
@@ -136,7 +136,7 @@ class PsgWriteBuffer:
     if not psg_reg.variablelevel(abc):
       vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
-        self.PSG_PREPARE_TONE()
+        self.PSG_PREPARE_TONE(abc)
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
@@ -171,7 +171,7 @@ class PsgWriteBuffer:
       psg_envmodulo = envvol = psg_envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
-        self.PSG_PREPARE_TONE()
+        self.PSG_PREPARE_TONE(abc)
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
