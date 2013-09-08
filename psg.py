@@ -3,6 +3,15 @@ psg_time_of_last_vbl_for_writing = 0
 SCREENS_PER_SOUND_VBL = 1
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
 
+def singleton(t):
+  return t()
+
+@singleton
+class psg_reg(list):
+
+  def __init__(self):
+    list.__init__(self, [0] * 14)
+
 def psg_write_buffer(abc, to_t):
   # buffer starts at time time_of_last_vbl
   # we've written up to psg_buf_pointer[abc]
