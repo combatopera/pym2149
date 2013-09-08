@@ -158,7 +158,7 @@ class PsgWriteBuffer:
       psg_noisetoggle = psg_noise[self.noisecounter]
 
   def PSG_ENVELOPE_ADVANCE(self):
-    self.envcountdown -= TWO_TO_SEVENTEEN
+    self.envcountdown -= self.envelopescale
     while self.envcountdown < 0:
       self.envcountdown += psg_envmodulo
       psg_envstage += 1
