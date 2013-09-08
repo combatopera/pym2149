@@ -38,32 +38,26 @@ def psg_write_buffer(abc, to_t):
             q += 1
           PSG_TONE_ADVANCE()
           count -= 1
-    }else if ((psg_reg[PSGR_MIXER] & (8 << abc))==0){ //noise enabled
-      PSG_PREPARE_NOISE
-      for (;count>0;count--){
-        if(psg_noisetoggle){
+    elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
+      PSG_PREPARE_NOISE()
+      while count > 0:
+        if psg_noisetoggle:
           q += 1
-        }else{
+        else:
           psg_channels_buf[q] += vol
           q += 1
-        }
-        PSG_NOISE_ADVANCE
-      }
-
-    }else{ //nothing enabled
-      for (;count>0;count--){
+        PSG_NOISE_ADVANCE()
+        count -= 1
+    else: # nothing enabled
+      while count > 0:
         psg_channels_buf[q] += vol
         q += 1
-      }
-    }
+        count -= 1
     psg_buf_pointer[abc]=to_t-psg_time_of_last_vbl_for_writing;
-    return;
-  }else{  // Enveloped
-//    DWORD est64=psg_envelope_start_time*64;
-    int envdeath,psg_envstage,envshape;
-    int psg_envmodulo,envvol,psg_envcountdown;
-
-    PSG_PREPARE_ENVELOPE;
+  else: # Enveloped
+    envdeath = psg_envstage = envshape = None
+    psg_envmodulo = envvol = psg_envcountdown = None
+    PSG_PREPARE_ENVELOPE()
 
     if ((psg_reg[PSGR_MIXER] & (1 << abc))==0 && (toneperiod>9)){ //tone enabled
       PSG_PREPARE_TONE
