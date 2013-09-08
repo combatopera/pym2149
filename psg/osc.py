@@ -17,8 +17,7 @@ class Osc:
       if not self.index:
         self.value = self.nextvalue(self.value, self.loadperiod)
       n = min(samplecount - bufpos, self.limit - self.index)
-      for bufindex in xrange(bufpos, bufpos + n):
-        buf[bufindex] = self.value
+      buf.fill(bufpos, bufpos + n, self.value)
       self.index = (self.index + n) % self.limit
       bufpos += n
 

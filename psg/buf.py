@@ -18,3 +18,6 @@ class Buf:
 
   def __getitem__(self, key):
     return self.buf[key]
+
+  def fill(self, start, end, value):
+    self.buf[start:end] = value
