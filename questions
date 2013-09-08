@@ -1,7 +1,7 @@
 buffering:
 
-         period buffering for tone
-         period buffering for noise
+qtonpbuf period buffering for tone
+qnoipbuf period buffering for noise
          period buffering for env
          mixer off buffering for tone
          mixer off buffering for noise
@@ -26,7 +26,7 @@ algos:
 
 qnoispec noise period spectrum
 qnoispec confirm noise lfsr
-         mixer off with fixed level
+qanlgmix mixer off with fixed level
          mixer off with variable level
          binary mixing function effect on env
 
