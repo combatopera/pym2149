@@ -29,16 +29,18 @@ class LastSampler(Sampler):
 
 class FirSampler(Sampler):
 
-  def __init__(self, signal, ratio, logtablesize):
-    # The kernel is symmetric so logically we only need to tabulate one side and the central value:
-    self.size = (1 << logtablesize) * 2 - 1
-    Sampler.__init__(self, signal, ratio, lambda: RingBuf(self.size))
-    self.kernel = scipy.signal.firwin(self.size, 1 / ratio)
+  def __init__(self, signal, fromfreq, tofreq, passfreq, ripple = 60):
+    fromnyq = fromfreq / 2
+    tonyq = tofreq / 2
+    N, beta = scipy.signal.kaiserord(ripple, (tonyq - passfreq) / fromnyq)
+    Sampler.__init__(self, signal, fromfreq / tofreq, lambda: RingBuf(N))
+    cutoff = (passfreq + tonyq) / 2 / fromnyq
+    self.taps = scipy.signal.firwin(N, cutoff, window = ('kaiser', beta))
 
   def __call__(self, buf, samplecount):
     for i in xrange(samplecount):
       self.load()
-      buf[i] = self.buf.convolve(self.kernel)
+      buf[i] = self.buf.convolve(self.taps)
 
 class MeanSampler(Sampler):
 
