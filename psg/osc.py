@@ -11,7 +11,7 @@ class Osc(Node):
     self.periodreg = periodreg
 
   def loadperiod(self):
-    self.limit = self.unit * self.periodreg.value
+    self.limit = self.unit * max(1, self.periodreg.value)
 
   def callimpl(self):
     frameindex = 0
