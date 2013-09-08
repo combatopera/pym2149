@@ -55,6 +55,10 @@ class YM6File:
     self.skip(-(self.framesize - 1) * self.framecount)
     return v
 
+  def __iter__(self):
+    for _ in xrange(self.framecount):
+      yield self.frame()
+
   def close(self):
     self.f.close()
 
@@ -65,8 +69,8 @@ def main():
     f = YM6File(f)
     for info in f.info:
       print >> sys.stderr, info
-    for frameindex in xrange(f.framecount):
-      print f.frame()
+    for frame in f:
+      print frame
   finally:
     f.close()
 
