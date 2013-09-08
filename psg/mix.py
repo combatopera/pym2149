@@ -4,13 +4,13 @@ from dac import *
 class Mixer:
 
   def __init__(self, *streams):
-    self.buf = SimpleBuf()
+    self.buf = SimpleBuf(0)
     self.streams = streams
 
-  def __call__(self, buf, samplecount):
-    self.streams[0](buf, samplecount)
-    self.buf.atleast(samplecount)
+  def __call__(self, buf):
+    self.streams[0](buf)
+    tmp = self.buf.crop(buf.framecount())
     for stream in self.streams[1:]:
-      stream(self.buf, samplecount)
-      buf.add(self.buf[:samplecount])
-    buf.xform(0, samplecount, -Dac.halfpoweramp)
+      stream(tmp)
+      buf.add(tmp)
+    buf.xform(-Dac.halfpoweramp)

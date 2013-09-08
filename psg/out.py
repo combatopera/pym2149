@@ -17,8 +17,8 @@ class WavWriter:
       path,
     ], stdin = subprocess.PIPE)
 
-  def __call__(self, buf, framecount):
-    buf.tofile(0, framecount, self.sox.stdin)
+  def __call__(self, buf):
+    buf.tofile(self.sox.stdin)
 
   def close(self):
     self.sox.stdin.close() # Send EOF.

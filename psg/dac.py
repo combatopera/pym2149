@@ -12,9 +12,9 @@ class Dac:
     self.halfvol = halfvol
     self.maxamp = self.halfpoweramp * 2 / ampshare
 
-  def __call__(self, buf, samplecount):
-    self.signal(buf, samplecount)
+  def __call__(self, buf):
+    self.signal(buf)
     if self.volreg.value != self.vol:
       self.amp = 2 ** ((self.volreg.value - self.maxvol) / (self.maxvol - self.halfvol)) * self.maxamp
       self.vol = self.volreg.value
-    buf.scale(0, samplecount, self.amp)
+    buf.scale(self.amp)
