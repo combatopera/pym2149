@@ -13,6 +13,7 @@ seconds = 8 / 7 # Deliberately a non-nice number.
 tonenote = 1000 # First peak should have this frequency.
 noisenote = 5000 # First trough should have this frequency. XXX: Is that authentic?
 sawnote = 600 # First peak should have this frequency.
+trinote = 1300 # First peak should have half this frequency.
 
 def blocks():
   framecount = int(round(seconds * clock))
@@ -34,7 +35,6 @@ def main():
     x.noiseflags[i].value = 1
   x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
   x.noiseperiod.value = int(round(clock / (16 * noisenote)))
-  x.envperiod.value = int(round(clock / (256 * sawnote)))
   x.fixedlevels[0].value = 15
   def dump(path):
     print >> sys.stderr, path
@@ -52,7 +52,12 @@ def main():
   x.noiseflags[0].value = 1 # Noise off.
   x.levelmodes[0].value = 1 # Envelope on.
   x.toneperiods[0].value = (1 << 12) - 1 # Max period.
+  x.envperiod.value = int(round(clock / (256 * sawnote)))
+  x.envshape.value = 0x08
   dump('600saw.wav')
+  x.envperiod.value = int(round(clock / (256 * trinote)))
+  x.envshape.value = 0x0a
+  dump('650tri.wav')
 
 if '__main__' == __name__:
   main()
