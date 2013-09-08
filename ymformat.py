@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-import sys, struct
+import struct
 
 class YM6File:
 
@@ -63,18 +61,3 @@ class YM6File:
 
   def close(self):
     self.f.close()
-
-def main():
-  path, = sys.argv[1:]
-  f = open(path, 'rb')
-  try:
-    f = YM6File(f)
-    for info in f.info:
-      print >> sys.stderr, info
-    for frame in f:
-      print frame
-  finally:
-    f.close()
-
-if '__main__' == __name__:
-  main()
