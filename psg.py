@@ -53,7 +53,6 @@ def psg_write_buffer(abc, to_t):
         psg_channels_buf[q] += vol
         q += 1
         count -= 1
-    psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
   else: # Enveloped
     envdeath = psg_envstage = envshape = None
     psg_envmodulo = envvol = psg_envcountdown = None
@@ -99,4 +98,4 @@ def psg_write_buffer(abc, to_t):
         q += 1
         PSG_ENVELOPE_ADVANCE
         count -= 1
-    psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
+  psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
