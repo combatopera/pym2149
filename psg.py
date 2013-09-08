@@ -131,12 +131,12 @@ class PsgWriteBuffer:
     bf = bf % af
     self.envcountdown = self.envmodulo - int(bf)
     if psg_reg.envelopehold() or not psg_reg.envelopecont():
-      envdeath = psg_flat_volume_level[[0, 15][psg_reg.envelopeshape() in (11, 13)]]
+      self.envdeath = psg_flat_volume_level[[0, 15][psg_reg.envelopeshape() in (11, 13)]]
     else:
-      envdeath = -1
+      self.envdeath = -1
     self.envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
-    if self.envstage >= 32 and envdeath != -1:
-      self.envvol = envdeath
+    if self.envstage >= 32 and self.envdeath != -1:
+      self.envvol = self.envdeath
     else:
       self.envvol = psg_envelope_level[self.envshape][self.envstage % 64]
 
@@ -160,8 +160,8 @@ class PsgWriteBuffer:
     while self.envcountdown < 0:
       self.envcountdown += self.envmodulo
       self.envstage += 1
-      if self.envstage >= 32 and envdeath != -1:
-        self.envvol = envdeath
+      if self.envstage >= 32 and self.envdeath != -1:
+        self.envvol = self.envdeath
       else:
         self.envvol = psg_envelope_level[self.envshape][self.envstage % 64]
 
@@ -210,7 +210,6 @@ class PsgWriteBuffer:
           q += 1
           count -= 1
     else:
-      envdeath = self.envstage = self.envshape = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
