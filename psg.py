@@ -211,7 +211,6 @@ class PsgWriteBuffer:
           count -= 1
     else:
       envdeath = self.envstage = self.envshape = None
-      self.envmodulo = self.envvol = self.envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
