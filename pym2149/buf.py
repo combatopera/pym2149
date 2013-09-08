@@ -8,8 +8,11 @@ class Buf:
   def framecount(self):
     return self.buf.shape[0]
 
-  def fill(self, startframe, endframe, value):
+  def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
+
+  def fill(self, value):
+    self.buf[:] = value
 
   def scale(self, factor):
     self.buf *= factor

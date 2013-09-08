@@ -17,7 +17,7 @@ class BinMix(Node):
     # XOR sounds just like noise so it can't be that.
     # AND and OR have the same frequency spectrum so either is good.
     # We choose OR as that's what Steem appears to use:
-    self.blockbuf.fill(0, self.block.framecount, 0)
+    self.blockbuf.fill(0)
     if not self.toneflagreg.value:
       self.blockbuf.orbuf(self.tone(self.block))
     if not self.noiseflagreg.value:
@@ -30,6 +30,6 @@ class Mixer(Node):
     self.streams = streams
 
   def callimpl(self):
-    self.blockbuf.fill(0, self.block.framecount, Dac.headroom)
+    self.blockbuf.fill(Dac.headroom)
     for stream in self.streams:
       self.blockbuf.addbuf(stream(self.block))

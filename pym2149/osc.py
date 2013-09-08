@@ -29,7 +29,7 @@ class Osc(Node):
             oldperiod = False
         self.value = self.stepvalue(self.stepindex)
       n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
-      self.blockbuf.fill(frameindex, frameindex + n, self.value)
+      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
       self.indexinstep = (self.indexinstep + n) % self.stepsize
       frameindex += n
 

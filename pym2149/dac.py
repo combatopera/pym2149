@@ -17,7 +17,7 @@ class Level(Node):
     else:
       # Convert to equivalent 5-bit level:
       level = self.fixedreg.value * 2 + 1 # That's right, 4-bit 0 is 5-bit 1.
-      self.blockbuf.fill(0, self.block.framecount, level)
+      self.blockbuf.fill(level)
     self.blockbuf.mulbuf(self.signal(self.block))
 
 class Dac(Node):

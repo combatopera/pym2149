@@ -14,7 +14,7 @@ class Counter(Node):
 
   def callimpl(self):
     for frameindex in xrange(self.block.framecount):
-      self.blockbuf.fill(frameindex, frameindex + 1, self.x)
+      self.blockbuf.fillpart(frameindex, frameindex + 1, self.x)
       self.x += 1
 
 def expect(*values):

@@ -11,7 +11,7 @@ class Ramps(Node):
 
   def callimpl(self):
     for i in xrange(self.block.framecount):
-      self.blockbuf.fill(i, i + 1, i)
+      self.blockbuf.fillpart(i, i + 1, i)
 
 class TestDac(unittest.TestCase):
 
