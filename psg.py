@@ -1,4 +1,4 @@
-import math
+import math, random
 
 psg_buf_pointer = [0] * 3
 psg_time_of_last_vbl_for_writing = 0
@@ -11,6 +11,7 @@ psg_flat_volume_level = tuple(VOLTAGE_FIXED_POINT * PSG_CHANNEL_AMPLITUDE * x / 
 ])
 sound_freq = 50066
 PSG_NOISE_ARRAY = 8192
+psg_noise = tuple(random.randint(0, 1) for i in xrange(PSG_NOISE_ARRAY))
 
 def singleton(t):
   return t()
