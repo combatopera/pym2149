@@ -17,7 +17,7 @@ sawnote = 600 # First peak should have this frequency.
 trinote = 1300 # First peak should have half this frequency.
 
 def main():
-  x = YM2149()
+  x = YM2149(1)
   for i in xrange(x.channels):
     x.toneflags[i].value = False
     x.noiseflags[i].value = False

@@ -25,7 +25,7 @@ class Registers:
 
 class YM2149(Registers, Mixer):
 
-  def __init__(self):
+  def __init__(self, ampshare = None):
     Registers.__init__(self)
     # Chip-wide signals:
     noise = NoiseOsc(self.noiseperiod)
@@ -34,8 +34,10 @@ class YM2149(Registers, Mixer):
     channels = [ToneOsc(self.toneperiods[i]) for i in xrange(self.channels)]
     channels = [BinMix(channel, noise, self.toneflags[i], self.noiseflags[i]) for i, channel in enumerate(channels)]
     channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel) for i, channel in enumerate(channels)]
+    if ampshare is None:
+      ampshare = self.channels
     # FIXME: All nodes should be called even if excluded from the mix.
-    Mixer.__init__(*[self] + [Dac(channel, self.channels) for i, channel in enumerate(channels)])
+    Mixer.__init__(*[self] + [Dac(channel, ampshare) for i, channel in enumerate(channels)])
 
   def update(self, frame):
     for i, x in enumerate(frame):
