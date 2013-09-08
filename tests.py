@@ -19,8 +19,8 @@ trinote = 1300 # First peak should have half this frequency.
 def main():
   x = YM2149()
   for i in xrange(x.channels):
-    x.toneflags[i].value = 1
-    x.noiseflags[i].value = 1
+    x.toneflags[i].value = False
+    x.noiseflags[i].value = False
   x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
   x.noiseperiod.value = int(round(clock / (16 * noisenote)))
   x.fixedlevels[0].value = 15
@@ -30,14 +30,14 @@ def main():
     for block in blocks(clock, refreshrate, seconds):
       w(block)
     w.close()
-  x.toneflags[0].value = 0
+  x.toneflags[0].value = True
   dump('1ktone.wav')
-  x.toneflags[0].value = 1
-  x.noiseflags[0].value = 0
+  x.toneflags[0].value = False
+  x.noiseflags[0].value = True
   dump('5knoise.wav')
-  x.toneflags[0].value = 0
+  x.toneflags[0].value = True
   dump('1ktone5knoise.wav')
-  x.noiseflags[0].value = 1 # Noise off.
+  x.noiseflags[0].value = False # Noise off.
   x.levelmodes[0].value = 1 # Envelope on.
   x.toneperiods[0].value = (1 << 12) - 1 # Max period.
   x.envperiod.value = int(round(clock / (256 * sawnote)))
