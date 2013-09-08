@@ -2,6 +2,11 @@ psg_buf_pointer = [0] * 3
 psg_time_of_last_vbl_for_writing = 0
 SCREENS_PER_SOUND_VBL = 1
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
+VOLTAGE_FIXED_POINT = 256
+PSG_CHANNEL_AMPLITUDE = 60
+psg_flat_volume_level = tuple(VOLTAGE_FIXED_POINT * PSG_CHANNEL_AMPLITUDE * x / 1000 + for x in [
+  0, 4, 8, 12, 17, 24, 35, 48, 69, 95, 139, 191, 287, 407, 648, 1000
+])
 
 def singleton(t):
   return t()
