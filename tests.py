@@ -3,6 +3,7 @@
 from __future__ import division
 from pym2149.out import WavWriter
 from pym2149.nod import Block
+from pym2149.util import blocks
 from pym2149.ym2149 import YM2149
 import sys
 
@@ -15,19 +16,6 @@ noisenote = 5000 # First trough should have this frequency. XXX: Is that authent
 sawnote = 600 # First peak should have this frequency.
 trinote = 1300 # First peak should have half this frequency.
 
-def blocks():
-  framecount = int(round(seconds * clock))
-  frameindex = 0
-  carry = 0
-  while frameindex < framecount:
-    blocksize = min(framecount - frameindex, clock // refreshrate)
-    carry += clock % refreshrate
-    while carry >= refreshrate: # Probably at most once.
-      blocksize += 1
-      carry -= refreshrate
-    yield Block(blocksize)
-    frameindex += blocksize
-
 def main():
   x = YM2149()
   for i in xrange(x.channels):
@@ -39,7 +27,7 @@ def main():
   def dump(path):
     print >> sys.stderr, path
     w = WavWriter(1, clock, x, outfreq, path)
-    for block in blocks():
+    for block in blocks(clock, refreshrate, seconds):
       w(block)
     w.close()
   x.toneflags[0].value = 0
