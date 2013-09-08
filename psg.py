@@ -130,17 +130,15 @@ class PsgWriteBuffer:
     self.envstage = int(math.floor(bf / af))
     bf = bf % af
     self.envcountdown = self.envmodulo - int(bf)
-    envdeath = -1
-    if (not psg_reg.envelopecont()) or psg_reg.envelopehold():
-      if psg_reg.envelopeshape() in (11, 13):
-        envdeath = psg_flat_volume_level[15]
-      else:
-        envdeath = psg_flat_volume_level[0]
+    if psg_reg.envelopehold() or not psg_reg.envelopecont():
+      envdeath = psg_flat_volume_level[[0, 15][psg_reg.envelopeshape() in (11, 13)]]
+    else:
+      envdeath = -1
     self.envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
     if self.envstage >= 32 and envdeath != -1:
       self.envvol = envdeath
     else:
-      self.envvol = psg_envelope_level[self.envshape][self.envstage & 63]
+      self.envvol = psg_envelope_level[self.envshape][self.envstage % 64]
 
   def PSG_TONE_ADVANCE(self):
     self.tonecountdown -= self.tonescale * 2
