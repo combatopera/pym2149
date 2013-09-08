@@ -1,37 +1,34 @@
 #!/usr/bin/env python
 
-import unittest
-from dac import *
-from buf import *
+import unittest, numpy as np
+from dac import Dac
+from nod import Node, Block
 
-class Ramps:
+class Ramps(Node):
 
-  def __call__(self, buf):
-    for i in xrange(buf.framecount()):
-      buf[i] = i
+  def __init__(self):
+    Node.__init__(self, int)
+
+  def callimpl(self, block):
+    for i in xrange(block.framecount):
+      self.blockbuf.fill(i, i + 1, i)
 
 def expect(*values):
-  return [v * 2 * Dac.halfpoweramp for v in values]
+  return [np.float32(v * 2 * Dac.halfpoweramp) for v in values]
 
 class TestDac(unittest.TestCase):
 
   def test_works(self):
-    v = MasterBuf(4)
-    v.fill(3, 4, 0)
     d = Dac(Ramps(), self, 15, 13, 1)
     self.value = 15
-    d(v.ensureandcrop(3))
-    self.assertEqual(expect(0, 1, 2, 0), list(v))
+    self.assertEqual(expect(0, 1, 2), d(Block(0, 3)).tolist())
     self.value = 13
-    d(v.ensureandcrop(3))
-    self.assertEqual(expect(0, .5, 1, 0), list(v))
+    self.assertEqual(expect(0, .5, 1), d(Block(1, 3)).tolist())
     d = Dac(Ramps(), self, 31, 27, 1)
     self.value = 31
-    d(v.ensureandcrop(3))
-    self.assertEqual(expect(0, 1, 2, 0), list(v))
+    self.assertEqual(expect(0, 1, 2), d(Block(2, 3)).tolist())
     self.value = 23
-    d(v.ensureandcrop(3))
-    self.assertEqual(expect(0, .25, .5, 0), list(v))
+    self.assertEqual(expect(0, .25, .5), d(Block(3, 3)).tolist())
 
 if __name__ == '__main__':
   unittest.main()
