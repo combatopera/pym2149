@@ -1,8 +1,8 @@
 from __future__ import division
-from pym2149.reg import Register
-from pym2149.osc import ToneOsc, NoiseOsc, EnvOsc
-from pym2149.dac import Level, Dac
-from pym2149.mix import BinMix, Mixer
+from reg import Register
+from osc import ToneOsc, NoiseOsc, EnvOsc
+from dac import Level, Dac
+from mix import BinMix, Mixer
 
 class YM2149(Mixer):
 
