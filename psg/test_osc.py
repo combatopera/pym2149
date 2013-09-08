@@ -49,6 +49,14 @@ class TestEnvOsc(unittest.TestCase):
       for i in xrange(32):
         self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
 
+  def test_09(self):
+    for shape in xrange(0x04):
+      o = EnvOsc(Register(3), Register(shape))
+      v = o(Block(8 * 3 * 32)).tolist()
+      for i in xrange(32):
+        self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
+      self.assertEqual([0] * (8 * 3 * 34), o(Block(8 * 3 * 34)).tolist())
+
   def test_0a(self):
     shapereg = Register(0x0a)
     periodreg = Register(3)
@@ -85,6 +93,14 @@ class TestEnvOsc(unittest.TestCase):
     v = o(Block(8 * 3 * 32)).tolist()
     for i in xrange(32):
       self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
+
+  def test_0f(self):
+    for shape in xrange(0x04, 0x08):
+      o = EnvOsc(Register(3), Register(shape))
+      v = o(Block(8 * 3 * 32)).tolist()
+      for i in xrange(32):
+        self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
+      self.assertEqual([0] * (8 * 3 * 34), o(Block(8 * 3 * 34)).tolist())
 
 if __name__ == '__main__':
   unittest.main()
