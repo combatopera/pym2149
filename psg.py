@@ -125,11 +125,11 @@ class PsgWriteBuffer:
   def PSG_PREPARE_ENVELOPE(self):
     envperiod = max(psg_reg.envelopeperiod(), 1)
     af = self.envelopescale * sound_freq * envperiod * 256 / float(fMaster) / 32
-    psg_envmodulo = int(af)
+    self.envmodulo = int(af)
     bf = (self.t - psg_envelope_start_time) * self.envelopescale
     psg_envstage = int(math.floor(bf / af))
     bf = bf % af
-    self.envcountdown = psg_envmodulo - int(bf)
+    self.envcountdown = self.envmodulo - int(bf)
     envdeath = -1
     if (not psg_reg.envelopecont()) or psg_reg.envelopehold():
       if psg_reg.envelopeshape() in (11, 13):
@@ -160,7 +160,7 @@ class PsgWriteBuffer:
   def PSG_ENVELOPE_ADVANCE(self):
     self.envcountdown -= self.envelopescale
     while self.envcountdown < 0:
-      self.envcountdown += psg_envmodulo
+      self.envcountdown += self.envmodulo
       psg_envstage += 1
       if psg_envstage >= 32 and envdeath != -1:
         envvol = envdeath
@@ -217,7 +217,7 @@ class PsgWriteBuffer:
           count -= 1
     else:
       envdeath = psg_envstage = envshape = None
-      psg_envmodulo = envvol = self.envcountdown = None
+      self.envmodulo = envvol = self.envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
