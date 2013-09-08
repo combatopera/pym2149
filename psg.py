@@ -53,7 +53,7 @@ class PsgWriteBuffer:
     bf = bf % (af * 2)
     af = bf - af
     if af >= 0:
-      psg_tonetoggle = False
+      self.tonetoggle = False
       bf = af
     self.tonecountdown = self.tonemodulo_2 - int(bf)
 
@@ -97,7 +97,7 @@ class PsgWriteBuffer:
     self.tonecountdown -= TWO_MILLION
     while self.tonecountdown < 0:
       self.tonecountdown += self.tonemodulo_2
-      psg_tonetoggle = not psg_tonetoggle
+      self.tonetoggle = not self.tonetoggle
 
   def PSG_NOISE_ADVANCE(self):
     self.noisecountdown -= ONE_MILLION
@@ -126,7 +126,7 @@ class PsgWriteBuffer:
     self.tonecountdown = self.noisecountdown = None
     self.noisecounter = None
     af = bf = None
-    psg_tonetoggle = True
+    self.tonetoggle = True
     psg_noisetoggle = None
     q = psg_buf_pointer[abc]
     self.t = psg_time_of_last_vbl_for_writing + psg_buf_pointer[abc]
@@ -141,7 +141,7 @@ class PsgWriteBuffer:
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
-            if not (psg_tonetoggle or psg_noisetoggle):
+            if not (self.tonetoggle or psg_noisetoggle):
               psg_channels_buf[q] += vol
             q += 1
             self.PSG_TONE_ADVANCE()
@@ -149,7 +149,7 @@ class PsgWriteBuffer:
             count -= 1
         else: # tone only
           while count > 0:
-            if not psg_tonetoggle:
+            if not self.tonetoggle:
               psg_channels_buf[q] += vol
             q += 1
             self.PSG_TONE_ADVANCE()
@@ -176,7 +176,7 @@ class PsgWriteBuffer:
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
           while count > 0:
-            if not (psg_tonetoggle or psg_noisetoggle):
+            if not (self.tonetoggle or psg_noisetoggle):
               psg_channels_buf[q] += envvol
             q += 1
             self.PSG_TONE_ADVANCE()
@@ -185,7 +185,7 @@ class PsgWriteBuffer:
             count -= 1
         else: # tone only
           while count > 0:
-            if not psg_tonetoggle:
+            if not self.tonetoggle:
               psg_channels_buf[q] += envvol
             q += 1
             self.PSG_TONE_ADVANCE()
