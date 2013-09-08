@@ -68,6 +68,19 @@ def psg_write_buffer(abc, to_t):
     bf = bf % af
     psg_noisecountdown = psg_noisemodulo - int(bf)
     psg_noisetoggle = psg_noise[psg_noisecounter]
+  def PSG_TONE_ADVANCE():
+    psg_tonecountdown -= TWO_MILLION
+    while psg_tonecountdown < 0:
+      psg_tonecountdown += psg_tonemodulo_2
+      psg_tonetoggle = !psg_tonetoggle
+  def PSG_NOISE_ADVANCE():
+    psg_noisecountdown -= ONE_MILLION
+    while psg_noisecountdown < 0:
+      psg_noisecountdown += psg_noisemodulo
+      psg_noisecounter += 1
+      if psg_noisecounter >= PSG_NOISE_ARRAY:
+        psg_noisecounter = 0
+      psg_noisetoggle = psg_noise[psg_noisecounter]
   if not psg_reg.variablelevel(abc):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
     if psg_reg.mixertone(abc) and toneperiod > 9: # tone enabled
