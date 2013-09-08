@@ -1,3 +1,5 @@
+psg_buf_pointer = [0] * 3
+
 def psg_write_buffer(abc, to_t):
   # buffer starts at time time_of_last_vbl
   # we've written up to psg_buf_pointer[abc]
