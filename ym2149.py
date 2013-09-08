@@ -32,7 +32,8 @@ class YM2149(Mixer):
   def update(self, frame):
     self.noiseperiod.value = frame[6] & 0x1f
     self.envperiod.value = frame[11] | (frame[12] << 8)
-    self.envshape.value = frame[13] & 0x0f
+    if 255 != frame[13]:
+      self.envshape.value = frame[13] & 0x0f
     for i in xrange(self.channels):
       self.toneperiods[i].value = (frame[2 * i] & 0xff) | ((frame[2 * i + 1] & 0x0f) << 8)
       self.toneflags[i].value = frame[7] & (0x01 << i)
