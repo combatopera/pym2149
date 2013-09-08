@@ -7,7 +7,8 @@ class U8Format:
 
   def __init__(self, signal, maxv):
     self.buf = []
-    self.scale = 2 / maxv
+    self.scale = 2 * self.amp / maxv
+    self.shift = 128 - self.amp
     self.signal = signal
 
   def __call__(self, buf, bufstart, bufstop):
@@ -16,4 +17,4 @@ class U8Format:
       self.buf = [None] * n
     self.signal(self.buf, 0, n)
     for i in xrange(n):
-      buf[bufstart + i] = int(128 + (self.buf[i] * self.scale - 1) * self.amp) # Effectively floor.
+      buf[bufstart + i] = int(max(0, self.buf[i] * self.scale + self.shift)) # Effectively floor.
