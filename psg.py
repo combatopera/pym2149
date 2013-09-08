@@ -19,6 +19,9 @@ class psg_reg(list):
   def __init__(self):
     list.__init__(self, [0] * 14)
 
+  def noiseperiod(self):
+    return self[6] & 0x1f
+
   def mixertone(self, channel):
     return not (self[7] & (0x01 << channel))
 
@@ -57,7 +60,7 @@ def psg_write_buffer(abc, to_t):
       bf = af
     psg_tonecountdown = psg_tonemodulo_2 - int(bf)
   def PSG_PREPARE_NOISE():
-    noiseperiod = 1 + (psg_reg[PSGR_NOISE_PERIOD] & 0x1f)
+    noiseperiod = 1 + psg_reg.noiseperiod()
     af = int(noiseperiod) * sound_freq
     af *= float(1 << 17) / 15625
     psg_noisemodulo = int(af)
