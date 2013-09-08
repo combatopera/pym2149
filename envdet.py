@@ -5,13 +5,12 @@ class EnvDet:
 
   rc = 1e3 * 0.1e-6 # From schematic.
 
-  def __init__(self, signal, f):
-    period = 1 / f
-    self.mul = math.exp(-period / self.rc)
-    self.v = 0 # Logically the value one period ago.
+  def __init__(self, signal, signalfreq):
+    self.mul = math.exp(-(1 / signalfreq) / self.rc)
+    self.last = 0 # Logically the value one period ago.
     self.signal = signal
 
   def __call__(self, buf, bufstart, bufstop):
-    self.signal(buf, bufstart, bufstop)
+    self.signal(buf, bufstart, bufstop) # Temporarily abuse target buffer.
     for bufindex in xrange(bufstart, bufstop):
-      buf[bufindex] = self.v = max(buf[bufindex], self.mul * self.v)
+      buf[bufindex] = self.last = max(buf[bufindex], self.mul * self.last)
