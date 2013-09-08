@@ -10,6 +10,7 @@ psg_flat_volume_level = tuple(VOLTAGE_FIXED_POINT * PSG_CHANNEL_AMPLITUDE * x / 
   0, 4, 8, 12, 17, 24, 35, 48, 69, 95, 139, 191, 287, 407, 648, 1000
 ])
 sound_freq = 50066
+PSG_NOISE_ARRAY = 8192
 
 def singleton(t):
   return t()
