@@ -2,7 +2,6 @@
 
 import unittest
 from mix import Mixer
-from buf import MasterBuf
 from dac import Dac
 from nod import Node, Block
 
