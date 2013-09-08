@@ -1,6 +1,7 @@
 import math, random
 
 psg_buf_pointer = [0] * 3
+psg_tone_start_time = [0] * 3
 psg_time_of_last_vbl_for_writing = 0
 SCREENS_PER_SOUND_VBL = 1
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
