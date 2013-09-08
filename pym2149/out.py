@@ -10,7 +10,7 @@ class WavWriter(AbstractNode):
       '-c', str(channels),
       '-r', str(infreq),
       # TODO: Get format from signal node, or standardise on SoX native.
-      '-e', 'unsigned',
+      '-e', 'signed',
       '-b', '32',
       '-t', 'raw',
       '-',

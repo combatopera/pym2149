@@ -20,8 +20,8 @@ class Buf:
   def add(self, value):
     self.buf += value
 
-  def addbuf(self, that):
-    self.buf += that.buf
+  def subbuf(self, that):
+    self.buf -= that.buf
 
   def orbuf(self, that):
     self.buf |= that.buf
