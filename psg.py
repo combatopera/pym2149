@@ -64,7 +64,7 @@ class PsgWriteBuffer:
     psg_noisecounter = int(math.floor(bf / af))
     psg_noisecounter &= (PSG_NOISE_ARRAY - 1)
     bf = bf % af
-    psg_noisecountdown = psg_noisemodulo - int(bf)
+    self.noisecountdown = psg_noisemodulo - int(bf)
     psg_noisetoggle = psg_noise[psg_noisecounter]
 
   def PSG_PREPARE_ENVELOPE(self):
@@ -97,9 +97,9 @@ class PsgWriteBuffer:
       psg_tonetoggle = not psg_tonetoggle
 
   def PSG_NOISE_ADVANCE(self):
-    psg_noisecountdown -= ONE_MILLION
-    while psg_noisecountdown < 0:
-      psg_noisecountdown += psg_noisemodulo
+    self.noisecountdown -= ONE_MILLION
+    while self.noisecountdown < 0:
+      self.noisecountdown += psg_noisemodulo
       psg_noisecounter += 1
       if psg_noisecounter >= PSG_NOISE_ARRAY:
         psg_noisecounter = 0
@@ -120,7 +120,7 @@ class PsgWriteBuffer:
     # we've written up to psg_buf_pointer[abc]
     # so start at pointer and write to to_t,
     psg_tonemodulo_2 = psg_noisemodulo = None
-    psg_tonecountdown = psg_noisecountdown = None
+    psg_tonecountdown = self.noisecountdown = None
     psg_noisecounter = None
     af = bf = None
     psg_tonetoggle = True
