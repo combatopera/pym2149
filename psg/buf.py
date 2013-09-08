@@ -20,8 +20,7 @@ class Buf:
   def scale(self, start, end, factor):
     self.buf[start:end] *= factor
 
-  def xform(self, start, end, factor, add):
-    self.buf[start:end] *= factor
+  def xform(self, start, end, add):
     self.buf[start:end] += add
 
   def add(self, that):
