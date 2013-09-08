@@ -21,3 +21,6 @@ class Buf:
 
   def fill(self, start, end, value):
     self.buf[start:end] = value
+
+  def scale(self, start, end, factor):
+    self.buf[start:end] *= factor

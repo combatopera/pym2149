@@ -10,5 +10,4 @@ class Dac:
   def __call__(self, buf, samplecount):
     self.signal(buf, samplecount)
     amp = self.getamp()
-    for bufindex in xrange(samplecount):
-      buf[bufindex] *= amp
+    buf.scale(0, samplecount, amp)
