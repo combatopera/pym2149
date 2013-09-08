@@ -207,4 +207,7 @@ class PsgWriteBuffer:
     psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
 
 if '__main__' == __name__:
-  psg_write_buffer(0, 100)
+  psg_reg[8] = 15
+  psg_reg[0] = 1000
+  psg_write_buffer(0, PSG_CHANNEL_BUF_LENGTH)
+  print psg_channels_buf
