@@ -20,9 +20,11 @@ class Osc:
 
 class ToneOsc(Osc):
 
+  scale = 16
+
   def __init__(self):
     # Divide count by 2 so that the whole wave is 16:
-    Osc.__init__(self, 16 / 2)
+    Osc.__init__(self, self.scale / 2)
 
   def nextvalue(self, previous, applyperiod):
     if not previous: # Includes initial case.
@@ -33,9 +35,11 @@ class ToneOsc(Osc):
 
 class NoiseOsc(Osc):
 
+  scale = 16
+
   def __init__(self):
     # Halve the count so that the upper frequency bound is correct:
-    Osc.__init__(self, 16 / 2)
+    Osc.__init__(self, self.scale / 2)
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 
   def nextvalue(self, previous, applyperiod):
