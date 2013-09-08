@@ -21,31 +21,25 @@ def psg_write_buffer(abc, to_t):
       if (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
         PSG_PREPARE_NOISE()
         while count > 0:
-          if psg_tonetoggle or psg_noisetoggle:
-            q += 1
-          else:
+          if not (psg_tonetoggle or psg_noisetoggle):
             psg_channels_buf[q] += vol
-            q += 1
+          q += 1
           PSG_TONE_ADVANCE()
           PSG_NOISE_ADVANCE()
           count -= 1
       else: # tone only
         while count > 0:
-          if psg_tonetoggle:
-            q += 1
-          else:
+          if not psg_tonetoggle:
             psg_channels_buf[q] += vol
-            q += 1
+          q += 1
           PSG_TONE_ADVANCE()
           count -= 1
     elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
       PSG_PREPARE_NOISE()
       while count > 0:
-        if psg_noisetoggle:
-          q += 1
-        else:
+        if not psg_noisetoggle:
           psg_channels_buf[q] += vol
-          q += 1
+        q += 1
         PSG_NOISE_ADVANCE()
         count -= 1
     else: # nothing enabled
@@ -62,33 +56,27 @@ def psg_write_buffer(abc, to_t):
       if (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
         PSG_PREPARE_NOISE()
         while count > 0:
-          if psg_tonetoggle or psg_noisetoggle:
-            q += 1
-          else:
+          if not (psg_tonetoggle or psg_noisetoggle):
             psg_channels_buf[q] += envvol
-            q += 1
+          q += 1
           PSG_TONE_ADVANCE()
           PSG_NOISE_ADVANCE()
           PSG_ENVELOPE_ADVANCE()
           count -= 1
       else: # tone only
         while count > 0:
-          if psg_tonetoggle:
-            q += 1
-          else:
+          if not psg_tonetoggle:
             psg_channels_buf[q] += envvol
-            q += 1
+          q += 1
           PSG_TONE_ADVANCE()
           PSG_ENVELOPE_ADVANCE()
           count -= 1
     elif (psg_reg[PSGR_MIXER] & (8 << abc)) == 0: # noise enabled
       PSG_PREPARE_NOISE()
       while count > 0:
-        if psg_noisetoggle:
-          q += 1
-        else:
+        if not psg_noisetoggle:
           psg_channels_buf[q] += envvol
-          q += 1
+        q += 1
         PSG_NOISE_ADVANCE()
         PSG_ENVELOPE_ADVANCE()
         count -= 1
