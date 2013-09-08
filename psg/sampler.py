@@ -3,12 +3,12 @@ from buf import *
 
 class Sampler:
 
-  def __init__(self, signal, ratio):
+  def __init__(self, signal, ratio, buftype = SimpleBuf):
     self.signal = signal
     self.ratio = ratio
     self.index = -1
     self.pos = 0
-    self.buf = SimpleBuf()
+    self.buf = buftype()
 
   def load(self):
     self.pos += self.ratio
