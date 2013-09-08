@@ -14,6 +14,7 @@ class YM6File:
       raise Exception('Bad magic.')
     self.f = f
     self.framecount = self.lword()
+    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
 
   def word(self):
     return self.wordstruct.unpack(self.f.read(2))[0]
@@ -34,7 +35,10 @@ class YM6File:
     self.skip(1)
     return text
 
-  def frame(self):
+  def simpleframe(self):
+    return [ord(c) for c in self.f.read(self.framesize)]
+
+  def interleavedframe(self):
     v = [None] * self.framesize
     for i in xrange(self.framesize - 1):
       v[i] = ord(self.f.read(1))
@@ -51,7 +55,6 @@ def main():
   f = open(path, 'rb')
   try:
     f = YM6File(f)
-    f.lword() # Song attributes.
     samplecount = f.word()
     clock = f.lword()
     framefreq = f.word()
