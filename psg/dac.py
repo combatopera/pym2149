@@ -12,7 +12,8 @@ class Dac(Node):
     def createlookup(maxvol, halfvol):
       return dict([v, int(2 ** ((v - maxvol) / (maxvol - halfvol)) * maxamp)] for v in xrange(maxvol + 1))
     self.fixedamps = createlookup(15, 13)
-    self.varamps = createlookup(31, 27)
+    varamps = createlookup(31, 27)
+    self.varamps = np.frompyfunc(lambda x: varamps[x], 1, 1)
     self.signal = signal
     self.modereg = modereg
     self.volreg = volreg
@@ -20,4 +21,8 @@ class Dac(Node):
 
   def callimpl(self):
     self.blockbuf.copybuf(self.signal(self.block))
-    self.blockbuf.scale(self.fixedamps[self.volreg.value])
+    if self.modereg.value:
+      self.blockbuf.mulbuf(self.env(self.block))
+      self.blockbuf.transform(self.varamps)
+    else:
+      self.blockbuf.scale(self.fixedamps[self.volreg.value])

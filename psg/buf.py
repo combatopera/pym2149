@@ -14,6 +14,12 @@ class Buf:
   def scale(self, factor):
     self.buf *= factor
 
+  def mulbuf(self, that):
+    self.buf *= that.buf
+
+  def transform(self, f):
+    f(self.buf, self.buf)
+
   def add(self, value):
     self.buf += value
 
