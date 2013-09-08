@@ -30,6 +30,6 @@ class Mixer(Node):
     self.streams = streams
 
   def callimpl(self):
-    self.blockbuf.fill(Dac.headroom)
+    self.blockbuf.fill(Dac.datum)
     for stream in self.streams:
       self.blockbuf.addbuf(stream(self.block))

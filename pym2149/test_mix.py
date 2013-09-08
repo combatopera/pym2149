@@ -18,7 +18,7 @@ class Counter(Node):
       self.x += 1
 
 def expect(*values):
-  return [Dac.headroom + v for v in values]
+  return [Dac.datum + v for v in values]
 
 class TestMixer(unittest.TestCase):
 

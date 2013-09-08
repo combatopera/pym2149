@@ -22,7 +22,7 @@ class Level(Node):
 class Dac(Node):
 
   dtype = np.uint32 # SoX is 32-bit signed internally, we use unsigned as it's easier.
-  headroom = int(2 ** 31 - 2 ** 30.5) # Half power point, very close to 3 dB.
+  datum = int(2 ** 31 - 2 ** 30.5) # Half power point, very close to 3 dB.
 
   def __init__(self, level, ampshare):
     Node.__init__(self, self.dtype)
