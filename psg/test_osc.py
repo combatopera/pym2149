@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest, lfsr
-from osc import ToneOsc, NoiseOsc
+from osc import ToneOsc, NoiseOsc, EnvOsc
 from nod import Block
 from reg import Register
 
@@ -37,6 +37,28 @@ class TestNoiseOsc(unittest.TestCase):
       v = o(Block(48 * n)).tolist()
       for i in xrange(n):
         self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
+
+class TestEnvOsc(unittest.TestCase):
+
+  def test_0c(self):
+    shapereg = Register(0x0c)
+    periodreg = Register(3)
+    o = EnvOsc(periodreg, shapereg)
+    for _ in xrange(2):
+      v = o(Block(8 * 3 * 32)).tolist()
+      for i in xrange(32):
+        self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
+
+  def test_0e(self):
+    shapereg = Register(0x0e)
+    periodreg = Register(3)
+    o = EnvOsc(periodreg, shapereg)
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
 
 if __name__ == '__main__':
   unittest.main()
