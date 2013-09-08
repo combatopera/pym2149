@@ -18,14 +18,16 @@ class LEFormat:
   def createoutbuf(self, count):
     return array.array('B', count * self.octets * [0]) # Unsigned chars as in C.
 
-  def __call__(self, buf, count):
-    self.signal(self.buf.atleast(count), 0, count)
-    for i in xrange(count):
-      x = int(max(0, self.buf[i] * self.scale + self.shift)) # Effectively floor.
+  def __call__(self, buf, samplecount):
+    self.signal(self.buf.atleast(samplecount), samplecount)
+    bufindex = 0
+    for sampleindex in xrange(samplecount):
+      x = int(max(0, self.buf[sampleindex] * self.scale + self.shift)) # Effectively floor.
       x = min(self.umax, x) - self.subtract # Clamp other side and apply signedness.
       for b in xrange(self.octets):
-        buf[self.octets * i + b] = x & 0xff
+        buf[bufindex + b] = x & 0xff
         x >>= 8
+      bufindex += self.octets
 
 class U8Format(LEFormat):
 
