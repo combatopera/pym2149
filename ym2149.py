@@ -1,8 +1,8 @@
 from __future__ import division
-from psg.reg import Register
-from psg.osc import ToneOsc, NoiseOsc, EnvOsc
-from psg.dac import Level, Dac
-from psg.mix import BinMix, Mixer
+from pym2149.reg import Register
+from pym2149.osc import ToneOsc, NoiseOsc, EnvOsc
+from pym2149.dac import Level, Dac
+from pym2149.mix import BinMix, Mixer
 
 class YM2149(Mixer):
 
