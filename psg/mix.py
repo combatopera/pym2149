@@ -4,10 +4,12 @@ import numpy as np
 
 class BinMix(Node):
 
-  def __init__(self, tone, noise):
+  def __init__(self, tone, noise, toneflagreg, noiseflagreg):
     Node.__init__(self, Node.commondtype(tone, noise))
     self.tone = tone
     self.noise = noise
+    self.toneflagreg = toneflagreg
+    self.noiseflagreg = noiseflagreg
 
   def callimpl(self):
     # The truth table options are {AND, OR, XOR}.
@@ -15,8 +17,11 @@ class BinMix(Node):
     # XOR sounds just like noise so it can't be that.
     # AND and OR have the same frequency spectrum so either is good.
     # We choose OR as that's what Steem appears to use:
-    self.blockbuf.copybuf(self.tone(self.block))
-    self.blockbuf.orbuf(self.noise(self.block))
+    self.blockbuf.fill(0, self.block.framecount, 0)
+    if self.toneflagreg.value:
+      self.blockbuf.orbuf(self.tone(self.block))
+    if self.noiseflagreg.value:
+      self.blockbuf.orbuf(self.noise(self.block))
 
 class Mixer(Node):
 
