@@ -13,7 +13,7 @@ class Ramps:
 class TestDac(unittest.TestCase):
 
   def test_works(self):
-    v = Buf().atleast(4)
+    v = SimpleBuf().atleast(4)
     d = Dac(Ramps(), self, 15, 13)
     self.value = 15
     d(v, 3)

@@ -12,7 +12,7 @@ class Reg:
 class TestToneOsc(unittest.TestCase):
 
   def test_works(self):
-    v = Buf().atleast(97)
+    v = SimpleBuf().atleast(97)
     v[96] = 100
     ToneOsc(Reg(3))(v, 96)
     self.assertEqual([1] * 24, list(v[:24]))
@@ -22,7 +22,7 @@ class TestToneOsc(unittest.TestCase):
     self.assertEqual([100], list(v[96:]))
 
   def test_stopping(self):
-    v = Buf().atleast(26)
+    v = SimpleBuf().atleast(26)
     v[25] = 100
     ToneOsc(Reg(3))(v, 25)
     self.assertEqual([1] * 24, list(v[:24]))
@@ -33,7 +33,7 @@ class TestNoiseOsc(unittest.TestCase):
 
   def test_works(self):
     n = 100
-    v = Buf().atleast(48 * n)
+    v = SimpleBuf().atleast(48 * n)
     NoiseOsc(Reg(3))(v, len(v))
     u = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
     for i in xrange(n):

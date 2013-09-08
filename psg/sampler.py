@@ -8,7 +8,7 @@ class Sampler:
     self.ratio = ratio
     self.index = -1
     self.pos = 0
-    self.buf = Buf()
+    self.buf = SimpleBuf()
 
   def load(self):
     self.pos += self.ratio

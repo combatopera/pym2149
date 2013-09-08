@@ -2,16 +2,11 @@ import numpy as np
 
 class Buf:
 
-  def __init__(self):
-    self.buf = np.empty(0)
+  def __init__(self, buf):
+    self.buf = buf
 
   def __len__(self):
     return self.buf.shape[0]
-
-  def atleast(self, size):
-    if len(self) < size:
-      self.buf.resize(size)
-    return self
 
   def __setitem__(self, key, value):
     self.buf[key] = value
@@ -24,3 +19,13 @@ class Buf:
 
   def scale(self, start, end, factor):
     self.buf[start:end] *= factor
+
+class SimpleBuf(Buf):
+
+  def __init__(self):
+    Buf.__init__(self, np.empty(0))
+
+  def atleast(self, size):
+    if len(self) < size:
+      self.buf.resize(size)
+    return self

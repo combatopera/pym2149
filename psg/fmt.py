@@ -5,7 +5,7 @@ import math, array
 class LEFormat:
 
   def __init__(self, signed, bits, signal, maxv):
-    self.buf = Buf()
+    self.buf = SimpleBuf()
     half = 1 << (bits - 1)
     amp = half / math.sqrt(2)
     self.scale = 2 * amp / maxv
