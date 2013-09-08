@@ -5,9 +5,13 @@ class Dac:
   def __init__(self, signal, volreg, maxvol, halfvol):
     self.signal = signal
     self.volreg = volreg
-    self.getamp = lambda: 2 ** ((volreg.value - maxvol) / (maxvol - halfvol))
+    self.vol = None
+    self.maxvol = maxvol
+    self.voldiv = maxvol - halfvol
 
   def __call__(self, buf, samplecount):
     self.signal(buf, samplecount)
-    amp = self.getamp()
-    buf.scale(0, samplecount, amp)
+    if self.volreg.value != self.vol:
+      self.amp = 2 ** ((self.volreg.value - self.maxvol) / self.voldiv)
+      self.vol = self.volreg.value
+    buf.scale(0, samplecount, self.amp)
