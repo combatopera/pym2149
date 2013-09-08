@@ -1,3 +1,4 @@
+from __future__ import division
 import math
 
 class EnvDet:
@@ -5,7 +6,7 @@ class EnvDet:
   rc = 0.1e-6 * 1e3 # From schematic.
 
   def __init__(self, f):
-    period = 1 / float(f)
+    period = 1 / f
     self.mul = math.exp(-period / self.rc)
     self.v = 0
 
