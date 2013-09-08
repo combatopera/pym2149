@@ -129,7 +129,7 @@ class PsgWriteBuffer:
     bf = (self.t - psg_envelope_start_time) * self.envelopescale
     psg_envstage = int(math.floor(bf / af))
     bf = bf % af
-    psg_envcountdown = psg_envmodulo - int(bf)
+    self.envcountdown = psg_envmodulo - int(bf)
     envdeath = -1
     if (not psg_reg.envelopecont()) or psg_reg.envelopehold():
       if psg_reg.envelopeshape() in (11, 13):
@@ -158,9 +158,9 @@ class PsgWriteBuffer:
       psg_noisetoggle = psg_noise[self.noisecounter]
 
   def PSG_ENVELOPE_ADVANCE(self):
-    psg_envcountdown -= TWO_TO_SEVENTEEN
-    while psg_envcountdown < 0:
-      psg_envcountdown += psg_envmodulo
+    self.envcountdown -= TWO_TO_SEVENTEEN
+    while self.envcountdown < 0:
+      self.envcountdown += psg_envmodulo
       psg_envstage += 1
       if psg_envstage >= 32 and envdeath != -1:
         envvol = envdeath
@@ -217,7 +217,7 @@ class PsgWriteBuffer:
           count -= 1
     else:
       envdeath = psg_envstage = envshape = None
-      psg_envmodulo = envvol = psg_envcountdown = None
+      psg_envmodulo = envvol = self.envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
