@@ -2,15 +2,19 @@ from __future__ import division
 from buf import *
 import math
 
-class U8Format:
+class Format:
 
-  amp = 128 / math.sqrt(2)
+  def __init__(self, bits, signal, maxv):
+    self.buf = Buf()
+    amp = (1 << (bits - 1)) / math.sqrt(2)
+    self.scale = 2 * amp / maxv
+    self.shift = (1 << (bits - 1)) - amp
+    self.signal = signal
+
+class U8Format(Format):
 
   def __init__(self, signal, maxv):
-    self.buf = Buf()
-    self.scale = 2 * self.amp / maxv
-    self.shift = 128 - self.amp
-    self.signal = signal
+    Format.__init__(self, 8, signal, maxv)
 
   def __call__(self, buf, bufstart, bufstop):
     n = bufstop - bufstart
@@ -18,15 +22,10 @@ class U8Format:
     for i in xrange(n):
       buf[bufstart + i] = int(max(0, self.buf[i] * self.scale + self.shift)) # Effectively floor.
 
-class S16LEFormat:
-
-  amp = 32768 / math.sqrt(2)
+class S16LEFormat(Format):
 
   def __init__(self, signal, maxv):
-    self.buf = Buf()
-    self.scale = 2 * self.amp / maxv
-    self.shift = 32768 - self.amp
-    self.signal = signal
+    Format.__init__(self, 16, signal, maxv)
 
   def __call__(self, buf, bufstart, bufstop):
     n = (bufstop - bufstart) / 2
