@@ -22,11 +22,11 @@ class TestNoiseOsc(unittest.TestCase):
 
   def test_works(self):
     n = 100
-    v = [None] * (24 * n)
+    v = [None] * (48 * n)
     NoiseOsc(Reg(3))(v, 0, len(v))
     u = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
     for i in xrange(n):
-      self.assertEqual([u()] * 24, v[i * 24:(i + 1) * 24])
+      self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
 
 if __name__ == '__main__':
   unittest.main()
