@@ -20,6 +20,12 @@ class AbstractNode:
 
 class Node(AbstractNode):
 
+  @staticmethod
+  def commondtype(*nodes):
+    dtypes = set(n.dtype for n in nodes)
+    dtype, = dtypes
+    return dtype
+
   def __init__(self, dtype):
     AbstractNode.__init__(self)
     masterbuf = MasterBuf(0, dtype)
@@ -28,6 +34,7 @@ class Node(AbstractNode):
       self.blockbuf = masterbuf.ensureandcrop(self.block.framecount)
       callimpl()
     self.callimpl = callimploverride
+    self.dtype = dtype
 
   def __call__(self, block):
     AbstractNode.__call__(self, block)

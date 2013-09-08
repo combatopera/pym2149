@@ -20,6 +20,9 @@ class Buf:
   def addbuf(self, that):
     self.buf += that.buf
 
+  def orbuf(self, that):
+    self.buf |= that.buf
+
   def copybuf(self, that):
     self.buf[:] = that.buf
 
