@@ -8,7 +8,7 @@ class Mixer(Node):
     Node.__init__(self, np.float32)
     self.streams = streams
 
-  def callimpl(self, block):
+  def callimpl(self):
     self.blockbuf.fill(0, self.blockbuf.framecount(), -Dac.halfpoweramp)
     for stream in self.streams:
-      self.blockbuf.addbuf(stream(block))
+      self.blockbuf.addbuf(stream(self.block))

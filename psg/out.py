@@ -20,8 +20,8 @@ class WavWriter(AbstractNode):
     ], stdin = subprocess.PIPE)
     self.signal = signal
 
-  def callimpl(self, block):
-    self.signal(block).tofile(self.sox.stdin)
+  def callimpl(self):
+    self.signal(self.block).tofile(self.sox.stdin)
 
   def close(self):
     self.sox.stdin.close() # Send EOF.

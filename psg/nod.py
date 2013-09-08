@@ -12,10 +12,10 @@ class AbstractNode:
 
   def __call__(self, block):
     if self.block != block:
-      self.callimpl(block)
       self.block = block
+      self.callimpl()
 
-  def callimpl(self, block):
+  def callimpl(self):
     raise Exception('Implement me!')
 
 class Node(AbstractNode):
@@ -24,9 +24,9 @@ class Node(AbstractNode):
     AbstractNode.__init__(self)
     masterbuf = MasterBuf(0, dtype)
     callimpl = self.callimpl
-    def callimploverride(block):
-      self.blockbuf = masterbuf.ensureandcrop(block.framecount)
-      callimpl(block)
+    def callimploverride():
+      self.blockbuf = masterbuf.ensureandcrop(self.block.framecount)
+      callimpl()
     self.callimpl = callimploverride
 
   def __call__(self, block):

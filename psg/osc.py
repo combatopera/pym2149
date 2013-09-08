@@ -13,12 +13,12 @@ class Osc(Node):
   def loadperiod(self):
     self.limit = self.unit * self.periodreg.value
 
-  def callimpl(self, block):
+  def callimpl(self):
     frameindex = 0
-    while frameindex < block.framecount:
+    while frameindex < self.block.framecount:
       if not self.index:
         self.value = self.nextvalue(self.value, self.loadperiod)
-      n = min(block.framecount - frameindex, self.limit - self.index)
+      n = min(self.block.framecount - frameindex, self.limit - self.index)
       self.blockbuf.fill(frameindex, frameindex + n, self.value)
       self.index = (self.index + n) % self.limit
       frameindex += n

@@ -15,9 +15,9 @@ class Dac(Node):
     self.maxvol = maxvol
     self.halfvol = halfvol
 
-  def callimpl(self, block):
+  def callimpl(self):
     if self.volreg.value != self.vol:
       self.amp = 2 ** ((self.volreg.value - self.maxvol) / (self.maxvol - self.halfvol)) * self.maxamp
       self.vol = self.volreg.value
-    self.blockbuf.copybuf(self.signal(block))
+    self.blockbuf.copybuf(self.signal(self.block))
     self.blockbuf.scale(self.amp)
