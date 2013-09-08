@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import unittest, numpy as np
+import unittest
 from mix import Mixer
 from buf import MasterBuf
 from dac import Dac
@@ -18,7 +18,7 @@ class Counter(Node):
       self.x += 1
 
 def expect(*values):
-  return [np.float32(v - Dac.halfpoweramp) for v in values]
+  return [Dac.headroom + v for v in values]
 
 class TestMixer(unittest.TestCase):
 
