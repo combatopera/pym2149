@@ -1,5 +1,6 @@
 from nod import Node
 from dac import Dac
+import numpy as np
 
 class BinMix(Node):
 
@@ -29,8 +30,7 @@ class BinMix(Node):
 class Mixer(Node):
 
   def __init__(self, *streams):
-    # TODO: It would be cheap to mix unsigned into SoX-native signed here.
-    Node.__init__(self, Node.commondtype(*streams))
+    Node.__init__(self, np.int32) # SoX internal sample format.
     self.streams = streams
 
   def callimpl(self):

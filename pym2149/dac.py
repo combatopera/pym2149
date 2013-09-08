@@ -27,11 +27,10 @@ class Dac(Node):
 
   def __init__(self, level, ampshare):
     # The level dtype must be such that its values can be used as indices.
-    dtype = np.int32 # Same as SoX internal sample format.
-    Node.__init__(self, dtype)
+    Node.__init__(self, np.uint32)
     maxamp = 2 ** 31.5 / ampshare
     # Lookup of ideal amplitudes, rounded towards zero:
-    self.leveltoamp = np.array([dtype(2 ** ((v - 31) / 4) * maxamp) for v in xrange(32)])
+    self.leveltoamp = np.array([self.dtype(2 ** ((v - 31) / 4) * maxamp) for v in xrange(32)])
     self.level = level
 
   def callimpl(self):
