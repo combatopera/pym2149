@@ -14,9 +14,6 @@ class Buf:
   def fill(self, value):
     self.buf[:] = value
 
-  def scale(self, factor):
-    self.buf *= factor
-
   def mulbuf(self, that):
     self.buf *= that.buf
 
