@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from lfsr import *
+from lfsr import Lfsr, ym2149nzdegrees
 
 class TestLfsr(unittest.TestCase):
 
