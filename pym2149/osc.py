@@ -26,8 +26,7 @@ class Osc(Node):
         if not self.stepindex:
           self.periodindex += 1
           if oldperiod:
-            # Clamp to 1 is authentic for noise, see qnoispec.
-            self.stepsize = self.scale // self.steps * max(1, self.periodreg.value)
+            self.stepsize = self.scale // self.steps * self.periodreg.value
             oldperiod = False
         self.value = self.stepvalue(self.stepindex)
       n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
