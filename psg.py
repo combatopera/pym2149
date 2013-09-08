@@ -44,6 +44,9 @@ class psg_reg(list):
   def variablelevel(self, channel):
     return self[8 + channel] & 0x10
 
+  def envelopeperiod(self):
+    return ((self[12] & 0xff) << 8) | (self[11] & 0xff)
+
 def psg_write_buffer(abc, to_t):
   PsgWriteBuffer()(abc, to_t)
 
@@ -77,7 +80,7 @@ class PsgWriteBuffer:
     psg_noisetoggle = psg_noise[self.noisecounter]
 
   def PSG_PREPARE_ENVELOPE(self):
-    envperiod = max((int(psg_reg[PSGR_ENVELOPE_PERIOD_HIGH]) << 8) + psg_reg[PSGR_ENVELOPE_PERIOD_LOW], 1)
+    envperiod = max(psg_reg.envelopeperiod(), 1)
     af = envperiod * sound_freq * self.envelopescale / float(16 * 15625)
     psg_envmodulo = int(af)
     bf = self.t - psg_envelope_start_time
