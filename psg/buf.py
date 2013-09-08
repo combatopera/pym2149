@@ -24,6 +24,9 @@ class Buf:
     self.buf[start:end] *= factor
     self.buf[start:end] += add
 
+  def add(self, that):
+    self.buf[:len(that)] += that
+
   def tofile(self, start, end, fileobj):
     self.buf[start:end].tofile(fileobj)
 

@@ -22,7 +22,7 @@ class TestMixer(unittest.TestCase):
     d = Counter()
     m = Mixer(c, d)
     buf = SimpleBuf()
-    m(buf, 5)
+    m(buf.atleast(5), 5)
     self.assertEqual([10, 12, 14, 16, 18], list(buf[:5]))
     # Check the buffer is actually cleared first:
     m(buf, 5)
