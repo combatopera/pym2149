@@ -22,7 +22,7 @@ class BinMix(Node):
       self.blockbuf.copybuf(self.tone(self.block))
       if not noiseflag:
         self.blockbuf.orbuf(self.noise(self.block))
-    elif noiseflag:
+    elif not noiseflag:
       self.blockbuf.copybuf(self.noise(self.block))
     else:
       self.blockbuf.fill(0)
