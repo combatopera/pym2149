@@ -182,68 +182,60 @@ class PsgWriteBuffer:
         self.PSG_PREPARE_TONE(abc)
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
-          while count > 0:
+          for c in xrange(count):
             if not (self.tonetoggle or self.noisetoggle):
               psg_channels_buf[q] += vol
             q += 1
             self.PSG_TONE_ADVANCE()
             self.PSG_NOISE_ADVANCE()
-            count -= 1
         else: # tone only
-          while count > 0:
+          for c in xrange(count):
             if not self.tonetoggle:
               psg_channels_buf[q] += vol
             q += 1
             self.PSG_TONE_ADVANCE()
-            count -= 1
       elif psg_reg.mixernoise(abc):
         self.PSG_PREPARE_NOISE()
-        while count > 0:
+        for c in xrange(count):
           if not self.noisetoggle:
             psg_channels_buf[q] += vol
           q += 1
           self.PSG_NOISE_ADVANCE()
-          count -= 1
       else: # nothing enabled
-        while count > 0:
+        for c in xrange(count):
           psg_channels_buf[q] += vol
           q += 1
-          count -= 1
     else:
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
         if psg_reg.mixernoise(abc):
           self.PSG_PREPARE_NOISE()
-          while count > 0:
+          for c in xrange(count):
             if not (self.tonetoggle or self.noisetoggle):
               psg_channels_buf[q] += self.envvol
             q += 1
             self.PSG_TONE_ADVANCE()
             self.PSG_NOISE_ADVANCE()
             self.PSG_ENVELOPE_ADVANCE()
-            count -= 1
         else: # tone only
-          while count > 0:
+          for c in xrange(count):
             if not self.tonetoggle:
               psg_channels_buf[q] += self.envvol
             q += 1
             self.PSG_TONE_ADVANCE()
             self.PSG_ENVELOPE_ADVANCE()
-            count -= 1
       elif psg_reg.mixernoise(abc):
         self.PSG_PREPARE_NOISE()
-        while count > 0:
+        for c in xrange(count):
           if not self.noisetoggle:
             psg_channels_buf[q] += self.envvol
           q += 1
           self.PSG_NOISE_ADVANCE()
           self.PSG_ENVELOPE_ADVANCE()
-          count -= 1
       else: # nothing enabled
-        while count > 0:
+        for c in xrange(count):
           psg_channels_buf[q] += self.envvol
           q += 1
           self.PSG_ENVELOPE_ADVANCE()
-          count -= 1
     psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
