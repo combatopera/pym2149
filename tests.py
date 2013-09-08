@@ -5,7 +5,7 @@ from pym2149.out import WavWriter
 from pym2149.nod import Block
 from pym2149.util import blocks
 from pym2149.ym2149 import YM2149
-import sys
+import sys, os
 
 clock = 2000000 # Atari ST.
 outfreq = 44100
@@ -25,6 +25,7 @@ def main():
   x.noiseperiod.value = int(round(clock / (16 * noisenote)))
   x.fixedlevels[0].value = 15
   def dump(path):
+    path = os.path.join('target', path)
     print >> sys.stderr, path
     w = WavWriter(1, clock, x, outfreq, path)
     for block in blocks(clock, refreshrate, seconds):
