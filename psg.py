@@ -253,9 +253,3 @@ class PsgWriteBuffer:
           self.PSG_ENVELOPE_ADVANCE()
           count -= 1
     psg_buf_pointer[abc] = to_t - psg_time_of_last_vbl_for_writing
-
-if '__main__' == __name__:
-  psg_reg[8] = 16
-  psg_reg[0] = 255
-  psg_write_buffer(0, PSG_CHANNEL_BUF_LENGTH)
-  print psg_channels_buf
