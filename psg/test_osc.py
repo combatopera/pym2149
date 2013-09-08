@@ -40,6 +40,29 @@ class TestNoiseOsc(unittest.TestCase):
 
 class TestEnvOsc(unittest.TestCase):
 
+  def test_08(self):
+    shapereg = Register(0x08)
+    periodreg = Register(3)
+    o = EnvOsc(periodreg, shapereg)
+    for _ in xrange(2):
+      v = o(Block(8 * 3 * 32)).tolist()
+      for i in xrange(32):
+        self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
+
+  def test_0a(self):
+    shapereg = Register(0x0a)
+    periodreg = Register(3)
+    o = EnvOsc(periodreg, shapereg)
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
+
   def test_0c(self):
     shapereg = Register(0x0c)
     periodreg = Register(3)
@@ -59,6 +82,9 @@ class TestEnvOsc(unittest.TestCase):
     v = o(Block(8 * 3 * 32)).tolist()
     for i in xrange(32):
       self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
+    v = o(Block(8 * 3 * 32)).tolist()
+    for i in xrange(32):
+      self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
 
 if __name__ == '__main__':
   unittest.main()
