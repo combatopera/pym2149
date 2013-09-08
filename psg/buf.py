@@ -37,6 +37,19 @@ class SimpleBuf(Buf):
       self.buf.resize(size)
     return self
 
+  def tosumming(self, size):
+    self.atleast(size)
+    self.buf[:size] = 0
+    return SummingBuf(self.buf)
+
+class SummingBuf:
+
+  def __init__(self, buf):
+    self.buf = buf
+
+  def __setitem__(self, key, value):
+    self.buf[key] += value
+
 class RingBuf(Buf):
 
   def __init__(self, size):
