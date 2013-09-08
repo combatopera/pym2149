@@ -138,9 +138,9 @@ class PsgWriteBuffer:
         envdeath = psg_flat_volume_level[0]
     self.envshape = psg_reg.envelopeshape() & 0x07 # Strip CONT.
     if self.envstage >= 32 and envdeath != -1:
-      envvol = envdeath
+      self.envvol = envdeath
     else:
-      envvol = psg_envelope_level[self.envshape][self.envstage & 63]
+      self.envvol = psg_envelope_level[self.envshape][self.envstage & 63]
 
   def PSG_TONE_ADVANCE(self):
     self.tonecountdown -= self.tonescale * 2
@@ -163,9 +163,9 @@ class PsgWriteBuffer:
       self.envcountdown += self.envmodulo
       self.envstage += 1
       if self.envstage >= 32 and envdeath != -1:
-        envvol = envdeath
+        self.envvol = envdeath
       else:
-        envvol = psg_envelope_level[self.envshape][self.envstage & 63]
+        self.envvol = psg_envelope_level[self.envshape][self.envstage & 63]
 
   def __call__(self, abc, to_t):
     # buffer starts at time time_of_last_vbl
@@ -217,7 +217,7 @@ class PsgWriteBuffer:
           count -= 1
     else:
       envdeath = self.envstage = self.envshape = None
-      self.envmodulo = envvol = self.envcountdown = None
+      self.envmodulo = self.envvol = self.envcountdown = None
       self.PSG_PREPARE_ENVELOPE()
       if psg_reg.mixertone(abc) and self.toneperiod > 9: # tone enabled
         self.PSG_PREPARE_TONE(abc)
@@ -225,7 +225,7 @@ class PsgWriteBuffer:
           self.PSG_PREPARE_NOISE()
           while count > 0:
             if not (self.tonetoggle or psg_noisetoggle):
-              psg_channels_buf[q] += envvol
+              psg_channels_buf[q] += self.envvol
             q += 1
             self.PSG_TONE_ADVANCE()
             self.PSG_NOISE_ADVANCE()
@@ -234,7 +234,7 @@ class PsgWriteBuffer:
         else: # tone only
           while count > 0:
             if not self.tonetoggle:
-              psg_channels_buf[q] += envvol
+              psg_channels_buf[q] += self.envvol
             q += 1
             self.PSG_TONE_ADVANCE()
             self.PSG_ENVELOPE_ADVANCE()
@@ -243,14 +243,14 @@ class PsgWriteBuffer:
         self.PSG_PREPARE_NOISE()
         while count > 0:
           if not psg_noisetoggle:
-            psg_channels_buf[q] += envvol
+            psg_channels_buf[q] += self.envvol
           q += 1
           self.PSG_NOISE_ADVANCE()
           self.PSG_ENVELOPE_ADVANCE()
           count -= 1
       else: # nothing enabled
         while count > 0:
-          psg_channels_buf[q] += envvol
+          psg_channels_buf[q] += self.envvol
           q += 1
           self.PSG_ENVELOPE_ADVANCE()
           count -= 1
