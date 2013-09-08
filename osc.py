@@ -11,15 +11,16 @@ class Osc:
   def loadperiod(self):
     self.limit = self.unit * self.periodreg.value
 
-  def __call__(self, buf, bufstart, bufstop):
-    while bufstart < bufstop:
+  def __call__(self, buf, samplecount):
+    bufpos = 0
+    while bufpos < samplecount:
       if not self.index:
         self.value = self.nextvalue(self.value, self.loadperiod)
-      n = min(bufstop - bufstart, self.limit - self.index)
-      for bufindex in xrange(bufstart, bufstart + n):
+      n = min(samplecount - bufpos, self.limit - self.index)
+      for bufindex in xrange(bufpos, bufpos + n):
         buf[bufindex] = self.value
       self.index = (self.index + n) % self.limit
-      bufstart += n
+      bufpos += n
 
 class ToneOsc(Osc):
 
