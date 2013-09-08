@@ -2,17 +2,17 @@ buffering:
 
 qtonpbuf period buffering for tone
 qnoipbuf period buffering for noise
-         period buffering for env
+qenvpbuf period buffering for env
          mixer off buffering for tone
          mixer off buffering for noise
-         envelope reset buffering
+qenvrbuf envelope reset buffering
          fixed level change buffering
 
 edge values:
 
-         effect of period 0 on tone
+qtonpzer effect of period 0 on tone
 qnoispec effect of period 0 on noise
-         effect of period 0 on envelope
+qenvpzer effect of period 0 on envelope
 
 calibration:
 
@@ -27,8 +27,8 @@ algos:
 qnoispec noise period spectrum
 qnoispec confirm noise lfsr
 qanlgmix mixer off with fixed level
-         mixer off with variable level
-         binary mixing function effect on env
+qenvpbuf mixer off with variable level
+qbmixenv binary mixing function effect on env
 
 resets:
 
