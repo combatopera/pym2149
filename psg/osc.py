@@ -1,24 +1,26 @@
-import lfsr
+import lfsr, numpy as np
+from nod import Node
 
-class Osc:
+class Osc(Node):
 
   def __init__(self, unit, periodreg):
-    self.unit = unit
+    Node.__init__(self, np.uint8) # Slightly faster than plain old int.
     self.index = 0
     self.value = None
+    self.unit = unit
     self.periodreg = periodreg
 
   def loadperiod(self):
     self.limit = self.unit * self.periodreg.value
 
-  def __call__(self, buf):
+  def callimpl(self, block):
     frameindex = 0
-    framecount = buf.framecount()
+    framecount = self.blockbuf.framecount()
     while frameindex < framecount:
       if not self.index:
         self.value = self.nextvalue(self.value, self.loadperiod)
       n = min(framecount - frameindex, self.limit - self.index)
-      buf.fill(frameindex, frameindex + n, self.value)
+      self.blockbuf.fill(frameindex, frameindex + n, self.value)
       self.index = (self.index + n) % self.limit
       frameindex += n
 

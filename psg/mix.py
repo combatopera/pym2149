@@ -1,16 +1,14 @@
-from buf import *
-from dac import *
+from nod import Node
+from dac import Dac
+import numpy as np
 
-class Mixer:
+class Mixer(Node):
 
   def __init__(self, *streams):
-    self.buf = SimpleBuf(0)
+    Node.__init__(self, np.float32)
     self.streams = streams
 
-  def __call__(self, buf):
-    self.streams[0](buf)
-    tmp = self.buf.crop(buf.framecount())
-    for stream in self.streams[1:]:
-      stream(tmp)
-      buf.add(tmp)
-    buf.xform(-Dac.halfpoweramp)
+  def callimpl(self, block):
+    self.blockbuf.fill(0, self.blockbuf.framecount(), -Dac.halfpoweramp)
+    for stream in self.streams:
+      self.blockbuf.addbuf(stream(block))

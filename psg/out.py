@@ -1,14 +1,16 @@
 import subprocess
+from nod import AbstractNode
 
-class WavWriter:
+class WavWriter(AbstractNode):
 
-  def __init__(self, channels, infreq, outfreq, path):
+  def __init__(self, channels, infreq, signal, outfreq, path):
+    AbstractNode.__init__(self)
     self.sox = subprocess.Popen([
       'sox',
       '-c', str(channels),
       '-r', str(infreq),
       '-e', 'floating-point',
-      '-b', '64',
+      '-b', '32',
       '-t', 'raw',
       '-',
       '-r', str(outfreq),
@@ -16,9 +18,10 @@ class WavWriter:
       '-b', '16',
       path,
     ], stdin = subprocess.PIPE)
+    self.signal = signal
 
-  def __call__(self, buf):
-    buf.tofile(self.sox.stdin)
+  def callimpl(self, block):
+    self.signal(block).tofile(self.sox.stdin)
 
   def close(self):
     self.sox.stdin.close() # Send EOF.

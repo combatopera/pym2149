@@ -22,10 +22,10 @@ class TestMixer(unittest.TestCase):
 
   def test_works(self):
     c = Counter()
-    c(SimpleBuf(10))
+    c(MasterBuf(10))
     d = Counter()
     m = Mixer(c, d)
-    buf = SimpleBuf(5)
+    buf = MasterBuf(5)
     m(buf)
     self.assertEqual(expect(10, 12, 14, 16, 18), list(buf[:5]))
     # Check the buffer is actually cleared first:

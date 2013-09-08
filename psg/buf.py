@@ -8,28 +8,25 @@ class Buf:
   def framecount(self):
     return self.buf.shape[0]
 
-  def __setitem__(self, key, value):
-    self.buf[key] = value
-
-  def __getitem__(self, key):
-    return self.buf[key]
-
   def fill(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
 
   def scale(self, factor):
     self.buf *= factor
 
-  def xform(self, value):
+  def add(self, value):
     self.buf += value
 
-  def add(self, that):
+  def addbuf(self, that):
     self.buf += that.buf
+
+  def copybuf(self, that):
+    self.buf[:] = that.buf
 
   def tofile(self, fileobj):
     self.buf.tofile(fileobj)
 
-  def crop(self, framecount):
+  def ensureandcrop(self, framecount):
     thisframecount = self.framecount()
     if thisframecount == framecount:
       return self
@@ -38,7 +35,7 @@ class Buf:
       return self
     return Buf(self.buf[:framecount])
 
-class SimpleBuf(Buf):
+class MasterBuf(Buf):
 
-  def __init__(self, framecount):
-    Buf.__init__(self, np.empty(framecount))
+  def __init__(self, framecount, dtype):
+    Buf.__init__(self, np.empty(framecount, dtype))

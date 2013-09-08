@@ -16,21 +16,21 @@ def expect(*values):
 class TestDac(unittest.TestCase):
 
   def test_works(self):
-    v = SimpleBuf(4)
+    v = MasterBuf(4)
     v.fill(3, 4, 0)
     d = Dac(Ramps(), self, 15, 13, 1)
     self.value = 15
-    d(v.crop(3))
+    d(v.ensureandcrop(3))
     self.assertEqual(expect(0, 1, 2, 0), list(v))
     self.value = 13
-    d(v.crop(3))
+    d(v.ensureandcrop(3))
     self.assertEqual(expect(0, .5, 1, 0), list(v))
     d = Dac(Ramps(), self, 31, 27, 1)
     self.value = 31
-    d(v.crop(3))
+    d(v.ensureandcrop(3))
     self.assertEqual(expect(0, 1, 2, 0), list(v))
     self.value = 23
-    d(v.crop(3))
+    d(v.ensureandcrop(3))
     self.assertEqual(expect(0, .25, .5, 0), list(v))
 
 if __name__ == '__main__':
