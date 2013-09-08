@@ -14,6 +14,7 @@ class YM6File:
       raise Exception('Bad magic.')
     self.f = f
     self.framecount = self.lword()
+    # TODO LATER: There are more attributes.
     self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
     self.samplecount = self.word()
     self.clock = self.lword()
@@ -21,7 +22,7 @@ class YM6File:
     self.loopframe = self.lword()
     self.skip(self.word()) # Future expansion.
     for _ in xrange(self.samplecount):
-      self.skip(self.lword())
+      self.skip(self.lword()) # Observe we ignore all samples for now.
     self.info = tuple(self.ntstring() for _ in xrange(3))
 
   def word(self):
@@ -43,10 +44,11 @@ class YM6File:
     self.skip(1)
     return text
 
-  def simpleframe(self):
+  def simpleframe(self): # Not tested.
     return [ord(c) for c in self.f.read(self.framesize)]
 
   def interleavedframe(self):
+    # FIXME: Too slow.
     v = [None] * self.framesize
     for i in xrange(self.framesize - 1):
       v[i] = ord(self.f.read(1))
@@ -55,7 +57,7 @@ class YM6File:
     self.skip(-(self.framesize - 1) * self.framecount)
     return v
 
-  def __iter__(self):
+  def __iter__(self): # FIXME: Does not loop.
     for _ in xrange(self.framecount):
       yield self.frame()
 
