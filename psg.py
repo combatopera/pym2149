@@ -16,6 +16,7 @@ psg_noise = tuple(random.randint(0, 1) for i in xrange(PSG_NOISE_ARRAY))
 PSG_CHANNEL_BUF_LENGTH = 8192 * SCREENS_PER_SOUND_VBL
 psg_channels_buf = [0] * (PSG_CHANNEL_BUF_LENGTH + 16)
 ONE_MILLION = 1048576
+TWO_MILLION = 2097152
 
 def singleton(t):
   return t()
