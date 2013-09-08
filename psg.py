@@ -12,6 +12,9 @@ class psg_reg(list):
   def __init__(self):
     list.__init__(self, [0] * 14)
 
+  def variablelevel(self, channel):
+    return self[8 + channel] & 0x10
+
 def psg_write_buffer(abc, to_t):
   # buffer starts at time time_of_last_vbl
   # we've written up to psg_buf_pointer[abc]
@@ -28,7 +31,7 @@ def psg_write_buffer(abc, to_t):
   to_t = min(to_t, psg_time_of_last_vbl_for_writing + PSG_CHANNEL_BUF_LENGTH)
   count = max(min(int(to_t - t), PSG_CHANNEL_BUF_LENGTH - psg_buf_pointer[abc]), 0)
   toneperiod = ((int(psg_reg[abc * 2 + 1]) & 0xf) << 8) + psg_reg[abc * 2]
-  if (psg_reg[abc + 8] & BIT_4) == 0: # Not Enveloped
+  if not psg_reg.variablelevel(abc):
     vol = psg_flat_volume_level[psg_reg[abc + 8] & 15]
     if (psg_reg[PSGR_MIXER] & (1 << abc)) == 0 and toneperiod > 9: # tone enabled
       PSG_PREPARE_TONE()
