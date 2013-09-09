@@ -24,7 +24,7 @@ qanlgmix analog mix function
 
 algos:
 
-qnoispec noise period spectrum
+qnoispec noise period spectrum # notches at formula frequency and multiples
 qnoispec confirm noise lfsr
 qanlgmix mixer off with fixed level
 qenvpbuf mixer off with variable level
