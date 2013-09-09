@@ -15,6 +15,7 @@ tonenote = 1000 # First peak should have this frequency.
 noisenote = 5000 # First trough should have this frequency, authentic by qnoispec.
 sawnote = 600 # First peak should have this frequency.
 trinote = 1300 # First peak should have half this frequency.
+slowtrinote = 2
 
 def main():
   x = YM2149(1)
@@ -47,6 +48,11 @@ def main():
   x.envperiod.value = int(round(clock / (256 * trinote)))
   x.envshape.value = 0x0a
   dump('650tri.wav')
+  x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
+  x.envperiod.value = int(round(clock / (256 * slowtrinote)))
+  x.toneflags[0].value = True
+  x.noiseflags[0].value = True
+  dump('1tri1ktone5knoise.wav')
 
 if '__main__' == __name__:
   main()
