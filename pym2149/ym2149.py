@@ -9,10 +9,12 @@ class Registers:
 
   def __init__(self):
     self.R = tuple(Reg(0) for i in xrange(16))
-    toneperiodxform = lambda fine, rough: max(1, ((rough & 0x0f) << 8) | (fine & 0xff))
-    envperiodxform = lambda fine, rough: max(1, ((rough & 0xff) << 8) | (fine & 0xff))
-    self.toneperiods = tuple(DerivedReg(toneperiodxform, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(self.channels))
-    self.noiseperiod = DerivedReg(lambda p: max(1, p & 0x1f), self.R[0x6])
+    # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively:
+    TP = lambda f, r: max(1, ((r & 0x0f) << 8) | (f & 0xff))
+    NP = lambda p: max(1, p & 0x1f)
+    EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
+    self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(self.channels))
+    self.noiseperiod = DerivedReg(NP, self.R[0x6])
     def flagxform(b):
       mask = 0x01 << b
       return lambda x: not (x & mask)
@@ -20,7 +22,7 @@ class Registers:
     self.noiseflags = tuple(DerivedReg(flagxform(self.channels + c), self.R[0x7]) for c in xrange(self.channels))
     self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(self.channels))
     self.levelmodes = tuple(DerivedReg(lambda x: x & 0x10, self.R[0x8 + c]) for c in xrange(self.channels))
-    self.envperiod = DerivedReg(envperiodxform, self.R[0xB], self.R[0xC])
+    self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
 
 class YM2149(Registers, Mixer):
