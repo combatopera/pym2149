@@ -29,7 +29,7 @@ qnoispec noise period spectrum # notches at formula frequency and multiples
 qnoispec confirm noise lfsr
 qanlgmix mixer off with fixed level # you get the level
 qenvpbuf mixer off with variable level # you get the level
-qbmixenv binary mixing function effect on env
+qbmixenv binary mixing function effect on env # mostly silence
 
 resets:
 
