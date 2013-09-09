@@ -23,8 +23,8 @@ class Buf:
   def subbuf(self, that):
     self.buf -= that.buf
 
-  def orbuf(self, that):
-    self.buf |= that.buf
+  def andbuf(self, that):
+    self.buf &= that.buf
 
   def copybuf(self, that):
     self.buf[:] = that.buf

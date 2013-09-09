@@ -15,12 +15,12 @@ class BinMix(Node):
     # Other functions are negations of these, the 2 constants, or not symmetric.
     # XOR sounds just like noise so it can't be that.
     # AND and OR have the same frequency spectrum so either is good.
-    # We use OR as downstream it will prefer envelope shape over zero:
+    # We use AND as zero is preferred over envelope, see qbmixenv:
     noiseflag = self.noiseflagreg.value
     if self.toneflagreg.value:
       self.blockbuf.copybuf(self.tone(self.block))
       if noiseflag:
-        self.blockbuf.orbuf(self.noise(self.block))
+        self.blockbuf.andbuf(self.noise(self.block))
     elif noiseflag:
       self.blockbuf.copybuf(self.noise(self.block))
     else:
