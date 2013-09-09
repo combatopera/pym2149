@@ -18,7 +18,6 @@ class Level(Node):
     else:
       # Convert to equivalent 5-bit level, observe 4-bit 0 is 5-bit 1:
       self.blockbuf.fill(self.fixedreg.value * 2 + 1)
-    # TODO: Find out whether tone+noise should result in mostly envelope or mostly zero:
     self.blockbuf.mulbuf(self.signal(self.block))
 
 class Dac(Node):
