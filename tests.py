@@ -39,16 +39,15 @@ def main():
   dump('5knoise.wav')
   x.toneflags[0].value = True
   dump('1ktone5knoise.wav')
-  x.noiseflags[0].value = False # Noise off.
+  x.toneflags[0].value = False
+  x.noiseflags[0].value = False
   x.levelmodes[0].value = 1 # Envelope on.
-  x.toneperiods[0].value = (1 << 12) - 1 # Max period.
   x.envperiod.value = int(round(clock / (256 * sawnote)))
   x.envshape.value = 0x08
   dump('600saw.wav')
   x.envperiod.value = int(round(clock / (256 * trinote)))
   x.envshape.value = 0x0a
   dump('650tri.wav')
-  x.toneperiods[0].value = int(round(clock / (16 * tonenote)))
   x.envperiod.value = int(round(clock / (256 * slowtrinote)))
   x.toneflags[0].value = True
   x.noiseflags[0].value = True

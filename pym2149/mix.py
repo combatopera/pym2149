@@ -24,7 +24,8 @@ class BinMix(Node):
     elif noiseflag:
       self.blockbuf.copybuf(self.noise(self.block))
     else:
-      self.blockbuf.fill(0)
+      # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
+      self.blockbuf.fill(1)
 
 class Mixer(Node):
 
