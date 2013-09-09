@@ -9,7 +9,8 @@ class Registers:
 
   def __init__(self):
     self.R = tuple(Reg(0) for i in xrange(16))
-    # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively:
+    # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
+    # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
     TP = lambda f, r: max(1, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
