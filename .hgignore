@@ -1,5 +1,5 @@
 ^target$
 ^observations$
 ^ymfiles$
-^atari-dev$
+^ataridev$
 [.]pyc$
