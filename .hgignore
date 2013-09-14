@@ -3,3 +3,4 @@
 ^ymfiles$
 ^ataridev$
 [.]pyc$
+[.]O$
