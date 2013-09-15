@@ -22,6 +22,7 @@ def main():
       for frame in f:
         chip.update(frame)
         stream(bi.next())
+      stream.flush()
     finally:
       stream.close()
   finally:
