@@ -27,6 +27,7 @@ def readbytecode(f, label):
           n = int(s[1:], 2)
         elif s[0] == '$':
           n = int(s[1:], 16)
+        # XXX: Octal?
         else:
           n = int(s)
         bytecode.append(n)
@@ -50,6 +51,7 @@ def main():
   chip = YM2149()
   stream = WavWriter(clock, chip, outpath)
   try:
+    # TODO LATER: Pass block iterator around to preserve carry.
     dosound(bytecode, chip, clock, stream)
     stream(Block(clock * extraseconds))
     stream.flush()
