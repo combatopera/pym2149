@@ -3,6 +3,8 @@ from osc import ToneOsc, NoiseOsc, EnvOsc
 from dac import Level, Dac
 from mix import BinMix, Mixer
 
+stclock = 2000000
+
 class Registers:
 
   channels = 3

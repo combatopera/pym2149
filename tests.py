@@ -3,12 +3,11 @@
 from __future__ import division
 from pym2149.out import WavWriter
 from pym2149.util import blocks, initlogging
-from pym2149.ym2149 import YM2149
+from pym2149.ym2149 import YM2149, stclock as clock
 import sys, os, logging
 
 log = logging.getLogger(__name__)
 
-clock = 2000000 # Atari ST.
 refreshrate = 60 # Deliberately not a divisor of the clock.
 seconds = 8 / 7 # Deliberately a non-nice number.
 tonenote = 1000 # First peak should have this frequency.
