@@ -2,14 +2,14 @@
 
 import sys, logging
 from pym2149.out import WavWriter
-from pym2149.util import blocks
+from pym2149.util import blocks, initlogging
 from pym2149.ym2149 import YM2149
 from ymformat import ymopen
 
 log = logging.getLogger(__name__)
 
 def main():
-  logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.INFO)
+  initlogging()
   inpath, outpath = sys.argv[1:]
   f = ymopen(inpath)
   try:

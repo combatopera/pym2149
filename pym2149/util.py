@@ -1,5 +1,6 @@
 from __future__ import division
 from nod import Block
+import logging
 
 def blocks(clock, refreshrate, secondsornone = None):
   if secondsornone is None:
@@ -20,3 +21,6 @@ def blocks(clock, refreshrate, secondsornone = None):
     blocksize = clamp()
     yield Block(blocksize)
     frameindex += blocksize
+
+def initlogging():
+  logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.DEBUG)

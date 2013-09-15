@@ -2,9 +2,11 @@
 
 from __future__ import division
 from pym2149.out import WavWriter
-from pym2149.util import blocks
+from pym2149.util import blocks, initlogging
 from pym2149.ym2149 import YM2149
-import sys, os
+import sys, os, logging
+
+log = logging.getLogger(__name__)
 
 clock = 2000000 # Atari ST.
 outfreq = 44100
@@ -17,6 +19,7 @@ trinote = 1300 # First peak should have half this frequency.
 slowtrinote = 2 # Frequency and actual period are both 1.
 
 def main():
+  initlogging()
   chip = YM2149(1) # Stretch 1 channel to full range.
   for c in xrange(chip.channels):
     chip.toneflags[c].value = False
@@ -26,11 +29,11 @@ def main():
   chip.fixedlevels[0].value = 15
   def dump(path):
     path = os.path.join('target', path)
-    print >> sys.stderr, path
-    w = WavWriter(1, clock, chip, outfreq, path)
+    log.debug(path)
+    stream = WavWriter(1, clock, chip, outfreq, path)
     for block in blocks(clock, refreshrate, seconds):
-      w(block)
-    w.close()
+      stream(block)
+    stream.close()
   chip.toneflags[0].value = True
   dump('1ktone.wav')
   chip.toneflags[0].value = False
