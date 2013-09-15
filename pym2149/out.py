@@ -3,27 +3,28 @@ from nod import AbstractNode
 
 class WavWriter(AbstractNode):
 
-  def __init__(self, infreq, signal, outfreq, path):
+  def __init__(self, clock, chip, path):
     AbstractNode.__init__(self)
     self.sox = subprocess.Popen([
       'sox',
       '-c', '1',
-      '-r', str(infreq),
+      '-r', str(clock),
       # Assume signal is in SoX native format:
       '-e', 'signed',
       '-b', '32',
       '-t', 'raw',
       '-',
-      '-r', str(outfreq),
+      # TODO LATER: Output format should be configurable.
+      '-r', '44100',
       '-e', 'signed',
       '-b', '16',
       path,
       # TODO: Find out whether DC filter here would be authentic.
     ], stdin = subprocess.PIPE)
-    self.signal = signal
+    self.chip = chip
 
   def callimpl(self):
-    self.signal(self.block).tofile(self.sox.stdin)
+    self.chip(self.block).tofile(self.sox.stdin)
 
   def flush(self):
     if self.sox is not None:

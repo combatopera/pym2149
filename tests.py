@@ -9,7 +9,6 @@ import sys, os, logging
 log = logging.getLogger(__name__)
 
 clock = 2000000 # Atari ST.
-outfreq = 44100
 refreshrate = 60 # Deliberately not a divisor of the clock.
 seconds = 8 / 7 # Deliberately a non-nice number.
 tonenote = 1000 # First peak should have this frequency.
@@ -30,7 +29,7 @@ def main():
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(clock, chip, outfreq, path)
+    stream = WavWriter(clock, chip, path)
     try:
       for block in blocks(clock, refreshrate, seconds):
         stream(block)

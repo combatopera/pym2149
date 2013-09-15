@@ -40,6 +40,7 @@ class YM2149(Registers, Mixer):
     if ampshare is None:
       ampshare = self.channels
     # FIXME: All nodes should be called even if excluded from the mix.
+    # TODO: The real thing has separate outputs, so analog mixer should be optional.
     Mixer.__init__(*[self] + [Dac(channel, ampshare) for i, channel in enumerate(channels)])
 
   def update(self, frame):
