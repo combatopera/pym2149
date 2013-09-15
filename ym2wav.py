@@ -16,7 +16,7 @@ def main():
     for info in f.info:
       log.info(info)
     chip = YM2149()
-    stream = WavWriter(1, f.clock, chip, 44100, outpath)
+    stream = WavWriter(f.clock, chip, 44100, outpath)
     try:
       bi = blocks(f.clock, f.framefreq)
       for frame in f:

@@ -30,7 +30,7 @@ def main():
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(1, clock, chip, outfreq, path)
+    stream = WavWriter(clock, chip, outfreq, path)
     for block in blocks(clock, refreshrate, seconds):
       stream(block)
     stream.close()

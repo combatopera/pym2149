@@ -3,13 +3,13 @@ from nod import AbstractNode
 
 class WavWriter(AbstractNode):
 
-  def __init__(self, channels, infreq, signal, outfreq, path):
+  def __init__(self, infreq, signal, outfreq, path):
     AbstractNode.__init__(self)
     self.sox = subprocess.Popen([
       'sox',
-      '-c', str(channels),
+      '-c', '1',
       '-r', str(infreq),
-      # TODO: Get format from signal node, or standardise on SoX native.
+      # Assume signal is in SoX native format:
       '-e', 'signed',
       '-b', '32',
       '-t', 'raw',
