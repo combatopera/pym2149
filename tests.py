@@ -4,7 +4,7 @@ from __future__ import division
 from pym2149.out import WavWriter
 from pym2149.util import blocks, initlogging
 from pym2149.ym2149 import YM2149, stclock as clock
-import sys, os, logging
+import os, logging
 
 log = logging.getLogger(__name__)
 
