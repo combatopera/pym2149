@@ -1,4 +1,6 @@
-import struct
+import struct, logging
+
+log = logging.getLogger(__name__)
 
 class YM6File:
 
@@ -19,8 +21,10 @@ class YM6File:
     self.framefreq = self.word()
     self.loopframe = self.lword()
     self.skip(self.word()) # Future expansion.
-    for _ in xrange(self.samplecount):
-      self.skip(self.lword()) # Observe we ignore all samples for now.
+    if self.samplecount:
+      log.warn("Ignoring %s samples.", self.samplecount)
+      for _ in xrange(self.samplecount):
+        self.skip(self.lword())
     self.info = tuple(self.ntstring() for _ in xrange(3))
 
   def word(self):
@@ -61,3 +65,11 @@ class YM6File:
 
   def close(self):
     self.f.close()
+
+def ymopen(path):
+  f = open(path, 'rb')
+  try:
+    return YM6File(f)
+  except:
+    f.close()
+    raise

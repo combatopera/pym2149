@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 
-import sys
+import sys, logging
 from pym2149.out import WavWriter
 from pym2149.util import blocks
 from pym2149.ym2149 import YM2149
-from ymformat import YM6File
+from ymformat import ymopen
+
+log = logging.getLogger(__name__)
 
 def main():
+  logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.INFO)
   inpath, outpath = sys.argv[1:]
-  f = open(inpath, 'rb')
+  f = ymopen(inpath)
   try:
-    f = YM6File(f)
     for info in f.info:
-      print >> sys.stderr, info
-    print >> sys.stderr, 'samplecount:', f.samplecount
-    x = YM2149()
-    y = WavWriter(1, f.clock, x, 44100, outpath)
+      log.info(info)
+    chip = YM2149()
+    stream = WavWriter(1, f.clock, chip, 44100, outpath)
     try:
       bi = blocks(f.clock, f.framefreq)
       for frame in f:
-        x.update(frame)
-        y(bi.next())
+        chip.update(frame)
+        stream(bi.next())
     finally:
-      y.close()
+      stream.close()
   finally:
     f.close()
 
