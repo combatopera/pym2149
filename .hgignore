@@ -2,6 +2,7 @@
 ^observations$
 ^ymfiles$
 ^ataridev$
+^resources$
 [.]pyc$
 [.]O$
 [.]swp$
