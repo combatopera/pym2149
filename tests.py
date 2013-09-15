@@ -2,7 +2,6 @@
 
 from __future__ import division
 from pym2149.out import WavWriter
-from pym2149.nod import Block
 from pym2149.util import blocks
 from pym2149.ym2149 import YM2149
 import sys, os
