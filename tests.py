@@ -31,9 +31,12 @@ def main():
     path = os.path.join('target', path)
     log.debug(path)
     stream = WavWriter(clock, chip, outfreq, path)
-    for block in blocks(clock, refreshrate, seconds):
-      stream(block)
-    stream.close()
+    try:
+      for block in blocks(clock, refreshrate, seconds):
+        stream(block)
+      stream.flush()
+    finally:
+      stream.close()
   chip.toneflags[0].value = True
   dump('1ktone.wav')
   chip.toneflags[0].value = False

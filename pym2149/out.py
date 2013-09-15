@@ -25,7 +25,13 @@ class WavWriter(AbstractNode):
   def callimpl(self):
     self.signal(self.block).tofile(self.sox.stdin)
 
+  def flush(self):
+    if self.sox is not None:
+      self.sox.stdin.close() # Send EOF.
+      status = self.sox.wait()
+      self.sox = None # We have released the resource(s).
+      if status:
+        raise Exception(status)
+
   def close(self):
-    self.sox.stdin.close() # Send EOF.
-    if self.sox.wait():
-      raise Exception(self.sox.returncode)
+    self.flush() # Does nothing if flush already called.
