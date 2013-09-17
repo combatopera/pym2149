@@ -5,7 +5,9 @@ def dosound(bytecode, chip, clock, stream):
     for b in bytecode:
       yield b & 0xff # It's supposed to be bytecode.
   g = g()
-  bi = blocks(clock, 50) # Authentic period.
+  session = Session(clock)
+  def block():
+    return session.block(50) # Authentic period.
   while True:
     ctrl = g.next()
     if ctrl <= 0xF:
@@ -22,7 +24,7 @@ def dosound(bytecode, chip, clock, stream):
         # TODO LATER: What happens if we reach/skip zero?
         softreg += adjust # Yes, this is done up-front.
         targetreg.value = softreg
-        stream(bi.next()) # One frame with that value.
+        stream(block()) # One frame with that value.
         # That's right, if we skip past it we loop forever:
         if last == softreg:
           break
@@ -32,6 +34,6 @@ def dosound(bytecode, chip, clock, stream):
         break
       ticks += 1 # Apparently!
       for i in xrange(ticks):
-        stream(bi.next())
+        stream(block())
     else:
       raise Exception(ctrl)
