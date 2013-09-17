@@ -2,7 +2,7 @@
 
 from __future__ import division
 from pym2149.out import WavWriter
-from pym2149.util import blocks, initlogging
+from pym2149.util import Session, initlogging
 from pym2149.ym2149 import YM2149, stclock as clock
 import os, logging
 
@@ -30,8 +30,9 @@ def main():
     log.debug(path)
     stream = WavWriter(clock, chip, path)
     try:
-      for block in blocks(clock, refreshrate, seconds):
-        stream(block)
+      session = Session(clock)
+      for i in xrange(int(round(seconds * refreshrate))):
+        stream(session.block(refreshrate))
       stream.flush()
     finally:
       stream.close()
