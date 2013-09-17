@@ -2,7 +2,7 @@
 
 import sys, logging
 from pym2149.out import WavWriter
-from pym2149.util import blocks, initlogging
+from pym2149.util import Session, initlogging
 from pym2149.ym2149 import YM2149
 from ymformat import ymopen
 
@@ -18,10 +18,10 @@ def main():
     chip = YM2149()
     stream = WavWriter(f.clock, chip, outpath)
     try:
-      bi = blocks(f.clock, f.framefreq)
+      session = Session(f.clock)
       for frame in f:
         chip.update(frame)
-        stream(bi.next())
+        stream(session.block(f.framefreq))
       stream.flush()
     finally:
       stream.close()
