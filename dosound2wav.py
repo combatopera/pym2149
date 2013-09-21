@@ -4,7 +4,7 @@ import sys, re
 from pym2149.dosound import dosound
 from pym2149.ym2149 import YM2149, stclock as clock
 from pym2149.out import WavWriter
-from pym2149.nod import Block
+from pym2149.util import Session
 
 extraseconds = 3
 pattern = re.compile(r'^([^\s]+)?\s+([^\s]+)?\s+([^\s]+)?')
@@ -51,9 +51,10 @@ def main():
   chip = YM2149()
   stream = WavWriter(clock, chip, outpath)
   try:
-    # TODO LATER: Pass block iterator around to preserve carry.
-    dosound(bytecode, chip, clock, stream)
-    stream(Block(clock * extraseconds))
+    session = Session(clock)
+    dosound(bytecode, chip, session, stream)
+    for _ in xrange(50 * extraseconds):
+      stream(session.block(50))
     stream.flush()
   finally:
     stream.close()

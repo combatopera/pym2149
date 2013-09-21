@@ -1,11 +1,8 @@
-from util import Session
-
-def dosound(bytecode, chip, clock, stream):
+def dosound(bytecode, chip, session, stream):
   def g():
     for b in bytecode:
       yield b & 0xff # It's supposed to be bytecode.
   g = g()
-  session = Session(clock)
   def block():
     return session.block(50) # Authentic period.
   while True:
