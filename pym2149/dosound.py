@@ -1,4 +1,4 @@
-from util import blocks
+from util import Session
 
 def dosound(bytecode, chip, clock, stream):
   def g():
