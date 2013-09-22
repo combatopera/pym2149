@@ -18,8 +18,8 @@ def dosound(bytecode, chip, session, stream):
         adjust -= 0x100 # Convert back to signed.
       last = g.next()
       while True:
-        # TODO LATER: What happens if we reach/skip zero?
         softreg += adjust # Yes, this is done up-front.
+        # The real thing simply uses the truncation on overflow:
         targetreg.value = softreg
         stream(block()) # One frame with that value.
         # That's right, if we skip past it we loop forever:
