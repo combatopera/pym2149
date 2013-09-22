@@ -1,4 +1,4 @@
-	bsr	vsync
+	bsr	tick
 	lea	scripts,a6
 
 next:	move.l	(a6)+,-(sp)
@@ -7,8 +7,8 @@ next:	move.l	(a6)+,-(sp)
 	addq.l	#6,sp
 
 	moveq	#49,d7
-wait:	bsr	vsync
-	dbra	d7,wait
+sleep:	bsr	tick
+	dbra	d7,sleep
 
 	tst.l	(a6)
 	bne	next
@@ -16,7 +16,7 @@ wait:	bsr	vsync
 	clr	-(sp)
 	trap	#1
 
-vsync:	move	#37,-(sp)
+tick:	move	#37,-(sp)
 	trap	#14
 	addq.l	#2,sp
 	rts
