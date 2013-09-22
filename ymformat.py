@@ -2,30 +2,17 @@ import struct, logging
 
 log = logging.getLogger(__name__)
 
-class YM6File:
+class YMFile:
 
-  magic = 'YM6!LeOnArD!'
+  checkstr = 'LeOnArD!'
   wordstruct = struct.Struct('>H')
   lwordstruct = struct.Struct('>I')
-  framesize = 16
 
-  def __init__(self, f):
-    if self.magic != f.read(len(self.magic)):
-      raise Exception('Bad magic.')
+  def __init__(self, f, checkstr):
+    if checkstr:
+      if self.checkstr != f.read(len(self.checkstr)):
+        raise Exception('Bad check string.')
     self.f = f
-    self.framecount = self.lword()
-    # TODO LATER: There are more attributes.
-    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
-    self.samplecount = self.word()
-    self.clock = self.lword()
-    self.framefreq = self.word()
-    self.loopframe = self.lword()
-    self.skip(self.word()) # Future expansion.
-    if self.samplecount:
-      log.warn("Ignoring %s samples.", self.samplecount)
-      for _ in xrange(self.samplecount):
-        self.skip(self.lword())
-    self.info = tuple(self.ntstring() for _ in xrange(3))
 
   def word(self):
     return self.wordstruct.unpack(self.f.read(2))[0]
@@ -46,6 +33,30 @@ class YM6File:
     self.skip(1)
     return text
 
+  def close(self):
+    self.f.close()
+
+class YM6File(YMFile):
+
+  formatid = 'YM6!'
+  framesize = 16
+
+  def __init__(self, f):
+    YMFile.__init__(self, f, True)
+    self.framecount = self.lword()
+    # TODO LATER: There are more attributes.
+    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
+    self.samplecount = self.word()
+    self.clock = self.lword()
+    self.framefreq = self.word()
+    self.loopframe = self.lword()
+    self.skip(self.word()) # Future expansion.
+    if self.samplecount:
+      log.warn("Ignoring %s samples.", self.samplecount)
+      for _ in xrange(self.samplecount):
+        self.skip(self.lword())
+    self.info = tuple(self.ntstring() for _ in xrange(3))
+
   def simpleframe(self): # Not tested.
     return [ord(c) for c in self.f.read(self.framesize)]
 
@@ -63,13 +74,12 @@ class YM6File:
     for _ in xrange(self.framecount):
       yield self.frame()
 
-  def close(self):
-    self.f.close()
+impls = dict([i.formatid, i] for i in [YM6File])
 
 def ymopen(path):
   f = open(path, 'rb')
   try:
-    return YM6File(f)
+    return impls[f.read(4)](f)
   except:
     f.close()
     raise
