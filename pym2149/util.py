@@ -4,7 +4,7 @@ import logging
 
 class Session:
 
-  def __init__(self, clock):
+  def __init__(self, clock): # TODO: This should take a max block size.
     self.carryticks = 0
     self.clock = clock
 

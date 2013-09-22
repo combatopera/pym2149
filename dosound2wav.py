@@ -31,6 +31,7 @@ def readbytecode(f, label):
         else:
           n = int(s)
         bytecode.append(n)
+      # TODO: Support termination not just at end of line.
       if len(bytecode) >= 2 and not bytecode[-1]:
         ctrl = bytecode[-2]
         if ctrl >= 0x82 and ctrl <= 0xff:
@@ -53,6 +54,7 @@ def main():
   try:
     session = Session(clock)
     dosound(bytecode, chip, session, stream)
+    # TODO: Session should be able to limit latency.
     for _ in xrange(50 * extraseconds):
       stream(session.block(50))
     stream.flush()
