@@ -57,7 +57,7 @@ class YM3(YM):
   info = ()
 
   def __init__(self, f):
-    YMFile.__init__(self, f, False)
+    YM.__init__(self, f, False)
     self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
 
   def __iter__(self):
@@ -69,7 +69,7 @@ class YM56(YM):
   framesize = 16
 
   def __init__(self, f):
-    YMFile.__init__(self, f, True)
+    YM.__init__(self, f, True)
     self.framecount = self.lword()
     # We can ignore the other attributes as they are specific to sample data:
     self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 0x01]
