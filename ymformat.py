@@ -4,7 +4,7 @@ from pym2149.ym2149 import stclock
 
 log = logging.getLogger(__name__)
 
-class YMFile:
+class YM:
 
   checkstr = 'LeOnArD!'
   wordstruct = struct.Struct('>H')
@@ -48,7 +48,7 @@ class YMFile:
   def close(self):
     self.f.close()
 
-class YM3File(YMFile):
+class YM3(YM):
 
   formatid = 'YM3!'
   framesize = 14
@@ -64,9 +64,8 @@ class YM3File(YMFile):
     for _ in xrange(self.framecount):
       yield self.interleavedframe()
 
-class YM6File(YMFile):
+class YM56(YM):
 
-  formatid = 'YM6!'
   framesize = 16
 
   def __init__(self, f):
@@ -92,7 +91,15 @@ class YM6File(YMFile):
     for _ in xrange(self.framecount):
       yield self.frame()
 
-impls = dict([i.formatid, i] for i in [YM3File, YM6File])
+class YM5(YM56):
+
+  formatid = 'YM5!'
+
+class YM6(YM56):
+
+  formatid = 'YM6!'
+
+impls = dict([i.formatid, i] for i in [YM3, YM5, YM6])
 
 def ymopen(path):
   f = open(path, 'rb')
