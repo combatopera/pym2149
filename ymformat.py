@@ -36,7 +36,6 @@ class YM:
     return text
 
   def interleavedframe(self):
-    # FIXME: Too slow.
     v = [None] * self.framesize
     for i in xrange(self.framesize - 1):
       v[i] = ord(self.f.read(1))
