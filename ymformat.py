@@ -1,4 +1,6 @@
-import struct, logging
+from __future__ import division
+import struct, logging, os
+from pym2149.ym2149 import stclock
 
 log = logging.getLogger(__name__)
 
@@ -33,8 +35,34 @@ class YMFile:
     self.skip(1)
     return text
 
+  def interleavedframe(self):
+    # FIXME: Too slow.
+    v = [None] * self.framesize
+    for i in xrange(self.framesize - 1):
+      v[i] = ord(self.f.read(1))
+      self.skip(-1 + self.framecount)
+    v[self.framesize - 1] = ord(self.f.read(1))
+    self.skip(-(self.framesize - 1) * self.framecount)
+    return v
+
   def close(self):
     self.f.close()
+
+class YM3File(YMFile):
+
+  formatid = 'YM3!'
+  framesize = 14
+  clock = stclock
+  framefreq = 50
+  info = ()
+
+  def __init__(self, f):
+    YMFile.__init__(self, f, False)
+    self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
+
+  def __iter__(self):
+    for _ in xrange(self.framecount):
+      yield self.interleavedframe()
 
 class YM6File(YMFile):
 
@@ -57,24 +85,14 @@ class YM6File(YMFile):
         self.skip(self.lword())
     self.info = tuple(self.ntstring() for _ in xrange(3))
 
-  def simpleframe(self): # Not tested.
+  def simpleframe(self):
     return [ord(c) for c in self.f.read(self.framesize)]
-
-  def interleavedframe(self):
-    # FIXME: Too slow.
-    v = [None] * self.framesize
-    for i in xrange(self.framesize - 1):
-      v[i] = ord(self.f.read(1))
-      self.skip(-1 + self.framecount)
-    v[self.framesize - 1] = ord(self.f.read(1))
-    self.skip(-(self.framesize - 1) * self.framecount)
-    return v
 
   def __iter__(self): # FIXME: Does not loop.
     for _ in xrange(self.framecount):
       yield self.frame()
 
-impls = dict([i.formatid, i] for i in [YM6File])
+impls = dict([i.formatid, i] for i in [YM3File, YM6File])
 
 def ymopen(path):
   f = open(path, 'rb')
