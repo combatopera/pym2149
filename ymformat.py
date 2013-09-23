@@ -72,8 +72,8 @@ class YM6File(YMFile):
   def __init__(self, f):
     YMFile.__init__(self, f, True)
     self.framecount = self.lword()
-    # TODO LATER: There are more attributes.
-    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 1]
+    # We can ignore the other attributes as they are specific to sample data:
+    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 0x01]
     self.samplecount = self.word()
     self.clock = self.lword()
     self.framefreq = self.word()
