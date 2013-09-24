@@ -47,6 +47,15 @@ class YM:
   def simpleframe(self):
     return [ord(c) for c in self.f.read(self.framesize)]
 
+  def __iter__(self):
+    for _ in xrange(self.framecount):
+      yield self.frame()
+    if self.loopframe is not None:
+      while True:
+        self.f.seek(self.loopoff)
+        for _ in xrange(self.framecount - self.loopframe):
+          yield self.frame()
+
   def close(self):
     self.f.close()
 
@@ -57,14 +66,11 @@ class YM23(YM):
   framefreq = 50
   info = ()
   frame = YM.interleavedframe
+  loopframe = None # Default, overridden in YM3b.
 
   def __init__(self, f):
     YM.__init__(self, f, False)
     self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
-
-  def __iter__(self):
-    for _ in xrange(self.framecount):
-      yield self.frame()
 
 class YM2(YM23):
 
@@ -81,8 +87,9 @@ class YM3b(YM23):
   def __init__(self, f):
     YM23.__init__(self, f)
     self.skip(self.framecount * self.framesize)
-    self.loopframe = self.lword() # TODO: Actually use it.
+    self.loopframe = self.lword()
     self.skip(-(self.framecount * self.framesize + 4))
+    self.loopoff = self.f.tell() + self.loopframe
 
 class YM56(YM):
 
@@ -110,14 +117,6 @@ class YM56(YM):
     else:
       self.frame = self.simpleframe
       self.loopoff += self.loopframe * self.framesize
-
-  def __iter__(self):
-    for _ in xrange(self.framecount):
-      yield self.frame()
-    while True:
-      self.f.seek(self.loopoff)
-      for _ in xrange(self.framecount - self.loopframe):
-        yield self.frame()
 
 class YM5(YM56):
 
