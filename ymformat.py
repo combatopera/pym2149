@@ -44,6 +44,9 @@ class YM:
     self.skip(-(self.framesize - 1) * self.framecount)
     return v
 
+  def simpleframe(self):
+    return [ord(c) for c in self.f.read(self.framesize)]
+
   def close(self):
     self.f.close()
 
@@ -89,9 +92,6 @@ class YM56(YM):
     else:
       self.frame = self.simpleframe
       self.loopoff += self.loopframe * self.framesize
-
-  def simpleframe(self):
-    return [ord(c) for c in self.f.read(self.framesize)]
 
   def __iter__(self):
     for _ in xrange(self.framecount):
