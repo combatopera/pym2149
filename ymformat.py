@@ -73,6 +73,16 @@ class YM3(YM23):
 
   formatid = 'YM3!'
 
+class YM3b(YM23):
+
+  formatid = 'YM3b'
+
+  def __init__(self, f):
+    YM23.__init__(self, f)
+    self.skip(self.framecount * self.framesize)
+    self.loopframe = self.lword() # TODO: Actually use it.
+    self.skip(-(self.framecount * self.framesize + 4))
+
 class YM56(YM):
 
   framesize = 16
@@ -116,7 +126,7 @@ class YM6(YM56):
 
   formatid = 'YM6!'
 
-impls = dict([i.formatid, i] for i in [YM2, YM3, YM5, YM6])
+impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
 def ymopen(path):
   f = open(path, 'rb')
