@@ -50,9 +50,8 @@ class YM:
   def close(self):
     self.f.close()
 
-class YM3(YM):
+class YM23(YM):
 
-  formatid = 'YM3!'
   framesize = 14
   clock = stclock
   framefreq = 50
@@ -65,6 +64,14 @@ class YM3(YM):
   def __iter__(self):
     for _ in xrange(self.framecount):
       yield self.interleavedframe()
+
+class YM2(YM23):
+
+  formatid = 'YM2!'
+
+class YM3(YM23):
+
+  formatid = 'YM3!'
 
 class YM56(YM):
 
@@ -109,7 +116,7 @@ class YM6(YM56):
 
   formatid = 'YM6!'
 
-impls = dict([i.formatid, i] for i in [YM3, YM5, YM6])
+impls = dict([i.formatid, i] for i in [YM2, YM3, YM5, YM6])
 
 def ymopen(path):
   f = open(path, 'rb')
