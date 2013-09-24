@@ -14,6 +14,7 @@ class YM:
     if expectcheckstr:
       if self.checkstr != f.read(len(self.checkstr)):
         raise Exception('Bad check string.')
+    self.frameindex = 0
     self.f = f
 
   def word(self):
@@ -36,25 +37,30 @@ class YM:
     return text
 
   def interleavedframe(self):
-    v = [None] * self.framesize
+    frame = [None] * self.framesize
     for i in xrange(self.framesize - 1):
-      v[i] = ord(self.f.read(1))
+      frame[i] = ord(self.f.read(1))
       self.skip(-1 + self.framecount)
-    v[self.framesize - 1] = ord(self.f.read(1))
+    frame[self.framesize - 1] = ord(self.f.read(1))
     self.skip(-(self.framesize - 1) * self.framecount)
-    return v
+    return frame
 
   def simpleframe(self):
     return [ord(c) for c in self.f.read(self.framesize)]
 
   def __iter__(self):
-    for _ in xrange(self.framecount):
-      yield self.readframe()
-    if self.loopframe is not None:
-      while True:
+    while self.frameindex < self.framecount:
+      frame = self.readframe()
+      self.frameindex += 1
+      yield frame
+    if self.loopframe is None:
+      return
+    while True:
+      if not (self.frameindex - self.framecount) % (self.framecount - self.loopframe):
         self.f.seek(self.loopoff)
-        for _ in xrange(self.framecount - self.loopframe):
-          yield self.readframe()
+      frame = self.readframe()
+      self.frameindex += 1
+      yield frame
 
   def close(self):
     self.f.close()
