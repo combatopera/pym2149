@@ -71,7 +71,7 @@ class YM56(YM):
     YM.__init__(self, f, True)
     self.framecount = self.lword()
     # We can ignore the other attributes as they are specific to sample data:
-    self.frame = [self.simpleframe, self.interleavedframe][self.lword() & 0x01]
+    interleaved = self.lword() & 0x01
     self.samplecount = self.word()
     self.clock = self.lword()
     self.framefreq = self.word()
@@ -82,13 +82,24 @@ class YM56(YM):
       for _ in xrange(self.samplecount):
         self.skip(self.lword())
     self.info = tuple(self.ntstring() for _ in xrange(3))
+    self.loopoff = self.f.tell()
+    if interleaved:
+      self.frame = self.interleavedframe
+      self.loopoff += self.loopframe
+    else:
+      self.frame = self.simpleframe
+      self.loopoff += self.loopframe * self.framesize
 
   def simpleframe(self):
     return [ord(c) for c in self.f.read(self.framesize)]
 
-  def __iter__(self): # FIXME: Does not loop.
+  def __iter__(self):
     for _ in xrange(self.framecount):
       yield self.frame()
+    while True:
+      self.f.seek(self.loopoff)
+      for _ in xrange(self.framecount - self.loopframe)
+        yield self.frame()
 
 class YM5(YM56):
 
