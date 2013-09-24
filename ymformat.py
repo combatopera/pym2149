@@ -56,6 +56,7 @@ class YM23(YM):
   clock = stclock
   framefreq = 50
   info = ()
+  frame = YM.interleavedframe
 
   def __init__(self, f):
     YM.__init__(self, f, False)
@@ -63,7 +64,7 @@ class YM23(YM):
 
   def __iter__(self):
     for _ in xrange(self.framecount):
-      yield self.interleavedframe()
+      yield self.frame()
 
 class YM2(YM23):
 
@@ -115,7 +116,7 @@ class YM56(YM):
       yield self.frame()
     while True:
       self.f.seek(self.loopoff)
-      for _ in xrange(self.framecount - self.loopframe)
+      for _ in xrange(self.framecount - self.loopframe):
         yield self.frame()
 
 class YM5(YM56):
