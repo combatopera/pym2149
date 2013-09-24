@@ -10,8 +10,8 @@ class YM:
   wordstruct = struct.Struct('>H')
   lwordstruct = struct.Struct('>I')
 
-  def __init__(self, f, checkstr):
-    if checkstr:
+  def __init__(self, f, expectcheckstr):
+    if expectcheckstr:
       if self.checkstr != f.read(len(self.checkstr)):
         raise Exception('Bad check string.')
     self.f = f
@@ -49,12 +49,12 @@ class YM:
 
   def __iter__(self):
     for _ in xrange(self.framecount):
-      yield self.frame()
+      yield self.readframe()
     if self.loopframe is not None:
       while True:
         self.f.seek(self.loopoff)
         for _ in xrange(self.framecount - self.loopframe):
-          yield self.frame()
+          yield self.readframe()
 
   def close(self):
     self.f.close()
@@ -65,7 +65,7 @@ class YM23(YM):
   clock = stclock
   framefreq = 50
   info = ()
-  frame = YM.interleavedframe
+  readframe = YM.interleavedframe
   loopframe = None # Default, overridden in YM3b.
 
   def __init__(self, f):
@@ -112,10 +112,10 @@ class YM56(YM):
     self.info = tuple(self.ntstring() for _ in xrange(3))
     self.loopoff = self.f.tell()
     if interleaved:
-      self.frame = self.interleavedframe
+      self.readframe = self.interleavedframe
       self.loopoff += self.loopframe
     else:
-      self.frame = self.simpleframe
+      self.readframe = self.simpleframe
       self.loopoff += self.loopframe * self.framesize
 
 class YM5(YM56):
