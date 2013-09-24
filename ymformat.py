@@ -100,14 +100,14 @@ class YM56(YM):
     self.framecount = self.lword()
     # We can ignore the other attributes as they are specific to sample data:
     interleaved = self.lword() & 0x01
-    self.samplecount = self.word()
+    samplecount = self.word()
     self.clock = self.lword()
     self.framefreq = self.word()
     self.loopframe = self.lword()
     self.skip(self.word()) # Future expansion.
-    if self.samplecount:
-      log.warn("Ignoring %s samples.", self.samplecount)
-      for _ in xrange(self.samplecount):
+    if samplecount:
+      log.warn("Ignoring %s samples.", samplecount)
+      for _ in xrange(samplecount):
         self.skip(self.lword())
     self.info = tuple(self.ntstring() for _ in xrange(3))
     self.loopoff = self.f.tell()
