@@ -4,15 +4,29 @@ import logging
 
 class Session:
 
-  def __init__(self, clock): # TODO: This should take a max block size.
+  def __init__(self, clock, minblockrate = 100):
+    if minblockrate is not None:
+      # If division not exact, rate will slightly exceed given minimum:
+      self.maxblocksize = clock // minblockrate
+      if not self.maxblocksize:
+        raise Exception(clock, minblockrate)
+    else:
+      self.maxblocksize = None
     self.carryticks = 0
     self.clock = clock
 
-  def block(self, refreshrate):
+  def blocks(self, refreshrate):
     available = self.carryticks + self.clock
     blockticks = int(round(available / refreshrate))
     self.carryticks = available - blockticks * refreshrate
-    return Block(blockticks)
+    if self.maxblocksize is not None:
+      while blockticks:
+        size = min(blockticks, self.maxblocksize)
+        b = Block(size)
+        blockticks -= size
+        yield b
+    else:
+      yield Block(blockticks)
 
 def initlogging():
   logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.DEBUG)

@@ -32,7 +32,8 @@ def main():
     try:
       session = Session(clock)
       for i in xrange(int(round(seconds * refreshrate))):
-        stream(session.block(refreshrate))
+        for b in session.blocks(refreshrate):
+          stream(b)
       stream.flush()
     finally:
       stream.close()

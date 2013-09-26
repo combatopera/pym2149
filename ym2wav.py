@@ -21,7 +21,8 @@ def main():
       session = Session(f.clock)
       for frame in f:
         chip.update(frame)
-        stream(session.block(f.framefreq))
+        for b in session.blocks(f.framefreq):
+          stream(b)
       stream.flush()
     finally:
       stream.close()

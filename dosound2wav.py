@@ -54,9 +54,10 @@ def main():
   try:
     session = Session(clock)
     dosound(bytecode, chip, session, stream)
-    # TODO: Session should be able to limit latency.
-    for _ in xrange(50 * extraseconds):
-      stream(session.block(50))
+    # TODO: Could blocks take a fraction?
+    for _ in xrange(extraseconds):
+      for b in session.blocks(1):
+        stream(b)
     stream.flush()
   finally:
     stream.close()
