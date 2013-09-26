@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import division
 import sys, re
 from pym2149.dosound import dosound
 from pym2149.ym2149 import YM2149, stclock as clock
@@ -54,10 +55,8 @@ def main():
   try:
     session = Session(clock)
     dosound(bytecode, chip, session, stream)
-    # TODO: Could blocks take a fraction?
-    for _ in xrange(extraseconds):
-      for b in session.blocks(1):
-        stream(b)
+    for b in session.blocks(1 / extraseconds):
+      stream(b)
     stream.flush()
   finally:
     stream.close()
