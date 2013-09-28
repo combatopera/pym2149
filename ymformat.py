@@ -4,6 +4,12 @@ from pym2149.ym2149 import stclock
 
 log = logging.getLogger(__name__)
 
+class LoopInfo:
+
+  def __init__(self, frame, offset):
+    self.frame = frame
+    self.offset = offset
+
 class YM:
 
   checkstr = 'LeOnArD!'
@@ -54,12 +60,12 @@ class YM:
       frame = self.readframe()
       self.frameindex += 1
       yield frame
-    if self.loopframe is None:
+    if self.loopinfo is None:
       return
     while True:
-      if not (self.frameindex - self.framecount) % (self.framecount - self.loopframe):
-        log.debug("Looping to frame %s.", self.loopframe)
-        self.f.seek(self.loopoff)
+      if not (self.frameindex - self.framecount) % (self.framecount - self.loopinfo.frame):
+        log.debug("Looping to frame %s.", self.loopinfo.frame)
+        self.f.seek(self.loopinfo.offset)
       frame = self.readframe()
       self.frameindex += 1
       yield frame
@@ -74,7 +80,7 @@ class YM23(YM):
   framefreq = 50
   info = ()
   readframe = YM.interleavedframe
-  loopframe = None # Default, overridden in YM3b.
+  loopinfo = None # Default, overridden in YM3b.
 
   def __init__(self, f):
     YM.__init__(self, f, False)
@@ -95,9 +101,9 @@ class YM3b(YM23):
   def __init__(self, f):
     YM23.__init__(self, f)
     self.skip(self.framecount * self.framesize)
-    self.loopframe = self.lword()
+    loopframe = self.lword()
     self.skip(-(self.framecount * self.framesize + 4))
-    self.loopoff = self.f.tell() + self.loopframe
+    self.loopinfo = LoopInfo(loopframe, self.f.tell() + loopframe)
 
 class YM56(YM):
 
@@ -111,20 +117,20 @@ class YM56(YM):
     samplecount = self.word()
     self.clock = self.lword()
     self.framefreq = self.word()
-    self.loopframe = self.lword()
+    loopframe = self.lword()
     self.skip(self.word()) # Future expansion.
     if samplecount:
       log.warn("Ignoring %s samples.", samplecount)
       for _ in xrange(samplecount):
         self.skip(self.lword())
     self.info = tuple(self.ntstring() for _ in xrange(3))
-    self.loopoff = self.f.tell()
+    dataoffset = self.f.tell()
     if interleaved:
       self.readframe = self.interleavedframe
-      self.loopoff += self.loopframe
+      self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
     else:
       self.readframe = self.simpleframe
-      self.loopoff += self.loopframe * self.framesize
+      self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
 
 class YM5(YM56):
 
