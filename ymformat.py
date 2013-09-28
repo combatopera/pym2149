@@ -1,5 +1,5 @@
 from __future__ import division
-import struct, logging, os
+import struct, logging, os, tempfile, subprocess, shutil, sys
 from pym2149.ym2149 import stclock
 
 log = logging.getLogger(__name__)
@@ -146,7 +146,47 @@ impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 def ymopen(path):
   f = open(path, 'rb')
   try:
+    if 'YM' == f.read(2):
+      return impls['YM' + f.read(2)](f)
+  except:
+    f.close()
+    raise
+  f.close()
+  f = unpack(path)
+  try:
     return impls[f.read(4)](f)
   except:
     f.close()
+    raise
+
+class Unpacked:
+
+  def __init__(self, f, clean):
+    self.f = f
+    self.clean = clean
+
+  def __getattr__(self, name):
+    return getattr(self.f, name)
+
+  def close(self):
+    self.f.close()
+    self.clean()
+
+def unpack(path):
+  tmpdir = tempfile.mkdtemp()
+  def clean():
+    log.debug("Deleting temporary folder: %s", tmpdir)
+    shutil.rmtree(tmpdir)
+  try:
+    # Observe we redirect stdout so it doesn't get played:
+    subprocess.check_call(['lha', 'x', os.path.abspath(path)], cwd = tmpdir, stdout = sys.stderr)
+    name, = os.listdir(tmpdir)
+    f = open(os.path.join(tmpdir, name), 'rb')
+    try:
+      return Unpacked(f, clean)
+    except:
+      f.close()
+      raise
+  except:
+    clean()
     raise
