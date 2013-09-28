@@ -28,6 +28,8 @@ class WavWriter(AbstractNode):
       # Observe we match the endian-ness of sox output:
       self.oss.setparameters(ossaudiodev.AFMT_S16_LE, channels, outfreq, True)
     else:
+      if '-' == path:
+        command += ['-t', 'wav']
       command += [path]
       self.oss = None
     # TODO: Find out whether a DC filter would be authentic.
