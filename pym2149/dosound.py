@@ -3,8 +3,9 @@ def dosound(bytecode, chip, session, stream):
     for b in bytecode:
       yield b & 0xff # It's supposed to be bytecode.
   g = g()
-  def block():
-    return session.block(50) # Authentic period.
+  def tick():
+    for b in session.blocks(50): # Authentic period.
+      stream(b)
   while True:
     ctrl = g.next()
     if ctrl <= 0xF:
@@ -21,7 +22,7 @@ def dosound(bytecode, chip, session, stream):
         softreg += adjust # Yes, this is done up-front.
         # The real thing simply uses the truncation on overflow:
         targetreg.value = softreg
-        stream(block()) # One frame with that value.
+        tick()
         # That's right, if we skip past it we loop forever:
         if last == softreg:
           break
@@ -30,7 +31,7 @@ def dosound(bytecode, chip, session, stream):
       if not ticks:
         break
       ticks += 1 # Apparently!
-      for i in xrange(ticks):
-        stream(block())
+      for _ in xrange(ticks):
+        tick()
     else:
       raise Exception(ctrl)
