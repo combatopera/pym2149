@@ -149,6 +149,18 @@ class YM56(YM):
     else:
       self.readframe = self.simpleframe
       self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
+    self.logtimersynth = True
+    self.logdigidrum = True
+
+  def __iter__(self):
+    for frame in YM.__iter__(self):
+      if self.logtimersynth and (frame[0x1] & 0x30):
+        log.warn("Timer-synth at frame %s.", self.frameindex - 1)
+        self.logtimersynth = False
+      if self.logdigidrum and (frame[0x3] & 0x30):
+        log.warn("Digi-drum at frame %s.", self.frameindex - 1)
+        self.logdigidrum = False
+      yield frame
 
 class YM5(YM56):
 
