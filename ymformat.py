@@ -152,18 +152,29 @@ def ymopen(path):
     f.close()
     raise
   f.close()
-  f = unpack(path)
+  f = UnpackedFile(path)
   try:
     return impls[f.read(4)](f)
   except:
     f.close()
     raise
 
-class Unpacked:
+class UnpackedFile:
 
-  def __init__(self, f, clean):
-    self.f = f
-    self.clean = clean
+  def __init__(self, path):
+    self.tmpdir = tempfile.mkdtemp()
+    try:
+      # Observe we redirect stdout so it doesn't get played:
+      subprocess.check_call(['lha', 'x', os.path.abspath(path)], cwd = self.tmpdir, stdout = sys.stderr)
+      name, = os.listdir(self.tmpdir)
+      self.f = open(os.path.join(self.tmpdir, name), 'rb')
+    except:
+      self.clean()
+      raise
+
+  def clean(self):
+    log.debug("Deleting temporary folder: %s", self.tmpdir)
+    shutil.rmtree(self.tmpdir)
 
   def __getattr__(self, name):
     return getattr(self.f, name)
@@ -171,22 +182,3 @@ class Unpacked:
   def close(self):
     self.f.close()
     self.clean()
-
-def unpack(path):
-  tmpdir = tempfile.mkdtemp()
-  def clean():
-    log.debug("Deleting temporary folder: %s", tmpdir)
-    shutil.rmtree(tmpdir)
-  try:
-    # Observe we redirect stdout so it doesn't get played:
-    subprocess.check_call(['lha', 'x', os.path.abspath(path)], cwd = tmpdir, stdout = sys.stderr)
-    name, = os.listdir(tmpdir)
-    f = open(os.path.join(tmpdir, name), 'rb')
-    try:
-      return Unpacked(f, clean)
-    except:
-      f.close()
-      raise
-  except:
-    clean()
-    raise
