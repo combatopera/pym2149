@@ -4,7 +4,7 @@ import sys, logging
 from pym2149.out import WavWriter
 from pym2149.util import Session, initlogging
 from pym2149.ym2149 import YM2149
-from ymformat import ymopen
+from pym2149.ymformat import ymopen
 
 log = logging.getLogger(__name__)
 
