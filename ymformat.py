@@ -138,7 +138,9 @@ impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 def ymopen(path):
   f = open(path, 'rb')
   try:
-    return impls[f.read(4)](f)
+    impl = impls[f.read(4)]
+    log.debug("Format ID: %s", impl.formatid)
+    return impl(f)
   except:
     f.close()
     raise
