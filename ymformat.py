@@ -55,20 +55,21 @@ class YM:
   def simpleframe(self):
     return [ord(c) for c in self.f.read(self.framesize)]
 
+  def step(self):
+    frame = self.readframe()
+    self.frameindex += 1
+    return frame
+
   def __iter__(self):
     while self.frameindex < self.framecount:
-      frame = self.readframe()
-      self.frameindex += 1
-      yield frame
+      yield self.step()
     if self.loopinfo is None:
       return
     while True:
       if not (self.frameindex - self.framecount) % (self.framecount - self.loopinfo.frame):
         log.debug("Looping to frame %s.", self.loopinfo.frame)
         self.f.seek(self.loopinfo.offset)
-      frame = self.readframe()
-      self.frameindex += 1
-      yield frame
+      yield self.step()
 
   def close(self):
     self.f.close()
