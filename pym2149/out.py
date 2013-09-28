@@ -1,4 +1,4 @@
-import subprocess, ossaudiodev
+import subprocess
 from nod import AbstractNode
 
 class WavWriter(AbstractNode):
@@ -20,20 +20,12 @@ class WavWriter(AbstractNode):
       '-r', str(outfreq),
       '-e', 'signed',
       '-b', '16',
-      '-L', # Little-endian.
     ]
-    if '/dev/dsp' == path:
-      command += ['-t', 'raw', '-']
-      self.oss = ossaudiodev.open('w')
-      # Observe we match the endian-ness of sox output:
-      self.oss.setparameters(ossaudiodev.AFMT_S16_LE, channels, outfreq, True)
-    else:
-      if '-' == path:
-        command += ['-t', 'wav']
-      command += [path]
-      self.oss = None
+    if '-' == path:
+      command += ['-t', 'wav']
+    command += [path]
     # TODO: Find out whether a DC filter would be authentic.
-    self.sox = subprocess.Popen(command, stdin = subprocess.PIPE, stdout = self.oss)
+    self.sox = subprocess.Popen(command, stdin = subprocess.PIPE)
     self.chip = chip
 
   def callimpl(self):
@@ -46,11 +38,6 @@ class WavWriter(AbstractNode):
       self.sox = None # We have released the resource(s).
       if status:
         raise Exception(status)
-    if self.oss is not None:
-      self.oss.sync()
 
   def close(self):
     self.flush() # Does nothing if flush already called.
-    if self.oss is not None:
-      self.oss.close() # Should be a formality if sync was called?
-      self.oss = None
