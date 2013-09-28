@@ -57,6 +57,7 @@ class YM:
       return
     while True:
       if not (self.frameindex - self.framecount) % (self.framecount - self.loopframe):
+        log.debug("Looping to frame %s.", self.loopframe)
         self.f.seek(self.loopoff)
       frame = self.readframe()
       self.frameindex += 1
