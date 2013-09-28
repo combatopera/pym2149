@@ -15,6 +15,7 @@ class YM:
   checkstr = 'LeOnArD!'
   wordstruct = struct.Struct('>H')
   lwordstruct = struct.Struct('>I')
+  lwordlestruct = struct.Struct('<I')
 
   def __init__(self, f, expectcheckstr):
     log.debug("Format ID: %s", self.formatid)
@@ -24,11 +25,27 @@ class YM:
     self.frameindex = 0
     self.f = f
 
+  def number(self, struct):
+    return struct.unpack(self.f.read(struct.size))[0]
+
   def word(self):
-    return self.wordstruct.unpack(self.f.read(2))[0]
+    return self.number(self.wordstruct)
 
   def lword(self):
-    return self.lwordstruct.unpack(self.f.read(4))[0]
+    return self.number(self.lwordstruct)
+
+  def readloopframe(self):
+    loopframe = self.lword()
+    if loopframe < self.framecount:
+      return loopframe
+    self.skip(-4)
+    loopframe = self.number(self.lwordlestruct)
+    if loopframe < self.framecount:
+      log.info('Loop frame apparently little-endian.')
+      return loopframe
+    loopframe = 0
+    log.warn("Cannot interpret loop frame, defaulting to %s.", loopframe)
+    return loopframe
 
   def skip(self, n):
     self.f.seek(n, 1)
@@ -102,7 +119,7 @@ class YM3b(YM23):
   def __init__(self, f):
     YM23.__init__(self, f)
     self.skip(self.framecount * self.framesize)
-    loopframe = self.lword()
+    loopframe = self.readloopframe()
     self.skip(-(self.framecount * self.framesize + 4))
     self.loopinfo = LoopInfo(loopframe, self.f.tell() + loopframe)
 
@@ -118,7 +135,7 @@ class YM56(YM):
     samplecount = self.word()
     self.clock = self.lword()
     self.framefreq = self.word()
-    loopframe = self.lword()
+    loopframe = self.readloopframe()
     self.skip(self.word()) # Future expansion.
     if samplecount:
       log.warn("Ignoring %s samples.", samplecount)
