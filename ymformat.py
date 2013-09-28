@@ -11,6 +11,7 @@ class YM:
   lwordstruct = struct.Struct('>I')
 
   def __init__(self, f, expectcheckstr):
+    log.debug("Format ID: %s", self.formatid)
     if expectcheckstr:
       if self.checkstr != f.read(len(self.checkstr)):
         raise Exception('Bad check string.')
@@ -138,9 +139,7 @@ impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 def ymopen(path):
   f = open(path, 'rb')
   try:
-    impl = impls[f.read(4)]
-    log.debug("Format ID: %s", impl.formatid)
-    return impl(f)
+    return impls[f.read(4)](f)
   except:
     f.close()
     raise
