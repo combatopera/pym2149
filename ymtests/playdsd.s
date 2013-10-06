@@ -44,13 +44,12 @@ play:	pea	ticks+2		; The actual data.
 	trap	#14
 	addq.l	#6,sp
 
-	bsr	vsync		; Sound probably starts now.
 	clr.b	crlf+1		; Hack to stay on same line.
 	moveq	#0,d7		; Clear high word for printing.
-	move	ticks,d7		; There are this many ticks left.
-loop:	move.l	d7,d0
+	move	ticks,d7		; Ticks remaining at next vsync.
+loop:	bsr	vsync		; Sound probably starts at first of these.
+	move.l	d7,d0
 	bsr	print
-	bsr	vsync
 	dbra	d7,loop
 
 anykey:	move	#$08,-(sp)	; Cnecin.
