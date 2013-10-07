@@ -9,8 +9,8 @@ class Reg:
     self.index = index
     self.xform = xform
 
-  def put(self, value):
-    self.bytecode.extend([self.index, self.xform(value)])
+  def put(self, *value):
+    self.bytecode.extend([self.index, self.xform(*value)])
 
 class Data:
 
@@ -27,8 +27,11 @@ class Data:
   def sleep(self, ticks):
     if ticks < 2:
       raise Exception(ticks)
-    self.bytecode.extend([0x82, ticks - 1])
-    self.totalticks += ticks
+    while ticks:
+      part = min(256, ticks)
+      self.bytecode.extend([0x82, part - 1])
+      self.totalticks += part
+      ticks -= part
 
   def save(self, f):
     w = lambda v: f.write(''.join(chr(x) for x in v))
