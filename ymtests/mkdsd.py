@@ -43,7 +43,7 @@ def main():
   inpath, outpath = sys.argv[1:]
   data = Data()
   A_fine, A_rough, B_fine, B_rough, C_fine, C_rough, N_period = (data.reg() for _ in xrange(7))
-  mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v))
+  mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0))
   A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
   A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
   sleep = data.sleep
