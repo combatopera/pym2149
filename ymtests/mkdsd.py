@@ -14,7 +14,8 @@ class Reg:
 
   def anim(self, preadjust, last):
     self.data.bytecode.extend([0x81, self.index, preadjust, last])
-    value = self.data.prev # TODO: If this is last do we tick at all?
+    # If prev equals last we do a full cycle rather than nothing, see dosound0:
+    value = self.data.prev
     while True:
       value = (value + preadjust) & 0xff
       self.data.totalticks += 1
