@@ -4,13 +4,22 @@ import sys, operator
 
 class Reg:
 
-  def __init__(self, bytecode, index, xform):
-    self.bytecode = bytecode
+  def __init__(self, data, index, xform):
+    self.data = data
     self.index = index
     self.xform = xform
 
   def put(self, *value):
-    self.bytecode.extend([self.index, self.xform(*value)])
+    self.data.bytecode.extend([self.index, self.xform(*value)])
+
+  def anim(self, preadjust, last):
+    self.data.bytecode.extend([0x81, self.index, preadjust, last])
+    value = self.data.prev # TODO: If this is last do we tick at all?
+    while True:
+      value = (value + preadjust) & 0xff
+      self.data.totalticks += 1
+      if value == last or value == self.data.prev:
+        break
 
 class Data:
 
@@ -20,9 +29,13 @@ class Data:
     self.bytecode = []
 
   def reg(self, xform = lambda x: x):
-    r = Reg(self.bytecode, self.index, xform)
+    r = Reg(self, self.index, xform)
     self.index += 1
     return r
+
+  def setprev(self, prev):
+    self.bytecode.extend([0x80, prev])
+    self.prev = prev
 
   def sleep(self, ticks):
     if ticks < 2:
@@ -46,6 +59,7 @@ def main():
   mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0))
   A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
   A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
+  setprev = data.setprev
   sleep = data.sleep
   execfile(inpath)
   f = open(outpath, 'wb')
