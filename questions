@@ -1,7 +1,7 @@
 buffering:
 
 qtonpbuf period buffering for tone # old countdown discarded immediately, toggle not reset
-         does toggle flip on period change
+qtonflip does toggle flip on period change
 qnoipbuf period buffering for noise # new period applied after current countdown
 qenvpbuf period buffering for env
          mixer off buffering for tone
