@@ -33,5 +33,5 @@ qbmixenv binary mixing function effect on env # mostly silence
 
 resets:
 
-         mixer on reset for tone
-         mixer on reset for noise
+qmtreset mixer on reset for tone
+qmnreset mixer on reset for noise
