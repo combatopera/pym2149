@@ -7,7 +7,7 @@ qenvpbuf period buffering for env
          mixer off buffering for tone
          mixer off buffering for noise
 qenvrbuf envelope reset buffering # reset does not wait until end of current step
-         fixed level change buffering
+qtonflip fixed level change buffering
 
 edge values:
 
