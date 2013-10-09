@@ -62,7 +62,7 @@ def main():
   A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
   setprev = data.setprev
   sleep = data.sleep
-  execfile(inpath)
+  execfile(inpath, locals())
   f = open(outpath, 'wb')
   try:
     data.save(f)
