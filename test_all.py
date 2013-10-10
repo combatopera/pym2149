@@ -18,8 +18,8 @@ class TestAll(unittest.TestCase):
       if thisname != name and name.startswith('test_'):
         print >> sys.stderr, path
         codes.append(subprocess.call(path))
-    self.assertTrue(not codes or set([0]) == set(codes))
     print >> sys.stderr, thispath
+    self.assertTrue(not codes or set([0]) == set(codes))
 
 if __name__ == '__main__':
   unittest.main()
