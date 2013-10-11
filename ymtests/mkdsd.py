@@ -57,11 +57,9 @@ def main():
   inpath, outpath = sys.argv[1:]
   data = Data()
   A_fine, A_rough, B_fine, B_rough, C_fine, C_rough, N_period = (data.reg() for _ in xrange(7))
-  mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0))
+  mixer, setprev, sleep = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0)), data.setprev, data.sleep
   A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
   A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
-  setprev = data.setprev
-  sleep = data.sleep
   execfile(inpath, locals())
   f = open(outpath, 'wb')
   try:
