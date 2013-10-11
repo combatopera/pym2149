@@ -13,7 +13,7 @@ class Reg:
     self.data.bytecode.extend([self.index, self.xform(*value)])
 
   def anim(self, preadjust, last):
-    self.data.bytecode.extend([0x81, self.index, preadjust, last])
+    self.data.bytecode.extend([0x81, self.index, preadjust & 0xff, last])
     # If prev equals last we do a full cycle rather than nothing, see dosound0:
     value = self.data.prev
     while True:
@@ -54,19 +54,21 @@ class Data:
     w([0x82, 0])
 
 def main():
-  inpath, outpath = sys.argv[1:]
-  data = Data()
-  A_fine, A_rough, B_fine, B_rough, C_fine, C_rough, N_period = (data.reg() for _ in xrange(7))
-  mixer, setprev, sleep = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0)), data.setprev, data.sleep
-  A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
-  A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
-  execfile(inpath, locals())
-  f = open(outpath, 'wb')
-  try:
-    data.save(f)
-    f.flush()
-  finally:
-    f.close()
+  for inpath in sys.argv[1:]:
+    outpath = inpath[:inpath.rindex('.')] + '.dsd'
+    print >> sys.stderr, outpath
+    data = Data()
+    A_fine, A_rough, B_fine, B_rough, C_fine, C_rough, N_period = (data.reg() for _ in xrange(7))
+    mixer, setprev, sleep = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0)), data.setprev, data.sleep
+    A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
+    A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
+    execfile(inpath, locals())
+    f = open(outpath, 'wb')
+    try:
+      data.save(f)
+      f.flush()
+    finally:
+      f.close()
 
 if '__main__' == __name__:
   main()
