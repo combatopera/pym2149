@@ -15,9 +15,15 @@ class TestAll(unittest.TestCase):
     codes = []
     for path in paths:
       name = os.path.basename(path)
-      if thisname != name and name.startswith('test_'):
+      if thisname == name:
+        pass
+      elif name.startswith('test_'):
         print >> sys.stderr, path
         codes.append(subprocess.call(path))
+      elif name.startswith('test'):
+        print >> sys.stderr, path
+        print >> sys.stderr, 'F'
+        codes.append(1)
     print >> sys.stderr, thispath
     self.assertTrue(not codes or set([0]) == set(codes))
 
