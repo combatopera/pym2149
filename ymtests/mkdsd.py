@@ -53,16 +53,22 @@ class Data:
     w(self.bytecode)
     w([0x82, 0])
 
+class Globals:
+
+  def __init__(g, data):
+    g.A_fine, g.A_rough, g.B_fine, g.B_rough, g.C_fine, g.C_rough, g.N_period = (data.reg() for _ in xrange(7))
+    g.mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0))
+    g.A_level, g.B_level, g.C_level, g.E_fine, g.E_rough, g.E_shape = (data.reg() for _ in xrange(6))
+    g.A_tone, g.B_tone, g.C_tone, g.A_noise, g.B_noise, g.C_noise = (0x01 << i for i in xrange(6))
+    g.setprev = data.setprev
+    g.sleep = data.sleep
+
 def main():
   for inpath in sys.argv[1:]:
     outpath = inpath[:inpath.rindex('.')] + '.dsd'
     print >> sys.stderr, outpath
     data = Data()
-    A_fine, A_rough, B_fine, B_rough, C_fine, C_rough, N_period = (data.reg() for _ in xrange(7))
-    mixer, setprev, sleep = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0)), data.setprev, data.sleep
-    A_level, B_level, C_level, E_fine, E_rough, E_shape = (data.reg() for _ in xrange(6))
-    A_tone, B_tone, C_tone, A_noise, B_noise, C_noise = (0x01 << i for i in xrange(6))
-    execfile(inpath, locals())
+    execfile(inpath, Globals(data).__dict__)
     f = open(outpath, 'wb')
     try:
       data.save(f)
