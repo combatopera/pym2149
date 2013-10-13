@@ -1,13 +1,14 @@
 buffering:
 
 qtonpbuf period buffering for tone # old countdown discarded immediately, toggle not reset
-qtonflip does toggle flip on period change
+qtonflip what happens to old countdown # used as prefix of new countdown (of half-wave)
+qtonflip does toggle flip on period change # it does not
 qnoipbuf period buffering for noise # new period applied after current countdown
 qenvpbuf period buffering for env
          mixer off buffering for tone
          mixer off buffering for noise
 qenvrbuf envelope reset buffering # reset does not wait until end of current step
-qtonflip fixed level change buffering
+         fixed level change buffering
 
 edge values:
 
@@ -33,5 +34,5 @@ qbmixenv binary mixing function effect on env # mostly silence
 
 resets:
 
-qmtreset mixer on reset for tone
-qmnreset mixer on reset for noise
+qmtreset mixer on reset for tone # no, partial countdowns seen
+qmnreset mixer on reset for noise # no, same as tone
