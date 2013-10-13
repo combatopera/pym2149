@@ -54,7 +54,7 @@ class NoiseOsc(Osc):
     self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
 
   def stepvalue(self, stepindex):
-    return self.lfsr()
+    return 1 - self.lfsr() # Authentic, see qnoispec.
 
 class EnvOsc(Osc):
 
