@@ -1,8 +1,8 @@
 buffering:
 
-qtonpbuf period buffering for tone # old countdown discarded immediately, toggle not reset
+qtonpbuf period buffering for tone # toggle not reset
 qtonflip what happens to old countdown # used as prefix of new countdown (of half-wave)
-         what if old countdown bigger than new
+qtinheri what if old countdown bigger than new # start next half-wave immediately
 qtonflip does toggle flip on period change # it does not
 qnoipbuf period buffering for noise # new period applied after current countdown
 qenvpbuf period buffering for env
