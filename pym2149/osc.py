@@ -2,12 +2,17 @@ from __future__ import division
 import lfsr, numpy as np
 from nod import Node
 
-class Osc(Node):
+class OscNode(Node):
+
+  def __init__(self):
+    Node.__init__(self, np.uint8) # Slightly faster than plain old int.
+
+class Osc(OscNode):
 
   def __init__(self, steps, periodreg):
     if 0 != (self.scale % steps):
       raise Exception("Number of steps must divide the scale.")
-    Node.__init__(self, np.uint8) # Slightly faster than plain old int.
+    OscNode.__init__(self)
     self.reset()
     self.steps = steps
     self.periodreg = periodreg
