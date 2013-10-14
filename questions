@@ -5,7 +5,7 @@ qtonflip what happens to old countdown # used as prefix of new countdown (of hal
 qtinheri what if old countdown bigger than new # start next half-wave immediately
 qtonflip does toggle flip on period change # it does not
 qnoipbuf period buffering for noise # new period applied after current countdown
-qenvpbuf period buffering for env
+qenvpbuf period buffering for env # steps behave same as tone half-waves
          mixer off buffering for tone
          mixer off buffering for noise
 qenvrbuf envelope reset buffering # reset does not wait until end of current step
