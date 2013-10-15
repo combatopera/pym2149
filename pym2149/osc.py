@@ -49,17 +49,35 @@ class ToneOsc(Osc):
   def stepvalue(self, stepindex):
     return 1 - stepindex
 
-class NoiseOsc(Osc):
+class NoiseOsc(OscNode):
 
   scale = 16
 
   def __init__(self, periodreg):
-    # One step per scale results in authentic spectrum, see qnoispec:
-    Osc.__init__(self, 1, periodreg)
-    self.lfsr = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
+    OscNode.__init__(self)
+    x = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
+    self.getvalue = lambda: 1 - x() # Authentic, see qnoispec.
+    self.countdown = 0
+    self.value = -1 # Won't actually be used.
+    self.periodreg = periodreg
 
-  def stepvalue(self, stepindex):
-    return 1 - self.lfsr() # Authentic, see qnoispec.
+  def callimpl(self):
+    cursor = min(self.block.framecount, self.countdown)
+    self.blockbuf.fillpart(0, cursor, self.value)
+    self.countdown -= cursor
+    if cursor == self.block.framecount:
+      return
+    # One step per scale results in authentic spectrum, see qnoispec:
+    stepsize = self.scale * self.periodreg.value
+    fullsteps = (self.block.framecount - cursor) // stepsize
+    for _ in xrange(fullsteps):
+      self.blockbuf.fillpart(cursor, cursor + stepsize, self.getvalue())
+      cursor += stepsize
+    if cursor == self.block.framecount:
+      return
+    self.value = self.getvalue()
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.value)
+    self.countdown = cursor + stepsize - self.block.framecount
 
 class EnvOsc(Osc):
 
