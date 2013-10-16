@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import unittest, lfsr
+from __future__ import division
+import unittest, lfsr, time
 from osc import ToneOsc, NoiseOsc, EnvOsc
 from nod import Block
 from reg import Reg
@@ -37,6 +38,17 @@ class TestNoiseOsc(unittest.TestCase):
       v = o(Block(48 * n)).tolist()
       for i in xrange(n):
         self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
+
+  def test_performance(self):
+    blockrate = 50
+    blocksize = 2000000 // blockrate
+    for p in 0x01, 0x1f:
+      r = Reg(p)
+      o = NoiseOsc(r)
+      start = time.time()
+      for _ in xrange(blockrate):
+        o(Block(blocksize))
+      self.assertTrue(time.time() - start < .05)
 
 class TestEnvOsc(unittest.TestCase):
 
