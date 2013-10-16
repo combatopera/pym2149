@@ -13,5 +13,15 @@ class TestBuf(unittest.TestCase):
     b.putring(4, 2, r, 4, 8)
     self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], list(b.buf))
 
+  def test_putringops(self):
+    r = np.empty(5)
+    self.assertEqual(0, Buf.putringops(r, None, 0))
+    self.assertEqual(1, Buf.putringops(r, 0, 1))
+    self.assertEqual(1, Buf.putringops(r, 4, 1))
+    self.assertEqual(1, Buf.putringops(r, 0, 5))
+    self.assertEqual(2, Buf.putringops(r, 0, 6))
+    self.assertEqual(2, Buf.putringops(r, 1, 5))
+    self.assertEqual(2, Buf.putringops(r, 0, 10))
+
 if __name__ == '__main__':
   unittest.main()

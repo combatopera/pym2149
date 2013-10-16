@@ -17,6 +17,17 @@ class Buf:
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
 
+  @staticmethod
+  def putringops(ring, ringstart, ringn):
+    ringsize = ring.shape[0]
+    ops = 0
+    while ringn: # TODO: Avoid looping.
+      n = min(ringsize - ringstart, ringn)
+      ops += 1
+      ringstart = (ringstart + n) % ringsize
+      ringn -= n
+    return ops
+
   def putring(self, start, step, ring, ringstart, ringn):
     ringsize = ring.shape[0]
     while ringn:
