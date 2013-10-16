@@ -4,8 +4,10 @@ from nod import Node
 
 class OscNode(Node):
 
+  oscdtype = np.uint8 # Slightly faster than plain old int.
+
   def __init__(self):
-    Node.__init__(self, np.uint8) # Slightly faster than plain old int.
+    Node.__init__(self, self.oscdtype)
 
 class Osc(OscNode):
 
@@ -52,13 +54,19 @@ class ToneOsc(Osc):
 class NoiseOsc(OscNode):
 
   scale = 16
+  values = np.fromiter(lfsr.Lfsr(*lfsr.ym2149nzdegrees), OscNode.oscdtype)
 
   def __init__(self, periodreg):
     OscNode.__init__(self)
-    self.getvalue = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
+    self.valueindex = 0
     self.countdown = 0
     self.value = -1 # Won't actually be used.
     self.periodreg = periodreg
+
+  def getvalue(self):
+    v = self.values[self.valueindex]
+    self.valueindex = (self.valueindex + 1) % self.values.shape[0]
+    return v
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.countdown)
