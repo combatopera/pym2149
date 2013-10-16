@@ -60,7 +60,6 @@ class NoiseOsc(OscNode):
     OscNode.__init__(self)
     self.valueindex = 0
     self.countdown = 0
-    self.value = -1 # Won't actually be used.
     self.periodreg = periodreg
 
   def getvalue(self):
@@ -73,7 +72,7 @@ class NoiseOsc(OscNode):
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.countdown)
-    self.blockbuf.fillpart(0, cursor, self.value)
+    cursor and self.blockbuf.fillpart(0, cursor, self.value)
     self.countdown -= cursor
     if cursor == self.block.framecount:
       return
