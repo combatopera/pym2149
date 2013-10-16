@@ -17,6 +17,17 @@ class Buf:
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
 
+  def putring(self, start, step, ring, ringstart, ringn):
+    ringsize = ring.shape[0]
+    while ringn:
+      n = min(ringsize - ringstart, ringn)
+      end = start + step * n
+      ringend = ringstart + n
+      self.buf[start:end:step] = ring[ringstart:ringend]
+      start = end
+      ringstart = ringend % ringsize
+      ringn -= n
+
   def add(self, value):
     self.buf += value
 
