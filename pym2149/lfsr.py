@@ -11,7 +11,7 @@ class Lfsr:
     self.x >>= 1
     if bit:
       self.x ^= self.mask
-    return bit
+    return 1 - bit # Authentic, see qnoispec.
 
   def __iter__(self):
     first = self.x

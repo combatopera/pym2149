@@ -55,8 +55,7 @@ class NoiseOsc(OscNode):
 
   def __init__(self, periodreg):
     OscNode.__init__(self)
-    x = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
-    self.getvalue = lambda: 1 - x() # Authentic, see qnoispec.
+    self.getvalue = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
     self.countdown = 0
     self.value = -1 # Won't actually be used.
     self.periodreg = periodreg

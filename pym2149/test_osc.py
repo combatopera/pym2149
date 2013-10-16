@@ -36,7 +36,7 @@ class TestNoiseOsc(unittest.TestCase):
     for _ in xrange(2):
       v = o(Block(48 * n)).tolist()
       for i in xrange(n):
-        self.assertEqual([1 - u()] * 48, v[i * 48:(i + 1) * 48])
+        self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
 
 class TestEnvOsc(unittest.TestCase):
 
