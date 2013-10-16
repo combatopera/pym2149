@@ -6,18 +6,18 @@ class OscNode(Node):
 
   oscdtype = np.uint8 # Slightly faster than plain old int.
 
-  def __init__(self):
+  def __init__(self, periodreg):
     Node.__init__(self, self.oscdtype)
+    self.periodreg = periodreg
 
 class Osc(OscNode):
 
   def __init__(self, steps, periodreg):
     if 0 != (self.scale % steps):
       raise Exception("Number of steps must divide the scale.")
-    OscNode.__init__(self)
+    OscNode.__init__(self, periodreg)
     self.reset()
     self.steps = steps
-    self.periodreg = periodreg
 
   def reset(self):
     self.indexinstep = 0
@@ -57,10 +57,9 @@ class NoiseOsc(OscNode):
   values = np.fromiter(lfsr.Lfsr(*lfsr.ym2149nzdegrees), OscNode.oscdtype)
 
   def __init__(self, periodreg):
-    OscNode.__init__(self)
+    OscNode.__init__(self, periodreg)
     self.valueindex = 0
     self.countdown = 0
-    self.periodreg = periodreg
 
   def getvalue(self):
     v = self.values[self.valueindex]
