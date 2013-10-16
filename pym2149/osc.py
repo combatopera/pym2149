@@ -65,8 +65,11 @@ class NoiseOsc(OscNode):
 
   def getvalue(self):
     v = self.values[self.valueindex]
-    self.valueindex = (self.valueindex + 1) % self.values.shape[0]
+    self.advance(1)
     return v
+
+  def advance(self, n):
+    self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.countdown)
@@ -77,9 +80,15 @@ class NoiseOsc(OscNode):
     # One step per scale results in authentic spectrum, see qnoispec:
     stepsize = self.scale * self.periodreg.value
     fullsteps = (self.block.framecount - cursor) // stepsize
-    for _ in xrange(fullsteps):
-      self.blockbuf.fillpart(cursor, cursor + stepsize, self.getvalue())
-      cursor += stepsize
+    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * stepsize < fullsteps:
+      for i in xrange(stepsize):
+        self.blockbuf.putring(cursor + i, stepsize, self.values, self.valueindex, fullsteps)
+      self.advance(fullsteps)
+      cursor += fullsteps * stepsize
+    else:
+      for _ in xrange(fullsteps):
+        self.blockbuf.fillpart(cursor, cursor + stepsize, self.getvalue())
+        cursor += stepsize
     if cursor == self.block.framecount:
       return
     self.value = self.getvalue()
