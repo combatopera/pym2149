@@ -37,7 +37,7 @@ class TestToneOsc(unittest.TestCase):
       start = time.time()
       for _ in xrange(blockrate):
         o(Block(blocksize))
-      print time.time() - start
+      self.assertTrue(time.time() - start < .05)
 
 class TestNoiseOsc(unittest.TestCase):
 

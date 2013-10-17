@@ -53,8 +53,11 @@ class ToneOsc(OscNode):
 
   def getvalue(self):
     v = self.values[self.valueindex]
-    self.valueindex = (self.valueindex + 1) % self.values.shape[0]
+    self.advance(1)
     return v
+
+  def advance(self, n):
+    self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
   def callimpl(self):
     self.stepsize = self.halfscale * self.periodreg.value
@@ -65,9 +68,15 @@ class ToneOsc(OscNode):
     if cursor == self.block.framecount:
       return
     fullsteps = (self.block.framecount - cursor) // self.stepsize
-    for _ in xrange(fullsteps):
-      self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
-      cursor += self.stepsize
+    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+      for i in xrange(self.stepsize):
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
+      self.advance(fullsteps)
+      cursor += fullsteps * self.stepsize
+    else:
+      for _ in xrange(fullsteps):
+        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
+        cursor += self.stepsize
     if cursor == self.block.framecount:
       return
     self.value = self.getvalue()
