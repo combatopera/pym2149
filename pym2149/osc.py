@@ -44,6 +44,7 @@ class Osc(OscNode):
 class ToneOsc(OscNode):
 
   halfscale = 16 // 2
+  values = np.fromiter((1 - (i & 1) for i in xrange(1000)), OscNode.oscdtype)
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
@@ -51,8 +52,8 @@ class ToneOsc(OscNode):
     self.progress = self.halfscale * 0xfff # Matching biggest possible stepsize.
 
   def getvalue(self):
-    v = 1 - (self.valueindex & 1)
-    self.valueindex = (self.valueindex + 1) % 2
+    v = self.values[self.valueindex]
+    self.valueindex = (self.valueindex + 1) % self.values.shape[0]
     return v
 
   def callimpl(self):
