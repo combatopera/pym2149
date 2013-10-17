@@ -43,28 +43,35 @@ class Osc(OscNode):
 
 class ToneOsc(OscNode):
 
-  scale = 16
-  steps = 2
+  halfscale = 16 // 2
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.progress = 0
-    self.stepindex = -1
+    self.valueindex = 0
+    self.progress = self.halfscale * 0xfff # Matching biggest possible stepsize.
+
+  def getvalue(self):
+    v = 1 - (self.valueindex & 1)
+    self.valueindex = (self.valueindex + 1) % 2
+    return v
 
   def callimpl(self):
-    oldperiod = True
-    frameindex = 0
-    while frameindex < self.block.framecount:
-      if not self.progress:
-        self.stepindex = (self.stepindex + 1) % self.steps
-        if oldperiod and not self.stepindex:
-          self.stepsize = self.scale // self.steps * self.periodreg.value
-          oldperiod = False
-        self.value = 1 - self.stepindex
-      n = min(self.block.framecount - frameindex, self.stepsize - self.progress)
-      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
-      self.progress = (self.progress + n) % self.stepsize
-      frameindex += n
+    self.stepsize = self.halfscale * self.periodreg.value
+    # If progress beats the new stepsize, we terminate right away:
+    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
+    cursor and self.blockbuf.fillpart(0, cursor, self.value)
+    self.progress = min(self.progress + cursor, self.stepsize)
+    if cursor == self.block.framecount:
+      return
+    fullsteps = (self.block.framecount - cursor) // self.stepsize
+    for _ in xrange(fullsteps):
+      self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
+      cursor += self.stepsize
+    if cursor == self.block.framecount:
+      return
+    self.value = self.getvalue()
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.value)
+    self.progress = self.block.framecount - cursor
 
 class NoiseOsc(OscNode):
 
