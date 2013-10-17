@@ -41,15 +41,31 @@ class Osc(OscNode):
       self.indexinstep = (self.indexinstep + n) % self.stepsize
       frameindex += n
 
-class ToneOsc(Osc):
+class ToneOsc(OscNode):
 
   scale = 16
+  steps = 2
 
   def __init__(self, periodreg):
-    Osc.__init__(self, 2, periodreg)
+    OscNode.__init__(self, periodreg)
+    self.indexinstep = 0
+    self.stepindex = -1
 
-  def stepvalue(self, stepindex):
-    return 1 - stepindex
+  def callimpl(self):
+    oldperiod = True
+    frameindex = 0
+    while frameindex < self.block.framecount:
+      if not self.indexinstep:
+        self.stepindex = (self.stepindex + 1) % self.steps
+        if not self.stepindex:
+          if oldperiod:
+            self.stepsize = self.scale // self.steps * self.periodreg.value
+            oldperiod = False
+        self.value = 1 - self.stepindex
+      n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
+      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
+      self.indexinstep = (self.indexinstep + n) % self.stepsize
+      frameindex += n
 
 class NoiseOsc(OscNode):
 
