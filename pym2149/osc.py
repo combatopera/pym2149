@@ -75,7 +75,7 @@ class NoiseOsc(OscNode):
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
     self.valueindex = 0
-    self.countdown = 0
+    self.progress = self.stepsize = 0
 
   def getvalue(self):
     v = self.values[self.valueindex]
@@ -86,28 +86,29 @@ class NoiseOsc(OscNode):
     self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
   def callimpl(self):
-    cursor = min(self.block.framecount, self.countdown)
+    cursor = min(self.block.framecount, self.stepsize - self.progress)
     cursor and self.blockbuf.fillpart(0, cursor, self.value)
-    self.countdown -= cursor
+    self.progress += cursor
     if cursor == self.block.framecount:
       return
     # One step per scale results in authentic spectrum, see qnoispec:
-    stepsize = self.scale * self.periodreg.value
-    fullsteps = (self.block.framecount - cursor) // stepsize
-    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * stepsize < fullsteps:
-      for i in xrange(stepsize):
-        self.blockbuf.putring(cursor + i, stepsize, self.values, self.valueindex, fullsteps)
+    self.stepsize = self.scale * self.periodreg.value
+    fullsteps = (self.block.framecount - cursor) // self.stepsize
+    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+      for i in xrange(self.stepsize):
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
       self.advance(fullsteps)
-      cursor += fullsteps * stepsize
+      cursor += fullsteps * self.stepsize
     else:
       for _ in xrange(fullsteps):
-        self.blockbuf.fillpart(cursor, cursor + stepsize, self.getvalue())
-        cursor += stepsize
+        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
+        cursor += self.stepsize
     if cursor == self.block.framecount:
+      self.progress = self.stepsize # Necessary in case stepsize changed.
       return
     self.value = self.getvalue()
     self.blockbuf.fillpart(cursor, self.block.framecount, self.value)
-    self.countdown = cursor + stepsize - self.block.framecount
+    self.progress = self.block.framecount - cursor
 
 class EnvOsc(Osc):
 
