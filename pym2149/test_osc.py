@@ -39,6 +39,16 @@ class TestNoiseOsc(unittest.TestCase):
       for i in xrange(n):
         self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
 
+  def test_carry(self):
+    r = Reg(0x01)
+    size = 17 * 16 + 1
+    ref = list(NoiseOsc(r)(Block(size)).buf)
+    for n in xrange(size + 1):
+      o = NoiseOsc(r)
+      v1 = list(o(Block(n)).buf)
+      v2 = list(o(Block(size - n)).buf)
+      self.assertEqual(ref, v1 + v2)
+
   def test_performance(self):
     blockrate = 50
     blocksize = 2000000 // blockrate
