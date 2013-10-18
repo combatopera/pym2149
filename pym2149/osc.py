@@ -12,20 +12,26 @@ class OscNode(Node):
     self.periodreg = periodreg
 
   def lastvalue(self):
-    return self.values[self.valueindex - 1]
+    return self.values.buf[self.valueindex - 1]
 
   def getvalue(self):
-    v = self.values[self.valueindex]
+    v = self.values.buf[self.valueindex]
     self.advance(1)
     return v
 
   def advance(self, n):
-    self.valueindex = (self.valueindex + n) % self.values.shape[0]
+    self.valueindex = (self.valueindex + n) % self.values.buf.shape[0]
+
+class Values:
+
+  def __init__(self, g, loop = 0):
+    self.buf = np.fromiter(g, OscNode.oscdtype)
+    self.loop = loop
 
 class ToneOsc(OscNode):
 
   halfscale = 16 // 2
-  values = np.fromiter((1 - (i & 1) for i in xrange(1000)), OscNode.oscdtype)
+  values = Values(1 - (i & 1) for i in xrange(1000))
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
@@ -40,9 +46,9 @@ class ToneOsc(OscNode):
     if cursor == self.block.framecount:
       return
     fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
       self.advance(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
@@ -57,7 +63,7 @@ class ToneOsc(OscNode):
 class NoiseOsc(OscNode):
 
   scale = 16
-  values = np.fromiter(lfsr.Lfsr(*lfsr.ym2149nzdegrees), OscNode.oscdtype)
+  values = Values(lfsr.Lfsr(*lfsr.ym2149nzdegrees))
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
@@ -72,9 +78,9 @@ class NoiseOsc(OscNode):
     # One step per scale results in authentic spectrum, see qnoispec:
     self.stepsize = self.scale * self.periodreg.value
     fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
       self.advance(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
