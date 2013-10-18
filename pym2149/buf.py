@@ -18,17 +18,18 @@ class Buf:
     lookup.take(that.buf, out = self.buf)
 
   @staticmethod
-  def putringops(ring, ringstart, ringn):
+  def putringops(ring, ringstart, ringn, ringloop = 0):
     ringsize = ring.shape[0]
     ops = 0
-    while ringn: # TODO: Avoid looping.
+    while ringn:
       n = min(ringsize - ringstart, ringn)
       ops += 1
-      ringstart = (ringstart + n) % ringsize
+      if ringstart + n == ringsize:
+        ringstart = ringloop
       ringn -= n
     return ops
 
-  def putring(self, start, step, ring, ringstart, ringn):
+  def putring(self, start, step, ring, ringstart, ringn, ringloop = 0):
     ringsize = ring.shape[0]
     while ringn:
       n = min(ringsize - ringstart, ringn)
@@ -36,7 +37,8 @@ class Buf:
       ringend = ringstart + n
       self.buf[start:end:step] = ring[ringstart:ringend]
       start = end
-      ringstart = ringend % ringsize
+      if ringend == ringsize:
+        ringstart = ringloop
       ringn -= n
 
   def add(self, value):
