@@ -22,37 +22,6 @@ class OscNode(Node):
   def advance(self, n):
     self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
-class Osc(OscNode):
-
-  def __init__(self, steps, periodreg):
-    if 0 != (self.scale % steps):
-      raise Exception("Number of steps must divide the scale.")
-    OscNode.__init__(self, periodreg)
-    self.reset()
-    self.steps = steps
-
-  def reset(self):
-    self.indexinstep = 0
-    self.stepindex = -1
-    self.periodindex = -1
-
-  def callimpl(self):
-    oldperiod = True
-    frameindex = 0
-    while frameindex < self.block.framecount:
-      if not self.indexinstep:
-        self.stepindex = (self.stepindex + 1) % self.steps
-        if not self.stepindex:
-          self.periodindex += 1
-          if oldperiod:
-            self.stepsize = self.scale // self.steps * self.periodreg.value
-            oldperiod = False
-        self.value = self.stepvalue(self.stepindex)
-      n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
-      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
-      self.indexinstep = (self.indexinstep + n) % self.stepsize
-      frameindex += n
-
 class ToneOsc(OscNode):
 
   halfscale = 16 // 2
@@ -118,14 +87,21 @@ class NoiseOsc(OscNode):
     self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
 
-class EnvOsc(Osc):
+class EnvOsc(OscNode):
 
   scale = 256
+  steps = 32
 
   def __init__(self, periodreg, shapereg):
-    Osc.__init__(self, 32, periodreg)
+    OscNode.__init__(self, periodreg)
+    self.reset()
     self.shapeversion = None
     self.shapereg = shapereg
+
+  def reset(self):
+    self.indexinstep = 0
+    self.stepindex = -1
+    self.periodindex = -1
 
   def callimpl(self):
     if self.shapeversion != self.shapereg.version:
@@ -135,7 +111,21 @@ class EnvOsc(Osc):
       self.stepvalue = getattr(self, "stepvalue%02x" % shape)
       self.shapeversion = self.shapereg.version
       self.reset()
-    Osc.callimpl(self)
+    oldperiod = True
+    frameindex = 0
+    while frameindex < self.block.framecount:
+      if not self.indexinstep:
+        self.stepindex = (self.stepindex + 1) % self.steps
+        if not self.stepindex:
+          self.periodindex += 1
+          if oldperiod:
+            self.stepsize = self.scale // self.steps * self.periodreg.value
+            oldperiod = False
+        self.value = self.stepvalue(self.stepindex)
+      n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
+      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
+      self.indexinstep = (self.indexinstep + n) % self.stepsize
+      frameindex += n
 
   def stepvalue08(self, stepindex):
     return 31 - stepindex
