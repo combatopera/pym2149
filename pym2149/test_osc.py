@@ -38,6 +38,13 @@ class TestToneOsc(unittest.TestCase):
       v2 = list(o(Block(size - n)).buf)
       self.assertEqual(ref, v1 + v2)
 
+  def test_increaseperiodonboundary(self):
+    r = Reg(0x01)
+    o = ToneOsc(r)
+    print o(Block(16)).buf
+    r.value = 0x02
+    print o(Block(1)).buf
+
   def test_performance(self):
     blockrate = 50
     blocksize = 2000000 // blockrate
