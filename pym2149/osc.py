@@ -11,16 +11,17 @@ class OscNode(Node):
     self.valueindex = 0
     self.periodreg = periodreg
 
-  def lastvalue(self):
-    return self.values.buf[self.valueindex - 1]
+  def getvalue(self, n = 1):
+    self.warp(n - 1)
+    self.lastvalue = self.values.buf[self.valueindex]
+    self.warp(1)
+    return self.lastvalue
 
-  def getvalue(self):
-    v = self.values.buf[self.valueindex]
-    self.advance(1)
-    return v
-
-  def advance(self, n):
-    self.valueindex = (self.valueindex + n) % self.values.buf.shape[0]
+  def warp(self, n):
+    self.valueindex += n
+    size = self.values.buf.shape[0]
+    while self.valueindex >= size:
+      self.valueindex = self.values.loop + self.valueindex - size
 
 class Values:
 
@@ -41,7 +42,7 @@ class ToneOsc(OscNode):
     self.stepsize = self.halfscale * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
     cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue())
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress = min(self.progress + cursor, self.stepsize)
     if cursor == self.block.framecount:
       return
@@ -49,7 +50,7 @@ class ToneOsc(OscNode):
     if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
         self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
-      self.advance(fullsteps)
+      self.getvalue(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
       for _ in xrange(fullsteps):
@@ -71,7 +72,7 @@ class NoiseOsc(OscNode):
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.stepsize - self.progress)
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue())
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress += cursor
     if cursor == self.block.framecount:
       return
@@ -81,7 +82,7 @@ class NoiseOsc(OscNode):
     if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
         self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
-      self.advance(fullsteps)
+      self.getvalue(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
       for _ in xrange(fullsteps):
