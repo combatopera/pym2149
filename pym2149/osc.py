@@ -8,7 +8,16 @@ class OscNode(Node):
 
   def __init__(self, periodreg):
     Node.__init__(self, self.oscdtype)
+    self.valueindex = 0
     self.periodreg = periodreg
+
+  def getvalue(self):
+    v = self.values[self.valueindex]
+    self.advance(1)
+    return v
+
+  def advance(self, n):
+    self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
 class Osc(OscNode):
 
@@ -48,16 +57,7 @@ class ToneOsc(OscNode):
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.valueindex = 0
     self.progress = self.halfscale * 0xfff # Matching biggest possible stepsize.
-
-  def getvalue(self):
-    v = self.values[self.valueindex]
-    self.advance(1)
-    return v
-
-  def advance(self, n):
-    self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
   def callimpl(self):
     self.stepsize = self.halfscale * self.periodreg.value
@@ -90,16 +90,7 @@ class NoiseOsc(OscNode):
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.valueindex = 0
     self.progress = self.stepsize = 0
-
-  def getvalue(self):
-    v = self.values[self.valueindex]
-    self.advance(1)
-    return v
-
-  def advance(self, n):
-    self.valueindex = (self.valueindex + n) % self.values.shape[0]
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.stepsize - self.progress)
