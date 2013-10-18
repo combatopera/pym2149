@@ -11,6 +11,9 @@ class OscNode(Node):
     self.valueindex = 0
     self.periodreg = periodreg
 
+  def lastvalue(self):
+    return self.values[self.valueindex - 1]
+
   def getvalue(self):
     v = self.values[self.valueindex]
     self.advance(1)
@@ -63,7 +66,7 @@ class ToneOsc(OscNode):
     self.stepsize = self.halfscale * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
     cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.value)
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue())
     self.progress = min(self.progress + cursor, self.stepsize)
     if cursor == self.block.framecount:
       return
@@ -79,8 +82,7 @@ class ToneOsc(OscNode):
         cursor += self.stepsize
     if cursor == self.block.framecount:
       return
-    self.value = self.getvalue()
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.value)
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
 
 class NoiseOsc(OscNode):
@@ -94,7 +96,7 @@ class NoiseOsc(OscNode):
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.stepsize - self.progress)
-    cursor and self.blockbuf.fillpart(0, cursor, self.value)
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue())
     self.progress += cursor
     if cursor == self.block.framecount:
       return
@@ -113,8 +115,7 @@ class NoiseOsc(OscNode):
     if cursor == self.block.framecount:
       self.progress = self.stepsize # Necessary in case stepsize changed.
       return
-    self.value = self.getvalue()
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.value)
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
 
 class EnvOsc(Osc):
