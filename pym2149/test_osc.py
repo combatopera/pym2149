@@ -28,6 +28,16 @@ class TestToneOsc(unittest.TestCase):
     self.assertEqual([0] * 23, v[:23])
     self.assertEqual([1], v[23:])
 
+  def test_carry(self):
+    r = Reg(0x01)
+    size = 3 * 8 + 1
+    ref = list(ToneOsc(r)(Block(size)).buf)
+    for n in xrange(size + 1):
+      o = ToneOsc(r)
+      v1 = list(o(Block(n)).buf)
+      v2 = list(o(Block(size - n)).buf)
+      self.assertEqual(ref, v1 + v2)
+
   def test_performance(self):
     blockrate = 50
     blocksize = 2000000 // blockrate
