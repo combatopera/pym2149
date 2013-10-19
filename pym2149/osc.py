@@ -1,5 +1,5 @@
 from __future__ import division
-import lfsr, numpy as np
+import lfsr, numpy as np, itertools
 from nod import Node
 
 class OscNode(Node):
@@ -94,10 +94,23 @@ class NoiseOsc(OscNode):
     self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
 
+def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated more than once.
+  for _ in xrange((minsize + len(v) - 1) // len(v)):
+    for x in v:
+      yield x
+
 class EnvOsc(OscNode):
 
   scale = 256
   steps = 32
+  values0c = Values(cycle(range(steps), 1000))
+  values08 = Values(cycle(range(steps - 1, -1, -1), 1000))
+  values0e = Values(cycle(range(steps) + range(steps - 1, -1, -1), 1000))
+  values0a = Values(cycle(range(steps - 1, -1, -1) + range(steps), 1000))
+  values0f = Values(itertools.chain(xrange(steps), itertools.repeat(0, 1000)), steps)
+  values0d = Values(itertools.chain(xrange(steps), itertools.repeat(steps - 1, 1000)), steps)
+  values0b = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
+  values09 = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
 
   def __init__(self, periodreg, shapereg):
     OscNode.__init__(self, periodreg)
