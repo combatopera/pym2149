@@ -128,7 +128,7 @@ class EnvOsc(OscNode):
       shape = self.shapereg.value & 0x0f
       if not (shape & 0x08):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
-      self.stepvalue = getattr(self, "stepvalue%02x" % shape)
+      self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
       self.reset()
     oldperiod = True
@@ -141,50 +141,8 @@ class EnvOsc(OscNode):
           if oldperiod:
             self.stepsize = self.scale // self.steps * self.periodreg.value
             oldperiod = False
-        self.value = self.stepvalue(self.stepindex)
+        self.value = self.values.buf[self.periodindex * self.steps + self.stepindex]
       n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
       self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
       self.indexinstep = (self.indexinstep + n) % self.stepsize
       frameindex += n
-
-  def stepvalue08(self, stepindex):
-    return 31 - stepindex
-
-  def stepvalue09(self, stepindex):
-    if not self.periodindex:
-      return 31 - stepindex
-    else:
-      return 0
-
-  def stepvalue0a(self, stepindex):
-    if not (self.periodindex & 1):
-      return 31 - stepindex
-    else:
-      return stepindex
-
-  def stepvalue0b(self, stepindex):
-    if not self.periodindex:
-      return 31 - stepindex
-    else:
-      return 31
-
-  def stepvalue0c(self, stepindex):
-    return stepindex
-
-  def stepvalue0d(self, stepindex):
-    if not self.periodindex:
-      return stepindex
-    else:
-      return 31
-
-  def stepvalue0e(self, stepindex):
-    if not (self.periodindex & 1):
-      return stepindex
-    else:
-      return 31 - stepindex
-
-  def stepvalue0f(self, stepindex):
-    if not self.periodindex:
-      return stepindex
-    else:
-      return 0
