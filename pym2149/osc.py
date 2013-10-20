@@ -121,8 +121,8 @@ class EnvOsc(OscNode):
 
   def callimpl(self):
     if self.shapeversion != self.shapereg.version:
-      shape = self.shapereg.value & 0x0f
-      if not (shape & 0x08):
+      shape = self.shapereg.value
+      if shape == (shape & 0x07):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
