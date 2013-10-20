@@ -25,6 +25,22 @@ class OscNode(Node):
     while self.valueindex >= size:
       self.valueindex = self.values.loop + self.valueindex - size
 
+  def common(self):
+    fullsteps = (self.block.framecount - cursor) // self.stepsize
+    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+      for i in xrange(self.stepsize):
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
+      self.getvalue(fullsteps)
+      cursor += fullsteps * self.stepsize
+    else:
+      for _ in xrange(fullsteps):
+        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
+        cursor += self.stepsize
+    if cursor == self.block.framecount:
+      return
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
+    self.progress = self.block.framecount - cursor
+
 class Values:
 
   dtype = np.uint8 # Slightly faster than plain old int.
@@ -49,20 +65,7 @@ class ToneOsc(OscNode):
     self.progress = min(self.progress + cursor, self.stepsize)
     if cursor == self.block.framecount:
       return
-    fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
-      for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
-      self.getvalue(fullsteps)
-      cursor += fullsteps * self.stepsize
-    else:
-      for _ in xrange(fullsteps):
-        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
-        cursor += self.stepsize
-    if cursor == self.block.framecount:
-      return
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
-    self.progress = self.block.framecount - cursor
+    self.common()
 
 class NoiseOsc(OscNode):
 
@@ -80,20 +83,7 @@ class NoiseOsc(OscNode):
     if cursor == self.block.framecount:
       return
     self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
-    fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
-      for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
-      self.getvalue(fullsteps)
-      cursor += fullsteps * self.stepsize
-    else:
-      for _ in xrange(fullsteps):
-        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
-        cursor += self.stepsize
-    if cursor == self.block.framecount:
-      return
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
-    self.progress = self.block.framecount - cursor
+    self.common()
 
 def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated more than once.
   for _ in xrange((minsize + len(v) - 1) // len(v)):
@@ -133,17 +123,4 @@ class EnvOsc(OscNode):
     self.progress = min(self.progress + cursor, self.stepsize)
     if cursor == self.block.framecount:
       return
-    fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
-      for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
-      self.getvalue(fullsteps)
-      cursor += fullsteps * self.stepsize
-    else:
-      for _ in xrange(fullsteps):
-        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
-        cursor += self.stepsize
-    if cursor == self.block.framecount:
-      return
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
-    self.progress = self.block.framecount - cursor
+    self.common()
