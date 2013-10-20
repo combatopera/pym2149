@@ -8,8 +8,12 @@ class OscNode(Node):
 
   def __init__(self, periodreg):
     Node.__init__(self, self.oscdtype)
-    self.valueindex = 0
+    self.reset()
     self.periodreg = periodreg
+
+  def reset(self):
+    self.valueindex = 0
+    self.progress = self.scaleofstep * 0xffff # Matching biggest possible 16-bit stepsize.
 
   def getvalue(self, n = 1):
     self.warp(n - 1)
@@ -36,7 +40,6 @@ class ToneOsc(OscNode):
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.progress = self.scaleofstep * 0xfff # Matching biggest possible stepsize.
 
   def callimpl(self):
     self.stepsize = self.scaleofstep * self.periodreg.value
@@ -68,7 +71,7 @@ class NoiseOsc(OscNode):
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.progress = self.stepsize = 0
+    self.stepsize = self.progress
 
   def callimpl(self):
     cursor = min(self.block.framecount, self.stepsize - self.progress)
@@ -113,12 +116,8 @@ class EnvOsc(OscNode):
 
   def __init__(self, periodreg, shapereg):
     OscNode.__init__(self, periodreg)
-    self.reset()
     self.shapeversion = None
     self.shapereg = shapereg
-
-  def reset(self):
-    self.progress = self.scaleofstep * 0xffff # Matching biggest possible stepsize.
 
   def callimpl(self):
     if self.shapeversion != self.shapereg.version:
@@ -127,7 +126,6 @@ class EnvOsc(OscNode):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
-      self.valueindex = 0
       self.reset()
     self.stepsize = self.scaleofstep * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
