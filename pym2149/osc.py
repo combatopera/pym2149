@@ -2,6 +2,14 @@ from __future__ import division
 import lfsr, numpy as np, itertools
 from nod import Node
 
+class Values:
+
+  dtype = np.uint8 # Slightly faster than plain old int.
+
+  def __init__(self, g, loop = 0):
+    self.buf = np.fromiter(g, self.dtype)
+    self.loop = loop
+
 class OscNode(Node):
 
   def __init__(self, periodreg):
@@ -40,14 +48,6 @@ class OscNode(Node):
       return
     self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
-
-class Values:
-
-  dtype = np.uint8 # Slightly faster than plain old int.
-
-  def __init__(self, g, loop = 0):
-    self.buf = np.fromiter(g, self.dtype)
-    self.loop = loop
 
 class ToneOsc(OscNode):
 
