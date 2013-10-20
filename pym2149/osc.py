@@ -62,9 +62,8 @@ class ToneOsc(OscNode):
     cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
     cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress = min(self.progress + cursor, self.stepsize)
-    if cursor == self.block.framecount:
-      return
-    self.common(cursor)
+    if cursor < self.block.framecount:
+      self.common(cursor)
 
 class NoiseOsc(OscNode):
 
@@ -79,10 +78,9 @@ class NoiseOsc(OscNode):
     cursor = min(self.block.framecount, self.stepsize - self.progress)
     cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress += cursor
-    if cursor == self.block.framecount:
-      return
-    self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
-    self.common(cursor)
+    if cursor < self.block.framecount:
+      self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
+      self.common(cursor)
 
 def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated more than once.
   for _ in xrange((minsize + len(v) - 1) // len(v)):
@@ -120,6 +118,5 @@ class EnvOsc(OscNode):
     cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
     cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress = min(self.progress + cursor, self.stepsize)
-    if cursor == self.block.framecount:
-      return
-    self.common(cursor)
+    if cursor < self.block.framecount:
+      self.common(cursor)
