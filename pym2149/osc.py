@@ -33,6 +33,13 @@ class OscNode(Node):
     while self.valueindex >= size:
       self.valueindex = self.values.loop + self.valueindex - size
 
+  def prolog(self):
+    # If progress beats the new stepsize, we terminate right away:
+    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
+    self.progress = min(self.progress + cursor, self.stepsize)
+    return cursor
+
   def common(self, cursor):
     fullsteps = (self.block.framecount - cursor) // self.stepsize
     if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
@@ -58,10 +65,7 @@ class ToneOsc(OscNode):
 
   def callimpl(self):
     self.stepsize = self.scaleofstep * self.periodreg.value
-    # If progress beats the new stepsize, we terminate right away:
-    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
-    self.progress = min(self.progress + cursor, self.stepsize)
+    cursor = self.prolog()
     if cursor < self.block.framecount:
       self.common(cursor)
 
@@ -75,9 +79,7 @@ class NoiseOsc(OscNode):
     self.stepsize = self.progress
 
   def callimpl(self):
-    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
-    self.progress = min(self.progress + cursor, self.stepsize)
+    cursor = self.prolog()
     if cursor < self.block.framecount:
       self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
       self.common(cursor)
@@ -114,9 +116,6 @@ class EnvOsc(OscNode):
       self.shapeversion = self.shapereg.version
       self.reset()
     self.stepsize = self.scaleofstep * self.periodreg.value
-    # If progress beats the new stepsize, we terminate right away:
-    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
-    self.progress = min(self.progress + cursor, self.stepsize)
+    cursor = self.prolog()
     if cursor < self.block.framecount:
       self.common(cursor)
