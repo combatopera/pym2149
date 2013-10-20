@@ -79,7 +79,7 @@ class NoiseOsc(OscNode):
     self.progress += cursor
     if cursor == self.block.framecount:
       return
-    self.stepsize = self.scaleofstep * self.periodreg.value
+    self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
     fullsteps = (self.block.framecount - cursor) // self.stepsize
     if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
@@ -91,7 +91,6 @@ class NoiseOsc(OscNode):
         self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
         cursor += self.stepsize
     if cursor == self.block.framecount:
-      self.progress = self.stepsize # Necessary in case stepsize changed.
       return
     self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
     self.progress = self.block.framecount - cursor
