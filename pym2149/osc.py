@@ -127,6 +127,7 @@ class EnvOsc(OscNode):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
+      self.valueindex = 0
       self.reset()
     self.stepsize = self.scaleofstep * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:

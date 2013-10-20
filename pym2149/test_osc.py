@@ -124,6 +124,15 @@ class TestEnvOsc(unittest.TestCase):
     self.assertEqual(32, v.loop)
     self.assertEqual(range(31, -1, -1) + [0] * 32, list(v.buf[:64]))
 
+  def test_reset(self):
+    shapereg = Reg(0x0c)
+    periodreg = Reg(0x0001)
+    o = EnvOsc(periodreg, shapereg)
+    self.assertEqual(range(32) + range(16), list(o(Block(48 * 8)).buf[::8]))
+    self.assertEqual(range(16, 32) + range(16), list(o(Block(32 * 8)).buf[::8]))
+    shapereg.value = 0x0c
+    self.assertEqual(range(32) + range(16), list(o(Block(48 * 8)).buf[::8]))
+
   def test_08(self):
     shapereg = Reg(0x08)
     periodreg = Reg(3)
