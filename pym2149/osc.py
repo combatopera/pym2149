@@ -31,15 +31,15 @@ class Values:
 
 class ToneOsc(OscNode):
 
-  halfscale = 16 // 2
+  scaleofstep = 16 // 2
   values = Values(1 - (i & 1) for i in xrange(1000))
 
   def __init__(self, periodreg):
     OscNode.__init__(self, periodreg)
-    self.progress = self.halfscale * 0xfff # Matching biggest possible stepsize.
+    self.progress = self.scaleofstep * 0xfff # Matching biggest possible stepsize.
 
   def callimpl(self):
-    self.stepsize = self.halfscale * self.periodreg.value
+    self.stepsize = self.scaleofstep * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
     cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
     cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
@@ -63,7 +63,7 @@ class ToneOsc(OscNode):
 
 class NoiseOsc(OscNode):
 
-  scale = 16
+  scaleofstep = 16 # One step per scale results in authentic spectrum, see qnoispec.
   values = Values(lfsr.Lfsr(*lfsr.ym2149nzdegrees))
 
   def __init__(self, periodreg):
@@ -76,8 +76,7 @@ class NoiseOsc(OscNode):
     self.progress += cursor
     if cursor == self.block.framecount:
       return
-    # One step per scale results in authentic spectrum, see qnoispec:
-    self.stepsize = self.scale * self.periodreg.value
+    self.stepsize = self.scaleofstep * self.periodreg.value
     fullsteps = (self.block.framecount - cursor) // self.stepsize
     if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
@@ -101,8 +100,8 @@ def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated m
 
 class EnvOsc(OscNode):
 
-  scale = 256
   steps = 32
+  scaleofstep = 256 // steps
   values0c = Values(cycle(range(steps), 1000))
   values08 = Values(cycle(range(steps - 1, -1, -1), 1000))
   values0e = Values(cycle(range(steps) + range(steps - 1, -1, -1), 1000))
@@ -119,9 +118,7 @@ class EnvOsc(OscNode):
     self.shapereg = shapereg
 
   def reset(self):
-    self.indexinstep = 0
-    self.stepindex = -1
-    self.periodindex = -1
+    self.progress = self.scaleofstep * 0xffff # Matching biggest possible stepsize.
 
   def callimpl(self):
     if self.shapeversion != self.shapereg.version:
@@ -131,18 +128,24 @@ class EnvOsc(OscNode):
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
       self.reset()
-    oldperiod = True
-    frameindex = 0
-    while frameindex < self.block.framecount:
-      if not self.indexinstep:
-        self.stepindex = (self.stepindex + 1) % self.steps
-        if not self.stepindex:
-          self.periodindex += 1
-          if oldperiod:
-            self.stepsize = self.scale // self.steps * self.periodreg.value
-            oldperiod = False
-        self.value = self.values.buf[self.periodindex * self.steps + self.stepindex]
-      n = min(self.block.framecount - frameindex, self.stepsize - self.indexinstep)
-      self.blockbuf.fillpart(frameindex, frameindex + n, self.value)
-      self.indexinstep = (self.indexinstep + n) % self.stepsize
-      frameindex += n
+    self.stepsize = self.scaleofstep * self.periodreg.value
+    # If progress beats the new stepsize, we terminate right away:
+    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
+    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
+    self.progress = min(self.progress + cursor, self.stepsize)
+    if cursor == self.block.framecount:
+      return
+    fullsteps = (self.block.framecount - cursor) // self.stepsize
+    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+      for i in xrange(self.stepsize):
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
+      self.getvalue(fullsteps)
+      cursor += fullsteps * self.stepsize
+    else:
+      for _ in xrange(fullsteps):
+        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
+        cursor += self.stepsize
+    if cursor == self.block.framecount:
+      return
+    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
+    self.progress = self.block.framecount - cursor
