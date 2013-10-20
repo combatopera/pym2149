@@ -75,7 +75,7 @@ class NoiseOsc(OscNode):
     self.stepsize = self.progress
 
   def callimpl(self):
-    cursor = min(self.block.framecount, self.stepsize - self.progress)
+    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
     cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
     self.progress = min(self.progress + cursor, self.stepsize)
     if cursor < self.block.framecount:
