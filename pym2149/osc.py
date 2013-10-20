@@ -44,10 +44,9 @@ class OscNode(Node):
       for _ in xrange(fullsteps):
         self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
         cursor += self.stepsize
-    if cursor == self.block.framecount:
-      return
-    self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
-    self.progress = self.block.framecount - cursor
+    if cursor < self.block.framecount:
+      self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
+      self.progress = self.block.framecount - cursor
 
 class ToneOsc(OscNode):
 
