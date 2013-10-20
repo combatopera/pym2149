@@ -45,6 +45,13 @@ class TestToneOsc(unittest.TestCase):
     r.value = 0x02
     self.assertEqual([0] * 8 + [1] * 16 + [0], list(o(Block(25)).buf))
 
+  def test_decreaseperiodonboundary(self):
+    r = Reg(0x02)
+    o = ToneOsc(r)
+    self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, list(o(Block(38)).buf))
+    r.value = 0x01
+    self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], list(o(Block(19)).buf))
+
   def test_performance(self):
     blockrate = 50
     blocksize = 2000000 // blockrate
