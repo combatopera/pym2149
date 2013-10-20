@@ -4,10 +4,8 @@ from nod import Node
 
 class OscNode(Node):
 
-  oscdtype = np.uint8 # Slightly faster than plain old int.
-
   def __init__(self, periodreg):
-    Node.__init__(self, self.oscdtype)
+    Node.__init__(self, Values.dtype)
     self.reset()
     self.periodreg = periodreg
 
@@ -29,8 +27,10 @@ class OscNode(Node):
 
 class Values:
 
+  dtype = np.uint8 # Slightly faster than plain old int.
+
   def __init__(self, g, loop = 0):
-    self.buf = np.fromiter(g, OscNode.oscdtype)
+    self.buf = np.fromiter(g, self.dtype)
     self.loop = loop
 
 class ToneOsc(OscNode):
