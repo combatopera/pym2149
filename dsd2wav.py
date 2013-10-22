@@ -8,7 +8,7 @@ from pym2149.util import Session
 
 def main():
   inpath, outpath = sys.argv[1:]
-  f = open(inpath)
+  f = open(inpath, 'rb')
   try:
     f.read(2) # Skip total ticks.
     bytecode = [ord(c) for c in f.read()]
