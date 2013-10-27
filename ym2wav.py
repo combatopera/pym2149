@@ -28,6 +28,8 @@ def main():
       log.info(info)
     chip = YM2149(scale = scale)
     clock = f.clock * scale / 8 # Observe may be non-integer.
+    if scale != defaultscale:
+      log.debug("Clock adjusted to %.3f for non-standard scale.", clock)
     stream = WavWriter(clock, Mixer(*chip.dacs), outpath)
     try:
       session = Session(clock)
