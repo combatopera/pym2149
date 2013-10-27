@@ -5,6 +5,9 @@ class Block:
   def __init__(self, framecount):
     self.framecount = framecount
 
+  def __repr__(self):
+    return "%s(%r)" % (self.__class__.__name__, self.framecount)
+
 class AbstractNode:
 
   def __init__(self):
