@@ -5,6 +5,7 @@ from pym2149.out import WavWriter
 from pym2149.util import Session, initlogging
 from pym2149.ym2149 import YM2149
 from pym2149.ymformat import ymopen
+from pym2149.mix import Mixer
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ def main():
     for info in f.info:
       log.info(info)
     chip = YM2149()
-    stream = WavWriter(f.clock, chip, outpath)
+    stream = WavWriter(f.clock, Mixer(*chip.dacs), outpath)
     try:
       session = Session(f.clock)
       for frame in f:

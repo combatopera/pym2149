@@ -1,7 +1,8 @@
 from reg import Reg, DerivedReg
 from osc import ToneOsc, NoiseOsc, EnvOsc
 from dac import Level, Dac
-from mix import BinMix, Mixer
+from mix import BinMix
+from nod import AbstractNode
 
 stclock = 2000000
 
@@ -28,7 +29,7 @@ class Registers:
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
 
-class YM2149(Registers, Mixer):
+class YM2149(Registers, AbstractNode):
 
   def __init__(self, ampshare = None):
     Registers.__init__(self)
@@ -42,10 +43,14 @@ class YM2149(Registers, Mixer):
     if ampshare is None:
       ampshare = self.channels
     # FIXME: All nodes should be called even if excluded from the mix.
-    # TODO: The real thing has separate outputs, so analog mixer should be optional.
-    Mixer.__init__(*[self] + [Dac(channel, ampshare) for i, channel in enumerate(channels)])
+    AbstractNode.__init__(self)
+    self.dacs = tuple(Dac(channel, ampshare) for i, channel in enumerate(channels))
 
   def update(self, frame):
     for i, x in enumerate(frame):
       if 0xD != i or 255 != x:
         self.R[i].value = x
+
+  def callimpl(self):
+    for dac in self.dacs:
+      dac(self.block)

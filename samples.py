@@ -4,6 +4,7 @@ from __future__ import division
 from pym2149.out import WavWriter
 from pym2149.util import Session, initlogging
 from pym2149.ym2149 import YM2149, stclock as clock
+from pym2149.mix import Mixer
 import os, logging
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ def main():
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(clock, chip, path)
+    stream = WavWriter(clock, Mixer(*chip.dacs), path)
     try:
       session = Session(clock)
       for i in xrange(int(round(seconds * refreshrate))):

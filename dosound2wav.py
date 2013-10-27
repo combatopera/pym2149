@@ -6,6 +6,7 @@ from pym2149.dosound import dosound
 from pym2149.ym2149 import YM2149, stclock as clock
 from pym2149.out import WavWriter
 from pym2149.util import Session, initlogging
+from pym2149.mix import Mixer
 from budgie import readbytecode
 
 log = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ def main():
   finally:
     f.close()
   chip = YM2149()
-  stream = WavWriter(clock, chip, outpath)
+  stream = WavWriter(clock, Mixer(*chip.dacs), outpath)
   try:
     session = Session(clock)
     dosound(bytecode, chip, session, stream)
