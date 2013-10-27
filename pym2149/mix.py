@@ -27,6 +27,16 @@ class BinMix(Node):
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
 
+class Multiplexer(Node):
+
+  def __init__(self, *streams):
+    Node.__init__(self, self.commondtype(*streams), len(streams))
+    self.streams = streams
+
+  def callimpl(self):
+    for i, s in enumerate(self.streams):
+      self.blockbuf.putring(i, len(self.streams), s(self.block).buf, 0, self.block.framecount)
+
 class Mixer(Node):
 
   def __init__(self, *streams):

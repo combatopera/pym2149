@@ -29,12 +29,12 @@ class Node(AbstractNode):
     dtype, = dtypes
     return dtype
 
-  def __init__(self, dtype):
+  def __init__(self, dtype, channels = 1):
     AbstractNode.__init__(self)
     masterbuf = MasterBuf(dtype)
     callimpl = self.callimpl
     def callimploverride():
-      self.blockbuf = masterbuf.ensureandcrop(self.block.framecount)
+      self.blockbuf = masterbuf.ensureandcrop(self.block.framecount * channels)
       callimpl()
     self.callimpl = callimploverride
     self.dtype = dtype
