@@ -5,6 +5,7 @@ from mix import BinMix
 from nod import AbstractNode
 
 stclock = 2000000
+defaultscale = 8
 
 class Registers:
 
@@ -31,13 +32,13 @@ class Registers:
 
 class YM2149(Registers, AbstractNode):
 
-  def __init__(self, ampshare = None):
+  def __init__(self, ampshare = None, scale = defaultscale):
     Registers.__init__(self)
     # Chip-wide signals:
-    noise = NoiseOsc(self.noiseperiod)
-    env = EnvOsc(self.envperiod, self.envshape)
+    noise = NoiseOsc(scale, self.noiseperiod)
+    env = EnvOsc(scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
-    channels = [ToneOsc(self.toneperiods[i]) for i in xrange(self.channels)]
+    channels = [ToneOsc(scale, self.toneperiods[i]) for i in xrange(self.channels)]
     channels = [BinMix(channel, noise, self.toneflags[i], self.noiseflags[i]) for i, channel in enumerate(channels)]
     channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel) for i, channel in enumerate(channels)]
     if ampshare is None:
