@@ -32,6 +32,7 @@ def main():
     stream = WavWriter(clock, Mixer(*chip.dacs), path)
     try:
       session = Session(clock)
+      # Closest number of frames to desired number of seconds:
       for i in xrange(int(round(seconds * refreshrate))):
         for b in session.blocks(refreshrate):
           stream(b)
