@@ -57,5 +57,14 @@ class TestSession(unittest.TestCase):
     self.assertEqual([67], [b.framecount for b in s.blocks(1.5)])
     self.assertEqual(0, s.carryticks)
 
+  def test_nonintegerclock(self):
+    s = Session(100.5, None)
+    self.assertEqual([34], [b.framecount for b in s.blocks(3)])
+    self.assertEqual(-1.5, s.carryticks)
+    self.assertEqual([33], [b.framecount for b in s.blocks(3)])
+    self.assertEqual(0, s.carryticks)
+    self.assertEqual([34], [b.framecount for b in s.blocks(3)])
+    self.assertEqual(-1.5, s.carryticks)
+
 if __name__ == '__main__':
   unittest.main()

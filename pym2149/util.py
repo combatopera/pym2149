@@ -7,7 +7,7 @@ class Session:
   def __init__(self, clock, minblockrate = 100):
     if minblockrate is not None:
       # If division not exact, rate will slightly exceed given minimum:
-      self.maxblocksize = clock // minblockrate
+      self.maxblocksize = int(clock // minblockrate)
       if not self.maxblocksize:
         raise Exception(clock, minblockrate)
     else:
