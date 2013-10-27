@@ -57,10 +57,10 @@ class OscNode(Node):
 
 class ToneOsc(OscNode):
 
-  scaleofstep = 16 // 2
   values = Values(1 - (i & 1) for i in xrange(1000))
 
-  def __init__(self, periodreg):
+  def __init__(self, scale, periodreg):
+    self.scaleofstep = scale * 2 // 2
     OscNode.__init__(self, periodreg)
 
   def callimpl(self):
@@ -71,10 +71,10 @@ class ToneOsc(OscNode):
 
 class NoiseOsc(OscNode):
 
-  scaleofstep = 16 # One step per scale results in authentic spectrum, see qnoispec.
   values = Values(lfsr.Lfsr(*lfsr.ym2149nzdegrees))
 
-  def __init__(self, periodreg):
+  def __init__(self, scale, periodreg):
+    self.scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
     OscNode.__init__(self, periodreg)
     self.stepsize = self.progress
 
@@ -92,7 +92,6 @@ def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated m
 class EnvOsc(OscNode):
 
   steps = 32
-  scaleofstep = 256 // steps
   values0c = Values(cycle(range(steps), 1000))
   values08 = Values(cycle(range(steps - 1, -1, -1), 1000))
   values0e = Values(cycle(range(steps) + range(steps - 1, -1, -1), 1000))
@@ -102,7 +101,8 @@ class EnvOsc(OscNode):
   values0b = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
   values09 = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
 
-  def __init__(self, periodreg, shapereg):
+  def __init__(self, scale, periodreg, shapereg):
+    self.scaleofstep = scale * 32 // self.steps
     OscNode.__init__(self, periodreg)
     self.shapeversion = None
     self.shapereg = shapereg
