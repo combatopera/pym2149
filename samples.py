@@ -19,7 +19,7 @@ slowtrinote = 2 # Frequency and actual period are both 1.
 
 def main():
   initlogging()
-  chip = YM2149(1) # Stretch 1 channel to full range.
+  chip = YM2149(ampshare = 1) # Stretch 1 channel to full range.
   for c in xrange(chip.channels):
     chip.toneflags[c].value = False
     chip.noiseflags[c].value = False
