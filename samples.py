@@ -3,8 +3,9 @@
 from __future__ import division
 from pym2149.out import WavWriter
 from pym2149.util import Session, initlogging
-from pym2149.ym2149 import YM2149, stclock as clock
+from pym2149.ym2149 import stclock as nomclock
 from pym2149.mix import Mixer
+from cli import Config
 import os, logging
 
 log = logging.getLogger(__name__)
@@ -19,19 +20,20 @@ slowtrinote = 2 # Frequency and actual period are both 1.
 
 def main():
   initlogging()
-  chip = YM2149(ampshare = 1) # Stretch 1 channel to full range.
+  config = Config()
+  chip = config.createchip(nomclock, ampshare = 1) # Stretch 1 channel to full range.
   for c in xrange(chip.channels):
     chip.toneflags[c].value = False
     chip.noiseflags[c].value = False
-  chip.toneperiods[0].value = int(round(clock / (16 * tonenote)))
-  chip.noiseperiod.value = int(round(clock / (16 * noisenote)))
+  chip.toneperiods[0].value = int(round(nomclock / (16 * tonenote)))
+  chip.noiseperiod.value = int(round(nomclock / (16 * noisenote)))
   chip.fixedlevels[0].value = 15
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(clock, Mixer(*chip.dacs), path)
+    stream = WavWriter(chip.clock, Mixer(*chip.dacs), path)
     try:
-      session = Session(clock)
+      session = Session(chip.clock)
       # Closest number of frames to desired number of seconds:
       for i in xrange(int(round(seconds * refreshrate))):
         for b in session.blocks(refreshrate):
@@ -49,13 +51,13 @@ def main():
   chip.toneflags[0].value = False
   chip.noiseflags[0].value = False
   chip.levelmodes[0].value = 1 # Envelope on.
-  chip.envperiod.value = int(round(clock / (256 * sawnote)))
+  chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
   chip.envshape.value = 0x08
   dump('600saw.wav')
-  chip.envperiod.value = int(round(clock / (256 * trinote)))
+  chip.envperiod.value = int(round(nomclock / (256 * trinote)))
   chip.envshape.value = 0x0a
   dump('650tri.wav')
-  chip.envperiod.value = int(round(clock / (256 * slowtrinote)))
+  chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
   chip.toneflags[0].value = True
   chip.noiseflags[0].value = True
   dump('1tri1ktone5knoise.wav')

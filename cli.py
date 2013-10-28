@@ -1,6 +1,5 @@
 from __future__ import division
 import sys, logging, getopt
-from pym2149.util import Session
 from pym2149.ym2149 import YM2149, defaultscale
 
 log = logging.getLogger(__name__)
@@ -19,8 +18,8 @@ class Config:
     options, self.args = getopt.getopt(sys.argv[1:], 's:', ['scale='])
     self.scale = self.uniqueoption(options, ('-s', '--scale'), defaultscale, int)
 
-  def createchip(self, nominalclock):
-    chip = YM2149(scale = self.scale)
+  def createchip(self, nominalclock, **kwargs):
+    chip = YM2149(scale = self.scale, **kwargs)
     chip.clock = nominalclock * self.scale / 8 # Observe may be non-integer.
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %.3f for non-standard scale.", chip.clock)
