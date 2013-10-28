@@ -5,7 +5,7 @@ import logging
 from pym2149.dosound import dosound
 from pym2149.ym2149 import stclock
 from pym2149.out import WavWriter
-from pym2149.util import initlogging
+from pym2149.util import Session, initlogging
 from pym2149.mix import Mixer
 from budgie import readbytecode
 from cli import Config
@@ -23,9 +23,10 @@ def main():
     bytecode = readbytecode(f, label)
   finally:
     f.close()
-  chip, session = config.createchipandsession(stclock)
-  stream = WavWriter(session.clock, Mixer(*chip.dacs), outpath)
+  chip = config.createchip(stclock)
+  stream = WavWriter(chip.clock, Mixer(*chip.dacs), outpath)
   try:
+    session = Session(chip.clock)
     dosound(bytecode, chip, session, stream)
     log.info("Streaming %.3f extra seconds.", extraseconds)
     for b in session.blocks(1 / extraseconds):

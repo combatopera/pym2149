@@ -19,8 +19,9 @@ class Config:
     options, self.args = getopt.getopt(sys.argv[1:], 's:', ['scale='])
     self.scale = self.uniqueoption(options, ('-s', '--scale'), defaultscale, int)
 
-  def createchipandsession(self, nominalclock):
-    clock = nominalclock * self.scale / 8 # Observe may be non-integer.
+  def createchip(self, nominalclock):
+    chip = YM2149(scale = self.scale)
+    chip.clock = nominalclock * self.scale / 8 # Observe may be non-integer.
     if self.scale != defaultscale:
-      log.debug("Clock adjusted to %.3f for non-standard scale.", clock)
-    return YM2149(scale = self.scale), Session(clock)
+      log.debug("Clock adjusted to %.3f for non-standard scale.", chip.clock)
+    return chip

@@ -4,7 +4,7 @@ import logging
 from pym2149.dosound import dosound
 from pym2149.ym2149 import stclock
 from pym2149.out import WavWriter
-from pym2149.util import initlogging
+from pym2149.util import Session, initlogging
 from pym2149.mix import Mixer
 from cli import Config
 
@@ -20,10 +20,10 @@ def main():
     bytecode = [ord(c) for c in f.read()]
   finally:
     f.close()
-  chip, session = config.createchipandsession(stclock)
-  stream = WavWriter(session.clock, Mixer(*chip.dacs), outpath)
+  chip = config.createchip(stclock)
+  stream = WavWriter(chip.clock, Mixer(*chip.dacs), outpath)
   try:
-    dosound(bytecode, chip, session, stream)
+    dosound(bytecode, chip, Session(chip.clock), stream)
     stream.flush()
   finally:
     stream.close()

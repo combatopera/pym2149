@@ -2,7 +2,7 @@
 
 import logging
 from pym2149.out import WavWriter
-from pym2149.util import initlogging
+from pym2149.util import Session, initlogging
 from pym2149.ymformat import ymopen
 from pym2149.mix import Mixer
 from cli import Config
@@ -17,9 +17,10 @@ def main():
   try:
     for info in f.info:
       log.info(info)
-    chip, session = config.createchipandsession(f.clock)
-    stream = WavWriter(session.clock, Mixer(*chip.dacs), outpath)
+    chip = config.createchip(f.clock)
+    stream = WavWriter(chip.clock, Mixer(*chip.dacs), outpath)
     try:
+      session = Session(chip.clock)
       for frame in f:
         chip.update(frame)
         for b in session.blocks(f.framefreq):
