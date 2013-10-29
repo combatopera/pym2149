@@ -18,7 +18,7 @@ def main():
     for info in f.info:
       log.info(info)
     chip = config.createchip(f.clock)
-    stream = WavWriter(chip.clock, Mixer(*chip.dacs), outpath)
+    stream = WavWriter(chip.clock, Mixer(chip), outpath)
     try:
       session = Session(chip.clock)
       for frame in f:

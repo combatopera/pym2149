@@ -24,7 +24,7 @@ def main():
   finally:
     f.close()
   chip = config.createchip(stclock)
-  stream = WavWriter(chip.clock, Mixer(*chip.dacs), outpath)
+  stream = WavWriter(chip.clock, Mixer(chip), outpath)
   try:
     session = Session(chip.clock)
     dosound(bytecode, chip, session, stream)

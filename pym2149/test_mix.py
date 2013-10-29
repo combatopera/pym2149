@@ -2,7 +2,7 @@
 
 import unittest
 from mix import Mixer, Multiplexer
-from nod import Node, Block
+from nod import Node, Block, Container
 
 class Counter(Node):
 
@@ -21,7 +21,7 @@ def expect(m, *values):
 class TestMixer(unittest.TestCase):
 
   def test_works(self):
-    m = Mixer(Counter(10), Counter())
+    m = Mixer(Container([Counter(10), Counter()]))
     self.assertEqual(expect(m, 10, 12, 14, 16, 18), m(Block(5)).tolist())
     # Check the buffer is actually cleared first:
     self.assertEqual(expect(m, 20, 22, 24, 26, 28), m(Block(5)).tolist())

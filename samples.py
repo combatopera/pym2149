@@ -31,7 +31,7 @@ def main():
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(chip.clock, Mixer(*chip.dacs), path)
+    stream = WavWriter(chip.clock, Mixer(chip), path)
     try:
       session = Session(chip.clock)
       # Closest number of frames to desired number of seconds:
