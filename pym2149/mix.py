@@ -39,12 +39,12 @@ class Multiplexer(Node):
 
 class Mixer(Node):
 
-  def __init__(self, *streams):
+  def __init__(self, container):
     Node.__init__(self, np.int32) # SoX internal sample format.
     self.datum = self.dtype(2 ** 30.5) # Half power point, very close to -3 dB.
-    self.streams = streams
+    self.container = container
 
   def callimpl(self):
     self.blockbuf.fill(self.datum)
-    for stream in self.streams:
-      self.blockbuf.subbuf(stream(self.block))
+    for buf in self.container(self.block):
+      self.blockbuf.subbuf(buf)
