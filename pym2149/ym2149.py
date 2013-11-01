@@ -39,6 +39,7 @@ class YM2149(Registers, Container):
     env = EnvOsc(scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     channels = [ToneOsc(scale, self.toneperiods[i]) for i in xrange(self.channels)]
+    self.maskables = [noise, env] + channels
     channels = [BinMix(channel, noise, self.toneflags[i], self.noiseflags[i]) for i, channel in enumerate(channels)]
     channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel) for i, channel in enumerate(channels)]
     if ampshare is None:
@@ -50,3 +51,9 @@ class YM2149(Registers, Container):
     for i, x in enumerate(frame):
       if 0xD != i or 255 != x:
         self.R[i].value = x
+
+  def callimpl(self, masked):
+    result = Container.callimpl(self, masked)
+    for maskable in self.maskables:
+      maskable(self.block, masked = True)
+    return result

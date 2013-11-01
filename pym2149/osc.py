@@ -63,7 +63,7 @@ class ToneOsc(OscNode):
     self.scaleofstep = scale * 2 // 2
     OscNode.__init__(self, periodreg)
 
-  def callimpl(self):
+  def callimpl(self, masked):
     self.stepsize = self.scaleofstep * self.periodreg.value
     cursor = self.prolog()
     if cursor < self.block.framecount:
@@ -78,7 +78,7 @@ class NoiseOsc(OscNode):
     OscNode.__init__(self, periodreg)
     self.stepsize = self.progress
 
-  def callimpl(self):
+  def callimpl(self, masked):
     cursor = self.prolog()
     if cursor < self.block.framecount:
       self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
@@ -107,7 +107,7 @@ class EnvOsc(OscNode):
     self.shapeversion = None
     self.shapereg = shapereg
 
-  def callimpl(self):
+  def callimpl(self, masked):
     if self.shapeversion != self.shapereg.version:
       shape = self.shapereg.value
       if shape == (shape & 0x07):

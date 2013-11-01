@@ -10,7 +10,7 @@ class BinMix(Node):
     self.toneflagreg = toneflagreg
     self.noiseflagreg = noiseflagreg
 
-  def callimpl(self):
+  def callimpl(self, masked):
     # The truth table options are {AND, OR, XOR}.
     # Other functions are negations of these, the 2 constants, or not symmetric.
     # XOR sounds just like noise so it can't be that.
@@ -18,11 +18,11 @@ class BinMix(Node):
     # We use AND as zero is preferred over envelope, see qbmixenv:
     noiseflag = self.noiseflagreg.value
     if self.toneflagreg.value:
-      self.blockbuf.copybuf(self.tone(self.block))
+      self.blockbuf.copybuf(self.tone(self.block, masked))
       if noiseflag:
-        self.blockbuf.andbuf(self.noise(self.block))
+        self.blockbuf.andbuf(self.noise(self.block, masked))
     elif noiseflag:
-      self.blockbuf.copybuf(self.noise(self.block))
+      self.blockbuf.copybuf(self.noise(self.block, masked))
     else:
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
@@ -33,9 +33,9 @@ class Multiplexer(Node):
     Node.__init__(self, self.commondtype(*streams), len(streams))
     self.streams = streams
 
-  def callimpl(self):
-    for i, s in enumerate(self.streams):
-      self.blockbuf.putring(i, len(self.streams), s(self.block).buf, 0, self.block.framecount)
+  def callimpl(self, masked):
+    for i, stream in enumerate(self.streams):
+      self.blockbuf.putring(i, len(self.streams), stream(self.block, masked).buf, 0, self.block.framecount)
 
 class Mixer(Node):
 
@@ -44,7 +44,7 @@ class Mixer(Node):
     self.datum = self.dtype(2 ** 30.5) # Half power point, very close to -3 dB.
     self.container = container
 
-  def callimpl(self):
+  def callimpl(self, masked):
     self.blockbuf.fill(self.datum)
-    for buf in self.container(self.block):
+    for buf in self.container(self.block, masked):
       self.blockbuf.subbuf(buf)

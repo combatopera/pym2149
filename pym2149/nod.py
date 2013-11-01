@@ -13,13 +13,13 @@ class AbstractNode:
   def __init__(self):
     self.block = None
 
-  def __call__(self, block):
+  def __call__(self, block, masked = False):
     if self.block != block:
       self.block = block
-      self.result = self.callimpl()
+      self.result = self.callimpl(masked)
     return self.result
 
-  def callimpl(self):
+  def callimpl(self, masked):
     raise Exception('Implement me!')
 
 class Container(AbstractNode):
@@ -28,8 +28,8 @@ class Container(AbstractNode):
     AbstractNode.__init__(self)
     self.nodes = nodes
 
-  def callimpl(self):
-    return [node(self.block) for node in self.nodes]
+  def callimpl(self, masked):
+    return [node(self.block, masked) for node in self.nodes]
 
 class Node(AbstractNode):
 
@@ -43,9 +43,9 @@ class Node(AbstractNode):
     AbstractNode.__init__(self)
     masterbuf = MasterBuf(dtype)
     callimpl = self.callimpl
-    def callimploverride():
+    def callimploverride(masked):
       self.blockbuf = masterbuf.ensureandcrop(self.block.framecount * channels)
-      callimpl()
+      callimpl(masked)
       return self.blockbuf
     self.callimpl = callimploverride
     self.dtype = dtype

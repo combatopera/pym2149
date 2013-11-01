@@ -10,7 +10,7 @@ class Counter(Node):
     Node.__init__(self, int)
     self.x = x
 
-  def callimpl(self):
+  def callimpl(self, masked):
     for frameindex in xrange(self.block.framecount):
       self.blockbuf.fillpart(frameindex, frameindex + 1, self.x)
       self.x += 1
