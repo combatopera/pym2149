@@ -18,11 +18,11 @@ class BinMix(Node):
     # We use AND as zero is preferred over envelope, see qbmixenv:
     noiseflag = self.noiseflagreg.value
     if self.toneflagreg.value:
-      self.blockbuf.copybuf(self.tone(self.block, self.masked))
+      self.blockbuf.copybuf(self.chain(self.tone))
       if noiseflag:
-        self.blockbuf.andbuf(self.noise(self.block, self.masked))
+        self.blockbuf.andbuf(self.chain(self.noise))
     elif noiseflag:
-      self.blockbuf.copybuf(self.noise(self.block, self.masked))
+      self.blockbuf.copybuf(self.chain(self.noise))
     else:
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
@@ -35,7 +35,7 @@ class Multiplexer(Node):
 
   def callimpl(self):
     for i, stream in enumerate(self.streams):
-      self.blockbuf.putring(i, len(self.streams), stream(self.block, self.masked).buf, 0, self.block.framecount)
+      self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount)
 
 class Mixer(Node):
 
@@ -46,5 +46,5 @@ class Mixer(Node):
 
   def callimpl(self):
     self.blockbuf.fill(self.datum)
-    for buf in self.container(self.block, self.masked):
+    for buf in self.chain(self.container):
       self.blockbuf.subbuf(buf)

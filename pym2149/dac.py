@@ -14,11 +14,11 @@ class Level(Node):
 
   def callimpl(self):
     if self.modereg.value:
-      self.blockbuf.copybuf(self.env(self.block, self.masked))
+      self.blockbuf.copybuf(self.chain(self.env))
     else:
       # Convert to equivalent 5-bit level, observe 4-bit 0 is 5-bit 1:
       self.blockbuf.fill(self.fixedreg.value * 2 + 1)
-    self.blockbuf.mulbuf(self.signal(self.block, self.masked))
+    self.blockbuf.mulbuf(self.chain(self.signal))
 
 class Dac(Node):
 
@@ -31,4 +31,4 @@ class Dac(Node):
     self.level = level
 
   def callimpl(self):
-    self.blockbuf.mapbuf(self.level(self.block, self.masked), self.leveltoamp)
+    self.blockbuf.mapbuf(self.chain(self.level), self.leveltoamp)

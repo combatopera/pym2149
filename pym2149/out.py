@@ -29,7 +29,7 @@ class WavWriter(AbstractNode):
     self.chip = chip
 
   def callimpl(self):
-    self.chip(self.block, self.masked).tofile(self.sox.stdin)
+    self.chain(self.chip).tofile(self.sox.stdin)
 
   def flush(self):
     if self.sox is not None:

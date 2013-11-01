@@ -26,6 +26,9 @@ class AbstractNode:
   def callimpl(self):
     raise Exception('Implement me!')
 
+  def chain(self, node):
+    return node(self.block, self.masked)
+
 class Container(AbstractNode):
 
   def __init__(self, nodes):
@@ -33,7 +36,7 @@ class Container(AbstractNode):
     self.nodes = nodes
 
   def callimpl(self):
-    return [node(self.block, self.masked) for node in self.nodes]
+    return [self.chain(node) for node in self.nodes]
 
 class Node(AbstractNode):
 
