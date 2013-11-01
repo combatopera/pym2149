@@ -3,6 +3,7 @@
 import unittest
 from mix import Mixer, Multiplexer
 from nod import Node, Block, Container
+from buf import NullBuf
 
 class Counter(Node):
 
@@ -25,6 +26,13 @@ class TestMixer(unittest.TestCase):
     self.assertEqual(expect(m, 10, 12, 14, 16, 18), m.call(Block(5)).tolist())
     # Check the buffer is actually cleared first:
     self.assertEqual(expect(m, 20, 22, 24, 26, 28), m.call(Block(5)).tolist())
+
+  def test_masked(self):
+    upstream = Counter(10), Counter()
+    m = Mixer(Container(upstream))
+    self.assertEqual(NullBuf, m(Block(5), True))
+    for n in upstream:
+      self.assertEqual(NullBuf, n.result)
 
 class TestMultiplexer(unittest.TestCase):
 
