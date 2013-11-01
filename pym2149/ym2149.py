@@ -44,7 +44,6 @@ class YM2149(Registers, Container):
     channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel) for i, channel in enumerate(channels)]
     if ampshare is None:
       ampshare = self.channels
-    # FIXME: All nodes should be called even if excluded from the mix.
     Container.__init__(self, [Dac(channel, ampshare) for channel in channels])
     self.pause = pause
 
