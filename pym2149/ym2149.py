@@ -32,7 +32,7 @@ class Registers:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, ampshare = None, scale = defaultscale):
+  def __init__(self, ampshare = None, scale = defaultscale, pause = False):
     Registers.__init__(self)
     # Chip-wide signals:
     noise = NoiseOsc(scale, self.noiseperiod)
@@ -46,6 +46,7 @@ class YM2149(Registers, Container):
       ampshare = self.channels
     # FIXME: All nodes should be called even if excluded from the mix.
     Container.__init__(self, [Dac(channel, ampshare) for channel in channels])
+    self.pause = pause
 
   def update(self, frame):
     for i, x in enumerate(frame):
@@ -54,7 +55,8 @@ class YM2149(Registers, Container):
 
   def callimpl(self):
     result = Container.callimpl(self)
-    # Pass the block to any nodes that were masked:
-    for maskable in self.maskables:
-      maskable(self.block, True) # The masked flag tells the node we don't care about output.
+    if not pause:
+      # Pass the block to any nodes that were masked:
+      for maskable in self.maskables:
+        maskable(self.block, True) # The masked flag tells the node we don't care about output.
     return result

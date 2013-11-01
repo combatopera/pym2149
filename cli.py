@@ -15,11 +15,12 @@ class Config:
     return xform(v)
 
   def __init__(self):
-    options, self.args = getopt.getopt(sys.argv[1:], 's:', ['scale='])
+    options, self.args = getopt.getopt(sys.argv[1:], 's:p', ['scale=', 'pause'])
     self.scale = self.uniqueoption(options, ('-s', '--scale'), defaultscale, int)
+    self.pause = '-p' in options or '--pause' in options
 
   def createchip(self, nominalclock, **kwargs):
-    chip = YM2149(scale = self.scale, **kwargs)
+    chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
     chip.clock = nominalclock * self.scale / 8 # Observe may be non-integer.
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %.3f for non-standard scale.", chip.clock)
