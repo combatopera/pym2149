@@ -37,7 +37,7 @@ def main():
       # Closest number of frames to desired number of seconds:
       for i in xrange(int(round(seconds * refreshrate))):
         for b in session.blocks(refreshrate):
-          stream(b)
+          stream.call(b)
       stream.flush()
     finally:
       stream.close()

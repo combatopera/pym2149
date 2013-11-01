@@ -5,7 +5,7 @@ def dosound(bytecode, chip, session, stream):
   g = g()
   def tick():
     for b in session.blocks(50): # Authentic period.
-      stream(b)
+      stream.call(b)
   while True:
     ctrl = g.next()
     if ctrl <= 0xF:

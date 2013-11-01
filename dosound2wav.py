@@ -30,7 +30,7 @@ def main():
     dosound(bytecode, chip, session, stream)
     log.info("Streaming %.3f extra seconds.", extraseconds)
     for b in session.blocks(1 / extraseconds):
-      stream(b)
+      stream.call(b)
     stream.flush()
   finally:
     stream.close()

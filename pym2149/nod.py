@@ -13,7 +13,10 @@ class AbstractNode:
   def __init__(self):
     self.block = None
 
-  def __call__(self, block, masked = False):
+  def call(self, block):
+    return self(block, False)
+
+  def __call__(self, block, masked):
     if self.block != block:
       self.block = block
       self.result = self.callimpl(masked)
