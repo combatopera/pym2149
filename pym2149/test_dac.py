@@ -9,7 +9,7 @@ class Ramps(Node):
   def __init__(self):
     Node.__init__(self, int)
 
-  def callimpl(self, masked):
+  def callimpl(self):
     for i in xrange(self.block.framecount):
       self.blockbuf.fillpart(i, i + 1, i)
 

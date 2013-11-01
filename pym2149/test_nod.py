@@ -9,7 +9,7 @@ class MyAbstractNode(AbstractNode):
     AbstractNode.__init__(self)
     self.x = 0
 
-  def callimpl(self, masked):
+  def callimpl(self):
     x = self.block.framecount + self.x
     self.x += 1
     return x

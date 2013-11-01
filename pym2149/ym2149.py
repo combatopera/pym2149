@@ -52,8 +52,8 @@ class YM2149(Registers, Container):
       if 0xD != i or 255 != x:
         self.R[i].value = x
 
-  def callimpl(self, masked):
-    result = Container.callimpl(self, masked)
+  def callimpl(self):
+    result = Container.callimpl(self)
     for maskable in self.maskables:
-      maskable(self.block, masked = True)
+      maskable(self.block, True)
     return result

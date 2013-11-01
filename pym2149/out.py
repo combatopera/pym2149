@@ -28,8 +28,8 @@ class WavWriter(AbstractNode):
     self.sox = subprocess.Popen(command, stdin = subprocess.PIPE)
     self.chip = chip
 
-  def callimpl(self, masked):
-    self.chip(self.block, masked).tofile(self.sox.stdin)
+  def callimpl(self):
+    self.chip(self.block, self.masked).tofile(self.sox.stdin)
 
   def flush(self):
     if self.sox is not None:
