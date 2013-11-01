@@ -54,6 +54,7 @@ class YM2149(Registers, Container):
 
   def callimpl(self):
     result = Container.callimpl(self)
+    # Pass the block to any nodes that were masked:
     for maskable in self.maskables:
-      maskable(self.block, True)
+      maskable(self.block, True) # The masked flag tells the node we don't care about output.
     return result
