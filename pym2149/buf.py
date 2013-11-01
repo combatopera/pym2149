@@ -1,6 +1,32 @@
 import numpy as np
 
-class Buf:
+def singleton(f):
+  return f()
+
+class AnyBuf:
+
+  @staticmethod
+  def putringops(ring, ringstart, ringn, ringloop = 0):
+    ringsize = ring.shape[0]
+    ops = 0
+    while ringn:
+      n = min(ringsize - ringstart, ringn)
+      ops += 1
+      if ringstart + n == ringsize:
+        ringstart = ringloop
+      ringn -= n
+    return ops
+
+@singleton
+class NullBuf(AnyBuf):
+
+  def fillpart(self, *args):
+    pass
+
+  def putring(self, *args):
+    pass
+
+class Buf(AnyBuf):
 
   def __init__(self, buf):
     self.buf = buf
@@ -16,18 +42,6 @@ class Buf:
 
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
-
-  @staticmethod
-  def putringops(ring, ringstart, ringn, ringloop = 0):
-    ringsize = ring.shape[0]
-    ops = 0
-    while ringn:
-      n = min(ringsize - ringstart, ringn)
-      ops += 1
-      if ringstart + n == ringsize:
-        ringstart = ringloop
-      ringn -= n
-    return ops
 
   def putring(self, start, step, ring, ringstart, ringn, ringloop = 0):
     ringsize = ring.shape[0]

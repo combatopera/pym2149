@@ -1,4 +1,4 @@
-from buf import MasterBuf
+from buf import MasterBuf, NullBuf
 
 class Block:
 
@@ -44,7 +44,10 @@ class Node(AbstractNode):
     masterbuf = MasterBuf(dtype)
     callimpl = self.callimpl
     def callimploverride(masked):
-      self.blockbuf = masterbuf.ensureandcrop(self.block.framecount * channels)
+      if masked:
+        self.blockbuf = NullBuf
+      else:
+        self.blockbuf = masterbuf.ensureandcrop(self.block.framecount * channels)
       callimpl(masked)
       return self.blockbuf
     self.callimpl = callimploverride
