@@ -13,7 +13,7 @@ def main():
   initlogging()
   config = Config()
   inpath, outpath = config.args
-  f = ymopen(inpath)
+  f = ymopen(inpath, config)
   try:
     for info in f.info:
       log.info(info)
