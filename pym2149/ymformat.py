@@ -17,6 +17,10 @@ class YM:
   lwordstruct = struct.Struct('>I')
   lwordlestruct = struct.Struct('<I')
 
+  @staticmethod
+  def logignoringloopinfo():
+    log.debug('Ignoring loop info.')
+
   def __init__(self, f, expectcheckstr):
     log.debug("Format ID: %s", self.formatid)
     if expectcheckstr:
@@ -108,26 +112,35 @@ class YM2(YM23):
 
   formatid = 'YM2!'
 
+  def __init__(self, f, config):
+    YM23.__init__(self, f)
+
 class YM3(YM23):
 
   formatid = 'YM3!'
+
+  def __init__(self, f, config):
+    YM23.__init__(self, f)
 
 class YM3b(YM23):
 
   formatid = 'YM3b'
 
-  def __init__(self, f):
+  def __init__(self, f, config):
     YM23.__init__(self, f)
-    self.skip(self.framecount * self.framesize)
-    loopframe = self.readloopframe()
-    self.skip(-(self.framecount * self.framesize + 4))
-    self.loopinfo = LoopInfo(loopframe, self.f.tell() + loopframe)
+    if config.once:
+      self.logignoringloopinfo()
+    else:
+      self.skip(self.framecount * self.framesize)
+      loopframe = self.readloopframe()
+      self.skip(-(self.framecount * self.framesize + 4))
+      self.loopinfo = LoopInfo(loopframe, self.f.tell() + loopframe)
 
 class YM56(YM):
 
   framesize = 16
 
-  def __init__(self, f):
+  def __init__(self, f, config):
     YM.__init__(self, f, True)
     self.framecount = self.lword()
     # We can ignore the other attributes as they are specific to sample data:
@@ -145,9 +158,14 @@ class YM56(YM):
     dataoffset = self.f.tell()
     if interleaved:
       self.readframe = self.interleavedframe
-      self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
     else:
       self.readframe = self.simpleframe
+    if config.once:
+      self.logignoringloopinfo()
+      self.loopinfo = None
+    elif interleaved:
+      self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
+    else:
       self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
     self.logtimersynth = True
     self.logdigidrum = True
@@ -172,18 +190,18 @@ class YM6(YM56):
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
-def ymopen(path):
+def ymopen(path, config):
   f = open(path, 'rb')
   try:
     if 'YM' == f.read(2):
-      return impls['YM' + f.read(2)](f)
+      return impls['YM' + f.read(2)](f, config)
   except:
     f.close()
     raise
   f.close()
   f = UnpackedFile(path)
   try:
-    return impls[f.read(4)](f)
+    return impls[f.read(4)](f, config)
   except:
     f.close()
     raise
