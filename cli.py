@@ -14,10 +14,18 @@ class Config:
     v, = vals
     return xform(v)
 
+  @staticmethod
+  def booleanoption(options, keys):
+    for k, _ in options:
+      if k in keys:
+        return True
+    return False
+
   def __init__(self):
-    options, self.args = getopt.getopt(sys.argv[1:], 's:p', ['scale=', 'pause'])
+    options, self.args = getopt.getopt(sys.argv[1:], 's:p1', ['scale=', 'pause', 'once'])
     self.scale = self.uniqueoption(options, ('-s', '--scale'), defaultscale, int)
-    self.pause = '-p' in options or '--pause' in options
+    self.pause = self.booleanoption(options, ('-p', '--pause'))
+    self.once = self.booleanoption(options, ('-1', '--once'))
 
   def createchip(self, nominalclock, **kwargs):
     chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
