@@ -1,9 +1,1 @@
-#!/bin/bash
-
-for tag in XXX TODO FIXME; do
-
-  find -name '*.py' -exec pcregrep --color=always "$tag LATER" '{}' +
-
-  find -name '*.py' -exec pcregrep --color=always "$tag(?! LATER)" '{}' +
-
-done
+../devutils/tasks
