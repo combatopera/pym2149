@@ -1,21 +1,18 @@
-import math
+from __future__ import division
 
-class Env:
+class Env(list):
 
   def __init__(self, initial):
-    self.levels = [initial]
+    self.append(initial)
 
-  def lineto(self, hold, step, target): # TODO: Refactor to number of frames to target.
-    level = self.levels[-1]
-    while level != target:
-      for _ in xrange(hold - 1):
-        self.levels.append(level)
-      sign = math.copysign(1, level - target) # Non-zero.
-      level += step
-      if math.copysign(1, level - target) != sign: # If same, either outcome OK.
-        level = target
-      self.levels.append(level)
+  def lin(self, n, target):
+    if n:
+      source = self[-1]
+      for i in xrange(1, n + 1):
+        self.append(int(round(source + (target - source) * i / n)))
+    else:
+      self[-1] = target
     return self
 
   def __call__(self, frame):
-    return self.levels[min(frame, len(self.levels) - 1)]
+    return self[min(frame, len(self) - 1)]
