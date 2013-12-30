@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 from __future__ import division
+from pym2149.initlogging import logging
 from pym2149.out import WavWriter
-from pym2149.util import Session, initlogging
+from pym2149.util import Session
 from pym2149.ym2149 import stclock as nomclock
 from pym2149.mix import Mixer
 from cli import Config
-import os, logging
+import os
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +20,6 @@ trinote = 1300 # First peak should have half this frequency.
 slowtrinote = 2 # Frequency and actual period are both 1.
 
 def main():
-  initlogging()
   config = Config()
   chip = config.createchip(nomclock, ampshare = 1) # Stretch 1 channel to full range.
   for c in xrange(chip.channels):

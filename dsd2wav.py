@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 
-import logging
+from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.ym2149 import stclock
 from pym2149.out import WavWriter
-from pym2149.util import Session, initlogging
+from pym2149.util import Session
 from pym2149.mix import Mixer
 from cli import Config
 
 log = logging.getLogger(__name__)
 
 def main():
-  initlogging()
   config = Config()
   inpath, outpath = config.args
   f = open(inpath, 'rb')
