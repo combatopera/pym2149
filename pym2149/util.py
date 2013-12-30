@@ -1,6 +1,6 @@
 from __future__ import division
 from nod import Block
-import logging
+import logging, inspect
 
 log = logging.getLogger(__name__)
 
@@ -32,4 +32,5 @@ class Session:
 
   def __del__(self): # XXX: Reliable enough?
     if self.carryticks:
-      log.warn("Non-zero carry at end of session.") # TODO: Add location info.
+      context = inspect.stack()[1]
+      log.warn("Non-zero end of session carry in %s before line %s.", context[1], context[2])
