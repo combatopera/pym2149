@@ -2,6 +2,8 @@ from __future__ import division
 from nod import Block
 import logging
 
+log = logging.getLogger(__name__)
+
 class Session:
 
   def __init__(self, clock, minblockrate = 100):
@@ -28,5 +30,6 @@ class Session:
     else:
       yield Block(blockticks)
 
-def initlogging():
-  logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.DEBUG)
+  def __del__(self): # XXX: Reliable enough?
+    if self.carryticks:
+      log.warn("Non-zero carry at end of session.") # TODO: Add location info.
