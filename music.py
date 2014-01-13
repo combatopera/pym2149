@@ -2,7 +2,7 @@ from pym2149.util import Session
 from pym2149.buf import singleton
 from pym2149.ym2149 import stclock as clock
 from pym2149.out import WavWriter
-from pym2149.mix import Mixer
+from pym2149.mix import IdealMixer
 from cli import Config
 
 @singleton
@@ -113,7 +113,7 @@ class Main:
     config = Config()
     outpath, = config.args
     chip = config.createchip(clock)
-    stream = WavWriter(chip.clock, Mixer(chip), outpath)
+    stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
     try:
       session = Session(chip.clock)
       chanupdaters = [voidupdater] * chip.channels

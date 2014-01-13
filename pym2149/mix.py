@@ -37,7 +37,7 @@ class Multiplexer(Node):
     for i, stream in enumerate(self.streams):
       self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount)
 
-class Mixer(Node):
+class IdealMixer(Node):
 
   def __init__(self, container):
     Node.__init__(self, np.int32) # SoX internal sample format.

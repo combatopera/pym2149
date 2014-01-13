@@ -5,7 +5,7 @@ from pym2149.initlogging import logging
 from pym2149.out import WavWriter
 from pym2149.util import Session
 from pym2149.ym2149 import stclock as nomclock
-from pym2149.mix import Mixer
+from pym2149.mix import IdealMixer
 from cli import Config
 import os
 
@@ -31,7 +31,7 @@ def main():
   def dump(path):
     path = os.path.join('target', path)
     log.debug(path)
-    stream = WavWriter(chip.clock, Mixer(chip), path)
+    stream = WavWriter(chip.clock, IdealMixer(chip), path)
     try:
       session = Session(chip.clock)
       # Closest number of frames to desired number of seconds:

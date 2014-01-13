@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from mix import Mixer, Multiplexer
+from mix import IdealMixer, Multiplexer
 from nod import Node, Block, Container
 from buf import NullBuf
 
@@ -19,17 +19,17 @@ class Counter(Node):
 def expect(m, *values):
   return [m.datum - v for v in values]
 
-class TestMixer(unittest.TestCase):
+class TestIdealMixer(unittest.TestCase):
 
   def test_works(self):
-    m = Mixer(Container([Counter(10), Counter()]))
+    m = IdealMixer(Container([Counter(10), Counter()]))
     self.assertEqual(expect(m, 10, 12, 14, 16, 18), m.call(Block(5)).tolist())
     # Check the buffer is actually cleared first:
     self.assertEqual(expect(m, 20, 22, 24, 26, 28), m.call(Block(5)).tolist())
 
   def test_masked(self):
     upstream = Counter(10), Counter()
-    m = Mixer(Container(upstream))
+    m = IdealMixer(Container(upstream))
     self.assertEqual(NullBuf, m(Block(5), True))
     for n in upstream:
       self.assertEqual(NullBuf, n.result)
