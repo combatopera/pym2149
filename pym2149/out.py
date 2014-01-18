@@ -16,7 +16,6 @@ class WavWriter(AbstractNode):
       '-b', '32',
       '-t', 'raw',
       '-',
-      # TODO LATER: Output format should be configurable.
       '-r', str(outfreq),
       '-e', 'signed',
       '-b', '16',
