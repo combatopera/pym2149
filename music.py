@@ -119,7 +119,7 @@ class Main:
       chanupdaters = [voidupdater] * chip.channels
       for frameindex, frame in enumerate(frames):
         for patternindex, action in enumerate(frame):
-          chan = patternindex # TODO: Utilise voids in channels.
+          chan = patternindex # TODO LATER: Utilise voids in channels.
           onnoteornone = action.onnoteornone(chip, chan)
           if onnoteornone is not None:
             chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
