@@ -18,5 +18,13 @@ class Env(list):
   def hold(self, n):
     return self.lin(n, self[-1])
 
+  def tri(self, n, target, waves):
+    source = self[-1]
+    for _ in xrange(waves):
+      self.lin(n, target)
+      self.lin(n * 2, source * 2 - target)
+      self.lin(n, source)
+    return self
+
   def __call__(self, frame):
     return self[min(frame, len(self) - 1)]
