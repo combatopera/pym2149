@@ -11,7 +11,7 @@ class Registers:
 
   channels = 3
 
-  def __init__(self, extended):
+  def __init__(self):
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
@@ -28,13 +28,12 @@ class Registers:
     self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(self.channels))
     self.levelmodes = tuple(DerivedReg(lambda x: x & 0x10, self.R[0x8 + c]) for c in xrange(self.channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
-    envmask = (0x0f, 0x1f)[extended]
-    self.envshape = DerivedReg(lambda x: x & envmask, self.R[0xD])
+    self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
 
 class YM2149(Registers, Container):
 
-  def __init__(self, ampshare = None, scale = defaultscale, pause = False, extended = False):
-    Registers.__init__(self, extended)
+  def __init__(self, ampshare = None, scale = defaultscale, pause = False):
+    Registers.__init__(self)
     # Chip-wide signals:
     noise = NoiseOsc(scale, self.noiseperiod)
     env = EnvOsc(scale, self.envperiod, self.envshape)
