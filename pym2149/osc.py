@@ -122,8 +122,6 @@ class EnvOsc(OscNode):
       shape = self.shapereg.value
       if shape == (shape & 0x07):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
-      elif shape & 0x10:
-        shape = 0x10
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
       self.reset()
