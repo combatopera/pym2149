@@ -1,6 +1,7 @@
 from __future__ import division
-import lfsr, numpy as np, itertools
+import lfsr, numpy as np, itertools, math
 from nod import Node
+from dac import leveltoamp, amptolevel
 
 class Values:
 
@@ -89,6 +90,14 @@ def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated m
     for x in v:
       yield x
 
+def sinevalues(steps): # Like saw but unlike triangular, we use steps for a full wave.
+  levels = []
+  minamp = leveltoamp(0)
+  for i in xrange(steps):
+    amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
+    levels.append(round(amptolevel(amp)))
+  return Values(cycle(levels, 1000))
+
 class EnvOsc(OscNode):
 
   steps = 32
@@ -100,6 +109,7 @@ class EnvOsc(OscNode):
   values0d = Values(itertools.chain(xrange(steps), itertools.repeat(steps - 1, 1000)), steps)
   values0b = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
   values09 = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
+  values10 = sinevalues(steps)
 
   def __init__(self, scale, periodreg, shapereg):
     self.scaleofstep = scale * 32 // self.steps
@@ -112,6 +122,8 @@ class EnvOsc(OscNode):
       shape = self.shapereg.value
       if shape == (shape & 0x07):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
+      elif shape & 0x10:
+        shape = 0x10
       self.values = getattr(self, "values%02x" % shape)
       self.shapeversion = self.shapereg.version
       self.reset()

@@ -1,6 +1,6 @@
 from __future__ import division
 from nod import Node
-import numpy as np
+import numpy as np, math
 
 class Level(Node):
 
@@ -20,6 +20,14 @@ class Level(Node):
       self.blockbuf.fill(self.fixedreg.value * 2 + 1)
     self.blockbuf.mulbuf(self.chain(self.signal))
 
+log2 = math.log(2)
+
+def leveltoamp(level):
+  return 2 ** ((level - 31) / 4)
+
+def amptolevel(amp):
+  return 31 + 4 * math.log(amp) / log2
+
 class Dac(Node):
 
   def __init__(self, level, ampshare):
@@ -27,7 +35,7 @@ class Dac(Node):
     Node.__init__(self, np.uint32)
     maxamp = 2 ** 31.5 / ampshare
     # Lookup of ideal amplitudes, rounded towards zero:
-    self.leveltoamp = np.array([self.dtype(2 ** ((v - 31) / 4) * maxamp) for v in xrange(32)])
+    self.leveltoamp = np.array([self.dtype(leveltoamp(v) * maxamp) for v in xrange(32)])
     self.level = level
 
   def callimpl(self):
