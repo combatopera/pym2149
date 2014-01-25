@@ -43,12 +43,6 @@ class Node(AbstractNode):
 
   zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
 
-  @staticmethod
-  def commondtype(*nodes):
-    dtypes = set(n.dtype for n in nodes)
-    dtype, = dtypes
-    return dtype
-
   def __init__(self, dtype, channels = 1):
     AbstractNode.__init__(self)
     masterbuf = MasterBuf(dtype)

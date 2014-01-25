@@ -29,6 +29,12 @@ class BinMix(Node):
 
 class Multiplexer(Node):
 
+  @staticmethod
+  def commondtype(*nodes):
+    dtypes = set(n.dtype for n in nodes)
+    dtype, = dtypes
+    return dtype
+
   def __init__(self, *streams):
     Node.__init__(self, self.commondtype(*streams), len(streams))
     self.streams = streams
