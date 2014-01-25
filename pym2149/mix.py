@@ -4,7 +4,7 @@ import numpy as np
 class BinMix(Node):
 
   def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-    Node.__init__(self, Node.commondtype(tone, noise))
+    Node.__init__(self, self.binarydtype)
     self.tone = tone
     self.noise = noise
     self.toneflagreg = toneflagreg

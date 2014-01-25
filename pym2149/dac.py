@@ -5,8 +5,7 @@ import numpy as np, math
 class Level(Node):
 
   def __init__(self, modereg, fixedreg, env, signal):
-    # Probably not necessary for dtype of signal to match that of env and this:
-    Node.__init__(self, Node.commondtype(env, signal))
+    Node.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
     self.modereg = modereg
     self.fixedreg = fixedreg
     self.env = env
@@ -31,7 +30,6 @@ def amptolevel(amp):
 class Dac(Node):
 
   def __init__(self, level, ampshare):
-    # The level dtype must be such that its values can be used as indices.
     Node.__init__(self, np.uint32)
     maxamp = 2 ** 31.5 / ampshare
     # Lookup of ideal amplitudes, rounded towards zero:

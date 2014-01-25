@@ -1,4 +1,5 @@
 from buf import MasterBuf, NullBuf
+import numpy as np
 
 class Block:
 
@@ -39,6 +40,8 @@ class Container(AbstractNode):
     return [self.chain(node) for node in self.nodes]
 
 class Node(AbstractNode):
+
+  zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
 
   @staticmethod
   def commondtype(*nodes):

@@ -5,16 +5,14 @@ from dac import leveltoamp, amptolevel
 
 class Values:
 
-  dtype = np.uint8 # Slightly faster than plain old int.
-
-  def __init__(self, g, loop = 0):
-    self.buf = np.fromiter(g, self.dtype)
+  def __init__(self, dtype, g, loop = 0):
+    self.buf = np.fromiter(g, dtype)
     self.loop = loop
 
 class OscNode(Node):
 
-  def __init__(self, periodreg):
-    Node.__init__(self, Values.dtype)
+  def __init__(self, dtype, periodreg):
+    Node.__init__(self, dtype)
     self.reset()
     self.periodreg = periodreg
 
@@ -58,11 +56,11 @@ class OscNode(Node):
 
 class ToneOsc(OscNode):
 
-  values = Values(1 - (i & 1) for i in xrange(1000))
+  values = Values(Node.binarydtype, (1 - (i & 1) for i in xrange(1000)))
 
   def __init__(self, scale, periodreg):
     self.scaleofstep = scale * 2 // 2
-    OscNode.__init__(self, periodreg)
+    OscNode.__init__(self, Node.binarydtype, periodreg)
 
   def callimpl(self):
     self.stepsize = self.scaleofstep * self.periodreg.value
@@ -72,11 +70,11 @@ class ToneOsc(OscNode):
 
 class NoiseOsc(OscNode):
 
-  values = Values(lfsr.Lfsr(*lfsr.ym2149nzdegrees))
+  values = Values(Node.binarydtype, lfsr.Lfsr(*lfsr.ym2149nzdegrees))
 
   def __init__(self, scale, periodreg):
     self.scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-    OscNode.__init__(self, periodreg)
+    OscNode.__init__(self, Node.binarydtype, periodreg)
     self.stepsize = self.progress
 
   def callimpl(self):
@@ -96,24 +94,24 @@ def sinevalues(steps): # Like saw but unlike triangular, we use steps for a full
   for i in xrange(steps):
     amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
     levels.append(round(amptolevel(amp)))
-  return Values(cycle(levels, 1000))
+  return Values(Node.zto255dtype, cycle(levels, 1000))
 
 class EnvOsc(OscNode):
 
   steps = 32
-  values0c = Values(cycle(range(steps), 1000))
-  values08 = Values(cycle(range(steps - 1, -1, -1), 1000))
-  values0e = Values(cycle(range(steps) + range(steps - 1, -1, -1), 1000))
-  values0a = Values(cycle(range(steps - 1, -1, -1) + range(steps), 1000))
-  values0f = Values(itertools.chain(xrange(steps), itertools.repeat(0, 1000)), steps)
-  values0d = Values(itertools.chain(xrange(steps), itertools.repeat(steps - 1, 1000)), steps)
-  values0b = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
-  values09 = Values(itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
+  values0c = Values(Node.zto255dtype, cycle(range(steps), 1000))
+  values08 = Values(Node.zto255dtype, cycle(range(steps - 1, -1, -1), 1000))
+  values0e = Values(Node.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1), 1000))
+  values0a = Values(Node.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps), 1000))
+  values0f = Values(Node.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(0, 1000)), steps)
+  values0d = Values(Node.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(steps - 1, 1000)), steps)
+  values0b = Values(Node.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
+  values09 = Values(Node.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
   values10 = sinevalues(steps)
 
   def __init__(self, scale, periodreg, shapereg):
     self.scaleofstep = scale * 32 // self.steps
-    OscNode.__init__(self, periodreg)
+    OscNode.__init__(self, Node.zto255dtype, periodreg)
     self.shapeversion = None
     self.shapereg = shapereg
 
