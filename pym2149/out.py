@@ -22,6 +22,8 @@ class WavWriter(AbstractNode):
     ]
     if '-' == path:
       command += ['-t', 'wav']
+    elif '/dev/null' == path:
+      command += ['-t', 'raw']
     command += [path]
     # TODO: Find out whether a DC filter would be authentic.
     self.sox = subprocess.Popen(command, stdin = subprocess.PIPE)
