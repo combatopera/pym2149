@@ -33,4 +33,4 @@ class Session:
   def __del__(self): # XXX: Reliable enough?
     if self.carryticks:
       context = inspect.stack()[1]
-      log.warn("Non-zero end of session carry in %s before line %s.", context[1], context[2])
+      log.warn("Non-zero end of session carry %s in %s before line %s.", self.carryticks, context[1], context[2])
