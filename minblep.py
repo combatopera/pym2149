@@ -28,7 +28,7 @@ class MinBlep:
       log.warn('Bad min-phase reconstruction.')
     self.minblep = normintegral(self.minbli)
 
-def main():
+def plot():
   import matplotlib.pyplot as plt
   minblep = MinBlep(10, 5)
   plt.plot(minblep.bli, 'b+')
@@ -40,4 +40,4 @@ def main():
   plt.show()
 
 if __name__ == '__main__':
-  main()
+  plot()
