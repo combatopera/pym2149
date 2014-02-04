@@ -16,7 +16,6 @@ class MinBlep:
     return int(round(4 / transition / 2)) * 2
 
   def __init__(self, order, scale, cutoff = .475):
-    # TODO: Rename vars for consistency with the detailed paper.
     if order & 1:
       raise Exeption('The order must be even.')
     self.midpoint = order * scale // 2 # Index of peak of sinc.
