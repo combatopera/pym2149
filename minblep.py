@@ -8,6 +8,8 @@ log = logging.getLogger(__name__)
 class MinBlep:
 
   def __init__(self, zeros, scale):
+    # TODO: Rename vars for consistency with the detailed paper.
+    # FIXME: Instead of zeros take transition band params.
     self.midpoint = zeros * scale # Index of peak of sinc.
     self.size = self.midpoint * 2 + 1
     x = 2 * zeros * np.arange(self.size) / (self.size - 1) - zeros
