@@ -8,14 +8,12 @@ log = logging.getLogger(__name__)
 class MinBlep:
 
   def __init__(self, zeros, scale):
-    def normintegral(signal):
-      return np.cumsum(signal) / scale
     self.midpoint = zeros * scale # Index of peak of sinc.
     self.size = self.midpoint * 2 + 1
     x = 2 * zeros * np.arange(self.size) / (self.size - 1) - zeros
     # The sinc starts and ends with zero, and the window fixes the integral height:
-    self.bli = np.blackman(self.size) * np.sinc(x)
-    self.blep = normintegral(self.bli)
+    self.bli = np.blackman(self.size) * np.sinc(x) / scale
+    self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
     realcepstrum = np.fft.ifft(np.log(absdft)) # Symmetric apart from first element.
@@ -26,14 +24,15 @@ class MinBlep:
     # Check our cepstrum manipulation isn't broken:
     if not np.allclose(absdft, np.abs(np.fft.fft(self.minbli))):
       log.warn('Bad min-phase reconstruction.')
-    self.minblep = normintegral(self.minbli)
+    self.minblep = np.cumsum(self.minbli)
 
 def plot():
   import matplotlib.pyplot as plt
-  minblep = MinBlep(10, 5)
-  plt.plot(minblep.bli, 'b+')
+  scale = 5
+  minblep = MinBlep(10, scale)
+  plt.plot(minblep.bli * scale, 'b+')
   plt.plot(minblep.blep, 'bo')
-  plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli, 'r+')
+  plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * scale, 'r+')
   for style in 'r', 'ro':
     plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minblep, style)
   plt.grid(True)
