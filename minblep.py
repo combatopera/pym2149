@@ -11,14 +11,15 @@ class MinBlep:
   def idealscale(ctrlrate, outrate):
     return ctrlrate // fractions.gcd(ctrlrate, outrate)
 
-  def __init__(self, zeros, scale):
+  def __init__(self, zeros, scale, cutoff = .5):
     # TODO: Rename vars for consistency with the detailed paper.
     # FIXME: Instead of zeros take transition band params.
     self.midpoint = zeros * scale # Index of peak of sinc.
     self.size = self.midpoint * 2 + 1
     x = 2 * zeros * np.arange(self.size) / (self.size - 1) - zeros
+    x *= cutoff * 2
     # The sinc starts and ends with zero, and the window fixes the integral height:
-    self.bli = np.blackman(self.size) * np.sinc(x) / scale
+    self.bli = np.blackman(self.size) * np.sinc(x) / scale * cutoff * 2
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
