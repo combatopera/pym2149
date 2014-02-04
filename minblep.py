@@ -12,15 +12,16 @@ class MinBlep:
     return ctrlrate // fractions.gcd(ctrlrate, outrate)
 
   @staticmethod
-  def zeros(transition = .05):
-    return int(round(4 / transition / 2)) # On each side.
+  def order(transition = .05):
+    return int(round(4 / transition / 2)) * 2
 
-  def __init__(self, zeros, scale, cutoff = .475):
+  def __init__(self, order, scale, cutoff = .475):
     # TODO: Rename vars for consistency with the detailed paper.
-    self.midpoint = zeros * scale # Index of peak of sinc.
-    self.size = self.midpoint * 2 + 1
-    x = 2 * zeros * np.arange(self.size) / (self.size - 1) - zeros
-    x *= cutoff * 2
+    if order & 1:
+      raise Exeption('The order must be even.')
+    self.midpoint = order * scale // 2 # Index of peak of sinc.
+    self.size = order * scale + 1
+    x = (np.arange(self.size) / (self.size - 1) * 2 - 1) * order * cutoff
     # The sinc starts and ends with zero, and the window fixes the integral height:
     self.bli = np.blackman(self.size) * np.sinc(x) / scale * cutoff * 2
     self.blep = np.cumsum(self.bli)
@@ -50,7 +51,7 @@ class MinBlep:
 
 def plot():
   import matplotlib.pyplot as plt
-  minblep = MinBlep(10, 5, cutoff = .5)
+  minblep = MinBlep(20, 5, cutoff = .5)
   plt.plot(minblep.bli * minblep.scale, 'b+')
   plt.plot(minblep.blep, 'bo')
   plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * minblep.scale, 'r+')
@@ -82,7 +83,7 @@ def render():
     ctrlsignal[x:x + period // 2] = toneamp
     ctrlsignal[x + period // 2:x + period] = -toneamp
     x += period
-  minblep = MinBlep(MinBlep.zeros(), scale)
+  minblep = MinBlep(MinBlep.order(), scale)
   diffsignal[:] = ctrlsignal
   diffsignal[0] -= 0 # Last value of previous ctrlsignal.
   diffsignal[1:] -= ctrlsignal[:-1]
