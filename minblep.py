@@ -11,9 +11,12 @@ class MinBlep:
   def idealscale(ctrlrate, outrate):
     return ctrlrate // fractions.gcd(ctrlrate, outrate)
 
-  def __init__(self, zeros, scale, cutoff = .5):
+  @staticmethod
+  def zeros(transition = .05):
+    return int(round(4 / transition / 2)) # On each side.
+
+  def __init__(self, zeros, scale, cutoff = .475):
     # TODO: Rename vars for consistency with the detailed paper.
-    # FIXME: Instead of zeros take transition band params.
     self.midpoint = zeros * scale # Index of peak of sinc.
     self.size = self.midpoint * 2 + 1
     x = 2 * zeros * np.arange(self.size) / (self.size - 1) - zeros
@@ -47,7 +50,7 @@ class MinBlep:
 
 def plot():
   import matplotlib.pyplot as plt
-  minblep = MinBlep(10, 5)
+  minblep = MinBlep(10, 5, cutoff = .5)
   plt.plot(minblep.bli * minblep.scale, 'b+')
   plt.plot(minblep.blep, 'bo')
   plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * minblep.scale, 'r+')
@@ -79,7 +82,7 @@ def render():
     ctrlsignal[x:x + period // 2] = toneamp
     ctrlsignal[x + period // 2:x + period] = -toneamp
     x += period
-  minblep = MinBlep(40, scale)
+  minblep = MinBlep(MinBlep.zeros(), scale)
   diffsignal[:] = ctrlsignal
   diffsignal[0] -= 0 # Last value of previous ctrlsignal.
   diffsignal[1:] -= ctrlsignal[:-1]
