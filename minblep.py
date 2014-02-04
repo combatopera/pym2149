@@ -27,14 +27,14 @@ class MinBlep:
     if not np.allclose(absdft, np.abs(np.fft.fft(self.minbli))):
       log.warn('Bad min-phase reconstruction.')
     self.minblep = np.cumsum(self.minbli)
+    self.scale = scale
 
 def plot():
   import matplotlib.pyplot as plt
-  scale = 5
-  minblep = MinBlep(10, scale)
-  plt.plot(minblep.bli * scale, 'b+')
+  minblep = MinBlep(10, 5)
+  plt.plot(minblep.bli * minblep.scale, 'b+')
   plt.plot(minblep.blep, 'bo')
-  plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * scale, 'r+')
+  plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * minblep.scale, 'r+')
   for style in 'r', 'ro':
     plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minblep, style)
   plt.grid(True)
