@@ -62,7 +62,7 @@ def render():
   outrate = 44100
   tonefreq = 1500
   toneamp = .25
-  scale = 500 # TODO: Find out what we can get away with.
+  scale = 500 # Smaller values result in worse-looking spectrograms.
   ctrlsize = ctrlrate
   outsize = outrate
   dtype = np.float32
