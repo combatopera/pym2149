@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import numpy as np, logging
+import numpy as np, logging, fractions, math
 
 log = logging.getLogger(__name__)
 
 class MinBlep:
+
+  @staticmethod
+  def idealscale(ctrlrate, outrate):
+    return ctrlrate // fractions.gcd(ctrlrate, outrate)
 
   def __init__(self, zeros, scale):
     # TODO: Rename vars for consistency with the detailed paper.
@@ -30,7 +34,6 @@ class MinBlep:
     self.scale = scale
 
   def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
-    import math
     outx = ctrlx / ctrlrate * outrate # 0, 0+, .5, 1-, 1
     outi = int(math.ceil(outx)) # 0, 1, 1, 1, 1
     frac = outi - outx # 0, 1-, .5, 0+, 0
@@ -59,7 +62,6 @@ def render():
   outrate = 44100
   tonefreq = 1500
   toneamp = .25
-  idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
   scale = 500 # TODO: Find out what we can get away with.
   ctrlsize = ctrlrate
   outsize = outrate
