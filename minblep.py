@@ -60,7 +60,7 @@ def render():
   tonefreq = 1500
   toneamp = .25
   idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
-  scale = 1000 # TODO: Find out what we can get away with.
+  scale = 500 # TODO: Find out what we can get away with.
   ctrlsize = ctrlrate
   outsize = outrate
   dtype = np.float32
