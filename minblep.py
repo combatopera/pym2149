@@ -13,6 +13,7 @@ class MinBlep:
 
   @staticmethod
   def order(transition = .05):
+    # Closest even order to 4/transition:
     return int(round(4 / transition / 2)) * 2
 
   def __init__(self, order, scale, cutoff = .475):
@@ -21,7 +22,8 @@ class MinBlep:
     self.midpoint = order * scale // 2 # Index of peak of sinc.
     self.size = order * scale + 1
     x = (np.arange(self.size) / (self.size - 1) * 2 - 1) * order * cutoff
-    # The sinc starts and ends with zero, and the window fixes the integral height:
+    # If cutoff is .5 the sinc starts and ends with zero.
+    # The window is necessary for a reliable integral height later:
     self.bli = np.blackman(self.size) * np.sinc(x) / scale * cutoff * 2
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
