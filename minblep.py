@@ -5,7 +5,7 @@ import numpy as np, logging, fractions, math
 
 log = logging.getLogger(__name__)
 
-class MinBlep:
+class MinBleps:
 
   @staticmethod
   def idealscale(ctrlrate, outrate):
@@ -52,12 +52,12 @@ class MinBlep:
 
 def plot():
   import matplotlib.pyplot as plt
-  minblep = MinBlep(20, 5, cutoff = .5)
-  plt.plot(minblep.bli * minblep.scale, 'b+')
-  plt.plot(minblep.blep, 'bo')
-  plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minbli * minblep.scale, 'r+')
+  minbleps = MinBleps(20, 5, cutoff = .5)
+  plt.plot(minbleps.bli * minbleps.scale, 'b+')
+  plt.plot(minbleps.blep, 'bo')
+  plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
   for style in 'r', 'ro':
-    plt.plot(np.arange(minblep.size) + minblep.midpoint, minblep.minblep, style)
+    plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minblep, style)
   plt.grid(True)
   plt.show()
 
@@ -84,13 +84,13 @@ def render():
     ctrlsignal[x:x + period // 2] = toneamp
     ctrlsignal[x + period // 2:x + period] = -toneamp
     x += period
-  minblep = MinBlep(MinBlep.order(), scale)
+  minbleps = MinBleps(MinBleps.order(), scale)
   diffsignal[:] = ctrlsignal
   diffsignal[0] -= 0 # Last value of previous ctrlsignal.
   diffsignal[1:] -= ctrlsignal[:-1]
   outsignal[:] = 0
   for ctrlx in np.flatnonzero(diffsignal): # XXX: Can we avoid making a new array?
-    outi, mixin = minblep.getmixin(ctrlx, ctrlrate, outrate, diffsignal[ctrlx], minblepbuf)
+    outi, mixin = minbleps.getmixin(ctrlx, ctrlrate, outrate, diffsignal[ctrlx], minblepbuf)
     outj = min(outsize, outi + len(mixin.buf))
     outsignal[outi:outj] += mixin.buf[:outj - outi]
     outsignal[outj:] += diffsignal[ctrlx]
