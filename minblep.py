@@ -9,14 +9,9 @@ class MinBleps:
   def idealscale(ctrlrate, outrate):
     return ctrlrate // fractions.gcd(ctrlrate, outrate)
 
-  @staticmethod
-  def order(transition = .05):
+  def __init__(self, scale, cutoff = .475, transition = .05):
     # Closest even order to 4/transition:
-    return int(round(4 / transition / 2)) * 2
-
-  def __init__(self, order, scale, cutoff = .475):
-    if order & 1:
-      raise Exception('The order must be even.')
+    order = int(round(4 / transition / 2)) * 2
     self.midpoint = order * scale // 2 # Index of peak of sinc.
     self.size = order * scale + 1
     x = (np.arange(self.size) / (self.size - 1) * 2 - 1) * order * cutoff
@@ -47,7 +42,7 @@ class MinBleps:
 
 def plot():
   import matplotlib.pyplot as plt
-  minbleps = MinBleps(20, 5, cutoff = .5)
+  minbleps = MinBleps(5, cutoff = .5, transition = 4/20)
   plt.plot(minbleps.bli * minbleps.scale, 'b+')
   plt.plot(minbleps.blep, 'bo')
   plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
@@ -79,7 +74,7 @@ def render():
     ctrlsignal[x:x + period // 2] = toneamp
     ctrlsignal[x + period // 2:x + period] = -toneamp
     x += period
-  minbleps = MinBleps(MinBleps.order(), scale)
+  minbleps = MinBleps(scale)
   diffsignal[:] = ctrlsignal
   diffsignal[0] -= 0 # Last value of previous ctrlsignal.
   diffsignal[1:] -= ctrlsignal[:-1]
