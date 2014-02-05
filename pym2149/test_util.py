@@ -37,6 +37,7 @@ class TestSession(unittest.TestCase):
     # Don't bother returning a block of size zero:
     self.assertEqual([], [b.framecount for b in s.blocks(2001)])
     self.assertEqual(1000, s.carryticks)
+    s.carryticks = 0
 
   def test_inexactminblockrate(self):
     s = Session(1000, 3)
@@ -65,6 +66,7 @@ class TestSession(unittest.TestCase):
     self.assertEqual(0, s.carryticks)
     self.assertEqual([34], [b.framecount for b in s.blocks(3)])
     self.assertEqual(-1.5, s.carryticks)
+    s.carryticks = 0
 
 if __name__ == '__main__':
   unittest.main()
