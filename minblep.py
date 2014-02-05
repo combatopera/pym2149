@@ -40,17 +40,6 @@ class MinBleps:
     buf.buf *= amp
     return outi, buf
 
-def plot():
-  import matplotlib.pyplot as plt
-  minbleps = MinBleps(5, cutoff = .5, transition = 4/20)
-  plt.plot(minbleps.bli * minbleps.scale, 'b+')
-  plt.plot(minbleps.blep, 'bo')
-  plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
-  for style in 'r', 'ro':
-    plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minblep, style)
-  plt.grid(True)
-  plt.show()
-
 def render():
   import subprocess, sys
   from pym2149.buf import MasterBuf
