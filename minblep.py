@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import numpy as np, logging, fractions, math
-
-log = logging.getLogger(__name__)
+import numpy as np, fractions, math
 
 class MinBleps:
 
@@ -18,7 +16,7 @@ class MinBleps:
 
   def __init__(self, order, scale, cutoff = .475):
     if order & 1:
-      raise Exeption('The order must be even.')
+      raise Exception('The order must be even.')
     self.midpoint = order * scale // 2 # Index of peak of sinc.
     self.size = order * scale + 1
     x = (np.arange(self.size) / (self.size - 1) * 2 - 1) * order * cutoff
@@ -33,9 +31,6 @@ class MinBleps:
     realcepstrum[1:self.midpoint + 1] *= 2
     realcepstrum[self.midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
-    # Check our cepstrum manipulation isn't broken. TODO: Replace with unit test.
-    if not np.allclose(absdft, np.abs(np.fft.fft(self.minbli))):
-      log.warn('Bad min-phase reconstruction.')
     self.minblep = np.cumsum(self.minbli)
     self.scale = scale
 
@@ -62,7 +57,7 @@ def plot():
   plt.show()
 
 def render():
-  import subprocess, sys, fractions
+  import subprocess, sys
   from pym2149.buf import MasterBuf
   ctrlrate = 2000000
   outrate = 44100
