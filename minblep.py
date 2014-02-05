@@ -2,6 +2,7 @@
 
 from __future__ import division
 import numpy as np, fractions, math
+from pym2149.buf import MasterBuf, Buf
 
 class MinBleps:
 
@@ -36,13 +37,12 @@ class MinBleps:
     shape = int(round(frac * self.scale)) # XXX: Is round correct here?
     view = self.minblep[shape::self.scale] # Two possible sizes.
     buf = buf.ensureandcrop(len(view))
-    buf.buf[:] = view
-    buf.buf *= amp
+    buf.copybuf(Buf(view))
+    buf.mul(amp)
     return outi, buf
 
 def render():
   import subprocess, sys
-  from pym2149.buf import MasterBuf
   ctrlrate = 2000000
   outrate = 44100
   tonefreq = 1500

@@ -60,6 +60,9 @@ class Buf(AnyBuf):
   def add(self, value):
     self.buf += value
 
+  def mul(self, value):
+    self.buf *= value
+
   def subbuf(self, that):
     self.buf -= that.buf
 
