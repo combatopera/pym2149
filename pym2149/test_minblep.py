@@ -2,7 +2,7 @@
 
 import unittest, numpy as np
 from minblep import MinBleps
-from pym2149.buf import MasterBuf
+from buf import MasterBuf
 
 class TestMinBleps(unittest.TestCase):
 
