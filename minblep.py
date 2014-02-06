@@ -1,5 +1,5 @@
 from __future__ import division
-import numpy as np, fractions, math
+import numpy as np, fractions
 from pym2149.buf import Buf
 
 class MinBleps:
@@ -29,10 +29,10 @@ class MinBleps:
     self.scale = scale
 
   def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
-    outx = ctrlx / ctrlrate * outrate # 0, 0+, .5, 1-, 1
-    outi = int(math.ceil(outx)) # 0, 1, 1, 1, 1
-    frac = outi - outx # 0, 1-, .5, 0+, 0
-    shape = int(round(frac * self.scale)) # XXX: Is round correct here?
+    outx = ctrlx / ctrlrate * outrate
+    tmpi = int(round(outx * self.scale))
+    outi = (tmpi + self.scale - 1) // self.scale
+    shape = (-tmpi) % self.scale
     view = self.minblep[shape::self.scale] # Two possible sizes.
     buf = buf.ensureandcrop(len(view))
     buf.copybuf(Buf(view))
