@@ -2,7 +2,7 @@
 
 from __future__ import division
 import numpy as np
-from minblep import MinBleps
+from pym2149.minblep import MinBleps
 
 def main():
   import matplotlib.pyplot as plt

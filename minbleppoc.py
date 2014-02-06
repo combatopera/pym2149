@@ -3,7 +3,7 @@
 from __future__ import division
 import numpy as np
 from pym2149.buf import MasterBuf
-from minblep import MinBleps
+from pym2149.minblep import MinBleps
 
 def main():
   import subprocess, sys
