@@ -46,8 +46,8 @@ class Multiplexer(Node):
 class IdealMixer(Node):
 
   def __init__(self, container):
-    Node.__init__(self, np.int32) # SoX internal sample format.
-    self.datum = self.dtype(2 ** 30.5) # Half power point, very close to -3 dB.
+    Node.__init__(self, np.float32)
+    self.datum = self.dtype(2 ** -.5) # Half power point, very close to -3 dB.
     self.container = container
 
   def callimpl(self):

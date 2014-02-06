@@ -5,14 +5,11 @@ class WavWriter(AbstractNode):
 
   def __init__(self, clock, chip, path):
     AbstractNode.__init__(self)
-    channels = 1
     outfreq = 44100
     command = [
       'sox',
-      '-c', str(channels),
       '-r', str(clock),
-      # Assume signal is in SoX native format:
-      '-e', 'signed',
+      '-e', 'float',
       '-b', '32',
       '-t', 'raw',
       '-',

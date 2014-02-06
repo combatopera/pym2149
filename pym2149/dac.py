@@ -30,10 +30,10 @@ def amptolevel(amp):
 class Dac(Node):
 
   def __init__(self, level, ampshare):
-    Node.__init__(self, np.uint32)
-    maxamp = 2 ** 31.5 / ampshare
-    # Lookup of ideal amplitudes, rounded towards zero:
-    self.leveltoamp = np.array([self.dtype(leveltoamp(v) * maxamp) for v in xrange(32)])
+    Node.__init__(self, np.float32)
+    maxamp = 2 ** .5 / ampshare
+    # Lookup of ideal amplitudes:
+    self.leveltoamp = np.fromiter((leveltoamp(v) * maxamp for v in xrange(32)), self.dtype)
     self.level = level
 
   def callimpl(self):
