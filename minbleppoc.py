@@ -29,10 +29,7 @@ def main():
     naivebuf.fillpart(x + period // 2, x + period, -toneamp)
     x += period
   minbleps = MinBleps(scale)
-  diffbuf = diffmaster.ensureandcrop(naivesize)
-  diffbuf.copybuf(naivebuf)
-  diffbuf.buf[0] -= 0 # Last value of previous naivesignal.
-  diffbuf.buf[1:] -= naivebuf.buf[:-1]
+  diffbuf = diffmaster.differentiate(0, naivebuf)
   outbuf = outmaster.ensureandcrop(outsize)
   outbuf.fill(0)
   for naivex in np.flatnonzero(diffbuf.buf): # XXX: Can we avoid making a new array?

@@ -33,6 +33,9 @@ class Buf(AnyBuf):
   def __init__(self, buf):
     self.buf = buf
 
+  def __len__(self):
+    return len(self.buf)
+
   def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
 
@@ -74,6 +77,13 @@ class Buf(AnyBuf):
 
   def tofile(self, fileobj):
     self.buf.tofile(fileobj)
+
+  def differentiate(self, lastofprev, that):
+    diff = self.ensureandcrop(len(that))
+    diff.copybuf(that)
+    diff.buf[0] -= lastofprev
+    diff.buf[1:] -= that.buf[:-1]
+    return diff
 
   def ensureandcrop(self, framecount):
     thisframecount = self.buf.shape[0]
