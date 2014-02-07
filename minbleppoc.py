@@ -21,7 +21,7 @@ def main():
   naivemaster = MasterBuf(dtype = dtype)
   diffmaster = MasterBuf(dtype = dtype)
   outmaster = MasterBuf(dtype = dtype)
-  minblepbuf = MasterBuf(dtype = dtype)
+  mixinmaster = MasterBuf(dtype = dtype)
   naivebuf = naivemaster.ensureandcrop(naivesize)
   x = 0
   while x < naivesize:
@@ -33,7 +33,7 @@ def main():
   outbuf = outmaster.ensureandcrop(outsize)
   outbuf.fill(0)
   for naivex in diffbuf.nonzeros():
-    outi, mixin = minbleps.getmixin(naivex, naiverate, outrate, diffbuf.buf[naivex], minblepbuf)
+    outi, mixin = minbleps.getmixin(naivex, naiverate, outrate, diffbuf.buf[naivex], mixinmaster)
     outj = min(outsize, outi + len(mixin))
     outbuf.buf[outi:outj] += mixin.buf[:outj - outi]
     outbuf.buf[outj:] += diffbuf.buf[naivex]
