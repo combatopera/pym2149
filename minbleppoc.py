@@ -34,7 +34,7 @@ def main():
   outbuf.fill(0)
   for naivex in diffbuf.nonzeros():
     outi, mixin = minbleps.getmixin(naivex, naiverate, outrate, diffbuf.buf[naivex], minblepbuf)
-    outj = min(outsize, outi + len(mixin.buf))
+    outj = min(outsize, outi + len(mixin))
     outbuf.buf[outi:outj] += mixin.buf[:outj - outi]
     outbuf.buf[outj:] += diffbuf.buf[naivex]
   command = ['sox', '-t', 'raw', '-r', str(outrate), '-e', 'float', '-b', '32', '-', 'minbleppoc.wav']
