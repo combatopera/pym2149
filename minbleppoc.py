@@ -32,7 +32,7 @@ def main():
   diffbuf = diffmaster.differentiate(0, naivebuf)
   outbuf = outmaster.ensureandcrop(outsize)
   outbuf.fill(0)
-  for naivex in np.flatnonzero(diffbuf.buf): # XXX: Can we avoid making a new array?
+  for naivex in diffbuf.nonzeros():
     outi, mixin = minbleps.getmixin(naivex, naiverate, outrate, diffbuf.buf[naivex], minblepbuf)
     outj = min(outsize, outi + len(mixin.buf))
     outbuf.buf[outi:outj] += mixin.buf[:outj - outi]

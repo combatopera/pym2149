@@ -85,6 +85,9 @@ class Buf(AnyBuf):
     diff.buf[1:] -= that.buf[:-1]
     return diff
 
+  def nonzeros(self):
+    return np.flatnonzero(self.buf) # XXX: Can we avoid making a new array?
+
   def ensureandcrop(self, framecount):
     thisframecount = self.buf.shape[0]
     if thisframecount == framecount:
