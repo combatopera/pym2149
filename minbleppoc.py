@@ -20,7 +20,7 @@ def main():
   period = toneoscscale * periodreg
   ctrlsignal = np.empty(ctrlsize, dtype = dtype)
   diffsignal = np.empty(ctrlsize, dtype = dtype)
-  outsignal = np.empty(outsize, dtype = dtype)
+  outmaster = MasterBuf(dtype = dtype)
   minblepbuf = MasterBuf(dtype = dtype)
   x = 0
   while x < ctrlsize:
@@ -31,15 +31,16 @@ def main():
   diffsignal[:] = ctrlsignal
   diffsignal[0] -= 0 # Last value of previous ctrlsignal.
   diffsignal[1:] -= ctrlsignal[:-1]
-  outsignal[:] = 0
+  outbuf = outmaster.ensureandcrop(outsize)
+  outbuf.fill(0)
   for ctrlx in np.flatnonzero(diffsignal): # XXX: Can we avoid making a new array?
     outi, mixin = minbleps.getmixin(ctrlx, ctrlrate, outrate, diffsignal[ctrlx], minblepbuf)
     outj = min(outsize, outi + len(mixin.buf))
-    outsignal[outi:outj] += mixin.buf[:outj - outi]
-    outsignal[outj:] += diffsignal[ctrlx]
+    outbuf.buf[outi:outj] += mixin.buf[:outj - outi]
+    outbuf.buf[outj:] += diffsignal[ctrlx]
   command = ['sox', '-t', 'raw', '-r', str(outrate), '-e', 'float', '-b', '32', '-', 'minbleppoc.wav']
   sox = subprocess.Popen(command, stdin = subprocess.PIPE)
-  outsignal.tofile(sox.stdin)
+  outbuf.tofile(sox.stdin)
   sox.stdin.close()
   sys.exit(sox.wait())
 
