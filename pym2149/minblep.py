@@ -28,6 +28,9 @@ class MinBleps:
     self.minblep = np.cumsum(self.minbli)
     self.scale = scale
 
+  def maxmixinsize(self):
+    return len(self.minblep[::self.scale])
+
   def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
     outx = ctrlx / ctrlrate * outrate
     tmpi = int(round(outx * self.scale))
