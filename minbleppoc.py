@@ -18,26 +18,28 @@ def main():
   toneoscscale = 16
   periodreg = int(round(ctrlrate / (toneoscscale * tonefreq)))
   period = toneoscscale * periodreg
-  ctrlsignal = np.empty(ctrlsize, dtype = dtype)
-  diffsignal = np.empty(ctrlsize, dtype = dtype)
+  ctrlmaster = MasterBuf(dtype = dtype)
+  diffmaster = MasterBuf(dtype = dtype)
   outmaster = MasterBuf(dtype = dtype)
   minblepbuf = MasterBuf(dtype = dtype)
+  ctrlbuf = ctrlmaster.ensureandcrop(ctrlsize)
   x = 0
   while x < ctrlsize:
-    ctrlsignal[x:x + period // 2] = toneamp
-    ctrlsignal[x + period // 2:x + period] = -toneamp
+    ctrlbuf.fillpart(x, x + period // 2, toneamp)
+    ctrlbuf.fillpart(x + period // 2, x + period, -toneamp)
     x += period
   minbleps = MinBleps(scale)
-  diffsignal[:] = ctrlsignal
-  diffsignal[0] -= 0 # Last value of previous ctrlsignal.
-  diffsignal[1:] -= ctrlsignal[:-1]
+  diffbuf = diffmaster.ensureandcrop(ctrlsize)
+  diffbuf.copybuf(ctrlbuf)
+  diffbuf.buf[0] -= 0 # Last value of previous ctrlsignal.
+  diffbuf.buf[1:] -= ctrlbuf.buf[:-1]
   outbuf = outmaster.ensureandcrop(outsize)
   outbuf.fill(0)
-  for ctrlx in np.flatnonzero(diffsignal): # XXX: Can we avoid making a new array?
-    outi, mixin = minbleps.getmixin(ctrlx, ctrlrate, outrate, diffsignal[ctrlx], minblepbuf)
+  for ctrlx in np.flatnonzero(diffbuf.buf): # XXX: Can we avoid making a new array?
+    outi, mixin = minbleps.getmixin(ctrlx, ctrlrate, outrate, diffbuf.buf[ctrlx], minblepbuf)
     outj = min(outsize, outi + len(mixin.buf))
     outbuf.buf[outi:outj] += mixin.buf[:outj - outi]
-    outbuf.buf[outj:] += diffsignal[ctrlx]
+    outbuf.buf[outj:] += diffbuf.buf[ctrlx]
   command = ['sox', '-t', 'raw', '-r', str(outrate), '-e', 'float', '-b', '32', '-', 'minbleppoc.wav']
   sox = subprocess.Popen(command, stdin = subprocess.PIPE)
   outbuf.tofile(sox.stdin)
