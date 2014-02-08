@@ -17,7 +17,7 @@ class TestDac(unittest.TestCase):
 
   def test_works(self):
     d = Dac(Ramps(), 1)
-    self.assertEqual([d.leveltoamp[v] for v in xrange(32)], d.call(Block(32)).tolist())
+    self.assertEqual([d.leveltopeaktopeak[v] for v in xrange(32)], d.call(Block(32)).tolist())
 
 if __name__ == '__main__':
   unittest.main()
