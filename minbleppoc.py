@@ -46,7 +46,6 @@ class Wave16:
     self.f.close()
 
 def main():
-  import subprocess, sys
   naiverate = 2000000
   outrate = 44100
   tonefreq = 1500
