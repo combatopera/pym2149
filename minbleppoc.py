@@ -45,7 +45,7 @@ class Wave16:
     self.writen(fsize - 44) # Size of data.
     self.f.close()
 
-class Node:
+class WavWriter:
 
   outrate = 44100
 
@@ -107,7 +107,7 @@ def main():
     naivebuf.fillpart(x, x + period // 2, toneamp)
     naivebuf.fillpart(x + period // 2, x + period, -toneamp)
     x += period
-  node = Node(naiverate, None, 'minbleppoc.wav')
+  node = WavWriter(naiverate, None, 'minbleppoc.wav')
   while node.naivex < naivesize:
     blocksize = random.randint(1, 30000)
     node(Buf(naivebuf.buf[node.naivex:node.naivex + blocksize]))
