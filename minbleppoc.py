@@ -45,61 +45,73 @@ class Wave16:
     self.writen(fsize - 44) # Size of data.
     self.f.close()
 
+class Node:
+
+  outrate = 44100
+
+  def __init__(self, clock, chip, path):
+    scale = 500 # Smaller values result in worse-looking spectrograms.
+    dtype = np.float32 # Effectively about 24 bits.
+    self.diffmaster = MasterBuf(dtype = dtype)
+    self.outmaster = MasterBuf(dtype = dtype)
+    self.wavmaster = MasterBuf(dtype = np.int16)
+    self.mixinmaster = MasterBuf(dtype = dtype)
+    self.minbleps = MinBleps(scale)
+    self.overflowsize = self.minbleps.maxmixinsize() - 1 # Sufficient for any mixin at last sample.
+    self.carrybuf = Buf(np.empty(self.overflowsize, dtype = dtype))
+    self.f = Wave16(path, self.outrate)
+    self.naivex = 0
+    self.dc = 0 # Last naive value of previous block.
+    self.outz = 0 # Absolute index of first output sample being processed in this iteration.
+    self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
+    self.naiverate = clock
+
+  def __call__(self, block):
+    blocksize = len(block)
+    diffbuf = self.diffmaster.differentiate(self.dc, block)
+    out0 = self.outz
+    # Index of the first sample we can't output yet:
+    self.outz = self.minbleps.getoutindexandshape(self.naivex + blocksize, self.naiverate, self.outrate)[0]
+    # Make space for all samples we can output plus overflow:
+    outbuf = self.outmaster.ensureandcrop(self.outz - out0 + self.overflowsize)
+    # Paste in the carry followed by the carried dc level:
+    outbuf.buf[:self.overflowsize] = self.carrybuf.buf
+    outbuf.buf[self.overflowsize:] = self.dc
+    for naivey in diffbuf.nonzeros():
+      amp = diffbuf.buf[naivey]
+      outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, self.naiverate, self.outrate, amp, self.mixinmaster)
+      outj = outi + mixinsize
+      outbuf.buf[outi - out0:outj - out0] += mixin.buf
+      outbuf.buf[outj - out0:] += amp
+    wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
+    wavbuf.buf[:] = outbuf.buf[:self.outz - out0]
+    self.f.block(wavbuf)
+    self.carrybuf.buf[:] = outbuf.buf[self.outz - out0:]
+    self.naivex += blocksize
+    self.dc = block.buf[-1]
+
+  def close(self):
+    self.f.close()
+
 def main():
   naiverate = 2000000
-  outrate = 44100
   tonefreq = 1500
   toneamp = .25 * 2 ** 15
-  scale = 500 # Smaller values result in worse-looking spectrograms.
   naivesize = naiverate * 60 # One minute of data.
-  dtype = np.float32 # Effectively about 24 bits.
   toneoscscale = 16 # A property of the chip.
   periodreg = int(round(naiverate / (toneoscscale * tonefreq)))
   period = toneoscscale * periodreg # Even.
-  diffmaster = MasterBuf(dtype = dtype)
-  outmaster = MasterBuf(dtype = dtype)
-  wavmaster = MasterBuf(dtype = np.int16)
-  mixinmaster = MasterBuf(dtype = dtype)
-  naivebuf = Buf(np.empty(naivesize, dtype = dtype))
+  naivebuf = Buf(np.empty(naivesize))
   x = 0
   while x < naivesize:
     naivebuf.fillpart(x, x + period // 2, toneamp)
     naivebuf.fillpart(x + period // 2, x + period, -toneamp)
     x += period
-  minbleps = MinBleps(scale)
-  overflowsize = minbleps.maxmixinsize() - 1 # Sufficient for any mixin at last sample.
-  carrybuf = Buf(np.empty(overflowsize, dtype = dtype))
-  f = Wave16('minbleppoc.wav', outrate)
-  naivex = 0
-  dc = 0 # Last naive value of previous block.
-  outz = 0 # Absolute index of first output sample being processed in this iteration.
-  carrybuf.fill(dc) # Initial carry can be the initial dc level.
-  while naivex < naivesize:
+  node = Node(naiverate, None, 'minbleppoc.wav')
+  while node.naivex < naivesize:
     blocksize = random.randint(1, 30000)
-    block = Buf(naivebuf.buf[naivex:naivex + blocksize])
-    diffbuf = diffmaster.differentiate(dc, block)
-    out0 = outz
-    # Index of the first sample we can't output yet:
-    outz = minbleps.getoutindexandshape(naivex + blocksize, naiverate, outrate)[0]
-    # Make space for all samples we can output plus overflow:
-    outbuf = outmaster.ensureandcrop(outz - out0 + overflowsize)
-    # Paste in the carry followed by the carried dc level:
-    outbuf.buf[:overflowsize] = carrybuf.buf
-    outbuf.buf[overflowsize:] = dc
-    for naivey in diffbuf.nonzeros():
-      amp = diffbuf.buf[naivey]
-      outi, mixin, mixinsize = minbleps.getmixin(naivex + naivey, naiverate, outrate, amp, mixinmaster)
-      outj = outi + mixinsize
-      outbuf.buf[outi - out0:outj - out0] += mixin.buf
-      outbuf.buf[outj - out0:] += amp
-    wavbuf = wavmaster.ensureandcrop(outz - out0)
-    wavbuf.buf[:] = outbuf.buf[:outz - out0]
-    f.block(wavbuf)
-    carrybuf.buf[:] = outbuf.buf[outz - out0:]
-    naivex += blocksize
-    dc = block.buf[-1]
-    del diffbuf, outbuf, wavbuf # Otherwise numpy complains on resize.
-  f.close()
+    node(Buf(naivebuf.buf[node.naivex:node.naivex + blocksize]))
+  node.close()
 
 if __name__ == '__main__':
   main()
