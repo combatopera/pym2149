@@ -4,6 +4,7 @@ from __future__ import division
 import numpy as np, random
 from pym2149.buf import MasterBuf, Buf
 from pym2149.minblep import MinBleps
+from pym2149.nod import AbstractNode, Block
 
 class Wave16:
 
@@ -93,25 +94,36 @@ class WavWriter:
   def close(self):
     self.f.close()
 
-def main():
+class Chip(AbstractNode):
+
   naiverate = 2000000
-  tonefreq = 1500
-  toneamp = .25 * 2 ** 15
-  naivesize = naiverate * 60 # One minute of data.
-  toneoscscale = 16 # A property of the chip.
-  periodreg = int(round(naiverate / (toneoscscale * tonefreq)))
-  period = toneoscscale * periodreg # Even.
-  naivebuf = Buf(np.empty(naivesize))
-  x = 0
-  while x < naivesize:
-    naivebuf.fillpart(x, x + period // 2, toneamp)
-    naivebuf.fillpart(x + period // 2, x + period, -toneamp)
-    x += period
-  node = WavWriter(naiverate, None, 'minbleppoc.wav')
-  while node.naivex < naivesize:
-    blocksize = random.randint(1, 30000)
-    node(Buf(naivebuf.buf[node.naivex:node.naivex + blocksize]))
-  node.close()
+
+  def __init__(self):
+    AbstractNode.__init__(self)
+    tonefreq = 1500
+    toneamp = .25 * 2 ** 15
+    self.naivesize = self.naiverate * 60 # One minute of data.
+    toneoscscale = 16 # A property of the chip.
+    periodreg = int(round(self.naiverate / (toneoscscale * tonefreq)))
+    period = toneoscscale * periodreg # Even.
+    self.naivebuf = Buf(np.empty(self.naivesize))
+    x = 0
+    while x < self.naivesize:
+      self.naivebuf.fillpart(x, x + period // 2, toneamp)
+      self.naivebuf.fillpart(x + period // 2, x + period, -toneamp)
+      x += period
+    self.cursor = 0
+
+  def callimpl(self):
+    self.cursor += self.block.framecount
+    return Buf(self.naivebuf.buf[self.cursor - self.block.framecount:self.cursor])
+
+def main():
+  chip = Chip()
+  stream = WavWriter(chip.naiverate, None, 'minbleppoc.wav')
+  while chip.cursor < chip.naivesize:
+    stream(chip(Block(random.randint(1, 30000)), None))
+  stream.close()
 
 if __name__ == '__main__':
   main()
