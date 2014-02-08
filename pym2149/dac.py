@@ -31,7 +31,7 @@ class Dac(Node):
 
   def __init__(self, level, ampshare):
     Node.__init__(self, np.float32)
-    maxpeaktopeak = 2 ** .5 / ampshare
+    maxpeaktopeak = 2 ** 15.5 / ampshare
     # Lookup of ideal amplitudes:
     self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
     self.level = level
