@@ -31,10 +31,10 @@ class Dac(Node):
 
   def __init__(self, level, ampshare):
     Node.__init__(self, np.float32)
-    maxamp = 2 ** .5 / ampshare
+    maxpeaktopeak = 2 ** .5 / ampshare
     # Lookup of ideal amplitudes:
-    self.leveltoamp = np.fromiter((leveltoamp(v) * maxamp for v in xrange(32)), self.dtype)
+    self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
     self.level = level
 
   def callimpl(self):
-    self.blockbuf.mapbuf(self.chain(self.level), self.leveltoamp)
+    self.blockbuf.mapbuf(self.chain(self.level), self.leveltopeaktopeak)
