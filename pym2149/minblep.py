@@ -24,10 +24,10 @@ class MinBleps:
     self.minblep = np.cumsum(self.minbli)
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     self.factor = outrate / ctrlrate * scale
+    self.maxmixinsize = len(self.minblep[::scale])
+    self.buf = np.empty(self.maxmixinsize)
+    self.buf2 = np.empty(self.maxmixinsize - 1)
     self.scale = scale
-
-  def maxmixinsize(self):
-    return len(self.minblep[::self.scale])
 
   def getoutindexandshape(self, ctrlx):
     tmpi = int(ctrlx * self.factor + .5)
@@ -35,11 +35,13 @@ class MinBleps:
     shape = outi * self.scale - tmpi
     return outi, shape
 
-  def getmixin(self, ctrlx, amp, buf):
+  def getmixin(self, ctrlx, amp):
     outi, shape = self.getoutindexandshape(ctrlx)
-    view = self.minblep[shape::self.scale] # Two possible sizes.
-    size = len(view)
-    buf = buf.ensureandcrop(size)
-    buf.copybuf(Buf(view))
-    buf.mul(amp)
-    return outi, buf, size
+    if not shape:
+      self.buf[:] = self.minblep[::self.scale]
+      self.buf *= amp
+      return outi, self.buf, self.maxmixinsize
+    else:
+      self.buf2[:] = self.minblep[shape::self.scale]
+      self.buf2 *= amp
+      return outi, self.buf2, self.maxmixinsize - 1

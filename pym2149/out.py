@@ -62,9 +62,8 @@ class WavWriter(AbstractNode):
     self.diffmaster = MasterBuf(dtype = dtype)
     self.outmaster = MasterBuf(dtype = dtype)
     self.wavmaster = MasterBuf(dtype = np.int16)
-    self.mixinmaster = MasterBuf(dtype = dtype)
     self.minbleps = MinBleps(clock, self.outrate, scale)
-    self.overflowsize = self.minbleps.maxmixinsize() - 1 # Sufficient for any mixin at last sample.
+    self.overflowsize = self.minbleps.maxmixinsize - 1 # Sufficient for any mixin at last sample.
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = dtype))
     self.f = Wave16(path, self.outrate)
     self.naivex = 0
@@ -87,9 +86,9 @@ class WavWriter(AbstractNode):
     outbuf.buf[self.overflowsize:] = self.dc
     for naivey in diffbuf.nonzeros():
       amp = diffbuf.buf[naivey]
-      outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, amp, self.mixinmaster)
+      outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, amp)
       outj = outi + mixinsize
-      outbuf.buf[outi - out0:outj - out0] += mixin.buf
+      outbuf.buf[outi - out0:outj - out0] += mixin
       outbuf.buf[outj - out0:] += amp
     wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
     wavbuf.buf[:] = outbuf.buf[:self.outz - out0]
