@@ -42,8 +42,7 @@ def main():
     diffbuf = diffmaster.differentiate(dc, block)
     out0 = outz
     # Index of the first sample we can't output yet:
-    # TODO: Implementation that doesn't prepare a mixin.
-    outz = minbleps.getmixin(naivex + blocksize, naiverate, outrate, 1, mixinmaster)[0]
+    outz = minbleps.getoutindexandshape(naivex + blocksize, naiverate, outrate)[0]
     # Make space for all samples we can output plus overflow:
     outbuf = outmaster.ensureandcrop(outz - out0 + overflowsize)
     # Paste in the carry followed by the carried dc level:

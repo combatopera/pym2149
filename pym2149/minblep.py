@@ -31,11 +31,15 @@ class MinBleps:
   def maxmixinsize(self):
     return len(self.minblep[::self.scale])
 
-  def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
+  def getoutindexandshape(self, ctrlx, ctrlrate, outrate):
     outx = ctrlx / ctrlrate * outrate
     tmpi = int(round(outx * self.scale))
     outi = (tmpi + self.scale - 1) // self.scale
     shape = (-tmpi) % self.scale
+    return outi, shape
+
+  def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
+    outi, shape = self.getoutindexandshape(ctrlx, ctrlrate, outrate)
     view = self.minblep[shape::self.scale] # Two possible sizes.
     buf = buf.ensureandcrop(len(view))
     buf.copybuf(Buf(view))
