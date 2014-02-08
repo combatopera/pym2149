@@ -16,16 +16,18 @@ class Counter(Node):
       self.blockbuf.fillpart(frameindex, frameindex + 1, self.x)
       self.x += 1
 
-def expect(m, *values):
-  return [m.datum - v for v in values]
-
 class TestIdealMixer(unittest.TestCase):
+
+  def expect(self, m, values, actual):
+    self.assertEqual(len(values), len(actual))
+    for i in xrange(len(values)):
+      self.assertAlmostEqual(m.datum - values[i], actual.buf[i], places = 5)
 
   def test_works(self):
     m = IdealMixer(Container([Counter(10), Counter()]))
-    self.assertEqual(expect(m, 10, 12, 14, 16, 18), m.call(Block(5)).tolist())
+    self.expect(m, [10, 12, 14, 16, 18], m.call(Block(5)))
     # Check the buffer is actually cleared first:
-    self.assertEqual(expect(m, 20, 22, 24, 26, 28), m.call(Block(5)).tolist())
+    self.expect(m, [20, 22, 24, 26, 28], m.call(Block(5)))
 
   def test_masked(self):
     upstream = Counter(10), Counter()
