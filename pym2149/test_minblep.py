@@ -19,7 +19,7 @@ class TestMinBleps(unittest.TestCase):
     masterbuf = MasterBuf(np.float32)
     mixins = []
     for x in xrange(ctrlrate * 2):
-      outi, buf = minbleps.getmixin(x, ctrlrate, outrate, 1, masterbuf)
+      outi, buf, _ = minbleps.getmixin(x, ctrlrate, outrate, 1, masterbuf)
       mixins.append((outi, np.copy(buf.buf)))
     return mixins
 
