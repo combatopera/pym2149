@@ -66,12 +66,12 @@ class Node:
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naiverate = clock
 
-  def __call__(self, block):
-    blocksize = len(block)
-    diffbuf = self.diffmaster.differentiate(self.dc, block)
+  def __call__(self, blockbuf):
+    framecount = len(blockbuf)
+    diffbuf = self.diffmaster.differentiate(self.dc, blockbuf)
     out0 = self.outz
     # Index of the first sample we can't output yet:
-    self.outz = self.minbleps.getoutindexandshape(self.naivex + blocksize, self.naiverate, self.outrate)[0]
+    self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount, self.naiverate, self.outrate)[0]
     # Make space for all samples we can output plus overflow:
     outbuf = self.outmaster.ensureandcrop(self.outz - out0 + self.overflowsize)
     # Paste in the carry followed by the carried dc level:
@@ -87,8 +87,8 @@ class Node:
     wavbuf.buf[:] = outbuf.buf[:self.outz - out0]
     self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[self.outz - out0:]
-    self.naivex += blocksize
-    self.dc = block.buf[-1]
+    self.naivex += framecount
+    self.dc = blockbuf.buf[-1]
 
   def close(self):
     self.f.close()
