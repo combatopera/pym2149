@@ -23,8 +23,7 @@ class Wave16:
     self.writen(self.bytespersample * 8, 2) # Bits per sample.
     self.f.write('data')
     self.skip(4)
-    self.dirty = True
-    self.cleanifnecessary()
+    self.clean()
 
   def skip(self, n):
     self.f.seek(n, 1)
@@ -36,25 +35,21 @@ class Wave16:
 
   def block(self, buf):
     buf.tofile(self.f)
-    self.dirty = True
+    self.clean()
 
-  def cleanifnecessary(self):
-    if self.dirty:
-      fsize = self.f.tell()
-      self.f.seek(4)
-      self.writen(fsize - 8) # Size of RIFF.
-      self.f.seek(40)
-      self.writen(fsize - 44) # Size of data.
-      self.f.seek(fsize)
-      self.dirty = False
+  def clean(self):
+    fsize = self.f.tell()
+    self.f.seek(4)
+    self.writen(fsize - 8) # Size of RIFF.
+    self.f.seek(40)
+    self.writen(fsize - 44) # Size of data.
+    self.f.seek(fsize)
 
   def flush(self):
-    self.cleanifnecessary()
     self.f.flush()
 
   def close(self):
-    self.cleanifnecessary()
-    self.f.close() # Implicit flush.
+    self.f.close()
 
 class WavWriter(AbstractNode):
 
