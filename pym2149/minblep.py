@@ -41,7 +41,8 @@ class MinBleps:
   def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
     outi, shape = self.getoutindexandshape(ctrlx, ctrlrate, outrate)
     view = self.minblep[shape::self.scale] # Two possible sizes.
-    buf = buf.ensureandcrop(len(view))
+    size = len(view)
+    buf = buf.ensureandcrop(size)
     buf.copybuf(Buf(view))
     buf.mul(amp)
-    return outi, buf
+    return outi, buf, size

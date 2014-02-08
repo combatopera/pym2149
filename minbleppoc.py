@@ -52,7 +52,7 @@ def main():
   tonefreq = 1500
   toneamp = .25 * 2 ** 15
   scale = 500 # Smaller values result in worse-looking spectrograms.
-  naivesize = naiverate # One second of data.
+  naivesize = naiverate * 60 # One minute of data.
   dtype = np.float32 # Effectively about 24 bits.
   toneoscscale = 16 # A property of the chip.
   periodreg = int(round(naiverate / (toneoscscale * tonefreq)))
@@ -89,8 +89,8 @@ def main():
     outbuf.buf[overflowsize:] = dc
     for naivey in diffbuf.nonzeros():
       amp = diffbuf.buf[naivey]
-      outi, mixin = minbleps.getmixin(naivex + naivey, naiverate, outrate, amp, mixinmaster)
-      outj = outi + len(mixin)
+      outi, mixin, mixinsize = minbleps.getmixin(naivex + naivey, naiverate, outrate, amp, mixinmaster)
+      outj = outi + mixinsize
       outbuf.buf[outi - out0:outj - out0] += mixin.buf
       outbuf.buf[outj - out0:] += amp
     wavbuf = wavmaster.ensureandcrop(outz - out0)
