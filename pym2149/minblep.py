@@ -33,7 +33,7 @@ class MinBleps:
 
   def getoutindexandshape(self, ctrlx, ctrlrate, outrate):
     outx = ctrlx / ctrlrate * outrate
-    tmpi = int(round(outx * self.scale))
+    tmpi = int(outx * self.scale + .5)
     outi = (tmpi + self.scale - 1) // self.scale
     shape = (-tmpi) % self.scale
     return outi, shape
