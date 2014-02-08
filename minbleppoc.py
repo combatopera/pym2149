@@ -46,11 +46,12 @@ class Wave16:
     self.writen(fsize - 44) # Size of data.
     self.f.close()
 
-class WavWriter:
+class WavWriter(AbstractNode):
 
   outrate = 44100
 
   def __init__(self, clock, chip, path):
+    AbstractNode.__init__(self)
     scale = 500 # Smaller values result in worse-looking spectrograms.
     dtype = np.float32 # Effectively about 24 bits.
     self.diffmaster = MasterBuf(dtype = dtype)
@@ -66,8 +67,10 @@ class WavWriter:
     self.outz = 0 # Absolute index of first output sample being processed in this iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naiverate = clock
+    self.chip = chip
 
-  def __call__(self, blockbuf):
+  def callimpl(self):
+    blockbuf = self.chain(self.chip)
     framecount = len(blockbuf)
     diffbuf = self.diffmaster.differentiate(self.dc, blockbuf)
     out0 = self.outz
@@ -120,9 +123,9 @@ class Chip(AbstractNode):
 
 def main():
   chip = Chip()
-  stream = WavWriter(chip.naiverate, None, 'minbleppoc.wav')
+  stream = WavWriter(chip.naiverate, chip, 'minbleppoc.wav')
   while chip.cursor < chip.naivesize:
-    stream(chip(Block(random.randint(1, 30000)), None))
+    stream.call(Block(random.randint(1, 30000)))
   stream.close()
 
 if __name__ == '__main__':
