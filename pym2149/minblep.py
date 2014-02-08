@@ -4,11 +4,7 @@ from buf import Buf
 
 class MinBleps:
 
-  @staticmethod
-  def idealscale(ctrlrate, outrate):
-    return ctrlrate // fractions.gcd(ctrlrate, outrate)
-
-  def __init__(self, scale, cutoff = .475, transition = .05):
+  def __init__(self, ctrlrate, outrate, scale, cutoff = .475, transition = .05):
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2
     self.midpoint = order * scale // 2 # Index of peak of sinc.
@@ -26,20 +22,21 @@ class MinBleps:
     realcepstrum[self.midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     self.minblep = np.cumsum(self.minbli)
+    self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
+    self.factor = outrate / ctrlrate * scale
     self.scale = scale
 
   def maxmixinsize(self):
     return len(self.minblep[::self.scale])
 
-  def getoutindexandshape(self, ctrlx, ctrlrate, outrate):
-    outx = ctrlx / ctrlrate * outrate
-    tmpi = int(outx * self.scale + .5)
+  def getoutindexandshape(self, ctrlx):
+    tmpi = int(ctrlx * self.factor + .5)
     outi = (tmpi + self.scale - 1) // self.scale
     shape = (-tmpi) % self.scale
     return outi, shape
 
-  def getmixin(self, ctrlx, ctrlrate, outrate, amp, buf):
-    outi, shape = self.getoutindexandshape(ctrlx, ctrlrate, outrate)
+  def getmixin(self, ctrlx, amp, buf):
+    outi, shape = self.getoutindexandshape(ctrlx)
     view = self.minblep[shape::self.scale] # Two possible sizes.
     size = len(view)
     buf = buf.ensureandcrop(size)

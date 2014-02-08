@@ -7,19 +7,19 @@ from buf import MasterBuf
 class TestMinBleps(unittest.TestCase):
 
   def test_minphasereconstruction(self):
-    minbleps = MinBleps(500)
+    minbleps = MinBleps(12, 1, 500)
     absdft = np.abs(np.fft.fft(minbleps.bli))
     absdft2 = np.abs(np.fft.fft(minbleps.minbli))
     self.assertTrue(np.allclose(absdft, absdft2))
 
   def getmixins(self, scale):
     ctrlrate, outrate = 12, 1
-    self.assertEqual(12, MinBleps.idealscale(ctrlrate, outrate))
-    minbleps = MinBleps(scale)
+    minbleps = MinBleps(ctrlrate, outrate, scale)
+    self.assertEqual(12, minbleps.idealscale)
     masterbuf = MasterBuf(np.float32)
     mixins = []
     for x in xrange(ctrlrate * 2):
-      outi, buf, _ = minbleps.getmixin(x, ctrlrate, outrate, 1, masterbuf)
+      outi, buf, _ = minbleps.getmixin(x, 1, masterbuf)
       mixins.append((outi, np.copy(buf.buf)))
     return mixins
 

@@ -63,7 +63,7 @@ class WavWriter(AbstractNode):
     self.outmaster = MasterBuf(dtype = dtype)
     self.wavmaster = MasterBuf(dtype = np.int16)
     self.mixinmaster = MasterBuf(dtype = dtype)
-    self.minbleps = MinBleps(scale)
+    self.minbleps = MinBleps(clock, self.outrate, scale)
     self.overflowsize = self.minbleps.maxmixinsize() - 1 # Sufficient for any mixin at last sample.
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = dtype))
     self.f = Wave16(path, self.outrate)
@@ -71,7 +71,6 @@ class WavWriter(AbstractNode):
     self.dc = 0 # Last naive value of previous block.
     self.outz = 0 # Absolute index of first output sample being processed in this iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
-    self.naiverate = clock
     self.chip = chip
 
   def callimpl(self):
@@ -80,7 +79,7 @@ class WavWriter(AbstractNode):
     diffbuf = self.diffmaster.differentiate(self.dc, blockbuf)
     out0 = self.outz
     # Index of the first sample we can't output yet:
-    self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount, self.naiverate, self.outrate)[0]
+    self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount)[0]
     # Make space for all samples we can output plus overflow:
     outbuf = self.outmaster.ensureandcrop(self.outz - out0 + self.overflowsize)
     # Paste in the carry followed by the carried dc level:
@@ -88,7 +87,7 @@ class WavWriter(AbstractNode):
     outbuf.buf[self.overflowsize:] = self.dc
     for naivey in diffbuf.nonzeros():
       amp = diffbuf.buf[naivey]
-      outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, self.naiverate, self.outrate, amp, self.mixinmaster)
+      outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, amp, self.mixinmaster)
       outj = outi + mixinsize
       outbuf.buf[outi - out0:outj - out0] += mixin.buf
       outbuf.buf[outj - out0:] += amp
