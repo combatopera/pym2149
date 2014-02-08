@@ -58,7 +58,7 @@ def main():
     carrybuf.buf[:] = outbuf.buf[outz - out0:]
     naivex += blocksize
     dc = block.buf[-1]
-    del diffbuf, outbuf # XXX: Why?
+    del diffbuf, outbuf # Otherwise numpy complains on resize.
   sox.stdin.close()
   sys.exit(sox.wait())
 
