@@ -36,13 +36,12 @@ class MinBleps:
     shape = outi * self.scale - tmpi
     return outi, shape
 
-  def getmixin(self, ctrlx, amp):
-    outi, shape = self.getoutindexandshape(ctrlx)
+  def getmixin(self, shape, amp):
     if not shape:
       self.mixin0[:] = self.minblep[::self.scale]
       self.mixin0 *= amp
-      return outi, self.mixin0, self.mixin0size
+      return self.mixin0, self.mixin0size
     else:
       self.mixin1[:] = self.minblep[shape::self.scale]
       self.mixin1 *= amp
-      return outi, self.mixin1, self.mixin1size
+      return self.mixin1, self.mixin1size

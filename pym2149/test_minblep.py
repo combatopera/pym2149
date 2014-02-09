@@ -17,7 +17,8 @@ class TestMinBleps(unittest.TestCase):
     self.assertEqual(12, minbleps.idealscale)
     mixins = []
     for x in xrange(ctrlrate * 2):
-      outi, mixin, _ = minbleps.getmixin(x, 1)
+      outi, shape = minbleps.getoutindexandshape(x)
+      mixin = minbleps.getmixin(shape, 1)[0]
       mixins.append((outi, np.copy(mixin)))
     return mixins
 
