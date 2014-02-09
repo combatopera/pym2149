@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np, sys
 from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import AbstractNode
@@ -6,11 +6,16 @@ from nod import AbstractNode
 class Wave16:
 
   bytespersample = 2
+  hugefilesize = 0x80000000
 
   def __init__(self, path, rate):
-    self.f = open(path, 'wb') # Binary.
+    if '-' == path:
+      self.f = sys.stdout
+    else:
+      self.f = open(path, 'wb') # Binary.
     self.f.write('RIFF')
-    self.skip(4)
+    self.riffsizeoff = self.f.tell()
+    self.writeriffsize(self.hugefilesize)
     self.f.write('WAVEfmt ') # Observe trailing space.
     self.writen(16) # Chunk data size.
     self.writen(1, 2) # PCM (uncompressed).
@@ -22,28 +27,32 @@ class Wave16:
     self.writen(bytesperframe, 2)
     self.writen(self.bytespersample * 8, 2) # Bits per sample.
     self.f.write('data')
-    self.skip(4)
-    self.clean()
+    self.datasizeoff = self.f.tell()
+    self.writedatasize(self.hugefilesize)
+    self.adjustsizes()
 
-  def skip(self, n):
-    self.f.seek(n, 1)
+  def writeriffsize(self, filesize):
+    self.writen(filesize - (self.riffsizeoff + 4))
 
-  def writen(self, n, size = 4): # Not for public use.
+  def writedatasize(self, filesize):
+    self.writen(filesize - (self.datasizeoff + 4))
+
+  def writen(self, n, size = 4):
     for _ in xrange(size):
       self.f.write(chr(n & 0xff))
       n >>= 8
 
   def block(self, buf):
     buf.tofile(self.f)
-    self.clean()
+    self.adjustsizes()
 
-  def clean(self):
-    fsize = self.f.tell()
-    self.f.seek(4)
-    self.writen(fsize - 8) # Size of RIFF.
-    self.f.seek(40)
-    self.writen(fsize - 44) # Size of data.
-    self.f.seek(fsize)
+  def adjustsizes(self):
+    filesize = self.f.tell()
+    self.f.seek(self.riffsizeoff)
+    self.writeriffsize(filesize)
+    self.f.seek(self.datasizeoff)
+    self.writedatasize(filesize)
+    self.f.seek(filesize)
 
   def flush(self):
     self.f.flush()
