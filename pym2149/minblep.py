@@ -22,6 +22,7 @@ class MinBleps:
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     dtype = np.float32
     self.minblep = np.append(np.cumsum(self.minbli, dtype = dtype), [1] * (scale - 1))
+    self.minbleps = np.reshape(self.minblep, (scale, order + 1), 'F')
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     self.factor = outrate / ctrlrate * scale
     self.mixinsize = len(self.minblep[::scale])
@@ -35,6 +36,6 @@ class MinBleps:
     return outi, shape
 
   def getmixin(self, shape, amp):
-    self.mixin[:] = self.minblep[shape::self.scale]
+    self.mixin[:] = self.minbleps[shape]
     self.mixin *= amp
     return self.mixin
