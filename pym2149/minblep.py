@@ -20,13 +20,14 @@ class MinBleps:
     realcepstrum[1:self.midpoint + 1] *= 2
     realcepstrum[self.midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
-    self.minblep = np.cumsum(self.minbli)
+    dtype = np.float32
+    self.minblep = np.cumsum(self.minbli, dtype = dtype)
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     self.factor = outrate / ctrlrate * scale
     self.mixin0size = len(self.minblep[::scale])
-    self.mixin0 = np.empty(self.mixin0size)
+    self.mixin0 = np.empty(self.mixin0size, dtype)
     self.mixin1size = self.mixin0size - 1
-    self.mixin1 = np.empty(self.mixin1size)
+    self.mixin1 = np.empty(self.mixin1size, dtype)
     self.scale = scale
 
   def getoutindexandshape(self, ctrlx):
