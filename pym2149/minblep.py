@@ -35,4 +35,4 @@ class MinBleps:
     return outi, shape
 
   def getmixin(self, shape, amp):
-    return np.transpose(np.transpose(self.minbleps[shape]) * amp)
+    return (self.minbleps[shape].T * amp).T
