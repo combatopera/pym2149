@@ -1,4 +1,4 @@
-import numpy as np, sys
+import numpy as np, sys, errno
 from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import AbstractNode
@@ -47,7 +47,12 @@ class Wave16:
     self.adjustsizes()
 
   def adjustsizes(self):
-    filesize = self.f.tell()
+    try:
+      filesize = self.f.tell()
+    except IOError, e:
+      if errno.ESPIPE != e.errno:
+        raise
+      return # Leave huge sizes.
     self.f.seek(self.riffsizeoff)
     self.writeriffsize(filesize)
     self.f.seek(self.datasizeoff)
