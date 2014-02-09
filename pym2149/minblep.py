@@ -31,7 +31,7 @@ class MinBleps:
     self.scale = scale
 
   def getoutindexandshape(self, ctrlx):
-    tmpi = int(ctrlx * self.factor + .5)
+    tmpi = np.array(ctrlx * self.factor + .5, dtype = int)
     outi = (tmpi + self.scale - 1) // self.scale
     shape = outi * self.scale - tmpi
     return outi, shape
