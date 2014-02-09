@@ -11,7 +11,7 @@ def main():
   plt.plot(minbleps.blep, 'bo')
   plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
   for style in 'r', 'ro':
-    plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minblep, style)
+    plt.plot(np.arange(minbleps.size + minbleps.scale - 1) + minbleps.midpoint, minbleps.minblep, style)
   plt.grid(True)
   plt.show()
 
