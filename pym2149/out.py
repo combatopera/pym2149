@@ -110,7 +110,7 @@ class WavWriter(AbstractNode):
     for idx, naivey in enumerate(nonzeros):
       pasteminblep()
     wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
-    wavbuf.buf[:] = outbuf.buf[:self.outz - out0]
+    wavbuf.buf[:] = outbuf.buf[:self.outz - out0] # Cast to int16.
     self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[self.outz - out0:]
     self.naivex += framecount
