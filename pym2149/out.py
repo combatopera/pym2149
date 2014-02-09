@@ -14,7 +14,7 @@ class Wave16:
     else:
       self.f = open(path, 'wb') # Binary.
     self.f.write('RIFF')
-    self.riffsizeoff = self.f.tell()
+    self.riffsizeoff = 4
     self.writeriffsize(self.hugefilesize)
     self.f.write('WAVEfmt ') # Observe trailing space.
     self.writen(16) # Chunk data size.
@@ -27,7 +27,7 @@ class Wave16:
     self.writen(bytesperframe, 2)
     self.writen(self.bytespersample * 8, 2) # Bits per sample.
     self.f.write('data')
-    self.datasizeoff = self.f.tell()
+    self.datasizeoff = 40
     self.writedatasize(self.hugefilesize)
     self.adjustsizes()
 
