@@ -2,7 +2,6 @@
 
 import unittest, numpy as np
 from minblep import MinBleps
-from buf import MasterBuf
 
 class TestMinBleps(unittest.TestCase):
 
@@ -16,11 +15,10 @@ class TestMinBleps(unittest.TestCase):
     ctrlrate, outrate = 12, 1
     minbleps = MinBleps(ctrlrate, outrate, scale)
     self.assertEqual(12, minbleps.idealscale)
-    masterbuf = MasterBuf(np.float32)
     mixins = []
     for x in xrange(ctrlrate * 2):
-      outi, buf, _ = minbleps.getmixin(x, 1, masterbuf)
-      mixins.append((outi, np.copy(buf.buf)))
+      outi, mixin, _ = minbleps.getmixin(x, 1)
+      mixins.append((outi, np.copy(mixin)))
     return mixins
 
   def test_sharing(self):

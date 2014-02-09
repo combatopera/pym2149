@@ -1,6 +1,5 @@
 from __future__ import division
 import numpy as np, fractions
-from buf import Buf
 
 class MinBleps:
 
