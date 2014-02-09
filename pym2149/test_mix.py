@@ -21,7 +21,7 @@ class TestIdealMixer(unittest.TestCase):
   def expect(self, m, values, actual):
     self.assertEqual(len(values), len(actual))
     for i in xrange(len(values)):
-      self.assertAlmostEqual(m.datum - values[i], actual.buf[i], places = 5)
+      self.assertAlmostEqual(m.datum - values[i], actual.buf[i])
 
   def test_works(self):
     m = IdealMixer(Container([Counter(10), Counter()]))
