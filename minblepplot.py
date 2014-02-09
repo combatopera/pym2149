@@ -6,7 +6,7 @@ from pym2149.minblep import MinBleps
 
 def main():
   import matplotlib.pyplot as plt
-  minbleps = MinBleps(5, cutoff = .5, transition = 4 / 20)
+  minbleps = MinBleps(1, 1, 5, cutoff = .5, transition = 4 / 20)
   plt.plot(minbleps.bli * minbleps.scale, 'b+')
   plt.plot(minbleps.blep, 'bo')
   plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
