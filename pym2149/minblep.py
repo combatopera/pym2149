@@ -26,7 +26,6 @@ class MinBleps:
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     self.factor = outrate / ctrlrate * scale
     self.mixinsize = len(self.minblep[::scale])
-    self.mixin = np.empty(self.mixinsize, dtype)
     self.scale = scale
 
   def getoutindexandshape(self, ctrlx):
@@ -36,6 +35,4 @@ class MinBleps:
     return outi, shape
 
   def getmixin(self, shape, amp):
-    self.mixin[:] = self.minbleps[shape]
-    self.mixin *= amp
-    return self.mixin
+    return np.transpose(np.transpose(self.minbleps[shape]) * amp)

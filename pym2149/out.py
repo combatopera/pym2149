@@ -101,12 +101,12 @@ class WavWriter(AbstractNode):
     outbuf.buf[self.overflowsize:] = self.dc
     def pasteminblep():
       amp = diffbuf.buf[naivey]
-      mixin = self.minbleps.getmixin(shape[idx], amp)
       outj = outi[idx] + self.minbleps.mixinsize
-      outbuf.buf[outi[idx] - out0:outj - out0] += mixin
+      outbuf.buf[outi[idx] - out0:outj - out0] += mixin[idx]
       outbuf.buf[outj - out0:] += amp
     nonzeros = diffbuf.nonzeros()
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
+    mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
     for idx, naivey in enumerate(nonzeros):
       pasteminblep()
     wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
