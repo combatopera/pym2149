@@ -99,12 +99,14 @@ class WavWriter(AbstractNode):
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
-    for naivey in diffbuf.nonzeros():
+    def pasteminblep():
       amp = diffbuf.buf[naivey]
       outi, mixin, mixinsize = self.minbleps.getmixin(self.naivex + naivey, amp)
       outj = outi + mixinsize
       outbuf.buf[outi - out0:outj - out0] += mixin
       outbuf.buf[outj - out0:] += amp
+    for naivey in diffbuf.nonzeros():
+      pasteminblep()
     wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
     wavbuf.buf[:] = outbuf.buf[:self.outz - out0]
     self.f.block(wavbuf)
