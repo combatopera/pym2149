@@ -6,12 +6,12 @@ from pym2149.minblep import MinBleps
 
 def main():
   import matplotlib.pyplot as plt
-  minbleps = MinBleps(1, 1, 5, cutoff = .5, transition = 4 / 20)
-  plt.plot(minbleps.bli * minbleps.scale, 'b+')
-  plt.plot(minbleps.blep, 'bo')
-  plt.plot(np.arange(minbleps.size) + minbleps.midpoint, minbleps.minbli * minbleps.scale, 'r+')
+  mb = MinBleps(1, 1, 5, cutoff = .5, transition = 4 / 20)
+  plt.plot(mb.bli * mb.scale, 'b+')
+  plt.plot(mb.blep, 'bo')
+  plt.plot(np.arange(mb.size) + mb.midpoint, mb.minbli * mb.scale, 'r+')
   for style in 'r', 'ro':
-    plt.plot(np.arange(minbleps.size + minbleps.scale - 1) + minbleps.midpoint, minbleps.minblep, style)
+    plt.plot(np.arange(mb.size + mb.scale - 1) + mb.midpoint, mb.minblep, style)
   plt.grid(True)
   plt.show()
 
