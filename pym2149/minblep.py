@@ -29,6 +29,7 @@ class MinBleps:
     self.scale = scale
 
   def getoutindexandshape(self, ctrlx):
+    # XXX: Could we use modular arithmetic to avoid int64?
     tmpi = np.array(ctrlx * self.factor + .5, dtype = np.int64)
     outi = (tmpi + self.scale - 1) // self.scale
     shape = outi * self.scale - tmpi
