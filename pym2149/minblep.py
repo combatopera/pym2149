@@ -3,6 +3,8 @@ import numpy as np, fractions
 
 class MinBleps:
 
+  minmag = np.exp(-100)
+
   def __init__(self, ctrlrate, outrate, scale, cutoff = .475, transition = .05):
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2
@@ -15,11 +17,12 @@ class MinBleps:
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
-    realcepstrum = np.fft.ifft(np.log(absdft)) # Symmetric apart from first element.
+    # The "real cepstrum" is symmetric apart from its first element:
+    realcepstrum = np.fft.ifft(np.log(self.minmag + absdft))
     # Leave first point, zero max phase part, double min phase part to compensate:
     realcepstrum[1:self.midpoint + 1] *= 2
     realcepstrum[self.midpoint + 1:] = 0
-    self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
+    self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum)) - self.minmag).real
     dtype = np.float32
     self.minblep = np.append(np.cumsum(self.minbli, dtype = dtype), [1] * (scale - 1))
     self.minbleps = np.reshape(self.minblep, (scale, order + 1), 'F')
