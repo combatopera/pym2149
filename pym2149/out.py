@@ -71,7 +71,7 @@ class WavWriter(AbstractNode):
 
   def __init__(self, clock, chip, path):
     AbstractNode.__init__(self)
-    scale = 500 # Smaller values result in worse-looking spectrograms.
+    scale = 1000 # Smaller values result in worse-looking spectrograms.
     dtype = np.float32 # Effectively about 24 bits.
     self.diffmaster = MasterBuf(dtype = dtype)
     self.outmaster = MasterBuf(dtype = dtype)
