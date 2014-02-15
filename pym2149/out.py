@@ -108,6 +108,7 @@ class WavWriter(AbstractNode):
     nonzeros = diffbuf.nonzeros()
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
     mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
+    # FIXME: This loop is too slow, so get numpy to implement it somehow.
     for idx, naivey in enumerate(nonzeros):
       pasteminblep()
     wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
