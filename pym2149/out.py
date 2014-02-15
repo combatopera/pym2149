@@ -71,6 +71,7 @@ class WavWriter(AbstractNode):
 
   def __init__(self, clock, chip, path):
     AbstractNode.__init__(self)
+    # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
     dtype = np.float32 # Effectively about 24 bits.
     self.diffmaster = MasterBuf(dtype = dtype)
