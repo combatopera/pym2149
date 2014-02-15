@@ -89,9 +89,9 @@ class WavWriter(AbstractNode):
     self.chip = chip
 
   def callimpl(self):
-    blockbuf = self.chain(self.chip)
-    framecount = len(blockbuf)
-    diffbuf = self.diffmaster.differentiate(self.dc, blockbuf)
+    chipbuf = self.chain(self.chip)
+    framecount = len(chipbuf)
+    diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
     out0 = self.outz
     # Index of the first sample we can't output yet:
     self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount)[0]
@@ -116,7 +116,7 @@ class WavWriter(AbstractNode):
     self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[self.outz - out0:]
     self.naivex += framecount
-    self.dc = blockbuf.buf[-1]
+    self.dc = chipbuf.buf[-1]
 
   def flush(self):
     self.f.flush()
