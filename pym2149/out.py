@@ -95,8 +95,9 @@ class WavWriter(AbstractNode):
     out0 = self.outz
     # Index of the first sample we can't output yet:
     self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount)[0]
+    outcount = self.outz - out0
     # Make space for all samples we can output plus overflow:
-    outbuf = self.outmaster.ensureandcrop(self.outz - out0 + self.overflowsize)
+    outbuf = self.outmaster.ensureandcrop(outcount + self.overflowsize)
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
@@ -111,10 +112,10 @@ class WavWriter(AbstractNode):
     # FIXME: This loop is too slow, so get numpy to implement it somehow.
     for idx, naivey in enumerate(nonzeros):
       pasteminblep()
-    wavbuf = self.wavmaster.ensureandcrop(self.outz - out0)
-    wavbuf.buf[:] = outbuf.buf[:self.outz - out0] # Cast to int16.
+    wavbuf = self.wavmaster.ensureandcrop(outcount)
+    wavbuf.buf[:] = outbuf.buf[:outcount] # Cast to int16.
     self.f.block(wavbuf)
-    self.carrybuf.buf[:] = outbuf.buf[self.outz - out0:]
+    self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += framecount
     self.dc = chipbuf.buf[-1]
 
