@@ -10,6 +10,7 @@ class MinBleps:
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2
     self.kernelsize = order * scale + 1
+    # The fft/ifft are too slow unless size is a power of 2:
     self.size = 2 ** 0
     while self.size < self.kernelsize:
       self.size <<= 1
