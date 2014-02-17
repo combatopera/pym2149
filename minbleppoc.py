@@ -21,6 +21,7 @@ class FakeChip(Node):
     self.naivebuf = Buf(np.empty(self.naivesize))
     x = 0
     while x < self.naivesize:
+      # Observe first step is half the size of all subsequent steps:
       self.naivebuf.fillpart(x, x + period // 2, toneamp)
       self.naivebuf.fillpart(x + period // 2, x + period, -toneamp)
       x += period
