@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 import unittest
-from nod import AbstractNode, Block
+from nod import Node, Block
 
-class MyAbstractNode(AbstractNode):
+class MyNode(Node):
 
   def __init__(self):
-    AbstractNode.__init__(self)
+    Node.__init__(self)
     self.x = 0
 
   def callimpl(self):
@@ -14,10 +14,10 @@ class MyAbstractNode(AbstractNode):
     self.x += 1
     return x
 
-class TestAbstractNode(unittest.TestCase):
+class TestNode(unittest.TestCase):
 
   def test_works(self):
-    n = MyAbstractNode()
+    n = MyNode()
     b1 = Block(10)
     b2 = Block(20)
     for _ in xrange(2):

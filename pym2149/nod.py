@@ -9,7 +9,7 @@ class Block:
   def __repr__(self):
     return "%s(%r)" % (self.__class__.__name__, self.framecount)
 
-class AbstractNode:
+class Node:
 
   def __init__(self):
     self.block = None
@@ -30,21 +30,21 @@ class AbstractNode:
   def chain(self, node):
     return node(self.block, self.masked)
 
-class Container(AbstractNode):
+class Container(Node):
 
   def __init__(self, nodes):
-    AbstractNode.__init__(self)
+    Node.__init__(self)
     self.nodes = nodes
 
   def callimpl(self):
     return [self.chain(node) for node in self.nodes]
 
-class BufNode(AbstractNode):
+class BufNode(Node):
 
   zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
 
   def __init__(self, dtype, channels = 1):
-    AbstractNode.__init__(self)
+    Node.__init__(self)
     masterbuf = MasterBuf(dtype)
     callimpl = self.callimpl
     def callimploverride():

@@ -1,7 +1,7 @@
 import numpy as np, sys, errno
 from buf import MasterBuf, Buf
 from minblep import MinBleps
-from nod import AbstractNode
+from nod import Node
 
 class Wave16:
 
@@ -65,12 +65,12 @@ class Wave16:
   def close(self):
     self.f.close()
 
-class WavWriter(AbstractNode):
+class WavWriter(Node):
 
   outrate = 44100
 
   def __init__(self, clock, chip, path):
-    AbstractNode.__init__(self)
+    Node.__init__(self)
     # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
     dtype = np.float32 # Effectively about 24 bits.

@@ -3,15 +3,15 @@
 from __future__ import division
 import numpy as np, random
 from pym2149.buf import Buf
-from pym2149.nod import AbstractNode, Block
+from pym2149.nod import Node, Block
 from pym2149.out import WavWriter
 
-class Chip(AbstractNode):
+class Chip(Node):
 
   naiverate = 2000000
 
   def __init__(self):
-    AbstractNode.__init__(self)
+    Node.__init__(self)
     tonefreq = 1500
     toneamp = .25 * 2 ** 15
     self.naivesize = self.naiverate * 60 # One minute of data.
