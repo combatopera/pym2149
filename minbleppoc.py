@@ -9,15 +9,15 @@ from pym2149.out import WavWriter
 class FakeChip(Node):
 
   naiverate = 2000000
+  toneoscscale = 16 # A property of the chip.
 
   def __init__(self):
     Node.__init__(self)
     tonefreq = 1500
     toneamp = .25 * 2 ** 15
     self.naivesize = self.naiverate * 60 # One minute of data.
-    toneoscscale = 16 # A property of the chip.
-    periodreg = int(round(self.naiverate / (toneoscscale * tonefreq)))
-    period = toneoscscale * periodreg # Even.
+    periodreg = int(round(self.naiverate / (self.toneoscscale * tonefreq)))
+    period = self.toneoscscale * periodreg # Even.
     self.naivebuf = Buf(np.empty(self.naivesize))
     x = 0
     while x < self.naivesize:
