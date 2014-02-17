@@ -39,7 +39,7 @@ class Container(AbstractNode):
   def callimpl(self):
     return [self.chain(node) for node in self.nodes]
 
-class Node(AbstractNode):
+class BufNode(AbstractNode):
 
   zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
 

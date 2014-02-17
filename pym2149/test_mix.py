@@ -2,13 +2,13 @@
 
 import unittest
 from mix import IdealMixer, Multiplexer
-from nod import Node, Block, Container
+from nod import BufNode, Block, Container
 from buf import NullBuf
 
-class Counter(Node):
+class Counter(BufNode):
 
   def __init__(self, x = 0):
-    Node.__init__(self, int)
+    BufNode.__init__(self, int)
     self.x = x
 
   def callimpl(self):

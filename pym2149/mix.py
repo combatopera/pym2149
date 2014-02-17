@@ -1,10 +1,10 @@
-from nod import Node
+from nod import BufNode
 import numpy as np
 
-class BinMix(Node):
+class BinMix(BufNode):
 
   def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-    Node.__init__(self, self.binarydtype)
+    BufNode.__init__(self, self.binarydtype)
     self.tone = tone
     self.noise = noise
     self.toneflagreg = toneflagreg
@@ -27,7 +27,7 @@ class BinMix(Node):
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
 
-class Multiplexer(Node):
+class Multiplexer(BufNode):
 
   @staticmethod
   def commondtype(*nodes):
@@ -36,17 +36,17 @@ class Multiplexer(Node):
     return dtype
 
   def __init__(self, *streams):
-    Node.__init__(self, self.commondtype(*streams), len(streams))
+    BufNode.__init__(self, self.commondtype(*streams), len(streams))
     self.streams = streams
 
   def callimpl(self):
     for i, stream in enumerate(self.streams):
       self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount)
 
-class IdealMixer(Node):
+class IdealMixer(BufNode):
 
   def __init__(self, container):
-    Node.__init__(self, np.float32)
+    BufNode.__init__(self, np.float32)
     self.datum = self.dtype(2 ** 14.5) # Half power point, very close to -3 dB.
     self.container = container
 

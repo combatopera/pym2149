@@ -2,12 +2,12 @@
 
 import unittest
 from dac import Dac
-from nod import Node, Block
+from nod import BufNode, Block
 
-class Ramps(Node):
+class Ramps(BufNode):
 
   def __init__(self):
-    Node.__init__(self, int)
+    BufNode.__init__(self, int)
 
   def callimpl(self):
     for i in xrange(self.block.framecount):

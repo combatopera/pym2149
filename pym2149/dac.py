@@ -1,11 +1,11 @@
 from __future__ import division
-from nod import Node
+from nod import BufNode
 import numpy as np, math
 
-class Level(Node):
+class Level(BufNode):
 
   def __init__(self, modereg, fixedreg, env, signal):
-    Node.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
+    BufNode.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
     self.modereg = modereg
     self.fixedreg = fixedreg
     self.env = env
@@ -27,10 +27,10 @@ def leveltoamp(level):
 def amptolevel(amp):
   return 31 + 4 * math.log(amp) / log2
 
-class Dac(Node):
+class Dac(BufNode):
 
   def __init__(self, level, ampshare):
-    Node.__init__(self, np.float32)
+    BufNode.__init__(self, np.float32)
     maxpeaktopeak = 2 ** 15.5 / ampshare
     # Lookup of ideal amplitudes:
     self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
