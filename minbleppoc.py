@@ -6,7 +6,7 @@ from pym2149.buf import Buf
 from pym2149.nod import Node, Block
 from pym2149.out import WavWriter
 
-class Chip(Node):
+class FakeChip(Node):
 
   naiverate = 2000000
 
@@ -31,7 +31,7 @@ class Chip(Node):
     return Buf(self.naivebuf.buf[self.cursor - self.block.framecount:self.cursor])
 
 def main():
-  chip = Chip()
+  chip = FakeChip()
   stream = WavWriter(chip.naiverate, chip, 'minbleppoc.wav')
   while chip.cursor < chip.naivesize:
     stream.call(Block(random.randint(1, 30000)))
