@@ -52,7 +52,7 @@ class WavWriter(Node):
     for idx in xrange(len(nonzeros)):
       pasteminblep()
     wavbuf = self.wavmaster.ensureandcrop(outcount)
-    wavbuf.buf[:] = outbuf.buf[:outcount] # Cast to int16.
+    np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += framecount
