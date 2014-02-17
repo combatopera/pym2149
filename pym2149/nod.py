@@ -42,6 +42,7 @@ class Container(Node):
 class BufNode(Node):
 
   zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
+  floatdtype = np.float32 # Effectively about 24 bits.
 
   def __init__(self, dtype, channels = 1):
     Node.__init__(self)

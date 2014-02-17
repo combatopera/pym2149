@@ -1,9 +1,11 @@
 import sys, errno
+import numpy as np
 
 class Wave16:
 
   bytespersample = 2
   hugefilesize = 0x80000000
+  dtype = np.int16
 
   def __init__(self, path, rate):
     if '-' == path:

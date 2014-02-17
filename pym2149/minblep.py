@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np, fractions
+from nod import BufNode
 
 class MinBleps:
 
@@ -33,8 +34,7 @@ class MinBleps:
     realcepstrum[self.midpoint + 1:] = 0
     # We subtract the minmag again to preserve height of integral:
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum)) - self.minmag).real
-    dtype = np.float32
-    self.minblep = np.cumsum(self.minbli, dtype = dtype)
+    self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
     ones = (-self.size) % scale
     self.minblep = np.append(self.minblep, [1] * ones)
     self.mixinsize = len(self.minblep) // scale

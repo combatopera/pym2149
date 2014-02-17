@@ -1,5 +1,4 @@
 from nod import BufNode
-import numpy as np
 
 class BinMix(BufNode):
 
@@ -46,7 +45,7 @@ class Multiplexer(BufNode):
 class IdealMixer(BufNode):
 
   def __init__(self, container):
-    BufNode.__init__(self, np.float32)
+    BufNode.__init__(self, self.floatdtype)
     self.datum = self.dtype(2 ** 14.5) # Half power point, very close to -3 dB.
     self.container = container
 

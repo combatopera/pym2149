@@ -1,7 +1,7 @@
 import numpy as np
 from buf import MasterBuf, Buf
 from minblep import MinBleps
-from nod import Node
+from nod import Node, BufNode
 from wav import Wave16
 
 class WavWriter(Node):
@@ -12,14 +12,13 @@ class WavWriter(Node):
     Node.__init__(self)
     # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
-    dtype = np.float32 # Effectively about 24 bits.
-    self.diffmaster = MasterBuf(dtype = dtype)
-    self.outmaster = MasterBuf(dtype = dtype)
-    self.wavmaster = MasterBuf(dtype = np.int16)
+    self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
+    self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
+    self.wavmaster = MasterBuf(dtype = Wave16.dtype)
     self.minbleps = MinBleps(clock, self.outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
     self.overflowsize = self.minbleps.mixinsize
-    self.carrybuf = Buf(np.empty(self.overflowsize, dtype = dtype))
+    self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))
     self.f = Wave16(path, self.outrate)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
