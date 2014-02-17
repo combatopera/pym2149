@@ -22,7 +22,7 @@ class WavWriter(Node):
     self.f = Wave16(path, self.outrate)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
-    self.outz = 0 # Absolute index of first output sample being processed in this iteration.
+    self.outz = 0 # Absolute index of first output sample being processed next iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.chip = chip
 
