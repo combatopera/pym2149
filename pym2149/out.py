@@ -22,17 +22,16 @@ class WavWriter(Node):
     self.f = Wave16(path, self.outrate)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
-    self.outz = 0 # Absolute index of first output sample being processed next iteration.
+    self.out0 = 0 # Absolute index of first output sample being processed next iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.chip = chip
 
   def callimpl(self):
     chipbuf = self.chain(self.chip)
     diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
-    out0 = self.outz
     # Index of the first sample we can't output yet:
-    self.outz = self.minbleps.getoutindexandshape(self.naivex + self.block.framecount)[0]
-    outcount = self.outz - out0
+    outz = self.minbleps.getoutindexandshape(self.naivex + self.block.framecount)[0]
+    outcount = outz - self.out0
     # Make space for all samples we can output plus overflow:
     outbuf = self.outmaster.ensureandcrop(outcount + self.overflowsize)
     # Paste in the carry followed by the carried dc level:
@@ -43,7 +42,7 @@ class WavWriter(Node):
       outbuf.buf[outj[idx]:] += amp[idx]
     nonzeros = diffbuf.nonzeros()
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
-    outi -= out0
+    outi -= self.out0
     outj = outi + self.minbleps.mixinsize
     mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
     amp = diffbuf.buf[nonzeros]
@@ -56,6 +55,7 @@ class WavWriter(Node):
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
+    self.out0 = outz
 
   def flush(self):
     self.f.flush()
