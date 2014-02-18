@@ -26,15 +26,13 @@ class MinBleps:
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
-    # XXX: Would it make more sense to max than add?
     # The "real cepstrum" is symmetric apart from its first element:
-    realcepstrum = np.fft.ifft(np.log(self.minmag + absdft))
+    realcepstrum = np.fft.ifft(np.log(np.maximum(self.minmag, absdft)))
     # Leave first point, zero max phase part, double min phase part to compensate.
     # The midpoint is shared between parts so it doesn't change:
     realcepstrum[1:self.midpoint] *= 2
     realcepstrum[self.midpoint + 1:] = 0
-    # We subtract the minmag again to preserve height of integral:
-    self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum)) - self.minmag).real
+    self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
     ones = (-self.size) % scale
     self.minblep = np.append(self.minblep, [1] * ones)
