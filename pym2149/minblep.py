@@ -26,6 +26,7 @@ class MinBleps:
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
+    # XXX: Would it make more sense to max than add?
     # The "real cepstrum" is symmetric apart from its first element:
     realcepstrum = np.fft.ifft(np.log(self.minmag + absdft))
     # Leave first point, zero max phase part, double min phase part to compensate.
