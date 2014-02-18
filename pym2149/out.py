@@ -28,11 +28,10 @@ class WavWriter(Node):
 
   def callimpl(self):
     chipbuf = self.chain(self.chip)
-    framecount = len(chipbuf)
     diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
     out0 = self.outz
     # Index of the first sample we can't output yet:
-    self.outz = self.minbleps.getoutindexandshape(self.naivex + framecount)[0]
+    self.outz = self.minbleps.getoutindexandshape(self.naivex + self.block.framecount)[0]
     outcount = self.outz - out0
     # Make space for all samples we can output plus overflow:
     outbuf = self.outmaster.ensureandcrop(outcount + self.overflowsize)
@@ -55,7 +54,7 @@ class WavWriter(Node):
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
-    self.naivex += framecount
+    self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
 
   def flush(self):
