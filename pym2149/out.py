@@ -37,18 +37,12 @@ class WavWriter(Node):
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
-    def pasteminblep():
-      outbuf.buf[outi[idx]:outj[idx]] += mixin[idx]
-      outbuf.buf[outj[idx]:] += amp[idx]
     nonzeros = diffbuf.nonzeros()
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
     outi -= self.out0
-    outj = outi + self.minbleps.mixinsize
     mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
     amp = diffbuf.buf[nonzeros]
-    # FIXME: This loop is too slow, so get numpy to implement it somehow.
-    for idx in xrange(len(nonzeros)):
-      pasteminblep()
+    pasteminbleps(len(nonzeros), outbuf.buf, outi, self.minbleps.mixinsize, mixin, amp)
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
@@ -62,3 +56,12 @@ class WavWriter(Node):
 
   def close(self):
     self.f.close()
+
+# FIXME: This loop is too slow, so get numpy to implement it somehow.
+def pasteminbleps(n, out, outi, mixinsize, mixin, amp):
+  for x in xrange(n):
+    i = outi[x]
+    j = i + mixinsize
+    m = mixin[x]
+    out[i:j] += m
+    out[j:] += amp[x]
