@@ -2,6 +2,7 @@
 
 import unittest, numpy as np
 from minblep import MinBleps
+from nod import BufNode
 
 class TestMinBleps(unittest.TestCase):
 
@@ -10,6 +11,11 @@ class TestMinBleps(unittest.TestCase):
     absdft = np.abs(np.fft.fft(minbleps.bli))
     absdft2 = np.abs(np.fft.fft(minbleps.minbli))
     self.assertTrue(np.allclose(absdft, absdft2))
+
+  def test_types(self):
+    minbleps = MinBleps(1, 1, 500)
+    self.assertEqual(BufNode.floatdtype, minbleps.minblep.dtype)
+    self.assertEqual(BufNode.floatdtype, minbleps.minbleps.dtype)
 
   def getmixins(self, scale):
     ctrlrate, outrate = 12, 1
