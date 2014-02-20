@@ -7,6 +7,7 @@ from wav import Wave16
 class WavWriter(Node):
 
   outrate = 44100
+  indexdtype = np.int32
 
   def __init__(self, clock, chip, path):
     Node.__init__(self)
@@ -14,6 +15,7 @@ class WavWriter(Node):
     scale = 1000 # Smaller values result in worse-looking spectrograms.
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
+    self.outimaster = MasterBuf(dtype = self.indexdtype)
     self.wavmaster = MasterBuf(dtype = Wave16.dtype)
     self.minbleps = MinBleps(clock, self.outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
@@ -39,10 +41,11 @@ class WavWriter(Node):
     outbuf.buf[self.overflowsize:] = self.dc
     nonzeros = diffbuf.nonzeros()
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
-    outi -= self.out0
+    outibuf = self.outimaster.ensureandcrop(len(nonzeros))
+    np.subtract(outi, self.out0, outibuf.buf)
     mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
     amp = diffbuf.buf[nonzeros]
-    pasteminbleps(len(nonzeros), outbuf.buf, outi, self.minbleps.mixinsize, mixin, amp)
+    pasteminbleps(len(nonzeros), outbuf.buf, outibuf.buf, self.minbleps.mixinsize, mixin, amp)
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
