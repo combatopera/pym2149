@@ -46,7 +46,7 @@ class WavWriter(Node):
     np.subtract(outi, self.out0, outibuf.buf)
     amp = diffbuf.buf[nonzeros]
     mixin = self.minbleps.getmixin(shape, amp)
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(self.minbleps.mixinsize), mixin, amp)
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), mixin, amp)
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
@@ -62,10 +62,11 @@ class WavWriter(Node):
     self.f.close()
 
 # FIXME: This loop is too slow, so get numpy to implement it somehow.
-def pasteminbleps(n, out, outi, mixinsize, mixin, amp):
+def pasteminbleps(n, out, outi, outsize, mixinsize, mixin, amp):
   for x in xrange(n):
     i = outi[x]
     j = i + mixinsize
-    m = mixin[x]
-    out[i:j] += m
-    out[j:] += amp[x]
+    s = out[i:j]
+    np.add(s, mixin[x], s)
+    s = out[j:outsize]
+    np.add(s, amp[x], s)
