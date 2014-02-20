@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import numpy as np, random
+import numpy as np, random, subprocess
 from pym2149.buf import Buf
 from pym2149.nod import Node, Block
 from pym2149.out import WavWriter
@@ -33,10 +33,12 @@ class FakeChip(Node):
 
 def main():
   chip = FakeChip()
-  stream = WavWriter(chip.naiverate, chip, 'minbleppoc.wav')
+  path = 'minbleppoc.wav'
+  stream = WavWriter(chip.naiverate, chip, path)
   while chip.cursor < chip.naivesize:
     stream.call(Block(random.randint(1, 30000)))
   stream.close()
+  subprocess.check_call(['sox', path, '-n', 'spectrogram', '-o', 'minbleppoc.png'])
 
 if __name__ == '__main__':
   main()
