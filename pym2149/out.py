@@ -40,12 +40,13 @@ class WavWriter(Node):
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
     nonzeros = diffbuf.nonzeros()
+    pasten = self.indexdtype(len(nonzeros))
     outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
-    outibuf = self.outimaster.ensureandcrop(len(nonzeros))
+    outibuf = self.outimaster.ensureandcrop(pasten)
     np.subtract(outi, self.out0, outibuf.buf)
-    mixin = self.minbleps.getmixin(shape, diffbuf.buf[nonzeros])
     amp = diffbuf.buf[nonzeros]
-    pasteminbleps(len(nonzeros), outbuf.buf, outibuf.buf, self.minbleps.mixinsize, mixin, amp)
+    mixin = self.minbleps.getmixin(shape, amp)
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(self.minbleps.mixinsize), mixin, amp)
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
