@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np, numba as nb
 from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import Node, BufNode
@@ -61,12 +61,19 @@ class WavWriter(Node):
   def close(self):
     self.f.close()
 
-# FIXME: This loop is too slow, so get numpy to implement it somehow.
+@nb.jit(nb.void(nb.i4, nb.float32[:], nb.i4[:], nb.i4, nb.i4, nb.float32[:, :], nb.f4[:]), nopython = True)
 def pasteminbleps(n, out, outi, outsize, mixinsize, mixin, amp):
-  for x in xrange(n):
+  x = 0
+  while x < n:
     i = outi[x]
     j = i + mixinsize
-    s = out[i:j]
-    np.add(s, mixin[x], s)
-    s = out[j:outsize]
-    np.add(s, amp[x], s)
+    ij = i
+    while ij < j:
+      out[ij] = out[ij] + mixin[x, ij - i]
+      ij = ij + 1
+    a = amp[x]
+    ij = j
+    while ij < outsize:
+      out[ij] += a
+      ij = ij + 1
+    x = x + 1
