@@ -19,9 +19,7 @@ class MinPeriodTone(Node):
   def callimpl(self):
     return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
 
-class TestWavWriter(unittest.TestCase):
-
-  def test_minperiodperformance(self):
+def minperiodperformance():
     clock = 250000
     tone = MinPeriodTone()
     w = WavWriter(clock, tone, '/dev/null')
@@ -33,7 +31,12 @@ class TestWavWriter(unittest.TestCase):
       w.call(block)
       tone.cursor += block.framecount
     w.close()
-    self.assertTrue(time.time() - start < 5) # FIXME: Get this under a second.
+    return time.time() - start
+
+class TestWavWriter(unittest.TestCase):
+
+  def test_minperiodperformance(self):
+    self.assertTrue(minperiodperformance() < 5) # FIXME: Get this under a second.
 
 if __name__ == '__main__':
   unittest.main()
