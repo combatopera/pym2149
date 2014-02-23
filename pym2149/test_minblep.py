@@ -24,8 +24,8 @@ class TestMinBleps(unittest.TestCase):
     mixins = []
     for x in xrange(ctrlrate * 2):
       outi, shape = minbleps.getoutindexandshape(x)
-      mixin = minbleps.getmixin(shape, 1)[0]
-      mixins.append((outi, np.copy(mixin)))
+      mixin = minbleps.minbleps[shape]
+      mixins.append((outi, mixin))
     return mixins
 
   def test_sharing(self):
