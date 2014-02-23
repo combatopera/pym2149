@@ -64,7 +64,7 @@ class WavWriter(Node):
 def pasteminbleps(n, out, outi, outsize, mixinsize, mixin, amp):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, mixin, amp)
 
-@nb.jit(nb.void(nb.i4, nb.float32[:], nb.i4[:], nb.i4, nb.i4, nb.float32[:, :], nb.f4[:]), nopython = True)
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:, :], nb.f4[:]), nopython = True)
 def pasteminblepsimpl(n, out, outi, outsize, mixinsize, mixin, amp):
   x = 0
   while x < n:
