@@ -46,8 +46,5 @@ class MinBleps:
     # XXX: Could we use modular arithmetic to avoid int64?
     tmpi = np.array(ctrlx * self.factor + .5, dtype = np.int64)
     outi = (tmpi + self.scale - 1) // self.scale
-    shape = outi * self.scale - tmpi
+    shape = np.array(outi * self.scale - tmpi, dtype = np.int32)
     return outi, shape
-
-  def getmixin(self, shape, amp):
-    return (self.minbleps[shape].T * amp).T
