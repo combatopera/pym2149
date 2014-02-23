@@ -36,7 +36,7 @@ def minperiodperformance():
 class TestWavWriter(unittest.TestCase):
 
   def test_minperiodperformance(self):
-    self.assertTrue(minperiodperformance() < 5) # FIXME: Get this under a second.
+    self.assertTrue(minperiodperformance() < 4) # FIXME: Get this under a second.
 
 if __name__ == '__main__':
   unittest.main()
