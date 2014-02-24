@@ -15,7 +15,6 @@ class TestMinBleps(unittest.TestCase):
   def test_types(self):
     minbleps = MinBleps(1, 1, 500)
     self.assertEqual(BufNode.floatdtype, minbleps.minblep.dtype)
-    self.assertEqual(BufNode.floatdtype, minbleps.minbleps.dtype)
 
   def getmixins(self, scale):
     ctrlrate, outrate = 12, 1
@@ -24,7 +23,7 @@ class TestMinBleps(unittest.TestCase):
     mixins = []
     for x in xrange(ctrlrate * 2):
       outi, shape = minbleps.getoutindexandshape(x)
-      mixin = minbleps.minbleps[shape]
+      mixin = minbleps.minblep[shape::scale]
       mixins.append((outi, mixin))
     return mixins
 
