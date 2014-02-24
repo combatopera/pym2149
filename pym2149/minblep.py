@@ -37,7 +37,6 @@ class MinBleps:
     ones = (-self.size) % scale
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
-    self.minbleps = np.reshape(self.minblep, (scale, self.mixinsize), 'F')
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     self.factor = outrate / ctrlrate * scale
     self.scale = scale

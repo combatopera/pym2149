@@ -45,7 +45,7 @@ class WavWriter(Node):
     outibuf = self.outimaster.ensureandcrop(pasten)
     np.subtract(outi, self.out0, outibuf.buf)
     amp = diffbuf.buf[nonzeros]
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minbleps, shape, amp)
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shape, amp, self.indexdtype(self.minbleps.scale))
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.f.block(wavbuf)
@@ -60,11 +60,11 @@ class WavWriter(Node):
   def close(self):
     self.f.close()
 
-def pasteminbleps(n, out, outi, outsize, mixinsize, minbleps, shape, amp):
-  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minbleps, shape, amp)
+def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
+  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
 
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:, :], nb.i4[:], nb.f4[:]), nopython = True)
-def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minbleps, shape, amp):
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
+def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   x = 0
   while x < n:
     i = outi[x]
@@ -74,10 +74,11 @@ def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minbleps, shape, amp):
     a = amp[x]
     if k < j:
       while 1:
-        out[k] += minbleps[s, k - i] * a
+        out[k] += minblep[s] * a
         k += 1
         if k == j:
           break
+        s += scale
     if k < outsize:
       while 1:
         out[k] += a
