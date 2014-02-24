@@ -38,12 +38,15 @@ class MinBleps:
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
-    self.factor = outrate / ctrlrate * scale
+    # The ctrlrate and outrate will line up at 1 second:
+    tmpi = np.int32(np.arange(ctrlrate) / ctrlrate * outrate * scale + .5)
+    self.outi = (tmpi + scale - 1) // scale
+    self.shape = self.outi * scale - tmpi
+    self.ctrlrate = ctrlrate
+    self.outrate = outrate
     self.scale = scale
 
   def getoutindexandshape(self, ctrlx):
-    # XXX: Could we use modular arithmetic to avoid int64?
-    tmpi = np.array(ctrlx * self.factor + .5, dtype = np.int64)
-    outi = (tmpi + self.scale - 1) // self.scale
-    shape = np.array(outi * self.scale - tmpi, dtype = np.int32)
-    return outi, shape
+    k = ctrlx % self.ctrlrate
+    q = ctrlx // self.ctrlrate
+    return self.outi[k] + self.outrate * q, self.shape[k]
