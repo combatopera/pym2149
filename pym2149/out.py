@@ -66,6 +66,7 @@ def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
 def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   x = 0
+  one = 1 # Makes inspect_types easier to read.
   while x < n:
     i = outi[x]
     s = shape[x]
@@ -74,14 +75,14 @@ def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, sca
     if i < j:
       while 1:
         out[i] += minblep[s] * a
-        i += 1
+        i += one
+        s += scale
         if i == j:
           break
-        s += scale
     if i < outsize:
       while 1:
         out[i] += a
-        i += 1
+        i += one
         if i == outsize:
           break
-    x += 1
+    x += one
