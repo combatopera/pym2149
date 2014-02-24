@@ -70,19 +70,18 @@ def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, sca
     i = outi[x]
     s = shape[x]
     j = i + mixinsize
-    k = i
     a = amp[x]
-    if k < j:
+    if i < j:
       while 1:
-        out[k] += minblep[s] * a
-        k += 1
-        if k == j:
+        out[i] += minblep[s] * a
+        i += 1
+        if i == j:
           break
         s += scale
-    if k < outsize:
+    if i < outsize:
       while 1:
-        out[k] += a
-        k += 1
-        if k == outsize:
+        out[i] += a
+        i += 1
+        if i == outsize:
           break
     x += 1
