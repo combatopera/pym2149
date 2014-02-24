@@ -31,5 +31,5 @@ class Config:
     chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
     chip.clock = int(round(nominalclock * self.scale / 8))
     if self.scale != defaultscale:
-      log.debug("Clock adjusted to %.3f for non-standard scale.", chip.clock)
+      log.debug("Clock adjusted to %s for non-standard scale.", chip.clock)
     return chip
