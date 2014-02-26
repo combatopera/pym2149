@@ -43,7 +43,7 @@ class Registers:
     self.toneflags = tuple(DerivedReg(flagxform(c), self.R[0x7]) for c in xrange(self.channels))
     self.noiseflags = tuple(DerivedReg(flagxform(self.channels + c), self.R[0x7]) for c in xrange(self.channels))
     self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(self.channels))
-    self.levelmodes = tuple(DerivedReg(lambda x: x & 0x10, self.R[0x8 + c]) for c in xrange(self.channels))
+    self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(self.channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
 
