@@ -23,6 +23,7 @@ class Pitch(float):
 
   a4freq = 440
   a4midi = 69
+  names = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 
   def freq(self):
     return Freq(self.a4freq * (2 ** ((self - self.a4midi) / 12)))
@@ -32,6 +33,24 @@ class Pitch(float):
 
   def __sub__(self, that):
     return self.__class__(float.__sub__(self, that))
+
+  def __str__(self):
+    nearest = int(math.ceil(self - .5))
+    octave = nearest // 12
+    note = nearest % 12
+    cents = int(round((self - nearest) * 100))
+    octave -= 1
+    notestr = self.names[note]
+    if len(notestr) < 2:
+      notestr += '_'
+    octavestr = str(octave)
+    if len(octavestr) > 1:
+      octavestr = '!'
+    if abs(cents) < 10:
+      centsstr = ' ' * 3
+    else:
+      centsstr = "%+d" % cents
+    return notestr + octavestr + centsstr
 
 @singleton
 class shapescale:
