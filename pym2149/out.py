@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np, numba as nb
+import numpy as np, numba as nb, logging
 from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import Node, BufNode
 from wav import Wave16
+
+log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
@@ -80,6 +82,8 @@ class WavWriter(Node):
 def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
 
+log.debug('Compiling output stage.')
+
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
 def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   x = 0
@@ -103,3 +107,5 @@ def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, sca
         if i == outsize:
           break
     x += one
+
+log.debug('Done compiling.')
