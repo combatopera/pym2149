@@ -42,10 +42,10 @@ class Pitch(float):
     octave -= 1
     notestr = self.names[note]
     if len(notestr) < 2:
-      notestr += '_'
+      notestr += '.'
     octavestr = str(octave)
-    if len(octavestr) > 1:
-      octavestr = '!'
+    if len(octavestr) < 2:
+      octavestr = '.' + octavestr
     if abs(cents) < 10:
       centsstr = ' ' * 3
     else:

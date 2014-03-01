@@ -35,7 +35,7 @@ class Roll:
   def __init__(self, height, chip, nomclock):
     self.line = 0
     self.jump = "\x1b[%sA" % height
-    self.format = ' | '.join(chip.channels * ["%6s %1s %2s %1s %2s %6s"])
+    self.format = ' | '.join(chip.channels * ["%7s %1s %2s %1s %2s %7s"])
     self.height = height
     self.chip = chip
     self.nomclock = nomclock

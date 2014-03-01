@@ -23,16 +23,16 @@ from pitch import Pitch
 class TestPitch(unittest.TestCase):
 
   def test_str(self):
-    self.assertEqual('C_4   ', str(Pitch(60)))
-    self.assertEqual('C#4   ', str(Pitch(61)))
-    self.assertEqual('B_3   ', str(Pitch(59)))
-    self.assertEqual('B_3+40', str(Pitch(59.4)))
-    self.assertEqual('C_4-40', str(Pitch(59.6)))
-    self.assertEqual('B_3+50', str(Pitch(59.5)))
-    self.assertEqual('C_0   ', str(Pitch(12)))
-    self.assertEqual('B_!   ', str(Pitch(11)))
-    self.assertEqual('B_9   ', str(Pitch(131)))
-    self.assertEqual('C_!   ', str(Pitch(132)))
+    self.assertEqual('C..4   ', str(Pitch(60)))
+    self.assertEqual('C#.4   ', str(Pitch(61)))
+    self.assertEqual('B..3   ', str(Pitch(59)))
+    self.assertEqual('B..3+40', str(Pitch(59.4)))
+    self.assertEqual('C..4-40', str(Pitch(59.6)))
+    self.assertEqual('B..3+50', str(Pitch(59.5)))
+    self.assertEqual('C..0   ', str(Pitch(12)))
+    self.assertEqual('B.-1   ', str(Pitch(11)))
+    self.assertEqual('B..9   ', str(Pitch(131)))
+    self.assertEqual('C.10   ', str(Pitch(132)))
 
 if __name__ == '__main__':
   unittest.main()
