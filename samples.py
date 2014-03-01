@@ -38,7 +38,7 @@ slowtrinote = 2 # Frequency and actual period are both 1.
 
 def main():
   config = Config()
-  chip = config.createchip(nomclock, ampshare = 1) # Stretch 1 channel to full range.
+  chip = config.createchip(nomclock)
   for c in xrange(chip.channels):
     chip.toneflags[c].value = False
     chip.noiseflags[c].value = False
