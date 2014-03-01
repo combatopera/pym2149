@@ -17,19 +17,21 @@
 
 from __future__ import division
 from buf import singleton
+import math
 
-class Pitch(int):
+class Pitch(float):
 
   a4freq = 440
+  a4midi = 69
 
   def freq(self):
-    return Freq(self.a4freq * (2 ** ((self - 69) / 12)))
+    return Freq(self.a4freq * (2 ** ((self - self.a4midi) / 12)))
 
   def __add__(self, that):
-    return self.__class__(int.__add__(self, that))
+    return self.__class__(float.__add__(self, that))
 
   def __sub__(self, that):
-    return self.__class__(int.__sub__(self, that))
+    return self.__class__(float.__sub__(self, that))
 
 @singleton
 class shapescale:
@@ -50,6 +52,9 @@ class Freq(float):
 
   def envperiod(self, clock, shape):
     return self.periodimpl(clock, shapescale(shape))
+
+  def pitch(self):
+    return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
 
   def __mul__(self, that):
     return self.__class__(float.__mul__(self, that))
