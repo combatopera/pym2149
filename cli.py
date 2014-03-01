@@ -39,8 +39,8 @@ class Config:
     return False
 
   def __init__(self):
-    options, self.args = getopt.getopt(sys.argv[1:], 's:p1', ['scale=', 'pause', 'once'])
-    self.scale = self.uniqueoption(options, ('-s', '--scale'), defaultscale, int)
+    options, self.args = getopt.getopt(sys.argv[1:], 'q:p1', ['quant=', 'pause', 'once'])
+    self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
 
@@ -48,5 +48,5 @@ class Config:
     chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
     chip.clock = int(round(nominalclock * self.scale / 8))
     if self.scale != defaultscale:
-      log.debug("Clock adjusted to %s for non-standard scale.", chip.clock)
+      log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
