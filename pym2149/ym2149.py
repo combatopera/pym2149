@@ -29,6 +29,7 @@ class Registers:
   channels = 3
 
   def __init__(self):
+    # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
@@ -63,11 +64,6 @@ class YM2149(Registers, Container):
       ampshare = self.channels
     Container.__init__(self, [Dac(channel, ampshare) for channel in channels])
     self.pause = pause
-
-  def update(self, frame):
-    for i, x in enumerate(frame):
-      if 0xD != i or 255 != x:
-        self.R[i].value = x
 
   def callimpl(self):
     result = Container.callimpl(self)

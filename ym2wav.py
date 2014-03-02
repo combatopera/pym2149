@@ -93,7 +93,7 @@ def main():
       session = Session(chip.clock)
       roll = Roll(config.getheight(f.framefreq), chip, f.clock)
       for frame in f:
-        chip.update(frame)
+        frame(chip)
         roll.update()
         for b in session.blocks(f.framefreq):
           stream.call(b)

@@ -96,7 +96,7 @@ class YM:
   def step(self):
     frame = self.readframe()
     self.frameindex += 1
-    return frame
+    return PlainFrame(frame)
 
   def __iter__(self):
     while self.frameindex < self.framecount:
@@ -111,6 +111,16 @@ class YM:
 
   def close(self):
     self.f.close()
+
+class PlainFrame:
+
+  def __init__(self, data):
+    self.data = data
+
+  def __call__(self, chip):
+    for i, x in enumerate(self.data):
+      if 0xD != i or 255 != x:
+        chip.R[i].value = x
 
 class YM23(YM):
 
@@ -193,10 +203,10 @@ class YM5(YM56):
 
   def __iter__(self):
     for frame in YM.__iter__(self):
-      if self.logtimersynth and (frame[0x1] & 0x30):
+      if self.logtimersynth and (frame.data[0x1] & 0x30):
         log.warn("Timer-synth at frame %s.", self.frameindex - 1)
         self.logtimersynth = False
-      if self.logdigidrum and (frame[0x3] & 0x30):
+      if self.logdigidrum and (frame.data[0x3] & 0x30):
         log.warn("Digi-drum at frame %s.", self.frameindex - 1)
         self.logdigidrum = False
       yield frame
@@ -213,8 +223,8 @@ class YM6(YM56):
   def __iter__(self):
     for frame in YM.__iter__(self):
       for r in 0x1, 0x3:
-        if frame[r] & 0x30:
-          fx = frame[r] & 0xc0
+        if frame.data[r] & 0x30:
+          fx = frame.data[r] & 0xc0
           if self.logtimersynth and 0x00 == fx:
             log.warn("Timer-synth at frame %s.", self.frameindex - 1)
             self.logtimersynth = False
