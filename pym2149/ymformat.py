@@ -125,7 +125,7 @@ class YM23(YM):
     YM.__init__(self, f, False)
     self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
 
-class YM2(YM23):
+class YM2(YM23): # FIXME: Work out format from ST-Sound source, it's not this simple.
 
   formatid = 'YM2!'
 
@@ -187,6 +187,10 @@ class YM56(YM):
     self.logtimersynth = True
     self.logdigidrum = True
 
+class YM5(YM56):
+
+  formatid = 'YM5!'
+
   def __iter__(self):
     for frame in YM.__iter__(self):
       if self.logtimersynth and (frame[0x1] & 0x30):
@@ -197,13 +201,33 @@ class YM56(YM):
         self.logdigidrum = False
       yield frame
 
-class YM5(YM56):
-
-  formatid = 'YM5!'
-
 class YM6(YM56):
 
   formatid = 'YM6!'
+
+  def __init__(self, *args, **kwargs):
+    YM56.__init__(self, *args, **kwargs)
+    self.logsinussid = True
+    self.logsyncbuzzer = True
+
+  def __iter__(self):
+    for frame in YM.__iter__(self):
+      for r in 0x1, 0x3:
+        if frame[r] & 0x30:
+          fx = frame[r] & 0xc0
+          if self.logtimersynth and 0x00 == fx:
+            log.warn("Timer-synth at frame %s.", self.frameindex - 1)
+            self.logtimersynth = False
+          if self.logdigidrum and 0x40 == fx:
+            log.warn("Digi-drum at frame %s.", self.frameindex - 1)
+            self.logdigidrum = False
+          if self.logsinussid and 0x80 == fx:
+            log.warn("Sinus-SID at frame %s.", self.frameindex - 1)
+            self.logsinussid = False
+          if self.logsyncbuzzer and 0xc0 == fx:
+            log.warn("Sync-buzzer at frame %s.", self.frameindex - 1)
+            self.logsyncbuzzer = False
+      yield frame
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
