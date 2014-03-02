@@ -39,8 +39,9 @@ class Config:
     return False
 
   def __init__(self):
-    options, self.args = getopt.getopt(sys.argv[1:], 'q:p1', ['quant=', 'pause', 'once'])
+    options, self.args = getopt.getopt(sys.argv[1:], 'q:H:p1', ['quant=', 'height=', 'pause', 'once'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
+    self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
 
@@ -50,3 +51,9 @@ class Config:
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
+
+  def getheight(self, defaultheight):
+    if self.height is not None:
+      return self.height
+    else:
+      return defaultheight

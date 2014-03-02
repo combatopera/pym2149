@@ -91,7 +91,7 @@ def main():
     stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
     try:
       session = Session(chip.clock)
-      roll = Roll(f.framefreq, chip, f.clock)
+      roll = Roll(config.getheight(f.framefreq), chip, f.clock)
       for frame in f:
         chip.update(frame)
         roll.update()
