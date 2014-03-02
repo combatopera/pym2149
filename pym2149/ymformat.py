@@ -208,17 +208,18 @@ class Frame56(PlainFrame):
 class Frame5(Frame56):
 
   def __call__(self, chip):
+    PlainFrame.__call__(self, chip)
     if self.flags.logtimersynth and (self.data[0x1] & 0x30):
       log.warn("Timer-synth at frame %s.", self.index)
       self.flags.logtimersynth = False
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
-    PlainFrame.__call__(self, chip)
 
 class Frame6(Frame56):
 
   def __call__(self, chip):
+    PlainFrame.__call__(self, chip)
     for r in 0x1, 0x3:
       if self.data[r] & 0x30:
         fx = self.data[r] & 0xc0
@@ -234,7 +235,6 @@ class Frame6(Frame56):
         if self.flags.logsyncbuzzer and 0xc0 == fx:
           log.warn("Sync-buzzer at frame %s.", self.index)
           self.flags.logsyncbuzzer = False
-    PlainFrame.__call__(self, chip)
 
 class YM5(YM56):
 
