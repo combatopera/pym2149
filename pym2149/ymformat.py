@@ -94,9 +94,9 @@ class YM:
     return [ord(c) for c in self.f.read(self.framesize)]
 
   def step(self):
-    frame = self.readframe()
+    frame = self.frameobj(self)
     self.frameindex += 1
-    return PlainFrame(frame)
+    return frame
 
   def __iter__(self):
     while self.frameindex < self.framecount:
@@ -114,8 +114,8 @@ class YM:
 
 class PlainFrame:
 
-  def __init__(self, data):
-    self.data = data
+  def __init__(self, ym):
+    self.data = ym.readframe()
 
   def __call__(self, chip):
     for i, x in enumerate(self.data):
@@ -130,6 +130,7 @@ class YM23(YM):
   info = ()
   readframe = YM.interleavedframe
   loopinfo = None # Default, overridden in YM3b.
+  frameobj = PlainFrame
 
   def __init__(self, f):
     YM.__init__(self, f, False)
@@ -197,47 +198,58 @@ class YM56(YM):
     self.logtimersynth = True
     self.logdigidrum = True
 
+class Frame56(PlainFrame):
+
+  def __init__(self, ym):
+    PlainFrame.__init__(self, ym)
+    self.index = ym.frameindex
+    self.flags = ym
+
+class Frame5(Frame56):
+
+  def __call__(self, chip):
+    if self.flags.logtimersynth and (self.data[0x1] & 0x30):
+      log.warn("Timer-synth at frame %s.", self.index)
+      self.flags.logtimersynth = False
+    if self.flags.logdigidrum and (self.data[0x3] & 0x30):
+      log.warn("Digi-drum at frame %s.", self.index)
+      self.flags.logdigidrum = False
+    PlainFrame.__call__(self, chip)
+
+class Frame6(Frame56):
+
+  def __call__(self, chip):
+    for r in 0x1, 0x3:
+      if self.data[r] & 0x30:
+        fx = self.data[r] & 0xc0
+        if self.flags.logtimersynth and 0x00 == fx:
+          log.warn("Timer-synth at frame %s.", self.index)
+          self.flags.logtimersynth = False
+        if self.flags.logdigidrum and 0x40 == fx:
+          log.warn("Digi-drum at frame %s.", self.index)
+          self.flags.logdigidrum = False
+        if self.flags.logsinussid and 0x80 == fx:
+          log.warn("Sinus-SID at frame %s.", self.index)
+          self.flags.logsinussid = False
+        if self.flags.logsyncbuzzer and 0xc0 == fx:
+          log.warn("Sync-buzzer at frame %s.", self.index)
+          self.flags.logsyncbuzzer = False
+    PlainFrame.__call__(self, chip)
+
 class YM5(YM56):
 
   formatid = 'YM5!'
-
-  def __iter__(self):
-    for frame in YM.__iter__(self):
-      if self.logtimersynth and (frame.data[0x1] & 0x30):
-        log.warn("Timer-synth at frame %s.", self.frameindex - 1)
-        self.logtimersynth = False
-      if self.logdigidrum and (frame.data[0x3] & 0x30):
-        log.warn("Digi-drum at frame %s.", self.frameindex - 1)
-        self.logdigidrum = False
-      yield frame
+  frameobj = Frame5
 
 class YM6(YM56):
 
   formatid = 'YM6!'
+  frameobj = Frame6
 
   def __init__(self, *args, **kwargs):
     YM56.__init__(self, *args, **kwargs)
     self.logsinussid = True
     self.logsyncbuzzer = True
-
-  def __iter__(self):
-    for frame in YM.__iter__(self):
-      for r in 0x1, 0x3:
-        if frame.data[r] & 0x30:
-          fx = frame.data[r] & 0xc0
-          if self.logtimersynth and 0x00 == fx:
-            log.warn("Timer-synth at frame %s.", self.frameindex - 1)
-            self.logtimersynth = False
-          if self.logdigidrum and 0x40 == fx:
-            log.warn("Digi-drum at frame %s.", self.frameindex - 1)
-            self.logdigidrum = False
-          if self.logsinussid and 0x80 == fx:
-            log.warn("Sinus-SID at frame %s.", self.frameindex - 1)
-            self.logsinussid = False
-          if self.logsyncbuzzer and 0xc0 == fx:
-            log.warn("Sync-buzzer at frame %s.", self.frameindex - 1)
-            self.logsyncbuzzer = False
-      yield frame
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
