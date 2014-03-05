@@ -24,7 +24,7 @@ from pym2149.util import Session
 from pym2149.ym2149 import stclock as nomclock
 from pym2149.mix import IdealMixer
 from cli import Config
-import os
+import os, subprocess
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +61,7 @@ def main():
       stream.flush()
     finally:
       stream.close()
+    subprocess.check_call(['sox', path, '-n', 'spectrogram', '-o', path[:-len('wav')] + 'png'])
   chip.toneflags[0].value = True
   dump('1ktone.wav')
   chip.toneflags[0].value = False
