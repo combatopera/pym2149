@@ -50,8 +50,8 @@ class Samples:
     for c in xrange(chip.channels):
       chip.toneflags[c].value = False
       chip.noiseflags[c].value = False
-    chip.toneperiods[0].value = int(round(nomclock / (16 * tonenote)))
-    chip.noiseperiod.value = int(round(nomclock / (16 * noisenote)))
+    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
+    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
     chip.fixedlevels[0].value = 15
     sample(chip)
     name = sample.__name__

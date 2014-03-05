@@ -69,6 +69,9 @@ class Freq(float):
   def toneperiod(self, clock):
     return self.periodimpl(clock, 16)
 
+  def noiseperiod(self, clock):
+    return self.periodimpl(clock, 16) # First notch at freq.
+
   def envperiod(self, clock, shape):
     return self.periodimpl(clock, shapescale(shape))
 
