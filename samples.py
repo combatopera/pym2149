@@ -23,6 +23,7 @@ from pym2149.out import WavWriter
 from pym2149.util import Session
 from pym2149.ym2149 import stclock as nomclock
 from pym2149.mix import IdealMixer
+from pym2149.pitch import Freq
 from cli import Config
 import os, subprocess
 
@@ -33,8 +34,8 @@ seconds = 8 / 7 # Deliberately a non-nice number.
 tonenote = 1000 # First peak should have this frequency.
 noisenote = 5000 # First trough should have this frequency, authentic by qnoispec.
 sawnote = 600 # First peak should have this frequency.
-trinote = 1300 # First peak should have half this frequency.
-slowtrinote = 2 # Frequency and actual period are both 1.
+trinote = 650 # First peak should have this frequency.
+slowtrinote = 1 # Signal period is also 1.
 
 class Samples:
 
@@ -84,25 +85,25 @@ def main():
   samples.dump(_1ktone5knoise)
   def _600saw(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
     chip.envshape.value = 0x08
+    chip.envperiod.value = Freq(sawnote).envperiod(nomclock, chip.envshape.value)
   samples.dump(_600saw)
   def _600sin(chip):
     chip.levelmodes[0].value = 1
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
     chip.envshape.value = 0x10
+    chip.envperiod.value = Freq(sawnote).envperiod(nomclock, chip.envshape.value)
   samples.dump(_600sin)
   def _650tri(chip):
     chip.levelmodes[0].value = 1
-    chip.envperiod.value = int(round(nomclock / (256 * trinote)))
     chip.envshape.value = 0x0a
+    chip.envperiod.value = Freq(trinote).envperiod(nomclock, chip.envshape.value)
   samples.dump(_650tri)
   def _1tri1ktone5knoise(chip):
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
     chip.levelmodes[0].value = 1
-    chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
     chip.envshape.value = 0x0a
+    chip.envperiod.value = Freq(slowtrinote).envperiod(nomclock, chip.envshape.value)
   samples.dump(_1tri1ktone5knoise)
 
 if '__main__' == __name__:
