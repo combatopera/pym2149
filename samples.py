@@ -90,25 +90,15 @@ def main():
   def _600sin(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
     chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
-    chip.envshape.value = 0x08
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
     chip.envshape.value = 0x10
   samples.dump(_600sin)
   def _650tri(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
-    chip.envshape.value = 0x08
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
-    chip.envshape.value = 0x10
     chip.envperiod.value = int(round(nomclock / (256 * trinote)))
     chip.envshape.value = 0x0a
   samples.dump(_650tri)
   def _1tri1ktone5knoise(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
-    chip.envshape.value = 0x08
-    chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
-    chip.envshape.value = 0x10
     chip.envperiod.value = int(round(nomclock / (256 * trinote)))
     chip.envshape.value = 0x0a
     chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
