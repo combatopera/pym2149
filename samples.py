@@ -79,8 +79,8 @@ def main():
     chip.noiseflags[0].value = True
   samples.dump(_5knoise)
   def _1ktone5knoise(chip):
-    chip.noiseflags[0].value = True
     chip.toneflags[0].value = True
+    chip.noiseflags[0].value = True
   samples.dump(_1ktone5knoise)
   def _600saw(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
@@ -88,22 +88,21 @@ def main():
     chip.envshape.value = 0x08
   samples.dump(_600saw)
   def _600sin(chip):
-    chip.levelmodes[0].value = 1 # Envelope on.
+    chip.levelmodes[0].value = 1
     chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
     chip.envshape.value = 0x10
   samples.dump(_600sin)
   def _650tri(chip):
-    chip.levelmodes[0].value = 1 # Envelope on.
+    chip.levelmodes[0].value = 1
     chip.envperiod.value = int(round(nomclock / (256 * trinote)))
     chip.envshape.value = 0x0a
   samples.dump(_650tri)
   def _1tri1ktone5knoise(chip):
-    chip.levelmodes[0].value = 1 # Envelope on.
-    chip.envperiod.value = int(round(nomclock / (256 * trinote)))
-    chip.envshape.value = 0x0a
-    chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
+    chip.levelmodes[0].value = 1
+    chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
+    chip.envshape.value = 0x0a
   samples.dump(_1tri1ktone5knoise)
 
 if '__main__' == __name__:
