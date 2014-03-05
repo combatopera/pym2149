@@ -45,13 +45,13 @@ def main():
   chip.toneperiods[0].value = int(round(nomclock / (16 * tonenote)))
   chip.noiseperiod.value = int(round(nomclock / (16 * noisenote)))
   chip.fixedlevels[0].value = 15
-  targetpath = 'target'
+  targetpath = os.path.join(os.path.dirname(__file__), 'target')
   if not os.path.exists(targetpath):
     os.mkdir(targetpath)
-  def dump(path):
-    path = os.path.join(targetpath, path)
+  def dump(name):
+    path = os.path.join(targetpath, name)
     log.debug(path)
-    stream = WavWriter(chip.clock, IdealMixer(chip), path)
+    stream = WavWriter(chip.clock, IdealMixer(chip), path + '.wav')
     try:
       session = Session(chip.clock)
       # Closest number of frames to desired number of seconds:
@@ -61,30 +61,30 @@ def main():
       stream.flush()
     finally:
       stream.close()
-    subprocess.check_call(['sox', path, '-n', 'spectrogram', '-o', path[:-len('wav')] + 'png'])
+    subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
   chip.toneflags[0].value = True
-  dump('1ktone.wav')
+  dump('1ktone')
   chip.toneflags[0].value = False
   chip.noiseflags[0].value = True
-  dump('5knoise.wav')
+  dump('5knoise')
   chip.toneflags[0].value = True
-  dump('1ktone5knoise.wav')
+  dump('1ktone5knoise')
   chip.toneflags[0].value = False
   chip.noiseflags[0].value = False
   chip.levelmodes[0].value = 1 # Envelope on.
   chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
   chip.envshape.value = 0x08
-  dump('600saw.wav')
+  dump('600saw')
   chip.envperiod.value = int(round(nomclock / (256 * sawnote)))
   chip.envshape.value = 0x10
-  dump('600sin.wav')
+  dump('600sin')
   chip.envperiod.value = int(round(nomclock / (256 * trinote)))
   chip.envshape.value = 0x0a
-  dump('650tri.wav')
+  dump('650tri')
   chip.envperiod.value = int(round(nomclock / (256 * slowtrinote)))
   chip.toneflags[0].value = True
   chip.noiseflags[0].value = True
-  dump('1tri1ktone5knoise.wav')
+  dump('1tri1ktone5knoise')
 
 if '__main__' == __name__:
   main()
