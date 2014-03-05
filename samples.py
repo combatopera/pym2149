@@ -102,7 +102,7 @@ def main():
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
     chip.levelmodes[0].value = 1
-    chip.envshape.value = 0x0a
+    chip.envshape.value = 0x0e
     chip.envperiod.value = Freq(slowtrinote).envperiod(nomclock, chip.envshape.value)
   samples.dump(_1tri1ktone5knoise)
 
