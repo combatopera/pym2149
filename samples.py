@@ -45,8 +45,11 @@ def main():
   chip.toneperiods[0].value = int(round(nomclock / (16 * tonenote)))
   chip.noiseperiod.value = int(round(nomclock / (16 * noisenote)))
   chip.fixedlevels[0].value = 15
+  targetpath = 'target'
+  if not os.path.exists(targetpath):
+    os.mkdir(targetpath)
   def dump(path):
-    path = os.path.join('target', path)
+    path = os.path.join(targetpath, path)
     log.debug(path)
     stream = WavWriter(chip.clock, IdealMixer(chip), path)
     try:
