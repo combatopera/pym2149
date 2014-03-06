@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.out import WavWriter
-from pym2149.util import Session
+from pym2149.util import Timer
 from pym2149.ymformat import ymopen
 from pym2149.mix import IdealMixer
 from pym2149.pitch import Period
@@ -90,12 +90,12 @@ def main():
     chip = config.createchip(f.clock)
     stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
     try:
-      session = Session(chip.clock)
+      timer = Timer(chip.clock)
       roll = Roll(config.getheight(f.framefreq), chip, f.clock)
       for frame in f:
         frame(chip)
         roll.update()
-        for b in session.blocks(f.framefreq):
+        for b in timer.blocks(f.framefreq):
           stream.call(b)
       stream.flush()
     finally:

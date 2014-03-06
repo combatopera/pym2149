@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.util import Session
+from pym2149.util import Timer
 from pym2149.buf import singleton
 from pym2149.ym2149 import stclock as clock
 from pym2149.out import WavWriter
@@ -57,7 +57,7 @@ def getorlast(v, i):
 class Orc(dict):
 
   def __init__(self, ticksperbar):
-    self.sessions = []
+    self.timers = []
     self.ticksperbar = ticksperbar
 
   def add(self, cls):
@@ -71,19 +71,19 @@ class Orc(dict):
     return cls
 
   def __enter__(self):
-    self.sessions.append(Session(self.ticksperbar, None))
-    return OrcSession(self, self.sessions[-1])
+    self.timers.append(Timer(self.ticksperbar, None))
+    return OrcTimer(self, self.timers[-1])
 
   def __exit__(self, exc_type, exc_value, traceback):
-    self.sessions.pop() # It will log non-zero carry.
+    self.timers.pop() # It will log non-zero carry.
 
-class OrcSession:
+class OrcTimer:
 
   voidaction = NoteAction(voidnote)
 
-  def __init__(self, orc, session):
+  def __init__(self, orc, timer):
     self.orc = orc
-    self.session = session
+    self.timer = timer
 
   def __call__(self, beatsperbar, beats, *args, **kwargs):
     frames = []
@@ -99,7 +99,7 @@ class OrcSession:
         action = NoteAction(self.orc[char](*nargs, **nkwargs))
         paramindex += 1
       frames.append(action)
-      b, = self.session.blocks(beatsperbar)
+      b, = self.timer.blocks(beatsperbar)
       for _ in xrange(b.framecount - 1):
         frames.append(sustainaction)
     return frames
@@ -132,7 +132,7 @@ class Main:
     chip = config.createchip(clock)
     stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
     try:
-      session = Session(chip.clock)
+      timer = Timer(chip.clock)
       chanupdaters = [voidupdater] * chip.channels
       for frameindex, frame in enumerate(frames):
         for patternindex, action in enumerate(frame):
@@ -142,7 +142,7 @@ class Main:
             chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
-        for b in session.blocks(self.refreshrate):
+        for b in timer.blocks(self.refreshrate):
           stream.call(b)
       stream.flush()
     finally:

@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.ym2149 import stclock
 from pym2149.out import WavWriter
-from pym2149.util import Session
+from pym2149.util import Timer
 from pym2149.mix import IdealMixer
 from budgie import readbytecode
 from cli import Config
@@ -42,10 +42,10 @@ def main():
   chip = config.createchip(stclock)
   stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
   try:
-    session = Session(chip.clock)
-    dosound(bytecode, chip, session, stream)
+    timer = Timer(chip.clock)
+    dosound(bytecode, chip, timer, stream)
     log.info("Streaming %.3f extra seconds.", extraseconds)
-    for b in session.blocks(1 / extraseconds):
+    for b in timer.blocks(1 / extraseconds):
       stream.call(b)
     stream.flush()
   finally:

@@ -21,7 +21,7 @@ import logging, inspect
 
 log = logging.getLogger(__name__)
 
-class Session:
+class Timer:
 
   def __init__(self, clock, minblockrate = 100):
     if minblockrate is not None:

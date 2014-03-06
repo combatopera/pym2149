@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.out import WavWriter
-from pym2149.util import Session
+from pym2149.util import Timer
 from pym2149.ym2149 import stclock as nomclock
 from pym2149.mix import IdealMixer
 from pym2149.pitch import Freq
@@ -57,10 +57,10 @@ class Samples:
     log.debug(path)
     stream = WavWriter(chip.clock, IdealMixer(chip), path + '.wav')
     try:
-      session = Session(chip.clock)
+      timer = Timer(chip.clock)
       # Closest number of frames to desired number of seconds:
       for i in xrange(int(round(seconds * refreshrate))):
-        for b in session.blocks(refreshrate):
+        for b in timer.blocks(refreshrate):
           stream.call(b)
       stream.flush()
     finally:
