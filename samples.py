@@ -31,11 +31,6 @@ log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
 seconds = 8 / 7 # Deliberately a non-nice number.
-tonenote = 1000 # First peak should have this frequency.
-noisenote = 5000 # First trough should have this frequency, authentic by qnoispec.
-sawnote = 600 # First peak should have this frequency.
-trinote = 650 # First peak should have this frequency.
-slowtrinote = 1 # Signal period is also 1.
 
 class Samples:
 
@@ -76,7 +71,7 @@ def main():
   samples = Samples()
   def _1ktone(chip):
     chip.toneflags[0].value = True
-    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
+    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
   samples.dump(_1ktone)
   def _1k5tone(chip):
     chip.toneflags[0].value = True
@@ -88,37 +83,37 @@ def main():
   samples.dump(_250tone)
   def _5knoise(chip):
     chip.noiseflags[0].value = True
-    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
+    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
   samples.dump(_5knoise)
   def _1ktone5knoise(chip):
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
-    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
-    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
+    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
+    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
   samples.dump(_1ktone5knoise)
   def _600saw(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
     chip.envshape.value = 0x08
-    chip.envperiod.value = Freq(sawnote).envperiod(nomclock, chip.envshape.value)
+    chip.envperiod.value = Freq(600).envperiod(nomclock, chip.envshape.value)
   samples.dump(_600saw)
   def _600sin(chip):
     chip.levelmodes[0].value = 1
     chip.envshape.value = 0x10
-    chip.envperiod.value = Freq(sawnote).envperiod(nomclock, chip.envshape.value)
+    chip.envperiod.value = Freq(600).envperiod(nomclock, chip.envshape.value)
   samples.dump(_600sin)
   def _650tri(chip):
     chip.levelmodes[0].value = 1
     chip.envshape.value = 0x0a
-    chip.envperiod.value = Freq(trinote).envperiod(nomclock, chip.envshape.value)
+    chip.envperiod.value = Freq(650).envperiod(nomclock, chip.envshape.value)
   samples.dump(_650tri)
   def _1tri1ktone5knoise(chip):
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
-    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
-    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
+    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
+    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
     chip.levelmodes[0].value = 1
     chip.envshape.value = 0x0e
-    chip.envperiod.value = Freq(slowtrinote).envperiod(nomclock, chip.envshape.value)
+    chip.envperiod.value = Freq(1).envperiod(nomclock, chip.envshape.value)
   samples.dump(_1tri1ktone5knoise)
 
 if '__main__' == __name__:
