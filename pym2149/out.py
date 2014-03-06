@@ -48,6 +48,7 @@ class WavWriter(Node):
     self.chip = chip
 
   def callimpl(self):
+    # TODO: Unit-test that results do not depend on block size.
     chipbuf = self.chain(self.chip)
     diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
     # Index of the first sample we can't output yet:
