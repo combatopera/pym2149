@@ -76,6 +76,14 @@ def main():
   def _1ktone(chip):
     chip.toneflags[0].value = True
   samples.dump(_1ktone)
+  def _1k5tone(chip):
+    chip.toneflags[0].value = True
+    chip.toneperiods[0].value = Freq(1500).toneperiod(nomclock)
+  samples.dump(_1k5tone)
+  def _250tone(chip):
+    chip.toneflags[0].value = True
+    chip.toneperiods[0].value = Freq(250).toneperiod(nomclock)
+  samples.dump(_250tone)
   def _5knoise(chip):
     chip.noiseflags[0].value = True
   samples.dump(_5knoise)
