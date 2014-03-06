@@ -50,8 +50,6 @@ class Samples:
     for c in xrange(chip.channels):
       chip.toneflags[c].value = False
       chip.noiseflags[c].value = False
-    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
-    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
     chip.fixedlevels[0].value = 15
     # Minimise DC level:
     chip.fixedlevels[1].value = 13
@@ -78,6 +76,7 @@ def main():
   samples = Samples()
   def _1ktone(chip):
     chip.toneflags[0].value = True
+    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
   samples.dump(_1ktone)
   def _1k5tone(chip):
     chip.toneflags[0].value = True
@@ -89,10 +88,13 @@ def main():
   samples.dump(_250tone)
   def _5knoise(chip):
     chip.noiseflags[0].value = True
+    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
   samples.dump(_5knoise)
   def _1ktone5knoise(chip):
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
+    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
+    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
   samples.dump(_1ktone5knoise)
   def _600saw(chip):
     chip.levelmodes[0].value = 1 # Envelope on.
@@ -112,6 +114,8 @@ def main():
   def _1tri1ktone5knoise(chip):
     chip.toneflags[0].value = True
     chip.noiseflags[0].value = True
+    chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
+    chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
     chip.levelmodes[0].value = 1
     chip.envshape.value = 0x0e
     chip.envperiod.value = Freq(slowtrinote).envperiod(nomclock, chip.envshape.value)
