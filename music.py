@@ -72,12 +72,12 @@ class Orc(dict):
 
   def __enter__(self):
     self.timers.append(Timer(self.ticksperbar, None))
-    return OrcTimer(self, self.timers[-1])
+    return Play(self, self.timers[-1])
 
   def __exit__(self, exc_type, exc_value, traceback):
     self.timers.pop() # It will log non-zero carry.
 
-class OrcTimer:
+class Play:
 
   voidaction = NoteAction(voidnote)
 
