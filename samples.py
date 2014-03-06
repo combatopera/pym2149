@@ -53,6 +53,9 @@ class Samples:
     chip.toneperiods[0].value = Freq(tonenote).toneperiod(nomclock)
     chip.noiseperiod.value = Freq(noisenote).noiseperiod(nomclock)
     chip.fixedlevels[0].value = 15
+    # Minimise DC level:
+    chip.fixedlevels[1].value = 13
+    chip.fixedlevels[2].value = 13
     sample(chip)
     name = sample.__name__
     if name.startswith('_'):
