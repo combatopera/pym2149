@@ -38,8 +38,8 @@ class Config:
         return True
     return False
 
-  def __init__(self):
-    options, self.args = getopt.getopt(sys.argv[1:], 'q:H:p1', ['quant=', 'height=', 'pause', 'once'])
+  def __init__(self, args = sys.argv[1:]):
+    options, self.args = getopt.getopt(args, 'q:H:p1', ['quant=', 'height=', 'pause', 'once'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
     self.pause = self.booleanoption(options, ('-p', '--pause'))

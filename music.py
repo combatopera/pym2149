@@ -21,6 +21,7 @@ from pym2149.ym2149 import stclock as clock
 from pym2149.out import WavWriter
 from pym2149.mix import IdealMixer
 from cli import Config
+import sys
 
 @singleton
 class voidnote:
@@ -126,8 +127,8 @@ class Main:
   def __init__(self, refreshrate):
     self.refreshrate = refreshrate
 
-  def __call__(self, frames):
-    config = Config()
+  def __call__(self, frames, args = sys.argv[1:]):
+    config = Config(args)
     outpath, = config.args
     chip = config.createchip(clock)
     stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
