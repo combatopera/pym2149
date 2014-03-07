@@ -19,102 +19,125 @@
 
 from __future__ import division
 from pym2149.initlogging import logging
-from pym2149.out import WavWriter
-from pym2149.util import Timer
-from pym2149.ym2149 import stclock as nomclock
-from pym2149.mix import IdealMixer
 from pym2149.pitch import Freq
-from cli import Config
+from music import Orc, Main, clock as nomclock
 import os, subprocess
 
 log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
-seconds = 8 / 7 # Deliberately a non-nice number.
+orc = Orc(refreshrate) # A bar is exactly 1 second long.
 
-class Samples:
+class Boring:
+
+  def update(self, chip, chan, frame):
+    pass
+
+@orc.add
+class Silence(Boring):
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = False
+    chip.noiseflags[chan].value = False
+    chip.fixedlevels[chan].value = 13
+
+@orc.add
+class Tone(Boring):
+
+  def __init__(self, freq):
+    self.period = Freq(freq).toneperiod(nomclock)
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = True
+    chip.noiseflags[chan].value = False
+    chip.fixedlevels[chan].value = 15
+    chip.toneperiods[chan].value = self.period
+
+@orc.add
+class Noise(Boring):
+
+  def __init__(self, freq):
+    self.period = Freq(freq).noiseperiod(nomclock)
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = False
+    chip.noiseflags[chan].value = True
+    chip.fixedlevels[chan].value = 15
+    chip.noiseperiod.value = self.period
+
+@orc.add
+class Both(Boring):
+
+  def __init__(self, tfreq, nfreq):
+    self.tperiod = Freq(tfreq).toneperiod(nomclock)
+    self.nperiod = Freq(nfreq).noiseperiod(nomclock)
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = True
+    chip.noiseflags[chan].value = True
+    chip.fixedlevels[chan].value = 15
+    chip.toneperiods[chan].value = self.tperiod
+    chip.noiseperiod.value = self.nperiod
+
+@orc.add
+class Env(Boring):
+
+  def __init__(self, freq, shape):
+    self.period = Freq(freq).envperiod(nomclock, shape)
+    self.shape = shape
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = False
+    chip.noiseflags[chan].value = False
+    chip.levelmodes[chan].value = 1
+    chip.envperiod.value = self.period
+    chip.envshape.value = self.shape
+
+@orc.add
+class All(Boring):
+
+  def __init__(self, tfreq, nfreq, efreq, shape):
+    self.tperiod = Freq(tfreq).toneperiod(nomclock)
+    self.nperiod = Freq(nfreq).noiseperiod(nomclock)
+    self.eperiod = Freq(efreq).envperiod(nomclock, shape)
+    self.shape = shape
+
+  def noteon(self, chip, chan):
+    chip.toneflags[chan].value = True
+    chip.noiseflags[chan].value = True
+    chip.levelmodes[chan].value = 1
+    chip.toneperiods[chan].value = self.tperiod
+    chip.noiseperiod.value = self.nperiod
+    chip.envperiod.value = self.eperiod
+    chip.envshape.value = self.shape
+
+class Target:
+
+  with orc as play: dc0 = play(1, 'S')
+  main = Main(refreshrate)
 
   def __init__(self):
-    self.config = Config()
     self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
     if not os.path.exists(self.targetpath):
       os.mkdir(self.targetpath)
 
-  def dump(self, sample):
-    chip = self.config.createchip(nomclock)
-    for c in xrange(chip.channels):
-      chip.toneflags[c].value = False
-      chip.noiseflags[c].value = False
-    chip.fixedlevels[0].value = 15
-    # Minimise DC level:
-    chip.fixedlevels[1].value = 13
-    chip.fixedlevels[2].value = 13
-    sample(chip)
-    name = sample.__name__
-    if name.startswith('_'):
-      name = name[1:]
+  def dump(self, chan, name):
     path = os.path.join(self.targetpath, name)
     log.debug(path)
-    stream = WavWriter(chip.clock, IdealMixer(chip), path + '.wav')
-    try:
-      timer = Timer(chip.clock)
-      # Closest number of frames to desired number of seconds:
-      for i in xrange(int(round(seconds * refreshrate))):
-        for b in timer.blocks(refreshrate):
-          stream.call(b)
-      stream.flush()
-    finally:
-      stream.close()
+    self.main(zip(chan, self.dc0, self.dc0), [path + '.wav'])
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  samples = Samples()
-  def _1ktone(chip):
-    chip.toneflags[0].value = True
-    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
-  samples.dump(_1ktone)
-  def _1k5tone(chip):
-    chip.toneflags[0].value = True
-    chip.toneperiods[0].value = Freq(1500).toneperiod(nomclock)
-  samples.dump(_1k5tone)
-  def _250tone(chip):
-    chip.toneflags[0].value = True
-    chip.toneperiods[0].value = Freq(250).toneperiod(nomclock)
-  samples.dump(_250tone)
-  def _5knoise(chip):
-    chip.noiseflags[0].value = True
-    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
-  samples.dump(_5knoise)
-  def _1ktone5knoise(chip):
-    chip.toneflags[0].value = True
-    chip.noiseflags[0].value = True
-    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
-    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
-  samples.dump(_1ktone5knoise)
-  def _600saw(chip):
-    chip.levelmodes[0].value = 1 # Envelope on.
-    chip.envshape.value = 0x08
-    chip.envperiod.value = Freq(600).envperiod(nomclock, chip.envshape.value)
-  samples.dump(_600saw)
-  def _600sin(chip):
-    chip.levelmodes[0].value = 1
-    chip.envshape.value = 0x10
-    chip.envperiod.value = Freq(600).envperiod(nomclock, chip.envshape.value)
-  samples.dump(_600sin)
-  def _650tri(chip):
-    chip.levelmodes[0].value = 1
-    chip.envshape.value = 0x0a
-    chip.envperiod.value = Freq(650).envperiod(nomclock, chip.envshape.value)
-  samples.dump(_650tri)
-  def _1tri1ktone5knoise(chip):
-    chip.toneflags[0].value = True
-    chip.noiseflags[0].value = True
-    chip.toneperiods[0].value = Freq(1000).toneperiod(nomclock)
-    chip.noiseperiod.value = Freq(5000).noiseperiod(nomclock)
-    chip.levelmodes[0].value = 1
-    chip.envshape.value = 0x0e
-    chip.envperiod.value = Freq(1).envperiod(nomclock, chip.envshape.value)
-  samples.dump(_1tri1ktone5knoise)
+  target = Target()
+  with orc as play: target.dump(play(1, 'T', [250]), '250tone')
+  with orc as play: target.dump(play(1, 'T', [1000]), '1ktone')
+  with orc as play: target.dump(play(1, 'T', [1500]), '1k5tone')
+  with orc as play: target.dump(play(1, 'N', [5000]), '5knoise')
+  with orc as play: target.dump(play(1, 'B', [1000], [5000]), '1ktone5knoise')
+  with orc as play: target.dump(play(1, 'E', [600], [0x08]), '600saw')
+  with orc as play: target.dump(play(1, 'E', [600], [0x10]), '600sin')
+  with orc as play: target.dump(play(1, 'E', [650], [0x0a]), '650tri')
+  with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), '1tri1ktone5knoise')
 
 if '__main__' == __name__:
   main()
