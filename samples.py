@@ -129,15 +129,16 @@ class Target:
 
 def main():
   target = Target()
-  with orc as play: target.dump(play(1, 'T', [250]), '250tone')
-  with orc as play: target.dump(play(1, 'T', [1000]), '1ktone')
-  with orc as play: target.dump(play(1, 'T', [1500]), '1k5tone')
-  with orc as play: target.dump(play(1, 'N', [5000]), '5knoise')
-  with orc as play: target.dump(play(1, 'B', [1000], [5000]), '1ktone5knoise')
-  with orc as play: target.dump(play(1, 'E', [600], [0x08]), '600saw')
-  with orc as play: target.dump(play(1, 'E', [600], [0x10]), '600sin')
-  with orc as play: target.dump(play(1, 'E', [650], [0x0a]), '650tri')
-  with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), '1tri1ktone5knoise')
+  with orc as play: target.dump(play(1, 'T', [250]), 'tone250')
+  with orc as play: target.dump(play(1, 'T', [1000]), 'tone1k')
+  with orc as play: target.dump(play(1, 'T', [1500]), 'tone1k5')
+  with orc as play: target.dump(play(1, 'N', [5000]), 'noise5k')
+  with orc as play: target.dump(play(1, 'B', [1000], [5000]), 'tone1k+noise5k')
+  with orc as play: target.dump(play(1, 'E', [600], [0x08]), 'saw600')
+  with orc as play: target.dump(play(1, 'E', [600], [0x10]), 'sin600')
+  with orc as play: target.dump(play(1, 'E', [650], [0x0a]), 'tri650')
+  with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
+  with orc as play: target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
 
 if '__main__' == __name__:
   main()
