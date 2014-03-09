@@ -16,14 +16,17 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions
+import numpy as np, fractions, logging
 from nod import BufNode
+
+log = logging.getLogger(__name__)
 
 class MinBleps:
 
   minmag = np.exp(-100)
 
   def __init__(self, ctrlrate, outrate, scale, cutoff = .475, transition = .05):
+    log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2
@@ -59,6 +62,7 @@ class MinBleps:
     tmpi = np.int32(np.arange(ctrlrate) / ctrlrate * outrate * scale + .5)
     self.outi = (tmpi + scale - 1) // scale
     self.shape = self.outi * scale - tmpi
+    log.debug('%s minBLEPs created.', scale)
     self.ctrlrate = ctrlrate
     self.outrate = outrate
     self.scale = scale
