@@ -71,19 +71,42 @@ class OscNode(BufNode):
       self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
       self.progress = self.block.framecount - cursor
 
-class ToneOsc(OscNode):
-
-  values = Values(BufNode.binarydtype, (1 - (i & 1) for i in xrange(1000)))
+class ToneDiff(BufNode):
 
   def __init__(self, scale, periodreg):
+    BufNode.__init__(self, self.bindiffdtype)
     self.scaleofstep = scale * 2 // 2
-    OscNode.__init__(self, BufNode.binarydtype, periodreg)
+    self.progress = self.scaleofstep * 0xffff # Matching biggest possible 16-bit stepsize.
+    self.periodreg = periodreg
+    self.last = -1
 
   def callimpl(self):
-    self.stepsize = self.scaleofstep * self.periodreg.value
-    cursor = self.prolog()
+    self.blockbuf.fill(0)
+    stepsize = self.scaleofstep * self.periodreg.value
+    # If progress beats the new stepsize, we terminate right away:
+    cursor = min(self.block.framecount, max(0, stepsize - self.progress))
+    self.progress = min(self.progress + cursor, stepsize)
+    if cursor == self.block.framecount:
+      return
+    self.blockbuf.putstrided(cursor, stepsize * 2, -self.last)
+    self.blockbuf.putstrided(cursor + stepsize, stepsize * 2, self.last)
+    self.blockbuf.addtofirst((self.last + 1) // 2)
+    fullsteps = (self.block.framecount - cursor) // stepsize
+    if fullsteps & 1:
+      self.last = -self.last
+    cursor += fullsteps * stepsize
     if cursor < self.block.framecount:
-      self.common(cursor)
+      self.last = -self.last
+      self.progress = self.block.framecount - cursor
+
+class ToneOsc(BufNode):
+
+  def __init__(self, scale, periodreg):
+    BufNode.__init__(self, self.binarydtype)
+    self.diff = ToneDiff(scale, periodreg)
+
+  def callimpl(self):
+    self.blockbuf.integrate(self.chain(self.diff))
 
 class NoiseOsc(OscNode):
 
