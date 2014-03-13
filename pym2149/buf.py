@@ -45,6 +45,10 @@ class NullBuf(AnyBuf):
 
   def subbuf(self, *args): pass
 
+  def putstrided(self, *args): pass
+
+  def integrate(self, *args): pass
+
 class Buf(AnyBuf):
 
   def __init__(self, buf):
@@ -58,6 +62,17 @@ class Buf(AnyBuf):
 
   def fill(self, value):
     self.buf[:] = value
+
+  def putstrided(self, off, step, val):
+    self.buf[off::step] = val
+
+  def integrate(self, dc, that):
+    # We interfere with that to allow self to be unsigned:
+    that.buf[0] += dc
+    try:
+      np.cumsum(that.buf, out = self.buf)
+    finally:
+      that.buf[0] -= dc
 
   def mulbuf(self, that):
     self.buf *= that.buf
