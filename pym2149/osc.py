@@ -79,6 +79,7 @@ class ToneDiff(BufNode):
     self.progress = 0
     self.periodreg = periodreg
     self.last = -1
+    self.dc = 0
 
   def callimpl(self):
     stepsize = self.scaleofstep * self.periodreg.value
@@ -92,15 +93,16 @@ class ToneDiff(BufNode):
     periodsize = stepsize * 2
     self.blockbuf.putstrided(stepindex, periodsize, -self.last)
     self.blockbuf.putstrided(stepindex + stepsize, periodsize, self.last)
-    self.blockbuf.addtofirst((self.last + 1) // 2) # Add last value of previous integral.
+    self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
     # The last value changes iff we did an odd number of steps just now:
     if ((self.block.framecount - stepindex + stepsize - 1) // stepsize) & 1:
       self.last = -self.last
+      self.dc = 1 - self.dc
     return self.integral
 
   def hold(self, tonebuf):
-    tonebuf.fill((self.last + 1) // 2)
+    tonebuf.fill(self.dc)
 
   def integral(self, tonebuf):
     tonebuf.integrate(self.blockbuf)
