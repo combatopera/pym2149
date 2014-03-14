@@ -69,6 +69,16 @@ class TestToneOsc(unittest.TestCase):
     r.value = 0x01
     self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
 
+  def test_smallerblocksthanperiod(self):
+    r = Reg(0x05)
+    o = ToneOsc(1, r)
+    self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
+    self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
+    self.assertEqual([0,0,1], o.call(Block(3)).tolist())
+    self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
+    self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
+    self.assertEqual([1], o.call(Block(1)).tolist())
+
   def test_performance(self):
     blockrate = 50
     blocksize = 2000000 // blockrate
