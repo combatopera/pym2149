@@ -71,7 +71,9 @@ class BufNode(Node):
         self.blockbuf = NullBuf
       else:
         self.blockbuf = masterbuf.ensureandcrop(self.block.framecount * channels)
-      callimpl()
+      resultornone = callimpl()
+      if resultornone is not None:
+        return resultornone
       return self.blockbuf
     self.callimpl = callimploverride
     self.dtype = dtype
