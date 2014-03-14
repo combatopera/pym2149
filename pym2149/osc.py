@@ -81,23 +81,31 @@ class ToneDiff(BufNode):
     self.last = -1
 
   def callimpl(self):
-    self.blockbuf.fill(0)
     stepsize = self.scaleofstep * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
     stepindex = max(0, stepsize - self.progress)
     if stepindex >= self.block.framecount:
       # Next step of waveform is beyond this block:
-      if self.block.framecount: # TODO: This is dumb.
-        self.blockbuf.addtofirst((self.last + 1) // 2)
-        self.progress += self.block.framecount
-      return
+      self.progress += self.block.framecount
+      return self.dc
+    self.blockbuf.fill(0)
     periodsize = stepsize * 2
     self.blockbuf.putstrided(stepindex, periodsize, -self.last)
     self.blockbuf.putstrided(stepindex + stepsize, periodsize, self.last)
     self.blockbuf.addtofirst((self.last + 1) // 2) # Add last value of previous integral.
+    # TODO: Increase in stepsize should flip if we just finished a step.
+    # The new progress is the remainder with 0 mapped to stepsize:
     self.progress = stepsize - (stepindex - self.block.framecount) % stepsize
+    # The last value changes iff we did an odd number of steps just now:
     if ((self.block.framecount - stepindex + stepsize - 1) // stepsize) & 1:
       self.last = -self.last
+    return self.integral
+
+  def dc(self, tonebuf):
+    tonebuf.fill((self.last + 1) // 2)
+
+  def integral(self, tonebuf):
+    tonebuf.integrate(self.blockbuf)
 
 class ToneOsc(BufNode):
 
@@ -106,7 +114,7 @@ class ToneOsc(BufNode):
     self.diff = ToneDiff(scale, periodreg)
 
   def callimpl(self):
-    self.blockbuf.integrate(self.chain(self.diff))
+    self.chain(self.diff)(self.blockbuf)
 
 class NoiseOsc(OscNode):
 
