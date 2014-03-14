@@ -84,21 +84,21 @@ class ToneDiff(BufNode):
     self.blockbuf.fill(0)
     stepsize = self.scaleofstep * self.periodreg.value
     # If progress beats the new stepsize, we terminate right away:
-    cursor = min(self.block.framecount, max(0, stepsize - self.progress))
-    self.progress = min(self.progress + cursor, stepsize)
-    if cursor == self.block.framecount:
+    stepindex = min(self.block.framecount, max(0, stepsize - self.progress))
+    self.progress = min(self.progress + stepindex, stepsize)
+    if stepindex >= self.block.framecount:
       return # Next step of waveform is beyond this block.
     periodsize = stepsize * 2
-    self.blockbuf.putstrided(cursor, periodsize, -self.last)
-    self.blockbuf.putstrided(cursor + stepsize, periodsize, self.last)
+    self.blockbuf.putstrided(stepindex, periodsize, -self.last)
+    self.blockbuf.putstrided(stepindex + stepsize, periodsize, self.last)
     self.blockbuf.addtofirst((self.last + 1) // 2) # Add last value of previous integral.
-    fullsteps = (self.block.framecount - cursor) // stepsize
+    fullsteps = (self.block.framecount - stepindex) // stepsize
     if fullsteps & 1:
       self.last = -self.last
-    cursor += fullsteps * stepsize
-    if cursor < self.block.framecount:
+    stepindex += fullsteps * stepsize
+    if stepindex < self.block.framecount:
       self.last = -self.last
-      self.progress = self.block.framecount - cursor
+      self.progress = self.block.framecount - stepindex
 
 class ToneOsc(BufNode):
 
