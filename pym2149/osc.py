@@ -75,7 +75,7 @@ class ToneDiff(BufNode):
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
-    self.scaleofstep = scale * 2 // 2
+    self.scaleofstep = scale * 2 // 2 # Normally half of 16.
     self.progress = self.scaleofstep * 0xffff # Matching biggest possible 16-bit stepsize.
     self.periodreg = periodreg
     self.last = -1
@@ -87,10 +87,11 @@ class ToneDiff(BufNode):
     cursor = min(self.block.framecount, max(0, stepsize - self.progress))
     self.progress = min(self.progress + cursor, stepsize)
     if cursor == self.block.framecount:
-      return
-    self.blockbuf.putstrided(cursor, stepsize * 2, -self.last)
-    self.blockbuf.putstrided(cursor + stepsize, stepsize * 2, self.last)
-    self.blockbuf.addtofirst((self.last + 1) // 2)
+      return # Next step of waveform is beyond this block.
+    periodsize = stepsize * 2
+    self.blockbuf.putstrided(cursor, periodsize, -self.last)
+    self.blockbuf.putstrided(cursor + stepsize, periodsize, self.last)
+    self.blockbuf.addtofirst((self.last + 1) // 2) # Add last value of previous integral.
     fullsteps = (self.block.framecount - cursor) // stepsize
     if fullsteps & 1:
       self.last = -self.last
