@@ -60,11 +60,15 @@ class TestToneOsc(unittest.TestCase):
     o = ToneOsc(8, r)
     self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
     r.value = 0x02
-    self.assertEqual([0] * 8 + [1] * 16 + [0], o.call(Block(25)).tolist())
+    self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
+    r.value = 0x03
+    self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
 
   def test_decreaseperiodonboundary(self):
-    r = Reg(0x02)
+    r = Reg(0x03)
     o = ToneOsc(8, r)
+    self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
+    r.value = 0x02
     self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
     r.value = 0x01
     self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
