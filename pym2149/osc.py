@@ -76,32 +76,30 @@ class ToneDiff(BufNode):
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
     self.scaleofstep = scale * 2 // 2 # Normally half of 16.
-    self.progress = self.scaleofstep * 0xffff # Matching biggest possible 16-bit stepsize.
+    self.progress = 0
     self.periodreg = periodreg
     self.last = -1
 
   def callimpl(self):
     stepsize = self.scaleofstep * self.periodreg.value
-    # If progress beats the new stepsize, we terminate right away:
-    stepindex = max(0, stepsize - self.progress)
+    # If progress beats the new stepsize, we step right away:
+    stepindex = self.progress and max(0, stepsize - self.progress)
     if stepindex >= self.block.framecount:
       # Next step of waveform is beyond this block:
       self.progress += self.block.framecount
-      return self.dc
+      return self.hold
     self.blockbuf.fill(0)
     periodsize = stepsize * 2
     self.blockbuf.putstrided(stepindex, periodsize, -self.last)
     self.blockbuf.putstrided(stepindex + stepsize, periodsize, self.last)
     self.blockbuf.addtofirst((self.last + 1) // 2) # Add last value of previous integral.
-    # TODO: Increase in stepsize should flip if we just finished a step.
-    # The new progress is the remainder with 0 mapped to stepsize:
-    self.progress = stepsize - (stepindex - self.block.framecount) % stepsize
+    self.progress = (self.block.framecount - stepindex) % stepsize
     # The last value changes iff we did an odd number of steps just now:
     if ((self.block.framecount - stepindex + stepsize - 1) // stepsize) & 1:
       self.last = -self.last
     return self.integral
 
-  def dc(self, tonebuf):
+  def hold(self, tonebuf):
     tonebuf.fill((self.last + 1) // 2)
 
   def integral(self, tonebuf):
