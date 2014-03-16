@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np, time
+import unittest, numpy as np, time, sys
 from nod import Node, Block
 from buf import Buf
 from out import WavWriter
@@ -36,7 +36,9 @@ class MinPeriodTone(Node):
   def callimpl(self):
     return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
 
-def minperiodperformance(bigblocks):
+class TestWavWriter(unittest.TestCase):
+
+  def minperiodperformance(self, bigblocks, strictlimit):
     clock = 250000
     blocksize = clock // (1000, 10)[bigblocks]
     tone = MinPeriodTone()
@@ -48,15 +50,15 @@ def minperiodperformance(bigblocks):
       w.call(block)
       tone.cursor += block.framecount
     w.close()
-    return time.time() - start
-
-class TestWavWriter(unittest.TestCase):
+    expression = "%.3f < %s" % (time.time() - start, strictlimit)
+    print >> sys.stderr, expression
+    self.assertTrue(eval(expression))
 
   def test_minperiodperformancesmallblocks(self):
-    self.assertTrue(minperiodperformance(False) < 1)
+    self.minperiodperformance(False, 1)
 
   def test_minperiodperformancebigblocks(self):
-    self.assertTrue(minperiodperformance(True) < 3) # FIXME: Get this under a second.
+    self.minperiodperformance(True, 3) # FIXME: Get this under a second.
 
 if __name__ == '__main__':
   unittest.main()
