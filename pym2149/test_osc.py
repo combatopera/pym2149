@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import unittest, lfsr, time
+import unittest, lfsr, time, sys
 from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize
 from nod import Block
 from reg import Reg
@@ -92,7 +92,12 @@ class TestToneOsc(unittest.TestCase):
       start = time.time()
       for _ in xrange(blockrate):
         o.call(Block(blocksize))
-      self.assertTrue(time.time() - start < .05)
+      cmptime(self, time.time() - start, .05)
+
+def cmptime(self, taken, strictlimit):
+  expression = "%.3f < %s" % (taken, strictlimit)
+  print >> sys.stderr, expression
+  self.assertTrue(eval(expression))
 
 class TestNoiseOsc(unittest.TestCase):
 
@@ -124,7 +129,7 @@ class TestNoiseOsc(unittest.TestCase):
       start = time.time()
       for _ in xrange(blockrate):
         o.call(Block(blocksize))
-      self.assertTrue(time.time() - start < .05)
+      cmptime(self, time.time() - start, .05)
 
 class TestEnvOsc(unittest.TestCase):
 
