@@ -130,35 +130,35 @@ class TestEnvOsc(unittest.TestCase):
 
   def test_values(self):
     v = EnvOsc.values0c
-    self.assertEqual(1024, v.buf.shape[0])
+    self.assertEqual(EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(0, v.loop)
     self.assertEqual(range(32) + range(32), list(v.buf[:64]))
     v = EnvOsc.values08
-    self.assertEqual(1024, v.buf.shape[0])
+    self.assertEqual(EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(0, v.loop)
     self.assertEqual(range(31, -1, -1) + range(31, -1, -1), list(v.buf[:64]))
     v = EnvOsc.values0e
-    self.assertEqual(1024, v.buf.shape[0])
+    self.assertEqual(EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(0, v.loop)
     self.assertEqual(range(32) + range(31, -1, -1) + range(32), list(v.buf[:96]))
     v = EnvOsc.values0a
-    self.assertEqual(1024, v.buf.shape[0])
+    self.assertEqual(EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(0, v.loop)
     self.assertEqual(range(31, -1, -1) + range(32) + range(31, -1, -1), list(v.buf[:96]))
     v = EnvOsc.values0f
-    self.assertEqual(1032, v.buf.shape[0])
+    self.assertEqual(32 + EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(32, v.loop)
     self.assertEqual(range(32) + [0] * 32, list(v.buf[:64]))
     v = EnvOsc.values0d
-    self.assertEqual(1032, v.buf.shape[0])
+    self.assertEqual(32 + EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(32, v.loop)
     self.assertEqual(range(32) + [31] * 32, list(v.buf[:64]))
     v = EnvOsc.values0b
-    self.assertEqual(1032, v.buf.shape[0])
+    self.assertEqual(32 + EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(32, v.loop)
     self.assertEqual(range(31, -1, -1) + [31] * 32, list(v.buf[:64]))
     v = EnvOsc.values09
-    self.assertEqual(1032, v.buf.shape[0])
+    self.assertEqual(32 + EnvOsc.loopsize, v.buf.shape[0])
     self.assertEqual(32, v.loop)
     self.assertEqual(range(31, -1, -1) + [0] * 32, list(v.buf[:64]))
 
@@ -187,6 +187,13 @@ class TestEnvOsc(unittest.TestCase):
       for i in xrange(32):
         self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
       self.assertEqual([0] * (8 * 3 * 34), o.call(Block(8 * 3 * 34)).tolist())
+
+  def test_09loop(self):
+    o = EnvOsc(1, Reg(1), Reg(0x09))
+    self.assertEqual(range(31, -1, -1), o.call(Block(32)).tolist())
+    m = EnvOsc.loopsize - 10
+    self.assertEqual([0] * m, o.call(Block(m)).tolist())
+    self.assertEqual([0] * 20, o.call(Block(20)).tolist())
 
   def test_0a(self):
     shapereg = Reg(0x0a)

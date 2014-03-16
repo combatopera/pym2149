@@ -23,6 +23,8 @@ from buf import Ring
 
 class OscNode(BufNode):
 
+  loopsize = 1024
+
   def __init__(self, dtype, periodreg):
     BufNode.__init__(self, dtype)
     self.reset()
@@ -126,8 +128,10 @@ class NoiseOsc(OscNode):
       self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
       self.common(cursor)
 
-def cycle(v, minsize): # Unlike itertools version, we assume v can be iterated more than once.
-  for _ in xrange((minsize + len(v) - 1) // len(v)):
+def cycle(v, size): # Unlike itertools version, we assume v can be iterated more than once.
+  if 0 != size % len(v):
+    raise Exception("Size %s is not a multiple of unit size %s." % (size, len(v)))
+  for _ in xrange(size // len(v)):
     for x in v:
       yield x
 
@@ -137,19 +141,19 @@ def sinering(steps): # Like saw but unlike triangular, we use steps for a full w
   for i in xrange(steps):
     amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
     levels.append(round(amptolevel(amp)))
-  return Ring(BufNode.zto255dtype, cycle(levels, 1000))
+  return Ring(BufNode.zto255dtype, cycle(levels, OscNode.loopsize))
 
 class EnvOsc(OscNode):
 
   steps = 32
-  values0c = Ring(BufNode.zto255dtype, cycle(range(steps), 1000))
-  values08 = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1), 1000))
-  values0e = Ring(BufNode.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1), 1000))
-  values0a = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps), 1000))
-  values0f = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(0, 1000)), steps)
-  values0d = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(steps - 1, 1000)), steps)
-  values0b = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, 1000)), steps)
-  values09 = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, 1000)), steps)
+  values0c = Ring(BufNode.zto255dtype, cycle(range(steps), OscNode.loopsize))
+  values08 = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1), OscNode.loopsize))
+  values0e = Ring(BufNode.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1), OscNode.loopsize))
+  values0a = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps), OscNode.loopsize))
+  values0f = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(0, OscNode.loopsize)), steps)
+  values0d = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), itertools.repeat(steps - 1, OscNode.loopsize)), steps)
+  values0b = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(steps - 1, OscNode.loopsize)), steps)
+  values09 = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), itertools.repeat(0, OscNode.loopsize)), steps)
   values10 = sinering(steps)
 
   def __init__(self, scale, periodreg, shapereg):
