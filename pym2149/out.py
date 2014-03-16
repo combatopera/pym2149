@@ -25,10 +25,26 @@ log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
+  def __init__(self, clock, chip, path):
+    Node.__init__(self)
+    self.wavbuf = WavBuf(clock, chip)
+    self.f = Wave16(path, self.wavbuf.outrate)
+
+  def callimpl(self):
+    self.f.block(self.chain(self.wavbuf))
+
+  def flush(self):
+    self.f.flush()
+
+  def close(self):
+    self.f.close()
+
+class WavBuf(Node):
+
   outrate = 44100
   indexdtype = np.int32
 
-  def __init__(self, clock, chip, path):
+  def __init__(self, clock, chip):
     Node.__init__(self)
     # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
@@ -40,7 +56,6 @@ class WavWriter(Node):
     # Need space for a whole mixin in case it is rooted at outz:
     self.overflowsize = self.minbleps.mixinsize
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))
-    self.f = Wave16(path, self.outrate)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
     self.out0 = 0 # Absolute index of first output sample being processed next iteration.
@@ -68,17 +83,11 @@ class WavWriter(Node):
     pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shape, amp, self.indexdtype(self.minbleps.scale))
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
-    self.f.block(wavbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
     self.out0 = outz
-
-  def flush(self):
-    self.f.flush()
-
-  def close(self):
-    self.f.close()
+    return wavbuf
 
 def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
