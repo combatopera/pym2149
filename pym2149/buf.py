@@ -20,6 +20,12 @@ import numpy as np
 def singleton(f):
   return f()
 
+class Ring:
+
+  def __init__(self, dtype, g, loop = 0):
+    self.buf = np.fromiter(g, dtype)
+    self.loop = loop
+
 class AnyBuf:
 
   @staticmethod
