@@ -1,2 +1,1 @@
-^ymtests/dosound.[.]py$
-^ymtests/q.+[.]py$
+-path './ymtests/dosound?.py' -or -path './ymtests/q?*.py'
