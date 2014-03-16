@@ -57,7 +57,7 @@ class Multiplexer(BufNode):
 
   def callimpl(self):
     for i, stream in enumerate(self.streams):
-      self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount)
+      self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount, None)
 
 class IdealMixer(BufNode):
 

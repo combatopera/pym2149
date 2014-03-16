@@ -29,7 +29,7 @@ class Ring:
 class AnyBuf:
 
   @staticmethod
-  def putringops(ring, ringstart, ringn, ringloop = 0):
+  def putringops(ring, ringstart, ringn, ringloop):
     ringsize = ring.shape[0]
     ops = 0
     while ringn:
@@ -86,7 +86,7 @@ class Buf(AnyBuf):
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
 
-  def putring(self, start, step, ring, ringstart, ringn, ringloop = 0):
+  def putring(self, start, step, ring, ringstart, ringn, ringloop):
     ringsize = ring.shape[0]
     while ringn:
       n = min(ringsize - ringstart, ringn)

@@ -53,9 +53,9 @@ class OscNode(BufNode):
 
   def common(self, cursor):
     fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps, self.values.loop) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps)
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps, self.values.loop)
       self.getvalue(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
