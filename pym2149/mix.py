@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode
+from buf import MasterBuf
 
 class BinMix(BufNode):
 
@@ -61,12 +62,23 @@ class Multiplexer(BufNode):
 
 class IdealMixer(BufNode):
 
-  def __init__(self, container):
+  def __init__(self, container, amps = None):
     BufNode.__init__(self, self.floatdtype)
     self.datum = self.dtype(2 ** 14.5) # Half power point, very close to -3 dB.
+    if amps is not None:
+      self.contrib = MasterBuf(self.dtype)
     self.container = container
+    self.ampsornone = amps
 
   def callimpl(self):
     self.blockbuf.fill(self.datum)
-    for buf in self.chain(self.container):
-      self.blockbuf.subbuf(buf)
+    if self.ampsornone is not None:
+      contrib = self.contrib.ensureandcrop(self.block.framecount)
+      for buf, amp in zip(self.chain(self.container), self.ampsornone):
+        if amp:
+          contrib.copybuf(buf)
+          contrib.mul(amp)
+          self.blockbuf.subbuf(contrib)
+    else:
+      for buf in self.chain(self.container):
+        self.blockbuf.subbuf(buf)
