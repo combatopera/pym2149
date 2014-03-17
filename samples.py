@@ -21,7 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from music import Orc, Main, clock as nomclock
-import os, subprocess
+import os, subprocess, time
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +124,10 @@ class Target:
   def dump(self, chan, name):
     path = os.path.join(self.targetpath, name)
     log.debug(path)
-    self.main(zip(chan, self.dc0, self.dc0), [path + '.wav'])
+    frames = zip(chan, self.dc0, self.dc0)
+    start = time.time()
+    self.main(frames, ['--quant', '3', path + '.wav'])
+    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
