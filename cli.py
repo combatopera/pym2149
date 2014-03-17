@@ -18,6 +18,8 @@
 from __future__ import division
 import sys, logging, getopt
 from pym2149.ym2149 import YM2149, defaultscale
+from pym2149.out import WavWriter
+from pym2149.mix import IdealMixer
 
 log = logging.getLogger(__name__)
 
@@ -39,11 +41,12 @@ class Config:
     return False
 
   def __init__(self, args = sys.argv[1:]):
-    options, self.args = getopt.getopt(args, 'q:H:p1', ['quant=', 'height=', 'pause', 'once'])
+    options, self.args = getopt.getopt(args, 'q:H:p1s', ['quant=', 'height=', 'pause', 'once', 'stereo'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
+    self.stereo = self.booleanoption(options, ('-s', '--stereo'))
 
   def createchip(self, nominalclock, **kwargs):
     chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
@@ -51,6 +54,9 @@ class Config:
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
+
+  def createstream(self, chip, outpath):
+    return WavWriter(chip.clock, IdealMixer(chip), outpath)
 
   def getheight(self, defaultheight):
     if self.height is not None:

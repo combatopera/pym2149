@@ -18,10 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.out import WavWriter
 from pym2149.util import Timer
 from pym2149.ymformat import ymopen
-from pym2149.mix import IdealMixer
 from pym2149.pitch import Period
 from cli import Config
 import sys
@@ -88,7 +86,7 @@ def main():
     for info in f.info:
       log.info(info)
     chip = config.createchip(f.clock)
-    stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
+    stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)
       roll = Roll(config.getheight(f.framefreq), chip, f.clock)

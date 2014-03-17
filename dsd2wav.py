@@ -20,9 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.ym2149 import stclock
-from pym2149.out import WavWriter
 from pym2149.util import Timer
-from pym2149.mix import IdealMixer
 from cli import Config
 
 log = logging.getLogger(__name__)
@@ -37,7 +35,7 @@ def main():
   finally:
     f.close()
   chip = config.createchip(stclock)
-  stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
+  stream = config.createstream(chip, outpath)
   try:
     dosound(bytecode, chip, Timer(chip.clock), stream)
     stream.flush()

@@ -18,8 +18,6 @@
 from pym2149.util import Timer
 from pym2149.buf import singleton
 from pym2149.ym2149 import stclock as clock
-from pym2149.out import WavWriter
-from pym2149.mix import IdealMixer
 from cli import Config
 import sys
 
@@ -131,7 +129,7 @@ class Main:
     config = Config(args)
     outpath, = config.args
     chip = config.createchip(clock)
-    stream = WavWriter(chip.clock, IdealMixer(chip), outpath)
+    stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)
       chanupdaters = [voidupdater] * chip.channels
