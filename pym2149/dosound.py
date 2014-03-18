@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-def dosound(bytecode, chip, session, stream):
+def dosound(bytecode, chip, timer, stream):
   def g():
     for b in bytecode:
       yield b & 0xff # It's supposed to be bytecode.
   g = g()
   def tick():
-    for b in session.blocks(50): # Authentic period.
+    for b in timer.blocks(50): # Authentic period.
       stream.call(b)
   while True:
     ctrl = g.next()
