@@ -20,18 +20,24 @@ from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import Node, BufNode
 from wav import Wave16
+from mix import Multiplexer
 
 log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
-  def __init__(self, clock, chip, path):
+  def __init__(self, wavs, path):
     Node.__init__(self)
-    self.wavbuf = WavBuf(clock, chip)
-    self.f = Wave16(path, self.wavbuf.outrate)
+    outrates = set(wav.outrate for wav in wavs)
+    outrate, = outrates
+    self.f = Wave16(path, outrate, len(wavs))
+    try:
+      self.data, = wavs
+    except ValueError:
+      self.data = Multiplexer(self.f.dtype, wavs)
 
   def callimpl(self):
-    self.f.block(self.chain(self.wavbuf))
+    self.f.block(self.chain(self.data))
 
   def flush(self):
     self.f.flush()

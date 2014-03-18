@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from nod import BufNode
+from nod import BufNode, Node
 from buf import MasterBuf
 
 class BinMix(BufNode):
@@ -44,21 +44,25 @@ class BinMix(BufNode):
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
 
-class Multiplexer(BufNode):
+# TODO: This could be a BufNode if block size could be spoofed for downstream.
+class Multiplexer(Node):
 
-  @staticmethod
-  def commondtype(*nodes):
-    dtypes = set(n.dtype for n in nodes)
-    dtype, = dtypes
-    return dtype
-
-  def __init__(self, *streams):
-    BufNode.__init__(self, self.commondtype(*streams), len(streams))
+  def __init__(self, dtype, streams):
+    Node.__init__(self)
+    self.multi = MasterBuf(dtype)
+    self.channels = len(streams)
     self.streams = streams
 
   def callimpl(self):
     for i, stream in enumerate(self.streams):
-      self.blockbuf.putring(i, len(self.streams), self.chain(stream).buf, 0, self.block.framecount, None)
+      buf = self.chain(stream)
+      try:
+        multi
+      except NameError:
+        size = len(buf)
+        multi = self.multi.ensureandcrop(size * self.channels)
+      multi.putring(i, self.channels, buf.buf, 0, size, None)
+    return multi
 
 class IdealMixer(BufNode):
 

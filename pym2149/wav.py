@@ -24,7 +24,7 @@ class Wave16:
   hugefilesize = 0x80000000
   dtype = np.int16
 
-  def __init__(self, path, rate):
+  def __init__(self, path, rate, channels):
     if '-' == path:
       self.f = sys.stdout
     else:
@@ -35,7 +35,6 @@ class Wave16:
     self.f.write('WAVEfmt ') # Observe trailing space.
     self.writen(16) # Chunk data size.
     self.writen(1, 2) # PCM (uncompressed).
-    channels = 1
     self.writen(channels, 2)
     self.writen(rate)
     bytesperframe = self.bytespersample * channels

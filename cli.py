@@ -18,7 +18,7 @@
 from __future__ import division
 import sys, logging, getopt
 from pym2149.ym2149 import YM2149, defaultscale
-from pym2149.out import WavWriter
+from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
 
 log = logging.getLogger(__name__)
@@ -56,7 +56,12 @@ class Config:
     return chip
 
   def createstream(self, chip, outpath):
-    return WavWriter(chip.clock, IdealMixer(chip), outpath)
+    if self.stereo:
+      midamp = .5 # TODO: Adjust.
+      naives = [IdealMixer(chip, amps) for amps in ([1, midamp, 0], [0, midamp, 1])]
+    else:
+      naives = [IdealMixer(chip)]
+    return WavWriter([WavBuf(chip.clock, naive) for naive in naives], outpath)
 
   def getheight(self, defaultheight):
     if self.height is not None:
