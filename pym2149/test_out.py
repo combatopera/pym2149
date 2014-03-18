@@ -20,7 +20,7 @@
 import unittest, numpy as np, time, sys
 from nod import Node, Block
 from buf import Buf
-from out import WavWriter
+from out import WavWriter, WavBuf
 
 class MinPeriodTone(Node):
 
@@ -42,7 +42,7 @@ class TestWavWriter(unittest.TestCase):
     clock = 250000
     blocksize = clock // (1000, 10)[bigblocks]
     tone = MinPeriodTone()
-    w = WavWriter(clock, tone, '/dev/null')
+    w = WavWriter([WavBuf(clock, tone)], '/dev/null')
     tone.cursor = 0
     start = time.time()
     while tone.cursor < tone.size:
