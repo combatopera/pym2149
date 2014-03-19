@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, getopt
+import sys, logging, getopt, numpy as np
 from pym2149.ym2149 import YM2149, defaultscale
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
