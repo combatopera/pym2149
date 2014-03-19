@@ -41,9 +41,10 @@ class Config:
     return False
 
   def __init__(self, args = sys.argv[1:]):
-    options, self.args = getopt.getopt(args, 'q:H:p1s', ['quant=', 'height=', 'pause', 'once', 'stereo'])
+    options, self.args = getopt.getopt(args, 'q:H:l:p1s', ['quant=', 'height=', 'law=', 'pause', 'once', 'stereo'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
+    self.panlaw = self.uniqueoption(options, ('-l', '--law'), 3, float)
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
@@ -55,10 +56,20 @@ class Config:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
 
+  def amppair(self, loc):
+    l = ((1 - loc) / 2) ** (self.panlaw / 6)
+    r = ((1 + loc) / 2) ** (self.panlaw / 6)
+    return l, r
+
+  maxpan = .8
+
   def createstream(self, chip, outpath):
     if self.stereo:
-      midamp = .5 # TODO: Adjust.
-      naives = [IdealMixer(chip, amps) for amps in ([1, midamp, 0], [0, midamp, 1])]
+      n = chip.channels
+      locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
+      amppairs = [self.amppair(loc) for loc in locs]
+      chantoamps = zip(*amppairs)
+      naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
     return WavWriter([WavBuf(chip.clock, naive) for naive in naives], outpath)
