@@ -61,7 +61,7 @@ class Config:
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
 
-  maxpan = .8
+  maxpan = .75
 
   def createstream(self, chip, outpath):
     if self.stereo:
