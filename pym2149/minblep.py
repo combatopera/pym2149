@@ -58,6 +58,7 @@ class MinBleps:
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
+    # XXX: Can index mapping be simplified by pre-padding with zeros?
     # The ctrlrate and outrate will line up at 1 second:
     tmpi = np.int32(np.arange(ctrlrate) / ctrlrate * outrate * scale + .5)
     self.outi = (tmpi + scale - 1) // scale
