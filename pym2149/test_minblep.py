@@ -20,6 +20,7 @@
 import unittest, numpy as np
 from minblep import MinBleps
 from nod import BufNode
+from collections import namedtuple
 
 class TestMinBleps(unittest.TestCase):
 
@@ -38,65 +39,82 @@ class TestMinBleps(unittest.TestCase):
     minbleps = MinBleps(ctrlrate, outrate, scale)
     self.assertEqual(12, minbleps.idealscale)
     mixins = []
+    MixinInfo = namedtuple('MixinInfo', 'outi shape data')
     for x in xrange(ctrlrate * 2):
       outi, shape = minbleps.getoutindexandshape(x)
-      mixin = minbleps.minblep[shape::scale]
-      mixins.append((outi, mixin))
+      data = minbleps.minblep[shape::scale]
+      mixins.append(MixinInfo(outi, shape, data))
     return mixins
 
   def test_sharing(self):
     mixins = self.getmixins(4) # A third of the ideal.
     for x in xrange(0, 2):
-      self.assertEqual(0, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(0, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(2, 5):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[3][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(3, mixins[x].shape)
+      self.assertTrue((mixins[3].data == mixins[x].data).all())
     for x in xrange(5, 8):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[6][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(2, mixins[x].shape)
+      self.assertTrue((mixins[6].data == mixins[x].data).all())
     for x in xrange(8, 11):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[9][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(1, mixins[x].shape)
+      self.assertTrue((mixins[9].data == mixins[x].data).all())
     for x in xrange(11, 14):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(14, 17):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[3][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(3, mixins[x].shape)
+      self.assertTrue((mixins[3].data == mixins[x].data).all())
     for x in xrange(17, 20):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[6][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(2, mixins[x].shape)
+      self.assertTrue((mixins[6].data == mixins[x].data).all())
     for x in xrange(20, 23):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[9][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(1, mixins[x].shape)
+      self.assertTrue((mixins[9].data == mixins[x].data).all())
     for x in xrange(23, 24):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
 
   def test_sharing2(self):
     mixins = self.getmixins(3) # A quarter of the ideal.
     for x in xrange(0, 2):
-      self.assertEqual(0, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(0, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(2, 6):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[4][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(2, mixins[x].shape)
+      self.assertTrue((mixins[4].data == mixins[x].data).all())
     for x in xrange(6, 10):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[8][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(1, mixins[x].shape)
+      self.assertTrue((mixins[8].data == mixins[x].data).all())
     for x in xrange(10, 14):
-      self.assertEqual(1, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(14, 18):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[4][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(2, mixins[x].shape)
+      self.assertTrue((mixins[4].data == mixins[x].data).all())
     for x in xrange(18, 22):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[8][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(1, mixins[x].shape)
+      self.assertTrue((mixins[8].data == mixins[x].data).all())
     for x in xrange(22, 24):
-      self.assertEqual(2, mixins[x][0])
-      self.assertTrue((mixins[0][1] == mixins[x][1]).all())
+      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(0, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
 
 if __name__ == '__main__':
   unittest.main()
