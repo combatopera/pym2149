@@ -21,6 +21,9 @@ from nod import BufNode
 
 log = logging.getLogger(__name__)
 
+def round(v):
+  return np.int32(v + .5)
+
 class MinBleps:
 
   minmag = np.exp(-100)
@@ -60,9 +63,9 @@ class MinBleps:
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     # XXX: Can index mapping be simplified by pre-padding with zeros?
     # The ctrlrate and outrate will line up at 1 second:
-    tmpi = np.int32(np.round(np.arange(ctrlrate) / ctrlrate * outrate * scale))
-    self.outi = (tmpi + scale - 1) // scale
-    self.shape = self.outi * scale - tmpi
+    nearest = round(np.arange(ctrlrate) / ctrlrate * outrate * scale)
+    self.outi = (nearest + scale - 1) // scale
+    self.shape = self.outi * scale - nearest
     log.debug('%s minBLEPs created.', scale)
     self.ctrlrate = ctrlrate
     self.outrate = outrate
