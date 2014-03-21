@@ -57,15 +57,17 @@ class MinBleps:
     realcepstrum[self.midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
-    ones = (-self.size) % scale
+    # Prepend zeros to simplify outi calc:
+    self.minblep = np.append(np.zeros(scale - 1, BufNode.floatdtype), self.minblep)
+    # Append ones so that all mixins have the same length:
+    ones = (-len(self.minblep)) % scale
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
-    # XXX: Can index mapping be simplified by pre-padding with zeros?
     # The ctrlrate and outrate will line up at 1 second:
     nearest = round(np.arange(ctrlrate) / ctrlrate * outrate * scale)
-    self.outi = (nearest + scale - 1) // scale
-    self.shape = self.outi * scale - nearest
+    self.outi = nearest // scale
+    self.shape = self.outi * scale - nearest + scale - 1
     log.debug('%s minBLEPs created.', scale)
     self.ctrlrate = ctrlrate
     self.outrate = outrate
