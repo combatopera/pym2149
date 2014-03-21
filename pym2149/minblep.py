@@ -60,7 +60,7 @@ class MinBleps:
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     # XXX: Can index mapping be simplified by pre-padding with zeros?
     # The ctrlrate and outrate will line up at 1 second:
-    tmpi = np.int32(np.arange(ctrlrate) / ctrlrate * outrate * scale + .5)
+    tmpi = np.int32(np.round(np.arange(ctrlrate) / ctrlrate * outrate * scale))
     self.outi = (tmpi + scale - 1) // scale
     self.shape = self.outi * scale - tmpi
     log.debug('%s minBLEPs created.', scale)
