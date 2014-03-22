@@ -66,14 +66,18 @@ class OscNode(BufNode):
       self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
       self.progress = self.block.framecount - cursor
 
+loopsize = 1024
+
 class ToneDiff(BufNode):
+
+  diffs = Ring(BufNode.binarydtype, (1 - 2 * (i & 1) for i in xrange(loopsize)))
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
     self.scaleofstep = scale * 2 // 2 # Normally half of 16.
     self.progress = 0
     self.periodreg = periodreg
-    self.last = -1
+    self.index = 0
     self.dc = 0
 
   def callimpl(self):
@@ -85,14 +89,13 @@ class ToneDiff(BufNode):
       self.progress += self.block.framecount
       return self.hold
     self.blockbuf.fill(0)
-    periodsize = stepsize * 2
-    self.blockbuf.putstrided(stepindex, periodsize, -self.last)
-    self.blockbuf.putstrided(stepindex + stepsize, periodsize, self.last)
+    stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
+    self.blockbuf.putring(stepindex, stepsize, self.diffs.buf, self.index, stepcount, 0)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
-    # The last value changes iff we did an odd number of steps just now:
-    if ((self.block.framecount - stepindex + stepsize - 1) // stepsize) & 1:
-      self.last = -self.last
+    # The state changes iff we did an odd number of steps just now:
+    if stepcount & 1:
+      self.index = 1 - self.index
       self.dc = 1 - self.dc
     return self.integral
 
@@ -125,8 +128,6 @@ class NoiseOsc(OscNode):
     if cursor < self.block.framecount:
       self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
       self.common(cursor)
-
-loopsize = 1024
 
 def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
   unitsize = len(unit)
