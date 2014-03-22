@@ -5,4 +5,3 @@ See the Bitbucket [Wiki](https://bitbucket.org/combatopera/pym2149/wiki) for det
 
 File bugs and feature requests in [Issues](https://bitbucket.org/combatopera/pym2149/issues).  
 Support pym2149 development with Bitcoin: `17xqLXK5YhrhVqtYrxcoYDzHoNPX3FYu3n`  
-If your wallet supports BIP 21, here's a [clickable address](bitcoin:17xqLXK5YhrhVqtYrxcoYDzHoNPX3FYu3n?label=pym2149).
