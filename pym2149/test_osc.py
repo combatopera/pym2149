@@ -22,7 +22,7 @@ import unittest, lfsr, time, sys
 from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize
 from nod import Block, BufNode
 from reg import Reg
-from buf import Ring
+from buf import DiffRing, RingCursor
 
 class TestToneOsc(unittest.TestCase):
 
@@ -124,7 +124,7 @@ class TestNoiseOsc(unittest.TestCase):
   def test_increaseperiodonboundary(self):
     r = Reg(0x01)
     o = NoiseOsc(4, r)
-    o.values = Ring(BufNode.binarydtype, [1, 0], 0)
+    o.diff.ringcursor = RingCursor(DiffRing([1, 0], 0, BufNode.bindiffdtype))
     self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
     r.value = 0x02
     self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -134,7 +134,7 @@ class TestNoiseOsc(unittest.TestCase):
   def test_decreaseperiodonboundary(self):
     r = Reg(0x03)
     o = NoiseOsc(4, r)
-    o.values = Ring(BufNode.binarydtype, [1, 0], 0)
+    o.diff.ringcursor = RingCursor(DiffRing([1, 0], 0, BufNode.bindiffdtype))
     self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
     r.value = 0x02
     self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())

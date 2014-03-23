@@ -121,20 +121,17 @@ class ToneOsc(BufNode):
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
 
-class NoiseOsc(OscNode):
+class NoiseOsc(BufNode):
 
-  values = Ring(BufNode.binarydtype, lfsr.Lfsr(*lfsr.ym2149nzdegrees), 0)
+  diffs = DiffRing(lfsr.Lfsr(*lfsr.ym2149nzdegrees), 0, BufNode.bindiffdtype)
 
   def __init__(self, scale, periodreg):
-    self.scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-    OscNode.__init__(self, BufNode.binarydtype, periodreg)
-    self.stepsize = self.progress
+    BufNode.__init__(self, self.binarydtype)
+    scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
+    self.diff = OscDiff(self.diffs, scaleofstep, periodreg, False)
 
   def callimpl(self):
-    cursor = self.prolog()
-    if cursor < self.block.framecount:
-      self.progress = self.stepsize = self.scaleofstep * self.periodreg.value
-      self.common(cursor)
+    self.chain(self.diff)(self.blockbuf)
 
 def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
   unitsize = len(unit)
