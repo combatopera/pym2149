@@ -70,16 +70,14 @@ class OscNode(BufNode):
 
 loopsize = 1024
 
-class ToneDiff(BufNode):
+class OscDiff(BufNode):
 
-  diffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
-
-  def __init__(self, scale, periodreg, eagerstepsize):
+  def __init__(self, diffs, scaleofstep, periodreg, eagerstepsize):
     BufNode.__init__(self, self.bindiffdtype)
-    self.scaleofstep = scale * 2 // 2 # Normally half of 16.
+    self.scaleofstep = scaleofstep
     self.progress = 0
     self.periodreg = periodreg
-    self.ringcursor = RingCursor(self.diffs)
+    self.ringcursor = RingCursor(diffs)
     self.dc = 0
     self.stepsize = None
     self.eagerstepsize = eagerstepsize
@@ -113,9 +111,12 @@ class ToneDiff(BufNode):
 
 class ToneOsc(BufNode):
 
+  diffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
+
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = ToneDiff(scale, periodreg, True)
+    scaleofstep = scale * 2 // 2 # Normally half of 16.
+    self.diff = OscDiff(self.diffs, scaleofstep, periodreg, True)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
