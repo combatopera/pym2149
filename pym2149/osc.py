@@ -78,7 +78,6 @@ class OscDiff(BufNode):
     self.progress = 0
     self.periodreg = periodreg
     self.ringcursor = RingCursor(diffs)
-    self.dc = 0
     self.stepsize = None
     self.eagerstepsize = eagerstepsize
 
@@ -97,14 +96,14 @@ class OscDiff(BufNode):
     self.updatestepsize(False)
     self.blockbuf.fill(0)
     stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
+    dc = self.ringcursor.currentdc()
     self.ringcursor.put(self.blockbuf, stepindex, self.stepsize, stepcount)
-    self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
+    self.blockbuf.addtofirst(dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % self.stepsize
-    self.dc = self.ringcursor.currentdc()
     return self.integral
 
   def hold(self, tonebuf):
-    tonebuf.fill(self.dc)
+    tonebuf.fill(self.ringcursor.currentdc())
 
   def integral(self, tonebuf):
     tonebuf.integrate(self.blockbuf)
