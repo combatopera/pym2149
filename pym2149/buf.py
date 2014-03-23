@@ -68,7 +68,7 @@ class RingCursor:
       n = min(self.limit - self.index, ringn)
       end = start + step * n
       ringend = self.index + n
-      target.buf[start:end:step] = self.ring.buf[self.index:ringend]
+      target.putstrided(start, end, step, self.ring.buf[self.index:ringend])
       start = end
       if ringend == self.limit:
         # Allow non-rings to use one iteration of this method:
@@ -113,8 +113,8 @@ class Buf(AnyBuf):
   def fill(self, value):
     self.buf[:] = value
 
-  def putstrided(self, off, step, val):
-    self.buf[off::step] = val
+  def putstrided(self, start, end, step, data):
+    self.buf[start:end:step] = data
 
   def addtofirst(self, val):
     self.buf[0] += val
