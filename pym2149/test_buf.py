@@ -62,23 +62,33 @@ class TestBuf(unittest.TestCase):
     self.assertEqual([1, -1, 1, -1], list(r.buf))
     self.assertEqual(0, r.loopstart)
     self.assertEqual(unit * 3, integrateringthrice(r, dc))
+    self.assertEqual(unit, [r.dc[x] for x in xrange(len(r))])
     dc = 3
     unit = [1, 0, 1, 3]
     r = DiffRing(unit, dc, int)
     self.assertEqual([-2, -1, 1, 2], list(r.buf))
     self.assertEqual(0, r.loopstart)
     self.assertEqual(unit * 3, integrateringthrice(r, dc))
+    self.assertEqual(unit, [r.dc[x] for x in xrange(len(r))])
     dc = 0
     unit = [1, 0, 1, 0, 1]
     r = DiffRing(unit, dc, int)
     self.assertEqual([1, -1, 1, -1, 1, 0], list(r.buf))
     self.assertEqual(1, r.loopstart)
     self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
+    self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
     dc = 3 # Same unit.
     r = DiffRing(unit, dc, int)
     self.assertEqual([-2, -1, 1, -1, 1, 0], list(r.buf))
     self.assertEqual(1, r.loopstart)
     self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
+    self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
+    unit = [2, 0, 1, 0, 1] # Same dc.
+    r = DiffRing(unit, dc, int)
+    self.assertEqual([-1, -2, 1, -1, 1, 1], list(r.buf))
+    self.assertEqual(1, r.loopstart)
+    self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
+    self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
 
 def integrateringthrice(r, last):
   v = []

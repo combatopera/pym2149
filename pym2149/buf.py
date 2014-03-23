@@ -32,14 +32,14 @@ class Ring:
 class DiffRing(Ring):
 
   def __init__(self, g, dc, dtype):
-    v = list(g)
-    loopstart = v[-1] != dc
+    self.dc = list(g)
+    loopstart = self.dc[-1] != dc
+    if loopstart:
+      self.dc.append(self.dc[0])
     def h():
-      yield v[0] - dc
-      for i in xrange(1, len(v)):
-        yield v[i] - v[i - 1]
-      if loopstart:
-        yield v[0] - v[-1]
+      yield self.dc[0] - dc
+      for i in xrange(1, len(self.dc)):
+        yield self.dc[i] - self.dc[i - 1]
     Ring.__init__(self, dtype, h(), loopstart)
 
 class AnyBuf:

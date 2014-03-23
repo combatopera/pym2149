@@ -96,7 +96,7 @@ class ToneDiff(BufNode):
     # The state changes iff we did an odd number of steps just now:
     if stepcount & 1:
       self.index = 1 - self.index
-      self.dc = 1 - self.dc
+    self.dc = self.diffs.dc[self.index - 1]
     return self.integral
 
   def hold(self, tonebuf):
