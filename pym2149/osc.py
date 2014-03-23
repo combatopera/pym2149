@@ -74,27 +74,34 @@ class ToneDiff(BufNode):
 
   diffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
 
-  def __init__(self, scale, periodreg):
+  def __init__(self, scale, periodreg, eagerstepsize):
     BufNode.__init__(self, self.bindiffdtype)
     self.scaleofstep = scale * 2 // 2 # Normally half of 16.
     self.progress = 0
     self.periodreg = periodreg
     self.ringcursor = RingCursor(self.diffs)
     self.dc = 0
+    self.stepsize = None
+    self.eagerstepsize = eagerstepsize
+
+  def updatestepsize(self, eager):
+    if eager == self.eagerstepsize:
+      self.stepsize = self.scaleofstep * self.periodreg.value
 
   def callimpl(self):
-    stepsize = self.scaleofstep * self.periodreg.value
+    self.updatestepsize(True)
     # If progress beats the new stepsize, we step right away:
-    stepindex = self.progress and max(0, stepsize - self.progress)
+    stepindex = self.progress and max(0, self.stepsize - self.progress)
     if stepindex >= self.block.framecount:
       # Next step of waveform is beyond this block:
       self.progress += self.block.framecount
       return self.hold
+    self.updatestepsize(False)
     self.blockbuf.fill(0)
-    stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-    self.ringcursor.put(self.blockbuf, stepindex, stepsize, stepcount)
+    stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
+    self.ringcursor.put(self.blockbuf, stepindex, self.stepsize, stepcount)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
-    self.progress = (self.block.framecount - stepindex) % stepsize
+    self.progress = (self.block.framecount - stepindex) % self.stepsize
     self.dc = self.ringcursor.currentdc()
     return self.integral
 
@@ -108,7 +115,7 @@ class ToneOsc(BufNode):
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = ToneDiff(scale, periodreg)
+    self.diff = ToneDiff(scale, periodreg, True)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
