@@ -20,8 +20,9 @@
 from __future__ import division
 import unittest, lfsr, time, sys
 from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize
-from nod import Block
+from nod import Block, BufNode
 from reg import Reg
+from buf import Ring
 
 class TestToneOsc(unittest.TestCase):
 
@@ -119,6 +120,26 @@ class TestNoiseOsc(unittest.TestCase):
       v1 = o.call(Block(n)).tolist()
       v2 = o.call(Block(size - n)).tolist()
       self.assertEqual(ref, v1 + v2)
+
+  def test_increaseperiodonboundary(self):
+    r = Reg(0x01)
+    o = NoiseOsc(4, r)
+    o.values = Ring(BufNode.binarydtype, [1, 0], 0)
+    self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
+    r.value = 0x02
+    self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
+    r.value = 0x03
+    self.assertEqual([0] + [1] * 24 + [0], o.call(Block(26)).tolist())
+
+  def test_decreaseperiodonboundary(self):
+    r = Reg(0x03)
+    o = NoiseOsc(4, r)
+    o.values = Ring(BufNode.binarydtype, [1, 0], 0)
+    self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
+    r.value = 0x02
+    self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
+    r.value = 0x01
+    self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
 
   def test_performance(self):
     blockrate = 50
