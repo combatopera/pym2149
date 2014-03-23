@@ -115,8 +115,11 @@ class Buf(AnyBuf):
         try:
           ringstart = ring.loopstart
         except AttributeError:
-          del ringstart
+          ringstart = None
+      else:
+        ringstart = ringend
       ringn -= n
+    return ringstart
 
   def add(self, value):
     self.buf += value

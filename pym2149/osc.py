@@ -90,12 +90,9 @@ class ToneDiff(BufNode):
       return self.hold
     self.blockbuf.fill(0)
     stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-    self.blockbuf.putring(stepindex, stepsize, self.diffs, self.index, stepcount)
+    self.index = self.blockbuf.putring(stepindex, stepsize, self.diffs, self.index, stepcount)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
-    # The state changes iff we did an odd number of steps just now:
-    if stepcount & 1:
-      self.index = 1 - self.index
     self.dc = self.diffs.dc[self.index - 1]
     return self.integral
 
