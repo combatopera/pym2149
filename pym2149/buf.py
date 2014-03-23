@@ -80,6 +80,10 @@ class RingCursor:
         self.index = ringend
       ringn -= n
 
+  def currentdc(self):
+    # Observe this can break through loopstart, in which case value should be same as last:
+    return self.ring.dc[self.index - 1]
+
 @singleton
 class NullBuf(AnyBuf):
 

@@ -95,7 +95,7 @@ class ToneDiff(BufNode):
     self.ringcursor.put(self.blockbuf, stepindex, stepsize, stepcount)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
-    self.dc = self.diffs.dc[self.ringcursor.index - 1]
+    self.dc = self.ringcursor.currentdc()
     return self.integral
 
   def hold(self, tonebuf):
