@@ -18,25 +18,33 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, numpy as np
-from buf import Buf, Ring, DiffRing
+from buf import Buf, Ring, DiffRing, RingCursor
 
 class TestBuf(unittest.TestCase):
 
   def test_putring(self):
     b = Buf(np.zeros(20))
-    r = Ring(int, xrange(5), 0)
-    b.putring(3, 2, r, 4, 8)
+    r = RingCursor(Ring(int, xrange(5), 0))
+    r.index = 4
+    r.put(b, 3, 2, 8)
     self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], list(b.buf))
-    b.putring(4, 2, r, 4, 8)
+    self.assertEqual(2, r.index)
+    r.index = 4
+    r.put(b, 4, 2, 8)
     self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], list(b.buf))
+    self.assertEqual(2, r.index)
 
   def test_loop(self):
     b = Buf(np.zeros(20))
-    r = Ring(int, xrange(5), 2)
-    b.putring(3, 2, r, 1, 8)
+    r = RingCursor(Ring(int, xrange(5), 2))
+    r.index = 1
+    r.put(b, 3, 2, 8)
     self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], list(b.buf))
-    b.putring(4, 2, r, 1, 8)
+    self.assertEqual(3, r.index)
+    r.index = 1
+    r.put(b, 4, 2, 8)
     self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], list(b.buf))
+    self.assertEqual(3, r.index)
 
   def test_putringops(self):
     r = Ring(int, [0] * 5, None)

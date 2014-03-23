@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode, Node
-from buf import MasterBuf
+from buf import MasterBuf, RingCursor
 
 class BinMix(BufNode):
 
@@ -61,7 +61,7 @@ class Multiplexer(Node):
       except NameError:
         size = len(buf)
         multi = self.multi.ensureandcrop(size * self.channels)
-      multi.putring(i, self.channels, buf, 0, size)
+      RingCursor(buf).put(multi, i, self.channels, size)
     return multi
 
 class IdealMixer(BufNode):

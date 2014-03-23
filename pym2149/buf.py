@@ -45,16 +45,40 @@ class DiffRing(Ring):
 class AnyBuf:
 
   @staticmethod
-  def putringops(ring, ringstart, ringn):
-    ringsize = len(ring)
+  def putringops(ring, ringcursor, ringn):
+    limit = len(ring)
     ops = 0
     while ringn:
-      n = min(ringsize - ringstart, ringn)
+      n = min(limit - ringcursor, ringn)
       ops += 1
-      if ringstart + n == ringsize:
-        ringstart = ring.loopstart
+      if ringcursor + n == limit:
+        ringcursor = ring.loopstart
       ringn -= n
     return ops
+
+class RingCursor:
+
+  def __init__(self, ring):
+    self.limit = len(ring)
+    self.index = 0
+    self.ring = ring
+
+  def put(self, target, start, step, ringn):
+    while ringn:
+      n = min(self.limit - self.index, ringn)
+      end = start + step * n
+      ringend = self.index + n
+      target.buf[start:end:step] = self.ring.buf[self.index:ringend]
+      start = end
+      if ringend == self.limit:
+        # Allow non-rings to use one iteration of this method:
+        try:
+          self.index = self.ring.loopstart
+        except AttributeError:
+          self.index = None
+      else:
+        self.index = ringend
+      ringn -= n
 
 @singleton
 class NullBuf(AnyBuf):
@@ -62,8 +86,6 @@ class NullBuf(AnyBuf):
   def fillpart(self, *args): pass
 
   def fill(self, *args): pass
-
-  def putring(self, *args): pass
 
   def subbuf(self, *args): pass
 
@@ -101,25 +123,6 @@ class Buf(AnyBuf):
 
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
-
-  def putring(self, start, step, ring, ringstart, ringn):
-    ringsize = len(ring)
-    while ringn:
-      n = min(ringsize - ringstart, ringn)
-      end = start + step * n
-      ringend = ringstart + n
-      self.buf[start:end:step] = ring.buf[ringstart:ringend]
-      start = end
-      if ringend == ringsize:
-        # Allow non-rings to use one iteration of this method:
-        try:
-          ringstart = ring.loopstart
-        except AttributeError:
-          ringstart = None
-      else:
-        ringstart = ringend
-      ringn -= n
-    return ringstart
 
   def add(self, value):
     self.buf += value

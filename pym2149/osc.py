@@ -19,7 +19,7 @@ from __future__ import division
 import lfsr, itertools, math
 from nod import BufNode
 from dac import leveltoamp, amptolevel
-from buf import Ring, DiffRing
+from buf import Ring, DiffRing, RingCursor
 
 class OscNode(BufNode):
 
@@ -54,8 +54,10 @@ class OscNode(BufNode):
   def common(self, cursor):
     fullsteps = (self.block.framecount - cursor) // self.stepsize
     if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
+      ringcursor = RingCursor(self.values)
       for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
+        ringcursor.index = self.valueindex
+        ringcursor.put(self.blockbuf, cursor + i, self.stepsize, fullsteps)
       self.getvalue(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
@@ -77,7 +79,7 @@ class ToneDiff(BufNode):
     self.scaleofstep = scale * 2 // 2 # Normally half of 16.
     self.progress = 0
     self.periodreg = periodreg
-    self.index = 0
+    self.ringcursor = RingCursor(self.diffs)
     self.dc = 0
 
   def callimpl(self):
@@ -90,10 +92,10 @@ class ToneDiff(BufNode):
       return self.hold
     self.blockbuf.fill(0)
     stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-    self.index = self.blockbuf.putring(stepindex, stepsize, self.diffs, self.index, stepcount)
+    self.ringcursor.put(self.blockbuf, stepindex, stepsize, stepcount)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
-    self.dc = self.diffs.dc[self.index - 1]
+    self.dc = self.diffs.dc[self.ringcursor.index - 1]
     return self.integral
 
   def hold(self, tonebuf):
