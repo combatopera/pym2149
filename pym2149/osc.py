@@ -70,7 +70,7 @@ loopsize = 1024
 
 class ToneDiff(BufNode):
 
-  diffs = Ring(BufNode.binarydtype, (1 - 2 * (i & 1) for i in xrange(loopsize)), 0)
+  diffs = Ring(BufNode.bindiffdtype, (1 - 2 * (i & 1) for i in xrange(loopsize)), 0)
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
