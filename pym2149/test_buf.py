@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, numpy as np
-from buf import Buf, Ring
+from buf import Buf, Ring, DiffRing
 
 class TestBuf(unittest.TestCase):
 
@@ -58,24 +58,24 @@ class TestBuf(unittest.TestCase):
   def test_todiffring(self):
     dc = 0
     unit = [1, 0, 1, 0]
-    r = Buf(np.array(unit)).todiffring(dc, int)
+    r = DiffRing(unit, dc, int)
     self.assertEqual([1, -1, 1, -1], list(r.buf))
     self.assertEqual(0, r.loopstart)
     self.assertEqual(unit * 3, integrateringthrice(r, dc))
     dc = 3
     unit = [1, 0, 1, 3]
-    r = Buf(np.array(unit)).todiffring(dc, int)
+    r = DiffRing(unit, dc, int)
     self.assertEqual([-2, -1, 1, 2], list(r.buf))
     self.assertEqual(0, r.loopstart)
     self.assertEqual(unit * 3, integrateringthrice(r, dc))
     dc = 0
     unit = [1, 0, 1, 0, 1]
-    r = Buf(np.array(unit)).todiffring(dc, int)
+    r = DiffRing(unit, dc, int)
     self.assertEqual([1, -1, 1, -1, 1, 0], list(r.buf))
     self.assertEqual(1, r.loopstart)
     self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
     dc = 3 # Same unit.
-    r = Buf(np.array(unit)).todiffring(dc, int)
+    r = DiffRing(unit, dc, int)
     self.assertEqual([-2, -1, 1, -1, 1, 0], list(r.buf))
     self.assertEqual(1, r.loopstart)
     self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
