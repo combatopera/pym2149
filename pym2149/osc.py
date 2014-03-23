@@ -78,7 +78,6 @@ class OscDiff(BufNode):
     self.progress = 0
     self.periodreg = periodreg
     self.ringcursor = RingCursor(diffs)
-    self.stepsize = None
     self.eagerstepsize = eagerstepsize
 
   def updatestepsize(self, eager):
