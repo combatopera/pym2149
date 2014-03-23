@@ -19,7 +19,7 @@ from __future__ import division
 import lfsr, itertools, math
 from nod import BufNode
 from dac import leveltoamp, amptolevel
-from buf import Ring
+from buf import Ring, DiffRing
 
 class OscNode(BufNode):
 
@@ -70,7 +70,7 @@ loopsize = 1024
 
 class ToneDiff(BufNode):
 
-  diffs = Ring(BufNode.bindiffdtype, (1 - 2 * (i & 1) for i in xrange(loopsize)), 0)
+  diffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
