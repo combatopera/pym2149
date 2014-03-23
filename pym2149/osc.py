@@ -42,7 +42,7 @@ class OscNode(BufNode):
     self.valueindex += n
     size = self.values.buf.shape[0]
     while self.valueindex >= size:
-      self.valueindex = self.values.loop + self.valueindex - size
+      self.valueindex = self.values.loopstart + self.valueindex - size
 
   def prolog(self):
     # If progress beats the new stepsize, we terminate right away:
@@ -53,9 +53,9 @@ class OscNode(BufNode):
 
   def common(self, cursor):
     fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values.buf, self.valueindex, fullsteps, self.values.loop) * self.stepsize < fullsteps:
+    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
       for i in xrange(self.stepsize):
-        self.blockbuf.putring(cursor + i, self.stepsize, self.values.buf, self.valueindex, fullsteps, self.values.loop)
+        self.blockbuf.putring(cursor + i, self.stepsize, self.values, self.valueindex, fullsteps)
       self.getvalue(fullsteps)
       cursor += fullsteps * self.stepsize
     else:
@@ -70,7 +70,7 @@ loopsize = 1024
 
 class ToneDiff(BufNode):
 
-  diffs = Ring(BufNode.binarydtype, (1 - 2 * (i & 1) for i in xrange(loopsize)))
+  diffs = Ring(BufNode.binarydtype, (1 - 2 * (i & 1) for i in xrange(loopsize)), 0)
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.bindiffdtype)
@@ -90,7 +90,7 @@ class ToneDiff(BufNode):
       return self.hold
     self.blockbuf.fill(0)
     stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-    self.blockbuf.putring(stepindex, stepsize, self.diffs.buf, self.index, stepcount, 0)
+    self.blockbuf.putring(stepindex, stepsize, self.diffs, self.index, stepcount)
     self.blockbuf.addtofirst(self.dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % stepsize
     # The state changes iff we did an odd number of steps just now:
@@ -116,7 +116,7 @@ class ToneOsc(BufNode):
 
 class NoiseOsc(OscNode):
 
-  values = Ring(BufNode.binarydtype, lfsr.Lfsr(*lfsr.ym2149nzdegrees))
+  values = Ring(BufNode.binarydtype, lfsr.Lfsr(*lfsr.ym2149nzdegrees), 0)
 
   def __init__(self, scale, periodreg):
     self.scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
@@ -143,15 +143,15 @@ def sinering(steps): # Like saw but unlike triangular, we use steps for a full w
   for i in xrange(steps):
     amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
     levels.append(round(amptolevel(amp)))
-  return Ring(BufNode.zto255dtype, cycle(levels))
+  return Ring(BufNode.zto255dtype, cycle(levels), 0)
 
 class EnvOsc(OscNode):
 
   steps = 32
-  values0c = Ring(BufNode.zto255dtype, cycle(range(steps)))
-  values08 = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1)))
-  values0e = Ring(BufNode.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1)))
-  values0a = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps)))
+  values0c = Ring(BufNode.zto255dtype, cycle(range(steps)), 0)
+  values08 = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1)), 0)
+  values0e = Ring(BufNode.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1)), 0)
+  values0a = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps)), 0)
   values0f = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), cycle([0])), steps)
   values0d = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), cycle([steps - 1])), steps)
   values0b = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps)

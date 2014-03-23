@@ -22,21 +22,24 @@ def singleton(f):
 
 class Ring:
 
-  def __init__(self, dtype, g, loop = 0):
+  def __init__(self, dtype, g, loopstart):
     self.buf = np.fromiter(g, dtype)
-    self.loop = loop
+    self.loopstart = loopstart
+
+  def __len__(self):
+    return len(self.buf)
 
 class AnyBuf:
 
   @staticmethod
-  def putringops(ring, ringstart, ringn, ringloop):
-    ringsize = ring.shape[0]
+  def putringops(ring, ringstart, ringn):
+    ringsize = len(ring)
     ops = 0
     while ringn:
       n = min(ringsize - ringstart, ringn)
       ops += 1
       if ringstart + n == ringsize:
-        ringstart = ringloop
+        ringstart = ring.loopstart
       ringn -= n
     return ops
 
@@ -86,16 +89,20 @@ class Buf(AnyBuf):
   def mapbuf(self, that, lookup):
     lookup.take(that.buf, out = self.buf)
 
-  def putring(self, start, step, ring, ringstart, ringn, ringloop):
-    ringsize = ring.shape[0]
+  def putring(self, start, step, ring, ringstart, ringn):
+    ringsize = len(ring)
     while ringn:
       n = min(ringsize - ringstart, ringn)
       end = start + step * n
       ringend = ringstart + n
-      self.buf[start:end:step] = ring[ringstart:ringend]
+      self.buf[start:end:step] = ring.buf[ringstart:ringend]
       start = end
       if ringend == ringsize:
-        ringstart = ringloop
+        # Allow non-rings to use one iteration of this method:
+        try:
+          ringstart = ring.loopstart
+        except AttributeError:
+          del ringstart
       ringn -= n
 
   def add(self, value):

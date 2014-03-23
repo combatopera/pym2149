@@ -61,7 +61,7 @@ class Multiplexer(Node):
       except NameError:
         size = len(buf)
         multi = self.multi.ensureandcrop(size * self.channels)
-      multi.putring(i, self.channels, buf.buf, 0, size, None)
+      multi.putring(i, self.channels, buf, 0, size)
     return multi
 
 class IdealMixer(BufNode):
