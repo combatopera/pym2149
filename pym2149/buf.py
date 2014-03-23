@@ -130,6 +130,16 @@ class Buf(AnyBuf):
     diff.buf[1:] -= that.buf[:-1]
     return diff
 
+  def todiffring(self, dc, dtype):
+    loopstart = self.buf[-1] != dc
+    def g():
+      yield self.buf[0] - dc
+      for i in xrange(1, len(self)):
+        yield self.buf[i] - self.buf[i - 1]
+      if loopstart:
+        yield self.buf[0] - self.buf[-1]
+    return Ring(dtype, g(), loopstart)
+
   def nonzeros(self):
     return np.flatnonzero(self.buf) # XXX: Can we avoid making a new array?
 

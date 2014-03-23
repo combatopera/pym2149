@@ -55,5 +55,41 @@ class TestBuf(unittest.TestCase):
     self.assertEqual(3, Buf.putringops(r, 3, 8))
     self.assertEqual(4, Buf.putringops(r, 3, 9))
 
+  def test_todiffring(self):
+    dc = 0
+    unit = [1, 0, 1, 0]
+    r = Buf(np.array(unit)).todiffring(dc, int)
+    self.assertEqual([1, -1, 1, -1], list(r.buf))
+    self.assertEqual(0, r.loopstart)
+    self.assertEqual(unit * 3, integrateringthrice(r, dc))
+    dc = 3
+    unit = [1, 0, 1, 3]
+    r = Buf(np.array(unit)).todiffring(dc, int)
+    self.assertEqual([-2, -1, 1, 2], list(r.buf))
+    self.assertEqual(0, r.loopstart)
+    self.assertEqual(unit * 3, integrateringthrice(r, dc))
+    dc = 0
+    unit = [1, 0, 1, 0, 1]
+    r = Buf(np.array(unit)).todiffring(dc, int)
+    self.assertEqual([1, -1, 1, -1, 1, 0], list(r.buf))
+    self.assertEqual(1, r.loopstart)
+    self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
+    dc = 3 # Same unit.
+    r = Buf(np.array(unit)).todiffring(dc, int)
+    self.assertEqual([-2, -1, 1, -1, 1, 0], list(r.buf))
+    self.assertEqual(1, r.loopstart)
+    self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
+
+def integrateringthrice(r, last):
+  v = []
+  index = 0
+  for _ in xrange(3):
+    while index < len(r):
+      v.append(last + r.buf[index])
+      last = v[-1]
+      index += 1
+    index = r.loopstart
+  return v
+
 if __name__ == '__main__':
   unittest.main()
