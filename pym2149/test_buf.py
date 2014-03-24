@@ -98,6 +98,40 @@ class TestBuf(unittest.TestCase):
     self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r, dc))
     self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
 
+  def test_todiffringwithprolog(self):
+    dc = -5
+    prolog = [1, 1, 0]
+    unit = [0, 0]
+    r = DiffRing(prolog + unit, dc, int, len(prolog))
+    self.assertEqual([6, 0, -1, 0, 0], list(r.buf))
+    self.assertEqual(3, r.loopstart)
+    self.assertEqual(prolog + unit * 3, integrateringthrice(r, dc))
+    self.assertEqual(prolog + unit, [r.dc[x] for x in xrange(len(r))])
+    dc = -4
+    prolog = [1, 1]
+    unit = [0, 0, 0]
+    r = DiffRing(prolog + unit, dc, int, len(prolog))
+    self.assertEqual([5, 0, -1, 0, 0, 0], list(r.buf))
+    self.assertEqual(3, r.loopstart)
+    self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r, dc))
+    self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
+    dc = -3
+    prolog = [1]
+    unit = [1, 0, 0, 0]
+    r = DiffRing(prolog + unit, dc, int, len(prolog))
+    self.assertEqual([4, 0, -1, 0, 0, 1], list(r.buf))
+    self.assertEqual(2, r.loopstart)
+    self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r, dc))
+    self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(len(r))])
+    dc = -2
+    prolog = [1]
+    unit = [1, 0, 0, 1]
+    r = DiffRing(prolog + unit, dc, int, len(prolog))
+    self.assertEqual([3, 0, -1, 0, 1], list(r.buf))
+    self.assertEqual(1, r.loopstart)
+    self.assertEqual(prolog + unit * 3, integrateringthrice(r, dc))
+    self.assertEqual(prolog + unit, [r.dc[x] for x in xrange(len(r))])
+
 def integrateringthrice(r, last):
   v = []
   index = 0

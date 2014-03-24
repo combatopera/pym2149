@@ -31,16 +31,16 @@ class Ring:
 
 class DiffRing(Ring):
 
-  def __init__(self, g, dc, dtype):
+  def __init__(self, g, dc, dtype, prolog = 0):
     self.dc = list(g)
-    loopstart = self.dc[-1] != dc
-    if loopstart:
-      self.dc.append(self.dc[0])
+    jump = self.dc[-1] != (dc, self.dc[prolog - 1])[bool(prolog)]
+    if jump:
+      self.dc.append(self.dc[prolog])
     def h():
       yield self.dc[0] - dc
       for i in xrange(1, len(self.dc)):
         yield self.dc[i] - self.dc[i - 1]
-    Ring.__init__(self, dtype, h(), loopstart)
+    Ring.__init__(self, dtype, h(), prolog + jump)
 
 class AnyBuf:
 
