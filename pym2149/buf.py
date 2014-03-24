@@ -41,6 +41,7 @@ class DiffRing(Ring):
       for i in xrange(1, len(self.dc)):
         yield self.dc[i] - self.dc[i - 1]
     Ring.__init__(self, dtype, h(), prolog + jump)
+    self.initialdc = dc
 
 class AnyBuf:
 
@@ -82,7 +83,7 @@ class RingCursor:
 
   def currentdc(self):
     # Observe this can break through loopstart, in which case value should be same as last:
-    return self.ring.dc[self.index - 1]
+    return (self.ring.initialdc, self.ring.dc[self.index - 1])[bool(self.index)]
 
 @singleton
 class NullBuf(AnyBuf):

@@ -19,66 +19,22 @@ from __future__ import division
 import lfsr, itertools, math
 from nod import BufNode
 from dac import leveltoamp, amptolevel
-from buf import Ring, DiffRing, RingCursor
-
-class OscNode(BufNode):
-
-  def __init__(self, dtype, periodreg):
-    BufNode.__init__(self, dtype)
-    self.reset()
-    self.periodreg = periodreg
-
-  def reset(self):
-    self.valueindex = 0
-    self.progress = self.scaleofstep * 0xffff # Matching biggest possible 16-bit stepsize.
-
-  def getvalue(self, n = 1):
-    self.warp(n - 1)
-    self.lastvalue = self.values.buf[self.valueindex]
-    self.warp(1)
-    return self.lastvalue
-
-  def warp(self, n):
-    self.valueindex += n
-    size = self.values.buf.shape[0]
-    while self.valueindex >= size:
-      self.valueindex = self.values.loopstart + self.valueindex - size
-
-  def prolog(self):
-    # If progress beats the new stepsize, we terminate right away:
-    cursor = min(self.block.framecount, max(0, self.stepsize - self.progress))
-    cursor and self.blockbuf.fillpart(0, cursor, self.lastvalue)
-    self.progress = min(self.progress + cursor, self.stepsize)
-    return cursor
-
-  def common(self, cursor):
-    fullsteps = (self.block.framecount - cursor) // self.stepsize
-    if self.blockbuf.putringops(self.values, self.valueindex, fullsteps) * self.stepsize < fullsteps:
-      ringcursor = RingCursor(self.values)
-      for i in xrange(self.stepsize):
-        ringcursor.index = self.valueindex
-        ringcursor.put(self.blockbuf, cursor + i, self.stepsize, fullsteps)
-      self.getvalue(fullsteps)
-      cursor += fullsteps * self.stepsize
-    else:
-      for _ in xrange(fullsteps):
-        self.blockbuf.fillpart(cursor, cursor + self.stepsize, self.getvalue())
-        cursor += self.stepsize
-    if cursor < self.block.framecount:
-      self.blockbuf.fillpart(cursor, self.block.framecount, self.getvalue())
-      self.progress = self.block.framecount - cursor
+from buf import DiffRing, RingCursor
 
 loopsize = 1024
 
 class OscDiff(BufNode):
 
-  def __init__(self, diffs, scaleofstep, periodreg, eagerstepsize):
+  def __init__(self, scaleofstep, periodreg, eagerstepsize):
     BufNode.__init__(self, self.bindiffdtype)
     self.scaleofstep = scaleofstep
-    self.progress = 0
     self.periodreg = periodreg
-    self.ringcursor = RingCursor(diffs)
     self.eagerstepsize = eagerstepsize
+
+  def reset(self, diffs):
+    self.progress = 0
+    self.ringcursor = RingCursor(diffs)
+    return self
 
   def updatestepsize(self, eager):
     if eager == self.eagerstepsize:
@@ -114,7 +70,7 @@ class ToneOsc(BufNode):
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.binarydtype)
     scaleofstep = scale * 2 // 2 # Normally half of 16.
-    self.diff = OscDiff(self.diffs, scaleofstep, periodreg, True)
+    self.diff = OscDiff(scaleofstep, periodreg, True).reset(self.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
@@ -126,7 +82,7 @@ class NoiseOsc(BufNode):
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.binarydtype)
     scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-    self.diff = OscDiff(self.diffs, scaleofstep, periodreg, False)
+    self.diff = OscDiff(scaleofstep, periodreg, False).reset(self.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
@@ -140,29 +96,30 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
       yield x
 
 def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
-  levels = []
+  unit = []
   minamp = leveltoamp(0)
   for i in xrange(steps):
     amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
-    levels.append(round(amptolevel(amp)))
-  return Ring(BufNode.zto255dtype, cycle(levels), 0)
+    unit.append(round(amptolevel(amp)))
+  return DiffRing(cycle(unit), 0, BufNode.bindiffdtype)
 
-class EnvOsc(OscNode):
+class EnvOsc(BufNode):
 
   steps = 32
-  values0c = Ring(BufNode.zto255dtype, cycle(range(steps)), 0)
-  values08 = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1)), 0)
-  values0e = Ring(BufNode.zto255dtype, cycle(range(steps) + range(steps - 1, -1, -1)), 0)
-  values0a = Ring(BufNode.zto255dtype, cycle(range(steps - 1, -1, -1) + range(steps)), 0)
-  values0f = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), cycle([0])), steps)
-  values0d = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps), cycle([steps - 1])), steps)
-  values0b = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps)
-  values09 = Ring(BufNode.zto255dtype, itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps)
-  values10 = sinering(steps)
+  diffs0c = DiffRing(cycle(range(steps)), 0, BufNode.bindiffdtype)
+  diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)), 0, BufNode.bindiffdtype)
+  diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)), 0, BufNode.bindiffdtype)
+  diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)), 0, BufNode.bindiffdtype)
+  diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), 0, BufNode.bindiffdtype, steps)
+  diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
+  diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
+  diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), 0, BufNode.bindiffdtype, steps)
+  diffs10 = sinering(steps)
 
   def __init__(self, scale, periodreg, shapereg):
-    self.scaleofstep = scale * 32 // self.steps
-    OscNode.__init__(self, BufNode.zto255dtype, periodreg)
+    BufNode.__init__(self, self.zto255dtype)
+    scaleofstep = scale * 32 // self.steps
+    self.diff = OscDiff(scaleofstep, periodreg, True)
     self.shapeversion = None
     self.shapereg = shapereg
 
@@ -171,10 +128,6 @@ class EnvOsc(OscNode):
       shape = self.shapereg.value
       if shape == (shape & 0x07):
         shape = (0x09, 0x0f)[bool(shape & 0x04)]
-      self.values = getattr(self, "values%02x" % shape)
+      self.diff.reset(getattr(self, "diffs%02x" % shape))
       self.shapeversion = self.shapereg.version
-      self.reset()
-    self.stepsize = self.scaleofstep * self.periodreg.value
-    cursor = self.prolog()
-    if cursor < self.block.framecount:
-      self.common(cursor)
+    self.chain(self.diff)(self.blockbuf)
