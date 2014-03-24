@@ -29,7 +29,7 @@ class Ring:
   def __len__(self):
     return len(self.buf)
 
-class DiffRing(Ring):
+class DiffRing(Ring): # TODO: Inline 0 initial dc, always add one element.
 
   def __init__(self, g, dc, dtype, prolog = 0):
     self.dc = list(g)
