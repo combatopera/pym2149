@@ -70,7 +70,7 @@ class OscDiff(BinDiff):
 
 class TimerSynth(BufNode):
 
-  def __init__(self, chip, freqreg, shapereg):
+  def __init__(self, chip, freqreg):
     BufNode.__init__(self, self.binarydtype)
 
   def callimpl(self):
