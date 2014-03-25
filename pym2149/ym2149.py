@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from reg import Reg, DerivedReg
-from osc import ToneOsc, NoiseOsc, EnvOsc
+from osc import ToneOsc, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
@@ -47,6 +47,8 @@ class Registers:
     self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(self.channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
+    self.tsfreqs = tuple(Reg(0) for _ in xrange(self.channels))
+    self.tsshapes = tuple(Reg(0) for _ in xrange(self.channels))
 
 class YM2149(Registers, Container):
 
@@ -59,7 +61,8 @@ class YM2149(Registers, Container):
     channels = [ToneOsc(scale, self.toneperiods[i]) for i in xrange(self.channels)]
     self.maskables = [noise, env] + channels
     channels = [BinMix(channel, noise, self.toneflags[i], self.noiseflags[i]) for i, channel in enumerate(channels)]
-    channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel) for i, channel in enumerate(channels)]
+    timersynths = [TimerSynth(self, self.tsfreqs[i], self.tsshapes[i]) for i in xrange(self.channels)]
+    channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel, timersynths[i]) for i, channel in enumerate(channels)]
     if ampshare is None:
       ampshare = self.channels
     Container.__init__(self, [Dac(channel, ampshare) for channel in channels])
