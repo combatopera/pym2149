@@ -49,6 +49,7 @@ class Registers:
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
     self.tsfreqs = tuple(Reg(0) for _ in xrange(self.channels))
     self.tsshapes = tuple(Reg(0) for _ in xrange(self.channels))
+    self.tsflags = tuple(Reg(0) for _ in xrange(self.channels))
 
 class YM2149(Registers, Container):
 
@@ -62,7 +63,7 @@ class YM2149(Registers, Container):
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
     timersynths = [TimerSynth(self, self.tsfreqs[c], self.tsshapes[c]) for c in xrange(self.channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c]) for c in xrange(self.channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(self.channels)]
     if ampshare is None:
       ampshare = self.channels
     Container.__init__(self, [Dac(level, ampshare) for level in levels])
