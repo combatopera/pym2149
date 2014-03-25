@@ -200,6 +200,9 @@ class YM56(YM):
 
 class Frame56(PlainFrame):
 
+  mfpclock = 2457600
+  prescalers = (0, 4, 10, 16, 50, 64, 100, 200)
+
   def __init__(self, ym):
     PlainFrame.__init__(self, ym)
     self.index = ym.frameindex
