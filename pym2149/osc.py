@@ -23,18 +23,29 @@ from buf import DiffRing, RingCursor
 
 loopsize = 1024
 
-class OscDiff(BufNode):
+class BinDiff(BufNode):
+
+  def __init__(self):
+    BufNode.__init__(self, self.bindiffdtype)
+
+  def reset(self, diffs):
+    self.ringcursor = RingCursor(diffs)
+    self.progress = 0
+    return self
+
+  def hold(self, signalbuf):
+    signalbuf.fill(self.ringcursor.currentdc())
+
+  def integral(self, signalbuf):
+    signalbuf.integrate(self.blockbuf)
+
+class OscDiff(BinDiff):
 
   def __init__(self, scaleofstep, periodreg, eagerstepsize):
-    BufNode.__init__(self, self.bindiffdtype)
+    BinDiff.__init__(self)
     self.scaleofstep = scaleofstep
     self.periodreg = periodreg
     self.eagerstepsize = eagerstepsize
-
-  def reset(self, diffs):
-    self.progress = 0
-    self.ringcursor = RingCursor(diffs)
-    return self
 
   def updatestepsize(self, eager):
     if eager == self.eagerstepsize:
@@ -56,12 +67,6 @@ class OscDiff(BufNode):
     self.blockbuf.addtofirst(dc) # Add last value of previous integral.
     self.progress = (self.block.framecount - stepindex) % self.stepsize
     return self.integral
-
-  def hold(self, tonebuf):
-    tonebuf.fill(self.ringcursor.currentdc())
-
-  def integral(self, tonebuf):
-    tonebuf.integrate(self.blockbuf)
 
 class ToneOsc(BufNode):
 
