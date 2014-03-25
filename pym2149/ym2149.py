@@ -58,14 +58,14 @@ class YM2149(Registers, Container):
     noise = NoiseOsc(scale, self.noiseperiod)
     env = EnvOsc(scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
-    channels = [ToneOsc(scale, self.toneperiods[i]) for i in xrange(self.channels)]
-    self.maskables = [noise, env] + channels
-    channels = [BinMix(channel, noise, self.toneflags[i], self.noiseflags[i]) for i, channel in enumerate(channels)]
-    timersynths = [TimerSynth(self, self.tsfreqs[i], self.tsshapes[i]) for i in xrange(self.channels)]
-    channels = [Level(self.levelmodes[i], self.fixedlevels[i], env, channel, timersynths[i]) for i, channel in enumerate(channels)]
+    tones = [ToneOsc(scale, self.toneperiods[c]) for c in xrange(self.channels)]
+    self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
+    binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
+    timersynths = [TimerSynth(self, self.tsfreqs[c], self.tsshapes[c]) for c in xrange(self.channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c]) for c in xrange(self.channels)]
     if ampshare is None:
       ampshare = self.channels
-    Container.__init__(self, [Dac(channel, ampshare) for channel in channels])
+    Container.__init__(self, [Dac(level, ampshare) for level in levels])
     self.pause = pause
 
   def callimpl(self):
