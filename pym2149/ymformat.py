@@ -18,6 +18,7 @@
 from __future__ import division
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from pym2149.ym2149 import stclock
+from fractions import Fraction
 
 log = logging.getLogger(__name__)
 
@@ -223,12 +224,17 @@ class Frame6(Frame56):
 
   def __call__(self, chip):
     PlainFrame.__call__(self, chip)
-    for r in 0x1, 0x3:
+    for flag in chip.tsflags:
+      flag.value = False
+    for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
       if self.data[r] & 0x30:
+        chan = ((self.data[r] & 0x30) >> 4) - 1
         fx = self.data[r] & 0xc0
-        if self.flags.logtimersynth and 0x00 == fx:
-          log.warn("Timer-synth at frame %s.", self.index)
-          self.flags.logtimersynth = False
+        if 0x00 == fx:
+          denom = self.prescalers[(self.data[rr] & 0xe0) >> 5] * self.data[rrr]
+          if denom:
+            chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom)
+            chip.tsflags[chan].value = True
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
