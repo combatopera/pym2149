@@ -81,6 +81,17 @@ class RingCursor:
         self.index = ringend
       ringn -= n
 
+  def put2(self, target, indices):
+    while indices.shape[0]:
+      n = min(self.limit - self.index, indices.shape[0])
+      ringend = self.index + n
+      target.putindexed(indices[:n], self.ring.buf[self.index:ringend])
+      if ringend == self.limit:
+        self.index = self.ring.loopstart
+      else:
+        self.index = ringend
+      indices = indices[n:]
+
   def currentdc(self):
     # Observe this can break through loopstart, in which case value should be same as last:
     return (self.ring.initialdc, self.ring.dc[self.index - 1])[bool(self.index)]
@@ -95,6 +106,8 @@ class NullBuf(AnyBuf):
   def subbuf(self, *args): pass
 
   def putstrided(self, *args): pass
+
+  def putindexed(self, *args): pass
 
   def addtofirst(self, *args): pass
 
@@ -116,6 +129,9 @@ class Buf(AnyBuf):
 
   def putstrided(self, start, end, step, data):
     self.buf[start:end:step] = data
+
+  def putindexed(self, indices, data):
+    self.buf[indices] = data
 
   def addtofirst(self, val):
     self.buf[0] += val
