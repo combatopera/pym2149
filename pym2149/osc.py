@@ -72,6 +72,10 @@ class OscDiff(BinDiff):
       self.progress = (self.block.framecount - stepindex) % self.stepsize
       return self.integral
 
+def fracceil(f):
+  return -((-f.numerator) // f.denominator)
+
+# TODO: Tone tests should also be done on this.
 class RationalDiff(BinDiff):
 
   def __init__(self, dtype, chip, freqreg):
@@ -80,9 +84,15 @@ class RationalDiff(BinDiff):
     self.freqreg = freqreg
 
   def callimpl(self):
-    # FIXME: Implement me.
+    stepsize = self.chip.clock / self.freqreg.value / 2
+    if not self.progress:
+      stepindex = 0
+    else:
+      stepindex = max(0, stepsize - self.progress)
     self.blockbuf.fill(0)
-    self.blockbuf.addtofirst(1)
+    while fracceil(stepindex) < self.block.framecount:
+      self.ringcursor.put(self.blockbuf, fracceil(stepindex), 1, 1)
+      stepindex += stepsize
     return self.integral
 
 class TimerSynth(BufNode):
