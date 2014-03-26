@@ -56,6 +56,13 @@ class TestToneOsc(unittest.TestCase):
       v2 = o.call(Block(size - n)).tolist()
       self.assertEqual(ref, v1 + v2)
 
+  def test_endexistingstepatendofblock(self):
+    r = Reg(0x01)
+    o = ToneOsc(8, r)
+    self.assertEqual([1] * 4, o.call(Block(4)).tolist())
+    self.assertEqual([1] * 4, o.call(Block(4)).tolist())
+    self.assertEqual([0] * 4, o.call(Block(4)).tolist())
+
   def test_increaseperiodonboundary(self):
     r = Reg(0x01)
     o = ToneOsc(8, r)

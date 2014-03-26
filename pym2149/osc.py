@@ -53,20 +53,24 @@ class OscDiff(BinDiff):
 
   def callimpl(self):
     self.updatestepsize(True)
-    # If progress beats the new stepsize, we step right away:
-    stepindex = self.progress and max(0, self.stepsize - self.progress)
+    if not self.progress:
+      stepindex = 0
+    else:
+      # If progress beats the new stepsize, we step right away:
+      stepindex = max(0, self.stepsize - self.progress)
     if stepindex >= self.block.framecount:
       # Next step of waveform is beyond this block:
       self.progress += self.block.framecount
       return self.hold
-    self.updatestepsize(False)
-    self.blockbuf.fill(0)
-    stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
-    dc = self.ringcursor.currentdc()
-    self.ringcursor.put(self.blockbuf, stepindex, self.stepsize, stepcount)
-    self.blockbuf.addtofirst(dc) # Add last value of previous integral.
-    self.progress = (self.block.framecount - stepindex) % self.stepsize
-    return self.integral
+    else:
+      self.updatestepsize(False)
+      self.blockbuf.fill(0)
+      stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
+      dc = self.ringcursor.currentdc()
+      self.ringcursor.put(self.blockbuf, stepindex, self.stepsize, stepcount)
+      self.blockbuf.addtofirst(dc) # Add last value of previous integral.
+      self.progress = (self.block.framecount - stepindex) % self.stepsize
+      return self.integral
 
 class TimerSynth(BufNode):
 
