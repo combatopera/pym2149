@@ -72,13 +72,27 @@ class OscDiff(BinDiff):
       self.progress = (self.block.framecount - stepindex) % self.stepsize
       return self.integral
 
+class RationalDiff(BinDiff):
+
+  def __init__(self, dtype, chip, freqreg):
+    BinDiff.__init__(self, dtype)
+    self.chip = chip
+    self.freqreg = freqreg
+
+  def callimpl(self):
+    # FIXME: Implement me.
+    self.blockbuf.fill(0)
+    self.blockbuf.addtofirst(1)
+    return self.integral
+
 class TimerSynth(BufNode):
 
   def __init__(self, chip, freqreg):
     BufNode.__init__(self, self.binarydtype)
+    self.diff = RationalDiff(self.bindiffdtype, chip, freqreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
-    self.blockbuf.fill(1)
+    self.chain(self.diff)(self.blockbuf)
 
 class ToneOsc(BufNode):
 

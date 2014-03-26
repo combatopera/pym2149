@@ -19,10 +19,11 @@
 
 from __future__ import division
 import unittest, lfsr, time, sys, numpy as np
-from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize
+from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff
 from nod import Block, BufNode
 from reg import Reg
 from buf import DiffRing, RingCursor
+from collections import namedtuple
 
 class TestToneOsc(unittest.TestCase):
 
@@ -106,6 +107,15 @@ def cmptime(self, taken, strictlimit):
   expression = "%.3f < %s" % (taken, strictlimit)
   print >> sys.stderr, expression
   self.assertTrue(eval(expression))
+
+class TestRationalDiff(unittest.TestCase):
+
+  def test_works(self):
+    f = Reg(15)
+    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(100), f)
+    d.reset(ToneOsc.diffs)
+    d.call(Block(100))
+    self.assertEqual([1, 0, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0] * 10, d.blockbuf.tolist())
 
 class TestNoiseOsc(unittest.TestCase):
 
