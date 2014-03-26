@@ -113,13 +113,15 @@ def cmptime(self, taken, strictlimit):
   print >> sys.stderr, expression
   self.assertTrue(eval(expression))
 
-class TestRationalDiff(TestToneOsc):
+class TestTimerSynth(TestToneOsc):
 
   @staticmethod
   def createosc(scale, periodreg):
     clock = 2000000
     xform = lambda period: Fraction(clock, scale * 2 * period)
     return TimerSynth(namedtuple('Chip', 'clock')(clock), DerivedReg(xform, periodreg))
+
+class TestRationalDiff(unittest.TestCase):
 
   def test_works(self):
     f = Reg(Fraction(15))
