@@ -75,7 +75,6 @@ class OscDiff(BinDiff):
 def fracceil(f):
   return -((-f.numerator) // f.denominator)
 
-# TODO: Tone tests should also be done on this.
 class RationalDiff(BinDiff):
 
   def __init__(self, dtype, chip, freqreg):

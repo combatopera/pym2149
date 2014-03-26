@@ -19,17 +19,21 @@
 
 from __future__ import division
 import unittest, lfsr, time, sys, numpy as np
-from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff
+from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
 from nod import Block, BufNode
-from reg import Reg
+from reg import Reg, DerivedReg
 from buf import DiffRing, RingCursor
 from collections import namedtuple
 from fractions import Fraction
 
 class TestToneOsc(unittest.TestCase):
 
+  @staticmethod
+  def createosc(scale, periodreg):
+    return ToneOsc(scale, periodreg)
+
   def test_works(self):
-    o = ToneOsc(8, Reg(3))
+    o = self.createosc(8, Reg(3))
     v = o.call(Block(96)).tolist()
     self.assertEqual([1] * 24, v[:24])
     self.assertEqual([0] * 24, v[24:48])
@@ -40,7 +44,7 @@ class TestToneOsc(unittest.TestCase):
     self.assertEqual([0] * 24, v[24:])
 
   def test_resume(self):
-    o = ToneOsc(8, Reg(3))
+    o = self.createosc(8, Reg(3))
     v = o.call(Block(25)).tolist()
     self.assertEqual([1] * 24, v[:24])
     self.assertEqual([0], v[24:])
@@ -51,23 +55,23 @@ class TestToneOsc(unittest.TestCase):
   def test_carry(self):
     r = Reg(0x01)
     size = 3 * 8 + 1
-    ref = ToneOsc(8, r).call(Block(size)).tolist()
+    ref = self.createosc(8, r).call(Block(size)).tolist()
     for n in xrange(size + 1):
-      o = ToneOsc(8, r)
+      o = self.createosc(8, r)
       v1 = o.call(Block(n)).tolist()
       v2 = o.call(Block(size - n)).tolist()
       self.assertEqual(ref, v1 + v2)
 
   def test_endexistingstepatendofblock(self):
     r = Reg(0x01)
-    o = ToneOsc(8, r)
+    o = self.createosc(8, r)
     self.assertEqual([1] * 4, o.call(Block(4)).tolist())
     self.assertEqual([1] * 4, o.call(Block(4)).tolist())
     self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
   def test_increaseperiodonboundary(self):
     r = Reg(0x01)
-    o = ToneOsc(8, r)
+    o = self.createosc(8, r)
     self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
     r.value = 0x02
     self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -76,7 +80,7 @@ class TestToneOsc(unittest.TestCase):
 
   def test_decreaseperiodonboundary(self):
     r = Reg(0x03)
-    o = ToneOsc(8, r)
+    o = self.createosc(8, r)
     self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
     r.value = 0x02
     self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
@@ -85,7 +89,7 @@ class TestToneOsc(unittest.TestCase):
 
   def test_smallerblocksthanperiod(self):
     r = Reg(0x05)
-    o = ToneOsc(1, r)
+    o = self.createosc(1, r)
     self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
     self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
     self.assertEqual([0,0,1], o.call(Block(3)).tolist())
@@ -98,7 +102,7 @@ class TestToneOsc(unittest.TestCase):
     blocksize = 2000000 // blockrate
     for p in 0x001, 0xfff:
       r = Reg(p)
-      o = ToneOsc(8, r)
+      o = self.createosc(8, r)
       start = time.time()
       for _ in xrange(blockrate):
         o.call(Block(blocksize))
@@ -109,7 +113,13 @@ def cmptime(self, taken, strictlimit):
   print >> sys.stderr, expression
   self.assertTrue(eval(expression))
 
-class TestRationalDiff(unittest.TestCase):
+class TestRationalDiff(TestToneOsc):
+
+  @staticmethod
+  def createosc(scale, periodreg):
+    clock = 2000000
+    xform = lambda period: Fraction(clock, scale * 2 * period)
+    return TimerSynth(namedtuple('Chip', 'clock')(clock), DerivedReg(xform, periodreg))
 
   def test_works(self):
     f = Reg(Fraction(15))
