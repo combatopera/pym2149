@@ -24,6 +24,7 @@ from nod import Block, BufNode
 from reg import Reg
 from buf import DiffRing, RingCursor
 from collections import namedtuple
+from fractions import Fraction
 
 class TestToneOsc(unittest.TestCase):
 
@@ -111,11 +112,12 @@ def cmptime(self, taken, strictlimit):
 class TestRationalDiff(unittest.TestCase):
 
   def test_works(self):
-    f = Reg(15)
+    f = Reg(Fraction(15))
     d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(100), f)
     d.reset(ToneOsc.diffs)
-    d.call(Block(100))
-    self.assertEqual([1, 0, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0] * 10, d.blockbuf.tolist())
+    for _ in xrange(10):
+      d.call(Block(100))
+      self.assertEqual([1, 0, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0] * 5, d.blockbuf.tolist())
 
 class TestNoiseOsc(unittest.TestCase):
 
