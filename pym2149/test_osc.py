@@ -136,12 +136,12 @@ class TestRationalDiff(unittest.TestCase):
       d.call(Block(80))
       self.assertEqual(expected, d.blockbuf.tolist())
     actual = []
-    expected += expected[:20]
+    expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 5
     for _ in xrange(33):
       d.call(Block(3))
-      actual += d.blockbuf.tolist()
+      actual += list(np.cumsum(d.blockbuf.buf))
     d.call(Block(1))
-    actual += d.blockbuf.tolist()
+    actual += list(np.cumsum(d.blockbuf.buf))
     self.assertEqual(expected, actual)
 
   def test_zerofreq(self):
