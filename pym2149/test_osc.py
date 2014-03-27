@@ -28,6 +28,8 @@ from fractions import Fraction
 
 class TestToneOsc(unittest.TestCase):
 
+  performancelimit = .05
+
   @staticmethod
   def createosc(scale, periodreg):
     return ToneOsc(scale, periodreg)
@@ -106,7 +108,7 @@ class TestToneOsc(unittest.TestCase):
       start = time.time()
       for _ in xrange(blockrate):
         o.call(Block(blocksize))
-      cmptime(self, time.time() - start, .05)
+      cmptime(self, time.time() - start, self.performancelimit)
 
 def cmptime(self, taken, strictlimit):
   expression = "%.3f < %s" % (taken, strictlimit)
@@ -114,6 +116,8 @@ def cmptime(self, taken, strictlimit):
   self.assertTrue(eval(expression))
 
 class TestTimerSynth(TestToneOsc):
+
+  performancelimit = .1
 
   @staticmethod
   def createosc(scale, periodreg):
