@@ -20,6 +20,7 @@ from osc import ToneOsc, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
+from fractions import Fraction
 
 stclock = 2000000
 defaultscale = 8
@@ -47,7 +48,7 @@ class Registers:
     self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(self.channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
-    self.tsfreqs = tuple(Reg(0) for _ in xrange(self.channels))
+    self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(self.channels))
     self.tsflags = tuple(Reg(0) for _ in xrange(self.channels))
 
 class YM2149(Registers, Container):
