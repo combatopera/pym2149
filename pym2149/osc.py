@@ -88,7 +88,9 @@ class RationalDiff(BinDiff):
     if not self.progress:
       stepindex = 0
     else:
-      stepindex = max(0, stepsize - self.progress)
+      stepindex = stepsize - self.progress
+      if fracceil(stepindex) < 0:
+        stepindex = 0
     if fracceil(stepindex) >= self.block.framecount:
       self.progress += self.block.framecount
       return self.hold
@@ -100,7 +102,9 @@ class RationalDiff(BinDiff):
       dc = self.ringcursor.currentdc()
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
-      self.progress = (self.block.framecount - stepindex) % stepsize
+      self.progress = self.block.framecount - (stepcount - 1) * stepsize - stepindex
+      if self.progress == stepsize:
+        self.progress = 0
       return self.integral
 
 class TimerSynth(BufNode):
