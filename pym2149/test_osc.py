@@ -22,7 +22,7 @@ import unittest, lfsr, time, sys, numpy as np
 from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
 from nod import Block, BufNode
 from reg import Reg, DerivedReg
-from buf import DiffRing, RingCursor
+from buf import DiffRing, RingCursor, Buf
 from collections import namedtuple
 from fractions import Fraction
 
@@ -137,11 +137,13 @@ class TestRationalDiff(unittest.TestCase):
       self.assertEqual(expected, d.blockbuf.tolist())
     actual = []
     expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 5
+    def block(n):
+      v = Buf(np.empty(n, dtype = int))
+      d.call(Block(n))(v)
+      actual.extend(v.tolist())
     for _ in xrange(33):
-      d.call(Block(3))
-      actual += list(np.cumsum(d.blockbuf.buf))
-    d.call(Block(1))
-    actual += list(np.cumsum(d.blockbuf.buf))
+      block(3)
+    block(1)
     self.assertEqual(expected, actual)
 
   def test_zerofreq(self):
