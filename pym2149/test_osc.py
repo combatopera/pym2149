@@ -154,7 +154,6 @@ class TestRationalDiff(unittest.TestCase):
     for _ in xrange(50):
       d.call(Block(100))
       self.assertEqual(expected, d.blockbuf.tolist())
-      expected = [0] * 100
 
 class TestNoiseOsc(unittest.TestCase):
 
