@@ -21,6 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from music import Orc, Main, clock as nomclock
+from fractions import Fraction
 import os, subprocess, time
 
 log = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ class Boring:
     pass
 
 @orc.add
-class Silence(Boring):
+class silence(Boring):
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = False
@@ -111,9 +112,24 @@ class All(Boring):
     chip.envperiod.value = self.eperiod
     chip.envshape.value = self.shape
 
+@orc.add
+class PWM(Boring):
+
+  def __init__(self, tfreq, tsfreq):
+    self.tperiod = Freq(tfreq).toneperiod(nomclock)
+    self.tsfreq = Fraction(tsfreq)
+
+  def noteon(self, chip, chan):
+    chip.noiseflags[chan].value = False
+    chip.toneflags[chan].value = True
+    chip.tsflags[chan].value = True
+    chip.fixedlevels[chan].value = 15
+    chip.toneperiods[chan].value = self.tperiod
+    chip.tsfreqs[chan].value = self.tsfreq
+
 class Target:
 
-  with orc as play: dc0 = play(1, 'S')
+  with orc as play: dc0 = play(1, 's')
   main = Main(refreshrate)
 
   def __init__(self):
@@ -143,6 +159,8 @@ def main():
   with orc as play: target.dump(play(1, 'E', [650], [0x0a]), 'tri650')
   with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
   with orc as play: target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
+  with orc as play: target.dump(play(1, 'P', [501], [501]), 'pwm501')
+  with orc as play: target.dump(play(1, 'P', [250], [251]), 'pwm250')
 
 if '__main__' == __name__:
   main()
