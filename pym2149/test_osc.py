@@ -150,10 +150,18 @@ class TestRationalDiff(unittest.TestCase):
     f = Reg(Fraction(0))
     d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(1000), f)
     d.reset(ToneOsc.diffs)
-    expected = [1] + [0] * 99
     for _ in xrange(50):
       d.call(Block(100))
-      self.assertEqual(expected, d.blockbuf.tolist())
+      self.assertEqual([1] + [0] * 99, d.blockbuf.tolist())
+    self.assertEqual(5000, d.progress)
+    f.value = Fraction(50)
+    d.call(Block(25))
+    self.assertEqual([0] * 10 + [1] + [0] * 9 + [-1] + [0] * 4, d.blockbuf.tolist())
+    self.assertEqual(5, d.progress)
+    f.value = Fraction(0)
+    d.call(Block(25))
+    self.assertEqual([0] * 25, d.blockbuf.tolist())
+    self.assertEqual(30, d.progress)
 
 class TestNoiseOsc(unittest.TestCase):
 
