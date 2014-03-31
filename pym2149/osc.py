@@ -107,8 +107,8 @@ class RationalDiff(BinDiff):
     else:
       self.blockbuf.fill(0)
       stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-      # XXX: Use integer arithmetic?
-      indices = np.ceil(np.float32(stepindex) + np.arange(stepcount, dtype = np.float32) * np.float32(stepsize)).astype(np.int32)
+      m = stepsize.denominator * stepindex.denominator
+      indices = -((-(np.int32(stepindex * m) + np.arange(stepcount) * np.int32(stepsize * m))) // m)
       dc = self.ringcursor.currentdc()
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
