@@ -83,7 +83,17 @@ class RationalDiff(BinDiff):
     self.freqreg = freqreg
 
   def callimpl(self):
-    # FIXME: Handle zero frequency.
+    if not self.freqreg.value:
+      if not self.progress:
+        self.blockbuf.fill(0)
+        dc = self.ringcursor.currentdc()
+        self.ringcursor.put2(self.blockbuf, np.zeros(1, dtype = np.int32))
+        self.blockbuf.addtofirst(dc)
+        self.progress = self.block.framecount
+        return self.integral
+      else:
+        self.progress += self.block.framecount
+        return self.hold
     stepsize = self.chip.clock / self.freqreg.value / 2
     if not self.progress:
       stepindex = 0
