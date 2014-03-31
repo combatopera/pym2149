@@ -125,22 +125,23 @@ class TestTimerSynth(TestToneOsc):
     xform = lambda period: Fraction(clock, scale * 2 * period)
     return TimerSynth(namedtuple('Chip', 'clock')(clock), DerivedReg(xform, periodreg))
 
+def diffblock(d, n):
+  v = Buf(np.empty(n, dtype = int))
+  d.call(Block(n))(v)
+  return v.tolist()
+
 class TestRationalDiff(unittest.TestCase):
 
   def test_works(self):
     f = Reg(Fraction(15))
-    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(100), f)
-    d.reset(ToneOsc.diffs)
-    expected = [1, 0, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0] * 4
+    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(100), f).reset(ToneOsc.diffs)
+    expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
     for _ in xrange(13):
-      d.call(Block(80))
-      self.assertEqual(expected, d.blockbuf.tolist())
+      self.assertEqual(expected, diffblock(d, 80))
     actual = []
     expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 5
     def block(n):
-      v = Buf(np.empty(n, dtype = int))
-      d.call(Block(n))(v)
-      actual.extend(v.tolist())
+      actual.extend(diffblock(d, n))
     for _ in xrange(33):
       block(3)
     block(1)
@@ -148,19 +149,15 @@ class TestRationalDiff(unittest.TestCase):
 
   def test_zerofreq(self):
     f = Reg(Fraction(0))
-    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(1000), f)
-    d.reset(ToneOsc.diffs)
+    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(1000), f).reset(ToneOsc.diffs)
     for _ in xrange(50):
-      d.call(Block(100))
-      self.assertEqual([1] + [0] * 99, d.blockbuf.tolist())
+      self.assertEqual([1] * 100, diffblock(d, 100))
     self.assertEqual(5000, d.progress)
     f.value = Fraction(50)
-    d.call(Block(25))
-    self.assertEqual([0] * 10 + [1] + [0] * 9 + [-1] + [0] * 4, d.blockbuf.tolist())
+    self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
     self.assertEqual(5, d.progress)
     f.value = Fraction(0)
-    d.call(Block(25))
-    self.assertEqual([0] * 25, d.blockbuf.tolist())
+    self.assertEqual([0] * 25, diffblock(d, 25))
     self.assertEqual(30, d.progress)
 
 class TestNoiseOsc(unittest.TestCase):
