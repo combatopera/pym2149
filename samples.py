@@ -43,16 +43,22 @@ class silence(Boring):
     chip.fixedlevels[chan].value = 13
 
 @orc.add
-class Tone(Boring):
+class tone(Boring):
 
-  def __init__(self, freq):
-    self.period = Freq(freq).toneperiod(nomclock)
+  def __init__(self, period):
+    self.period = period
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = True
     chip.noiseflags[chan].value = False
     chip.fixedlevels[chan].value = 15
     chip.toneperiods[chan].value = self.period
+
+@orc.add
+class Tone(tone):
+
+  def __init__(self, freq):
+    tone.__init__(self, Freq(freq).toneperiod(nomclock))
 
 @orc.add
 class Noise(Boring):
@@ -160,7 +166,8 @@ def main():
   with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
   with orc as play: target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
   with orc as play: target.dump(play(1, 'P', [501], [501]), 'pwm501')
-  with orc as play: target.dump(play(1, 'P', [250], [251]), 'pwm250')
+  with orc as play: target.dump(play(1, 'P', [250], [251]), 'pwm250') # Observe timer detune.
+  with orc as play: target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
 
 if '__main__' == __name__:
   main()
