@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import lfsr, itertools, math, numpy as np
+import lfsr, itertools, math, numpy as np, fractions
 from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
@@ -107,8 +107,8 @@ class RationalDiff(BinDiff):
     else:
       self.blockbuf.fill(0)
       stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-      m = stepsize.denominator * stepindex.denominator
-      indices = -((-(np.int32(stepindex * m) + np.arange(stepcount) * np.int32(stepsize * m))) // m)
+      lcm = stepsize.denominator * stepindex.denominator // fractions.gcd(stepsize.denominator, stepindex.denominator)
+      indices = -((-(stepindex * lcm).numerator - np.arange(stepcount) * (stepsize * lcm).numerator) // lcm)
       dc = self.ringcursor.currentdc()
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
