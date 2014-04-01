@@ -160,6 +160,7 @@ def main():
   with orc as play: target.dump(play(1, 'N', [5000]), 'noise5k')
   with orc as play: target.dump(play(1, 'N', [125000]), 'noise125k')
   with orc as play: target.dump(play(1, 'B', [1000], [5000]), 'tone1k+noise5k')
+  with orc as play: target.dump(play(1, 'B', [nomclock // 16], [5000]), 'noise5k+tone1')
   with orc as play: target.dump(play(1, 'E', [600], [0x08]), 'saw600')
   with orc as play: target.dump(play(1, 'E', [600], [0x10]), 'sin600')
   with orc as play: target.dump(play(1, 'E', [650], [0x0a]), 'tri650')

@@ -17,7 +17,7 @@
 
 from pym2149.util import Timer
 from pym2149.buf import singleton
-from pym2149.ym2149 import stclock as clock
+from pym2149.ym2149 import stclock as clock # TODO: Make configurable.
 from cli import Config
 import sys
 
