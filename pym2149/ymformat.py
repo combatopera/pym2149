@@ -233,7 +233,8 @@ class Frame6(Frame56):
         if 0x00 == fx:
           denom = self.prescalers[(self.data[rr] & 0xe0) >> 5] * self.data[rrr]
           if denom:
-            chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom)
+            # Note freq is half of the step freq, so divide by 2:
+            chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom * 2)
             chip.tsflags[chan].value = True
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
