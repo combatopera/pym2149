@@ -26,7 +26,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
-# TODO: Envelope trigger and timer synth.
+# TODO: Show timer synth.
 class Roll:
 
   shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
@@ -34,7 +34,8 @@ class Roll:
   def __init__(self, height, chip, nomclock):
     self.line = 0
     self.jump = "\x1b[%sA" % height
-    self.format = ' | '.join(chip.channels * ["%7s %1s %2s %1s %2s %7s"])
+    self.format = ' | '.join(chip.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
+    self.shapeversion = None
     self.height = height
     self.chip = chip
     self.nomclock = nomclock
@@ -49,6 +50,8 @@ class Roll:
       noise = self.chip.noiseflags[c].value
       env = self.chip.levelmodes[c].value
       level = self.chip.fixedlevels[c].value
+      newshape = (self.shapeversion != self.chip.envshape.version)
+      self.shapeversion = self.chip.envshape.version
       rhs = env or level
       if tone and rhs:
         vals.append(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock).pitch())
@@ -69,11 +72,14 @@ class Roll:
       if env:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])
+        vals.append(('', '~')[newshape])
         vals.append(Period(self.chip.envperiod.value).envfreq(self.nomclock, shape).pitch())
       elif level:
         vals.append(level)
         vals.append('')
+        vals.append('')
       else:
+        vals.append('')
         vals.append('')
         vals.append('')
     print >> sys.stderr, self.format % tuple(vals)
