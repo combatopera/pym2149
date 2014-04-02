@@ -26,9 +26,10 @@ import sys
 
 log = logging.getLogger(__name__)
 
+# TODO: Envelope trigger and timer synth.
 class Roll:
 
-  shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\-', '//', '/-', '/\\', '/_')
+  shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
 
   def __init__(self, height, chip, nomclock):
     self.line = 0
