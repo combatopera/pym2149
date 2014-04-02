@@ -41,17 +41,18 @@ class Config:
     return False
 
   def __init__(self, args = sys.argv[1:]):
-    options, self.args = getopt.getopt(args, 'q:H:l:p1s', ['quant=', 'height=', 'law=', 'pause', 'once', 'stereo'])
+    options, self.args = getopt.getopt(args, 'q:H:l:p1sc', ['quant=', 'height=', 'law=', 'pause', 'once', 'stereo', 'clamp'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
     self.panlaw = self.uniqueoption(options, ('-l', '--law'), 3, float)
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
+    self.clamp = self.booleanoption(options, ('-c', '--clamp'))
 
   def createchip(self, nominalclock, **kwargs):
     clock = int(round(nominalclock * self.scale / 8))
-    chip = YM2149(clock, scale = self.scale, pause = self.pause, **kwargs)
+    chip = YM2149(clock, scale = self.scale, pause = self.pause, clamp = self.clamp, **kwargs)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip

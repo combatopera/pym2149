@@ -15,26 +15,33 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from reg import Reg, DerivedReg
 from osc import ToneOsc, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
+from out import WavBuf
 
 stclock = 2000000
 defaultscale = 8
+
+def toneperiodclamp(chip, outrate):
+  # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
+  return (chip.clock - 1) // (chip.scale * outrate)
 
 class Registers:
 
   channels = 3
 
-  def __init__(self):
+  def __init__(self, clamp):
     # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    TP = lambda f, r: max(1, ((r & 0x0f) << 8) | (f & 0xff))
+    mintoneperiod = max(toneperiodclamp(self, WavBuf.outrate), 1) if clamp else 1
+    TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
     self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(self.channels))
@@ -53,8 +60,8 @@ class Registers:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, clock, ampshare = None, scale = defaultscale, pause = False):
-    Registers.__init__(self)
+  def __init__(self, clock, ampshare = None, scale = defaultscale, pause = False, clamp = False):
+    Registers.__init__(self, clamp)
     # Chip-wide signals:
     noise = NoiseOsc(scale, self.noiseperiod)
     env = EnvOsc(scale, self.envperiod, self.envshape)
@@ -70,6 +77,7 @@ class YM2149(Registers, Container):
     Container.__init__(self, [Dac(level, ampshare) for level in levels])
     self.pause = pause
     self.clock = clock
+    self.scale = scale
 
   def callimpl(self):
     result = Container.callimpl(self)
