@@ -61,6 +61,8 @@ class Registers:
 class YM2149(Registers, Container):
 
   def __init__(self, clock, ampshare = None, scale = defaultscale, pause = False, clamp = False):
+    self.clock = clock
+    self.scale = scale
     Registers.__init__(self, clamp)
     # Chip-wide signals:
     noise = NoiseOsc(scale, self.noiseperiod)
@@ -76,8 +78,6 @@ class YM2149(Registers, Container):
       ampshare = self.channels
     Container.__init__(self, [Dac(level, ampshare) for level in levels])
     self.pause = pause
-    self.clock = clock
-    self.scale = scale
 
   def callimpl(self):
     result = Container.callimpl(self)
