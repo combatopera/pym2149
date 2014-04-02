@@ -20,13 +20,12 @@
 from pym2149.initlogging import logging
 from pym2149.util import Timer
 from pym2149.ymformat import ymopen
-from pym2149.pitch import Period
+from pym2149.pitch import Period, Freq
 from cli import Config
 import sys
 
 log = logging.getLogger(__name__)
 
-# TODO: Show timer synth.
 class Roll:
 
   shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
@@ -52,6 +51,7 @@ class Roll:
       level = self.chip.fixedlevels[c].value
       newshape = (self.shapeversion != self.chip.envshape.version)
       self.shapeversion = self.chip.envshape.version
+      timersynth = self.chip.tsflags[c].value
       rhs = env or level
       if tone and rhs:
         vals.append(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock).pitch())
@@ -69,7 +69,14 @@ class Roll:
         vals.append('*')
       else:
         vals.append('')
-      if env:
+      if timersynth and (env or level):
+        if env:
+          vals.append(self.shapes[self.chip.envshape.value])
+        else:
+          vals.append(level)
+        vals.append('')
+        vals.append(Freq(self.chip.tsfreqs[c].value).pitch())
+      elif env:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])
         vals.append(('', '~')[newshape])
