@@ -50,8 +50,8 @@ class Config:
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
 
   def createchip(self, nominalclock, **kwargs):
-    chip = YM2149(scale = self.scale, pause = self.pause, **kwargs)
-    chip.clock = int(round(nominalclock * self.scale / 8))
+    clock = int(round(nominalclock * self.scale / 8))
+    chip = YM2149(clock, scale = self.scale, pause = self.pause, **kwargs)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip

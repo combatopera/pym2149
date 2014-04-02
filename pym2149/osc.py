@@ -77,9 +77,9 @@ def fracceil(f):
 
 class RationalDiff(BinDiff):
 
-  def __init__(self, dtype, chip, freqreg):
+  def __init__(self, dtype, clock, freqreg):
     BinDiff.__init__(self, dtype)
-    self.chip = chip
+    self.clock = clock
     self.freqreg = freqreg
 
   def callimpl(self):
@@ -94,7 +94,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = self.chip.clock / self.freqreg.value / 2
+    stepsize = self.clock / self.freqreg.value / 2
     if not self.progress:
       stepindex = 0
     else:
@@ -119,9 +119,9 @@ class RationalDiff(BinDiff):
 
 class TimerSynth(BufNode):
 
-  def __init__(self, chip, freqreg):
+  def __init__(self, clock, freqreg):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = RationalDiff(self.bindiffdtype, chip, freqreg).reset(ToneOsc.diffs)
+    self.diff = RationalDiff(self.bindiffdtype, clock, freqreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)

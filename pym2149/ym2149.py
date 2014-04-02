@@ -53,14 +53,14 @@ class Registers:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, ampshare = None, scale = defaultscale, pause = False):
+  def __init__(self, clock, ampshare = None, scale = defaultscale, pause = False):
     Registers.__init__(self)
     # Chip-wide signals:
     noise = NoiseOsc(scale, self.noiseperiod)
     env = EnvOsc(scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(scale, self.toneperiods[c]) for c in xrange(self.channels)]
-    timersynths = [TimerSynth(self, self.tsfreqs[c]) for c in xrange(self.channels)]
+    timersynths = [TimerSynth(clock, self.tsfreqs[c]) for c in xrange(self.channels)]
     # We don't add timersynths to maskables as it makes sense to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
@@ -69,6 +69,7 @@ class YM2149(Registers, Container):
       ampshare = self.channels
     Container.__init__(self, [Dac(level, ampshare) for level in levels])
     self.pause = pause
+    self.clock = clock
 
   def callimpl(self):
     result = Container.callimpl(self)

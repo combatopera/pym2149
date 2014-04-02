@@ -23,7 +23,6 @@ from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
 from nod import Block, BufNode
 from reg import Reg, DerivedReg
 from buf import DiffRing, RingCursor, Buf
-from collections import namedtuple
 from fractions import Fraction
 
 class TestToneOsc(unittest.TestCase):
@@ -123,7 +122,7 @@ class TestTimerSynth(TestToneOsc):
   def createosc(scale, periodreg):
     clock = 2000000
     xform = lambda period: Fraction(clock, scale * 2 * period)
-    return TimerSynth(namedtuple('Chip', 'clock')(clock), DerivedReg(xform, periodreg))
+    return TimerSynth(clock, DerivedReg(xform, periodreg))
 
 def diffblock(d, n):
   v = Buf(np.empty(n, dtype = int))
@@ -134,7 +133,7 @@ class TestRationalDiff(unittest.TestCase):
 
   def test_works(self):
     f = Reg(Fraction(15))
-    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(100), f).reset(ToneOsc.diffs)
+    d = RationalDiff(RationalDiff.bindiffdtype, 100, f).reset(ToneOsc.diffs)
     expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
     for _ in xrange(13):
       self.assertEqual(expected, diffblock(d, 80))
@@ -149,7 +148,7 @@ class TestRationalDiff(unittest.TestCase):
 
   def test_zerofreq(self):
     f = Reg(Fraction(0))
-    d = RationalDiff(RationalDiff.bindiffdtype, namedtuple('Chip', 'clock')(1000), f).reset(ToneOsc.diffs)
+    d = RationalDiff(RationalDiff.bindiffdtype, 1000, f).reset(ToneOsc.diffs)
     for _ in xrange(50):
       self.assertEqual([1] * 100, diffblock(d, 100))
     self.assertEqual(5000, d.progress)
