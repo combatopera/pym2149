@@ -20,6 +20,7 @@ import lfsr, itertools, math, numpy as np, fractions
 from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
+from fractions import Fraction
 
 loopsize = 1024
 
@@ -75,11 +76,17 @@ class OscDiff(BinDiff):
 def fracceil(f):
   return -((-f.numerator) // f.denominator)
 
+def fracfloor(f):
+  return f.numerator // f.denominator
+
+def fraclcd(f, g): # The LCD is the LCM of the denominators.
+  return f.denominator * g.denominator // fractions.gcd(f.denominator, g.denominator)
+
 class RationalDiff(BinDiff):
 
   def __init__(self, dtype, clock, freqreg):
     BinDiff.__init__(self, dtype)
-    self.clock = clock
+    self.halfclock = Fraction(clock, 2)
     self.freqreg = freqreg
 
   def callimpl(self):
@@ -94,7 +101,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = self.clock / self.freqreg.value / 2
+    stepsize = self.halfclock / self.freqreg.value
     if not self.progress:
       stepindex = 0
     else:
@@ -106,9 +113,9 @@ class RationalDiff(BinDiff):
       return self.hold
     else:
       self.blockbuf.fill(0)
-      stepcount = (self.block.framecount - stepindex + stepsize - 1) // stepsize
-      lcm = stepsize.denominator * stepindex.denominator // fractions.gcd(stepsize.denominator, stepindex.denominator)
-      indices = -((-(stepindex * lcm).numerator - np.arange(stepcount) * (stepsize * lcm).numerator) // lcm)
+      stepcount = fracfloor((self.block.framecount - 1 - stepindex) / stepsize) + 1
+      lcd = fraclcd(stepsize, stepindex)
+      indices = -((-(stepindex * lcd).numerator - np.arange(stepcount) * (stepsize * lcd).numerator) // lcd)
       dc = self.ringcursor.currentdc()
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
