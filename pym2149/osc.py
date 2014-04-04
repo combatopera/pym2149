@@ -80,7 +80,9 @@ def fracfloor(f):
   return f.numerator // f.denominator
 
 def fraclcd(f, g): # The LCD is the LCM of the denominators.
-  return f.denominator * g.denominator // fractions.gcd(f.denominator, g.denominator)
+  fd = f.denominator
+  gd = g.denominator
+  return fd * gd // fractions.gcd(fd, gd)
 
 def fracint(f, denominator):
   return f.numerator * denominator // f.denominator
