@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from music import Orc, Main, clock as nomclock
 from fractions import Fraction
-import os, subprocess, time
+import os, subprocess, time, sys
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +148,7 @@ class Target:
     log.debug(path)
     frames = zip(chan, self.dc0, self.dc0)
     start = time.time()
-    self.main(frames, ['--quant', '3', path + '.wav']) # TODO: Merge with command line.
+    self.main(frames, sys.argv[1:] + [path + '.wav'])
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
