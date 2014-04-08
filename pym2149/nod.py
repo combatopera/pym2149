@@ -38,6 +38,7 @@ class Node:
     if self.block != block:
       self.block = block
       self.masked = masked
+      self.result = None # Otherwise numpy ref-counting may complain on resize.
       self.result = self.callimpl()
     return self.result
 
