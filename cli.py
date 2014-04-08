@@ -41,10 +41,11 @@ class Config:
     return False
 
   def __init__(self, args = sys.argv[1:]):
-    options, self.args = getopt.getopt(args, 'q:H:l:p1sc', ['quant=', 'height=', 'law=', 'pause', 'once', 'stereo', 'clamp'])
+    options, self.args = getopt.getopt(args, 'q:H:l:r:p1sc', ['quant=', 'height=', 'law=', 'rate=', 'pause', 'once', 'stereo', 'clamp'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
     self.panlaw = self.uniqueoption(options, ('-l', '--law'), 3, float)
+    self.outrate = self.uniqueoption(options, ('-r', '--rate'), 44100, int)
     self.pause = self.booleanoption(options, ('-p', '--pause'))
     self.once = self.booleanoption(options, ('-1', '--once'))
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
@@ -52,7 +53,8 @@ class Config:
 
   def createchip(self, nominalclock, **kwargs):
     clock = int(round(nominalclock * self.scale / 8))
-    chip = YM2149(clock, scale = self.scale, pause = self.pause, clamp = self.clamp, **kwargs)
+    clampoutrate = self.outrate if self.clamp else None
+    chip = YM2149(clock, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate, **kwargs)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
@@ -73,7 +75,7 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    return WavWriter([WavBuf(chip.clock, naive) for naive in naives], outpath)
+    return WavWriter([WavBuf(chip.clock, naive, self.outrate) for naive in naives], outpath)
 
   def getheight(self, defaultheight):
     if self.height is not None:

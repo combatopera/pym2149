@@ -47,10 +47,9 @@ class WavWriter(Node):
 
 class WavBuf(Node):
 
-  outrate = 44100
   indexdtype = np.int32
 
-  def __init__(self, clock, chip):
+  def __init__(self, clock, chip, outrate):
     Node.__init__(self)
     # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
@@ -58,7 +57,7 @@ class WavBuf(Node):
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outimaster = MasterBuf(dtype = self.indexdtype)
     self.wavmaster = MasterBuf(dtype = Wave16.dtype)
-    self.minbleps = MinBleps(clock, self.outrate, scale)
+    self.minbleps = MinBleps(clock, outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
     self.overflowsize = self.minbleps.mixinsize
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))
@@ -67,6 +66,7 @@ class WavBuf(Node):
     self.out0 = 0 # Absolute index of first output sample being processed next iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.chip = chip
+    self.outrate = outrate
 
   def callimpl(self):
     # TODO: Unit-test that results do not depend on block size.

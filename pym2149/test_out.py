@@ -42,7 +42,7 @@ class TestWavWriter(unittest.TestCase):
     clock = 250000
     blocksize = clock // (1000, 10)[bigblocks]
     tone = MinPeriodTone()
-    w = WavWriter([WavBuf(clock, tone)], '/dev/null')
+    w = WavWriter([WavBuf(clock, tone, 44100)], '/dev/null')
     tone.cursor = 0
     start = time.time()
     while tone.cursor < tone.size:
