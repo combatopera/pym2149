@@ -52,12 +52,15 @@ class Config:
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
     self.clamp = self.booleanoption(options, ('-c', '--clamp'))
 
-  def createchip(self, nominalclock = None, **kwargs):
-    # Prefer user setting, then passed-in, then default:
+  def nominalclock(self, altdefault = None):
     if self.nominalclockornone is not None:
-      nominalclock = self.nominalclockornone
-    elif nominalclock is None:
-      nominalclock = stclock
+      return self.nominalclockornone
+    if altdefault is not None:
+      return stclock
+    return stclock
+
+  def createchip(self, nominalclock = None, **kwargs):
+    nominalclock = self.nominalclock(nominalclock)
     clockdiv = 8 // self.scale
     if nominalclock % clockdiv:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))

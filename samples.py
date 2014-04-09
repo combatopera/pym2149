@@ -20,8 +20,9 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from music import Orc, Main, clock as nomclock
+from music import Orc, Main
 from fractions import Fraction
+from cli import Config
 import os, subprocess, time, sys
 
 log = logging.getLogger(__name__)
@@ -153,6 +154,8 @@ class Target:
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
+  global nomclock # TODO: This is a hack.
+  nomclock = Config().nominalclock()
   target = Target()
   with orc as play: target.dump(play(1, 'T', [250]), 'tone250')
   with orc as play: target.dump(play(1, 'T', [1000]), 'tone1k')
