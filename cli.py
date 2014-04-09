@@ -55,10 +55,13 @@ class Config:
   def createchip(self, nominalclock = None, **kwargs):
     # Prefer user setting, then passed-in, then default:
     if self.nominalclockornone is not None:
-      nominalclock = self.nominalclock
+      nominalclock = self.nominalclockornone
     elif nominalclock is None:
       nominalclock = stclock
-    clock = int(round(nominalclock * self.scale / 8)) # FIXME: Fail instead of round.
+    clockdiv = 8 // self.scale
+    if nominalclock % clockdiv:
+      raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
+    clock = nominalclock // clockdiv
     clampoutrate = self.outrate if self.clamp else None
     chip = YM2149(clock, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate, **kwargs)
     if self.scale != defaultscale:
