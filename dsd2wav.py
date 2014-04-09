@@ -19,7 +19,6 @@
 
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound
-from pym2149.ym2149 import stclock
 from pym2149.util import Timer
 from cli import Config
 
@@ -34,7 +33,7 @@ def main():
     bytecode = [ord(c) for c in f.read()]
   finally:
     f.close()
-  chip = config.createchip(stclock)
+  chip = config.createchip()
   stream = config.createstream(chip, outpath)
   try:
     dosound(bytecode, chip, Timer(chip.clock), stream)

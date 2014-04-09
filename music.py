@@ -17,7 +17,6 @@
 
 from pym2149.util import Timer
 from pym2149.buf import singleton
-from pym2149.ym2149 import stclock as clock # TODO: Make configurable.
 from cli import Config
 import sys
 
@@ -128,7 +127,7 @@ class Main:
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
     outpath, = config.args
-    chip = config.createchip(clock)
+    chip = config.createchip()
     stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)

@@ -99,7 +99,7 @@ def main():
   try:
     for info in f.info:
       log.info(info)
-    chip = config.createchip(f.clock)
+    chip = config.createchip(nominalclock = f.clock)
     stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)
