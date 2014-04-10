@@ -73,7 +73,15 @@ class MinBleps:
     self.outrate = outrate
     self.scale = scale
 
+  def loadoutindexandshape(self, ctrlx, outi, shape):
+    k = ctrlx % self.ctrlrate
+    q = ctrlx // self.ctrlrate
+    outi.buf[:] = q
+    outi.buf[:] *= self.outrate
+    outi.buf[:] += self.outi[k]
+    shape.buf[:] = self.shape[k]
+
   def getoutindexandshape(self, ctrlx):
     k = ctrlx % self.ctrlrate
     q = ctrlx // self.ctrlrate
-    return self.outi[k] + self.outrate * q, self.shape[k]
+    return q * self.outrate + self.outi[k], self.shape[k]

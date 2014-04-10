@@ -56,6 +56,7 @@ class WavBuf(Node):
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outimaster = MasterBuf(dtype = self.indexdtype)
+    self.shapemaster = MasterBuf(dtype = self.indexdtype)
     self.wavmaster = MasterBuf(dtype = Wave16.dtype)
     self.minbleps = MinBleps(clock, outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
@@ -82,11 +83,12 @@ class WavBuf(Node):
     outbuf.buf[self.overflowsize:] = self.dc
     nonzeros = diffbuf.nonzeros()
     pasten = self.indexdtype(len(nonzeros))
-    outi, shape = self.minbleps.getoutindexandshape(self.naivex + nonzeros)
     outibuf = self.outimaster.ensureandcrop(pasten)
-    np.subtract(outi, self.out0, outibuf.buf)
+    shapebuf = self.shapemaster.ensureandcrop(pasten)
+    self.minbleps.loadoutindexandshape(self.naivex + nonzeros, outibuf, shapebuf)
+    outibuf.buf -= self.out0
     amp = diffbuf.buf[nonzeros]
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shape, amp, self.indexdtype(self.minbleps.scale))
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shapebuf.buf, amp, self.indexdtype(self.minbleps.scale))
     wavbuf = self.wavmaster.ensureandcrop(outcount)
     np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
