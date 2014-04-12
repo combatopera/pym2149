@@ -59,13 +59,13 @@ class tone(Boring):
 class Tone(tone):
 
   def __init__(self, freq):
-    tone.__init__(self, Freq(freq).toneperiod(nomclock))
+    tone.__init__(self, Freq(freq).toneperiod(orc.nomclock))
 
 @orc.add
 class Noise(Boring):
 
   def __init__(self, freq):
-    self.period = Freq(freq).noiseperiod(nomclock)
+    self.period = Freq(freq).noiseperiod(orc.nomclock)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = False
@@ -77,8 +77,8 @@ class Noise(Boring):
 class Both(Boring):
 
   def __init__(self, tfreq, nfreq):
-    self.tperiod = Freq(tfreq).toneperiod(nomclock)
-    self.nperiod = Freq(nfreq).noiseperiod(nomclock)
+    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
+    self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = True
@@ -91,7 +91,7 @@ class Both(Boring):
 class Env(Boring):
 
   def __init__(self, freq, shape):
-    self.period = Freq(freq).envperiod(nomclock, shape)
+    self.period = Freq(freq).envperiod(orc.nomclock, shape)
     self.shape = shape
 
   def noteon(self, chip, chan):
@@ -105,9 +105,9 @@ class Env(Boring):
 class All(Boring):
 
   def __init__(self, tfreq, nfreq, efreq, shape):
-    self.tperiod = Freq(tfreq).toneperiod(nomclock)
-    self.nperiod = Freq(nfreq).noiseperiod(nomclock)
-    self.eperiod = Freq(efreq).envperiod(nomclock, shape)
+    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
+    self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
+    self.eperiod = Freq(efreq).envperiod(orc.nomclock, shape)
     self.shape = shape
 
   def noteon(self, chip, chan):
@@ -123,7 +123,7 @@ class All(Boring):
 class PWM(Boring):
 
   def __init__(self, tfreq, tsfreq):
-    self.tperiod = Freq(tfreq).toneperiod(nomclock)
+    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.tsfreq = Fraction(tsfreq)
 
   def noteon(self, chip, chan):
@@ -154,8 +154,7 @@ class Target:
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  global nomclock # TODO: This is a hack.
-  nomclock = Config().nominalclock()
+  orc.nomclock = Config().nominalclock()
   target = Target()
   with orc as play: target.dump(play(1, 'T', [250]), 'tone250')
   with orc as play: target.dump(play(1, 'T', [1000]), 'tone1k')
@@ -163,7 +162,7 @@ def main():
   with orc as play: target.dump(play(1, 'N', [5000]), 'noise5k')
   with orc as play: target.dump(play(1, 'N', [125000]), 'noise125k')
   with orc as play: target.dump(play(1, 'B', [1000], [5000]), 'tone1k+noise5k')
-  with orc as play: target.dump(play(1, 'B', [nomclock // 16], [5000]), 'noise5k+tone1')
+  with orc as play: target.dump(play(1, 'B', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
   with orc as play: target.dump(play(1, 'E', [600], [0x08]), 'saw600')
   with orc as play: target.dump(play(1, 'E', [600], [0x10]), 'sin600')
   with orc as play: target.dump(play(1, 'E', [650], [0x0a]), 'tri650')
