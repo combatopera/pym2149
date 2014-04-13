@@ -23,6 +23,7 @@ from pym2149.ymformat import ymopen
 from pym2149.nod import Node, BufNode
 from pym2149.dac import Dac
 from cli import Config
+from ym2wav import Roll
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
@@ -76,8 +77,10 @@ def main():
     stream = JackWriter(config.createfloatstream(chip))
     try:
       timer = Timer(chip.clock)
+      roll = Roll(config.getheight(f.framefreq), chip, f.clock)
       for frame in f:
         frame(chip)
+        roll.update()
         for b in timer.blocks(f.framefreq):
           stream.call(b)
     finally:
