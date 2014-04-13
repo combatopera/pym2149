@@ -28,12 +28,12 @@ import jack, numpy as np
 
 log = logging.getLogger(__name__)
 
+clientname = 'pym2149'
+
 class JackWriter(Node):
 
   def __init__(self, wav):
     Node.__init__(self)
-    clientname = 'pym2149'
-    jack.attach(clientname)
     jack.register_port('in_1', jack.IsInput)
     for i in xrange(wav.channels):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
@@ -64,11 +64,12 @@ class JackWriter(Node):
 
   def close(self):
     jack.deactivate()
-    jack.detach()
 
 def main():
   config = Config()
   inpath, = config.args
+  jack.attach(clientname)
+  config.outrate = jack.get_sample_rate() # Override user setting if any.
   f = ymopen(inpath, config)
   try:
     for info in f.info:
@@ -87,6 +88,7 @@ def main():
       stream.close()
   finally:
     f.close()
+  jack.detach()
 
 if '__main__' == __name__:
   main()
