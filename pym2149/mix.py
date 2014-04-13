@@ -56,9 +56,7 @@ class Multiplexer(Node):
   def callimpl(self):
     for i, stream in enumerate(self.streams):
       buf = self.chain(stream)
-      try:
-        multi
-      except NameError:
+      if not i:
         size = len(buf)
         multi = self.multi.ensureandcrop(size * self.channels)
       RingCursor(buf).put(multi, i, self.channels, size)
