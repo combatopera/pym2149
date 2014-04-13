@@ -34,7 +34,7 @@ class JackWriter(Node):
 
   def __init__(self, wav):
     Node.__init__(self)
-    jack.register_port('in_1', jack.IsInput)
+    jack.register_port('in_1', jack.IsInput) # Apparently necessary.
     for i in xrange(wav.channels):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     jack.activate()
@@ -43,6 +43,7 @@ class JackWriter(Node):
     size = jack.get_buffer_size()
     self.size = wav.channels * size
     self.jack = np.empty(self.size, dtype = BufNode.floatdtype)
+    # XXX: Instead could we multiplex differently or not at all?
     self.jack2 = self.jack.reshape((wav.channels, size), order = 'F')
     self.empty = np.empty((1, size), dtype = BufNode.floatdtype)
     self.cursor = 0
@@ -58,7 +59,7 @@ class JackWriter(Node):
       self.cursor += m
       i += m
       if self.cursor == self.size:
-        self.jack2 /= Dac.amprange
+        self.jack2 /= Dac.amprange # TODO: Avoid multiplying in the first place.
         jack.process(self.jack2, self.empty)
         self.cursor = 0
 
@@ -77,7 +78,7 @@ def main():
     chip = config.createchip(nominalclock = f.clock)
     stream = JackWriter(config.createfloatstream(chip))
     try:
-      timer = Timer(chip.clock)
+      timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
       roll = Roll(config.getheight(f.framefreq), chip, f.clock)
       for frame in f:
         frame(chip)
