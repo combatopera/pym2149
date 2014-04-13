@@ -87,7 +87,7 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    return WavWriter([WavBuf(chip.clock, naive, self.outrate) for naive in naives], outpath)
+    return WavWriter(WavBuf.multi(chip.clock, naives, self.outrate), outpath)
 
   def getheight(self, defaultheight):
     if self.height is not None:

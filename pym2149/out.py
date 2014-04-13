@@ -26,19 +26,14 @@ log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
-  def __init__(self, wavs, path):
+  def __init__(self, wav, path):
     Node.__init__(self)
-    outrates = set(wav.outrate for wav in wavs)
-    outrate, = outrates
-    self.f = Wave16(path, outrate, len(wavs))
-    try:
-      self.data, = wavs
-    except ValueError:
-      self.data = Multiplexer(self.f.dtype, wavs)
+    self.f = Wave16(path, wav.outrate, wav.channels)
     self.wavmaster = MasterBuf(dtype = self.f.dtype)
+    self.wav = wav
 
   def callimpl(self):
-    outbuf = self.chain(self.data)
+    outbuf = self.chain(self.wav)
     wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
     np.around(outbuf.buf, out = wavbuf.buf)
     self.f.block(wavbuf)
@@ -53,7 +48,18 @@ class WavBuf(Node):
 
   indexdtype = np.int32
 
-  def __init__(self, clock, chip, outrate):
+  @classmethod
+  def multi(cls, clock, naives, outrate):
+    channels = len(naives)
+    if 1 == channels:
+      wav = cls(clock, naives[0], outrate)
+    else:
+      wav = Multiplexer(BufNode.floatdtype, [cls(clock, naive, outrate) for naive in naives])
+      wav.outrate = outrate
+    wav.channels = channels
+    return wav
+
+  def __init__(self, clock, naive, outrate):
     Node.__init__(self)
     # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
     scale = 1000 # Smaller values result in worse-looking spectrograms.
@@ -69,12 +75,12 @@ class WavBuf(Node):
     self.dc = 0 # Last naive value of previous block.
     self.out0 = 0 # Absolute index of first output sample being processed next iteration.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
-    self.chip = chip
+    self.naive = naive
     self.outrate = outrate
 
   def callimpl(self):
     # TODO: Unit-test that results do not depend on block size.
-    chipbuf = self.chain(self.chip)
+    chipbuf = self.chain(self.naive)
     diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
     # Index of the first sample we can't output yet:
     outz = self.minbleps.getoutindexandshape(self.naivex + self.block.framecount)[0]
