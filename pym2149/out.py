@@ -35,9 +35,13 @@ class WavWriter(Node):
       self.data, = wavs
     except ValueError:
       self.data = Multiplexer(self.f.dtype, wavs)
+    self.wavmaster = MasterBuf(dtype = self.f.dtype)
 
   def callimpl(self):
-    self.f.block(self.chain(self.data))
+    outbuf = self.chain(self.data)
+    wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
+    np.around(outbuf.buf, out = wavbuf.buf)
+    self.f.block(wavbuf)
 
   def flush(self):
     self.f.flush()
@@ -57,7 +61,6 @@ class WavBuf(Node):
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outimaster = MasterBuf(dtype = self.indexdtype)
     self.shapemaster = MasterBuf(dtype = self.indexdtype)
-    self.wavmaster = MasterBuf(dtype = Wave16.dtype)
     self.minbleps = MinBleps(clock, outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
     self.overflowsize = self.minbleps.mixinsize
@@ -89,13 +92,11 @@ class WavBuf(Node):
     outibuf.buf -= self.out0
     amp = diffbuf.buf[nonzeros]
     pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shapebuf.buf, amp, self.indexdtype(self.minbleps.scale))
-    wavbuf = self.wavmaster.ensureandcrop(outcount)
-    np.around(outbuf.buf[:outcount], out = wavbuf.buf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
     self.out0 = outz
-    return wavbuf
+    return Buf(outbuf.buf[:outcount])
 
 def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
