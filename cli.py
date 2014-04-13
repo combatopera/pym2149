@@ -78,7 +78,7 @@ class Config:
 
   maxpan = .75
 
-  def createstream(self, chip, outpath):
+  def createfloatstream(self, chip):
     if self.stereo:
       n = chip.channels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
@@ -87,7 +87,10 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    return WavWriter(WavBuf.multi(chip.clock, naives, self.outrate), outpath)
+    return WavBuf.multi(chip.clock, naives, self.outrate)
+
+  def createstream(self, chip, outpath):
+    return WavWriter(self.createfloatstream(chip), outpath)
 
   def getheight(self, defaultheight):
     if self.height is not None:
