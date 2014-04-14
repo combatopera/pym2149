@@ -59,14 +59,14 @@ class Config:
       return stclock
     return stclock
 
-  def createchip(self, nominalclock = None, **kwargs):
+  def createchip(self, nominalclock = None):
     nominalclock = self.nominalclock(nominalclock)
     clockdiv = 8 // self.scale
     if nominalclock % clockdiv:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
     clock = nominalclock // clockdiv
     clampoutrate = self.outrate if self.clamp else None
-    chip = YM2149(clock, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate, **kwargs)
+    chip = YM2149(clock, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip
