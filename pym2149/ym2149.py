@@ -75,6 +75,7 @@ class YM2149(Registers, Container):
     levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(self.channels)]
     Container.__init__(self, [Dac(level, bits, self.channels) for level in levels])
     self.pause = pause
+    self.bits = bits
 
   def callimpl(self):
     result = Container.callimpl(self)
