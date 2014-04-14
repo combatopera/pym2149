@@ -59,7 +59,6 @@ class JackWriter(Node):
       self.cursor += m
       i += m
       if self.cursor == self.size:
-        self.jack2 /= (2 ** 15.5) # TODO: Avoid multiplying in the first place.
         jack.process(self.jack2, self.empty)
         self.cursor = 0
 
@@ -75,7 +74,8 @@ def main():
   try:
     for info in f.info:
       log.info(info)
-    chip = config.createchip(nominalclock = f.clock)
+    # For jack the available amplitude range is 2 ** 1:
+    chip = config.createchip(nominalclock = f.clock, bits = 1)
     stream = JackWriter(config.createfloatstream(chip))
     try:
       timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
