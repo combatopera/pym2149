@@ -31,35 +31,33 @@ clientname = 'pym2149'
 
 class JackWriter(Node):
 
-  def __init__(self, wav):
+  def __init__(self, wavs):
     Node.__init__(self)
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
-    for i in xrange(wav.channels):
+    for i in xrange(len(wavs)):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     jack.activate()
     for i in xrange(2):
-      chan = min(wav.channels - 1, i)
+      chan = min(len(wavs) - 1, i)
       jack.connect("%s:out_%s" % (clientname, 1 + chan), "alsa_pcm:playback_%s" % (1 + i))
-    size = jack.get_buffer_size()
-    self.size = wav.channels * size
-    self.jack = np.empty(self.size, dtype = BufNode.floatdtype)
-    # XXX: Instead could we multiplex differently or not at all?
-    self.jack2 = self.jack.reshape((wav.channels, size), order = 'F')
-    self.empty = np.empty((1, size), dtype = BufNode.floatdtype)
+    self.size = jack.get_buffer_size()
+    self.jack = np.empty((len(wavs), self.size), dtype = BufNode.floatdtype)
+    self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
     self.cursor = 0
-    self.wav = wav
+    self.wavs = wavs
 
   def callimpl(self):
-    outbuf = self.chain(self.wav)
-    n = len(outbuf) # Samples i.e. channels times frames.
+    outbufs = [self.chain(wav) for wav in self.wavs]
+    n = len(outbufs[0])
     i = 0
     while i < n:
       m = min(n - i, self.size - self.cursor)
-      self.jack[self.cursor:self.cursor + m] = outbuf.buf[i:i + m]
+      for c in xrange(len(self.wavs)):
+        self.jack[c, self.cursor:self.cursor + m] = outbufs[c].buf[i:i + m]
       self.cursor += m
       i += m
       if self.cursor == self.size:
-        jack.process(self.jack2, self.empty)
+        jack.process(self.jack, self.empty)
         self.cursor = 0
 
   def close(self):

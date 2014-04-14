@@ -48,14 +48,14 @@ class WavBuf(Node):
 
   indexdtype = np.int32
 
-  @classmethod
-  def multi(cls, clock, naives, outrate):
-    channels = len(naives)
+  @staticmethod
+  def multi(wavs):
+    channels = len(wavs)
     if 1 == channels:
-      wav = cls(clock, naives[0], outrate)
+      wav, = wavs
     else:
-      wav = Multiplexer(BufNode.floatdtype, [cls(clock, naive, outrate) for naive in naives])
-      wav.outrate = outrate
+      wav = Multiplexer(BufNode.floatdtype, wavs)
+      wav.outrate = wavs[0].outrate
     wav.channels = channels
     return wav
 
