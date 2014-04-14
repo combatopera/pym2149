@@ -38,8 +38,9 @@ class JackWriter(Node):
     for i in xrange(wav.channels):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     jack.activate()
-    for i in xrange(wav.channels):
-      jack.connect("%s:out_%s" % (clientname, 1 + i), "alsa_pcm:playback_%s" % (1 + i))
+    for i in xrange(2):
+      chan = min(wav.channels - 1, i)
+      jack.connect("%s:out_%s" % (clientname, 1 + chan), "alsa_pcm:playback_%s" % (1 + i))
     size = jack.get_buffer_size()
     self.size = wav.channels * size
     self.jack = np.empty(self.size, dtype = BufNode.floatdtype)
