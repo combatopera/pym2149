@@ -43,14 +43,18 @@ class TestIdealMixer(unittest.TestCase):
       self.assertAlmostEqual(m.datum - values[i], actual.buf[i])
 
   def test_works(self):
-    m = IdealMixer(Container([Counter(10), Counter()]))
+    c = Container([Counter(10), Counter()])
+    c.bits = 16
+    m = IdealMixer(c)
     self.expect(m, [10, 12, 14, 16, 18], m.call(Block(5)))
     # Check the buffer is actually cleared first:
     self.expect(m, [20, 22, 24, 26, 28], m.call(Block(5)))
 
   def test_masked(self):
     upstream = Counter(10), Counter()
-    m = IdealMixer(Container(upstream))
+    c = Container(upstream)
+    c.bits = 16
+    m = IdealMixer(c)
     self.assertEqual(NullBuf, m(Block(5), True))
     for n in upstream:
       self.assertEqual(NullBuf, n.result)
