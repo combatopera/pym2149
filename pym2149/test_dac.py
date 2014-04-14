@@ -33,7 +33,7 @@ class Ramps(BufNode):
 class TestDac(unittest.TestCase):
 
   def test_works(self):
-    d = Dac(Ramps(), 1)
+    d = Dac(Ramps(), 16, 1)
     self.assertEqual([d.leveltopeaktopeak[v] for v in xrange(32)], d.call(Block(32)).tolist())
 
 if __name__ == '__main__':

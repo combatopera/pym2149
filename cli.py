@@ -66,7 +66,7 @@ class Config:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
     clock = nominalclock // clockdiv
     clampoutrate = self.outrate if self.clamp else None
-    chip = YM2149(clock, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
+    chip = YM2149(clock, 16, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
     return chip

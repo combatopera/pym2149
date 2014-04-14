@@ -21,7 +21,6 @@ from pym2149.initlogging import logging
 from pym2149.util import Timer
 from pym2149.ymformat import ymopen
 from pym2149.nod import Node, BufNode
-from pym2149.dac import Dac
 from cli import Config
 from ym2wav import Roll
 import jack, numpy as np
@@ -60,7 +59,7 @@ class JackWriter(Node):
       self.cursor += m
       i += m
       if self.cursor == self.size:
-        self.jack2 /= Dac.amprange # TODO: Avoid multiplying in the first place.
+        self.jack2 /= (2 ** 15.5) # TODO: Avoid multiplying in the first place.
         jack.process(self.jack2, self.empty)
         self.cursor = 0
 

@@ -50,11 +50,9 @@ def amptolevel(amp):
 
 class Dac(BufNode):
 
-  amprange = 2 ** 15.5
-
-  def __init__(self, level, ampshare):
+  def __init__(self, level, bits, ampshare):
     BufNode.__init__(self, self.floatdtype)
-    maxpeaktopeak = self.amprange / ampshare
+    maxpeaktopeak = (2 ** (bits - .5)) / ampshare
     # Lookup of ideal amplitudes:
     self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
     self.level = level
