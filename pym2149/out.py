@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np, numba as nb, logging
+import numpy as np, logging
 from buf import MasterBuf, Buf
 from minblep import MinBleps
 from nod import Node, BufNode
@@ -91,46 +91,9 @@ class WavBuf(Node):
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
     nonzeros = diffbuf.nonzeros()
-    pasten = self.indexdtype(len(nonzeros))
-    outibuf = self.outimaster.ensureandcrop(pasten)
-    shapebuf = self.shapemaster.ensureandcrop(pasten)
-    self.minbleps.loadoutindexandshape(self.naivex + nonzeros, outibuf, shapebuf)
-    outibuf.buf -= self.out0
-    amp = diffbuf.buf[nonzeros]
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, self.indexdtype(len(outbuf)), self.indexdtype(self.minbleps.mixinsize), self.minbleps.minblep, shapebuf.buf, amp, self.indexdtype(self.minbleps.scale))
+    self.minbleps.paste(self.naivex + nonzeros, self.out0, diffbuf.buf[nonzeros], self.outimaster, self.shapemaster, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
     self.out0 = outz
     return Buf(outbuf.buf[:outcount])
-
-def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
-  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
-
-log.debug('Compiling output stage.')
-
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
-  x = 0
-  one = 1 # Makes inspect_types easier to read.
-  while x < n:
-    i = outi[x]
-    s = shape[x]
-    j = i + mixinsize
-    a = amp[x]
-    if i < j:
-      while 1:
-        out[i] += minblep[s] * a
-        i += one
-        s += scale
-        if i == j:
-          break
-    if i < outsize:
-      while 1:
-        out[i] += a
-        i += one
-        if i == outsize:
-          break
-    x += one
-
-log.debug('Done compiling.')

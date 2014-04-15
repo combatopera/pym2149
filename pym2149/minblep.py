@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging
+import numpy as np, fractions, logging, numba as nb
 from nod import BufNode
 
 log = logging.getLogger(__name__)
@@ -85,3 +85,43 @@ class MinBleps:
     k = ctrlx % self.ctrlrate
     q = ctrlx // self.ctrlrate
     return q * self.outrate + self.outi[k], self.shape[k]
+
+  def paste(self, ctrlx, out0, amp, outimaster, shapemaster, outbuf):
+    indexdtype = np.int32
+    pasten = indexdtype(len(ctrlx))
+    outibuf = outimaster.ensureandcrop(pasten)
+    shapebuf = shapemaster.ensureandcrop(pasten)
+    self.loadoutindexandshape(ctrlx, outibuf, shapebuf)
+    outibuf.buf -= out0
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, shapebuf.buf, amp, indexdtype(self.scale))
+
+def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
+  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
+
+log.debug('Compiling output stage.')
+
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
+def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
+  x = 0
+  one = 1 # Makes inspect_types easier to read.
+  while x < n:
+    i = outi[x]
+    s = shape[x]
+    j = i + mixinsize
+    a = amp[x]
+    if i < j:
+      while 1:
+        out[i] += minblep[s] * a
+        i += one
+        s += scale
+        if i == j:
+          break
+    if i < outsize:
+      while 1:
+        out[i] += a
+        i += one
+        if i == outsize:
+          break
+    x += one
+
+log.debug('Done compiling.')
