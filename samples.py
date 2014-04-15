@@ -136,7 +136,7 @@ class PWM(Boring):
 
 class Target:
 
-  with orc as play: dc0 = play(1, 's')
+  with orc as play: dc0 = play(1, 's'*10)
   main = Main(refreshrate)
 
   def __init__(self):
@@ -156,20 +156,20 @@ class Target:
 def main():
   orc.nomclock = Config().nominalclock()
   target = Target()
-  with orc as play: target.dump(play(1, 'T', [250]), 'tone250')
-  with orc as play: target.dump(play(1, 'T', [1000]), 'tone1k')
-  with orc as play: target.dump(play(1, 'T', [1500]), 'tone1k5')
-  with orc as play: target.dump(play(1, 'N', [5000]), 'noise5k')
-  with orc as play: target.dump(play(1, 'N', [125000]), 'noise125k')
-  with orc as play: target.dump(play(1, 'B', [1000], [5000]), 'tone1k+noise5k')
-  with orc as play: target.dump(play(1, 'B', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
-  with orc as play: target.dump(play(1, 'E', [600], [0x08]), 'saw600')
-  with orc as play: target.dump(play(1, 'E', [600], [0x10]), 'sin600')
-  with orc as play: target.dump(play(1, 'E', [650], [0x0a]), 'tri650')
-  with orc as play: target.dump(play(1, 'A', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
+  with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
+  with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')
+  with orc as play: target.dump(play(2, 'T..', [1500]), 'tone1k5')
+  with orc as play: target.dump(play(2, 'N..', [5000]), 'noise5k')
+  with orc as play: target.dump(play(2, 'N..', [125000]), 'noise125k')
+  with orc as play: target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
+  with orc as play: target.dump(play(2, 'B..', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
+  with orc as play: target.dump(play(2, 'E..', [600], [0x08]), 'saw600')
+  with orc as play: target.dump(play(2, 'E..', [600], [0x10]), 'sin600')
+  with orc as play: target.dump(play(2, 'E..', [650], [0x0a]), 'tri650')
+  with orc as play: target.dump(play(2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
   with orc as play: target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
-  with orc as play: target.dump(play(1, 'P', [501], [501]), 'pwm501')
-  with orc as play: target.dump(play(1, 'P', [250], [251]), 'pwm250') # Observe timer detune.
+  with orc as play: target.dump(play(2, 'P..', [501], [501]), 'pwm501')
+  with orc as play: target.dump(play(2, 'P..', [250], [251]), 'pwm250') # Observe timer detune.
   with orc as play: target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
 
 if '__main__' == __name__:
