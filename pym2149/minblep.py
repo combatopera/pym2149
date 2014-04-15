@@ -86,14 +86,15 @@ class MinBleps:
     q = ctrlx // self.ctrlrate
     return q * self.outrate + self.outi[k], self.shape[k]
 
-  def paste(self, ctrlx, out0, amp, outimaster, shapemaster, outbuf):
+  def paste(self, ctrlx, out0, diffbuf, outimaster, shapemaster, outbuf):
+    nonzeros = diffbuf.nonzeros()
     indexdtype = np.int32
-    pasten = indexdtype(len(ctrlx))
+    pasten = indexdtype(len(nonzeros))
     outibuf = outimaster.ensureandcrop(pasten)
     shapebuf = shapemaster.ensureandcrop(pasten)
-    self.loadoutindexandshape(ctrlx, outibuf, shapebuf)
+    self.loadoutindexandshape(ctrlx + nonzeros, outibuf, shapebuf)
     outibuf.buf -= out0
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, shapebuf.buf, amp, indexdtype(self.scale))
+    pasteminbleps(pasten, outbuf.buf, outibuf.buf, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, shapebuf.buf, diffbuf.buf[nonzeros], indexdtype(self.scale))
 
 def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)

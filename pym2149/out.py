@@ -90,8 +90,7 @@ class WavBuf(Node):
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
-    nonzeros = diffbuf.nonzeros()
-    self.minbleps.paste(self.naivex + nonzeros, self.out0, diffbuf.buf[nonzeros], self.outimaster, self.shapemaster, outbuf)
+    self.minbleps.paste(self.naivex, self.out0, diffbuf, self.outimaster, self.shapemaster, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]
