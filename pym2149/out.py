@@ -65,8 +65,6 @@ class WavBuf(Node):
     scale = 1000 # Smaller values result in worse-looking spectrograms.
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
-    self.outimaster = MasterBuf(dtype = self.indexdtype)
-    self.shapemaster = MasterBuf(dtype = self.indexdtype)
     self.minbleps = MinBleps(clock, outrate, scale)
     # Need space for a whole mixin in case it is rooted at outz:
     self.overflowsize = self.minbleps.mixinsize
@@ -90,7 +88,7 @@ class WavBuf(Node):
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
     outbuf.buf[self.overflowsize:] = self.dc
-    self.minbleps.paste(self.naivex, self.out0, diffbuf, self.outimaster, self.shapemaster, outbuf)
+    self.minbleps.paste(self.naivex, self.out0, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
     self.dc = chipbuf.buf[-1]

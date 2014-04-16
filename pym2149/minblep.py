@@ -73,43 +73,36 @@ class MinBleps:
     self.outrate = outrate
     self.scale = scale
 
-  def loadoutindexandshape(self, ctrlx, outi, shape):
-    k = ctrlx % self.ctrlrate
-    q = ctrlx // self.ctrlrate
-    outi.buf[:] = q
-    outi.buf[:] *= self.outrate
-    outi.buf[:] += self.outi[k]
-    shape.buf[:] = self.shape[k]
-
   def getoutindexandshape(self, ctrlx):
     k = ctrlx % self.ctrlrate
     q = ctrlx // self.ctrlrate
     return q * self.outrate + self.outi[k], self.shape[k]
 
-  def paste(self, ctrlx, out0, diffbuf, outimaster, shapemaster, outbuf):
-    nonzeros = diffbuf.nonzeros()
+  def paste(self, ctrlx, out0, diffbuf, outbuf):
     indexdtype = np.int32
-    pasten = indexdtype(len(nonzeros))
-    outibuf = outimaster.ensureandcrop(pasten)
-    shapebuf = shapemaster.ensureandcrop(pasten)
-    self.loadoutindexandshape(ctrlx + nonzeros, outibuf, shapebuf)
-    outibuf.buf -= out0
-    pasteminbleps(pasten, outbuf.buf, outibuf.buf, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, shapebuf.buf, diffbuf.buf[nonzeros], indexdtype(self.scale))
+    pasten = indexdtype(len(diffbuf))
+    pasteminbleps(pasten, outbuf.buf, self.outi, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, self.shape, diffbuf.buf, indexdtype(self.scale), indexdtype(ctrlx), indexdtype(self.ctrlrate), indexdtype(self.outrate), indexdtype(out0))
 
-def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
-  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale)
+def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
+  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0)
 
 log.debug('Compiling output stage.')
 
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale):
-  x = 0
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
+def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
+  zero = 0
+  x = zero
   one = 1 # Makes inspect_types easier to read.
   while x < n:
-    i = outi[x]
-    s = shape[x]
-    j = i + mixinsize
     a = amp[x]
+    if a == zero:
+      x += one
+      continue
+    k = (ctrlx + x) % ctrlrate
+    q = (ctrlx + x) // ctrlrate
+    i = q * outrate + outi[k] - out0
+    s = shape[k]
+    j = i + mixinsize
     if i < j:
       while 1:
         out[i] += minblep[s] * a
