@@ -76,8 +76,8 @@ class WavBuf(Node):
 
   def callimpl(self):
     # TODO: Unit-test that results do not depend on block size.
-    chipbuf = self.chain(self.naive)
-    diffbuf = self.diffmaster.differentiate(self.dc, chipbuf)
+    naivebuf = self.chain(self.naive)
+    diffbuf = self.diffmaster.differentiate(self.dc, naivebuf)
     # Index of the first sample we can't output yet:
     outz = self.minbleps.getoutindexandshape(self.naivex + self.block.framecount)[0]
     outcount = outz - self.out0
@@ -89,6 +89,6 @@ class WavBuf(Node):
     self.minbleps.paste(self.naivex, self.out0, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex += self.block.framecount
-    self.dc = chipbuf.buf[-1]
+    self.dc = naivebuf.buf[-1]
     self.out0 = outz
     return Buf(outbuf.buf[:outcount])
