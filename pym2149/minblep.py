@@ -96,27 +96,25 @@ def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, sca
   x = zero
   while x < n:
     a = amp[x]
-    if a == zero:
-      x += one
-      continue
-    k = (ctrlx + x) % ctrlrate
-    q = (ctrlx + x) // ctrlrate
-    i = q * outrate + outi[k] - out0
-    s = shape[k]
-    j = i + mixinsize
-    if i < j:
-      while 1:
-        out[i] += minblep[s] * a
-        i += one
-        s += scale
-        if i == j:
-          break
-    if i < outsize:
-      while 1:
-        out[i] += a
-        i += one
-        if i == outsize:
-          break
+    if a != zero:
+      k = (ctrlx + x) % ctrlrate
+      q = (ctrlx + x) // ctrlrate
+      i = q * outrate + outi[k] - out0
+      s = shape[k]
+      j = i + mixinsize
+      if i < j:
+        while 1:
+          out[i] += minblep[s] * a
+          i += one
+          s += scale
+          if i == j:
+            break
+      if i < outsize:
+        while 1:
+          out[i] += a
+          i += one
+          if i == outsize:
+            break
     x += one
 
 log.debug('Done compiling.')
