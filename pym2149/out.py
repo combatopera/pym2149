@@ -46,8 +46,6 @@ class WavWriter(Node):
 
 class WavBuf(Node):
 
-  indexdtype = np.int32
-
   @staticmethod
   def multi(wavs):
     channels = len(wavs)
