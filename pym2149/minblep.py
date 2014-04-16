@@ -79,9 +79,9 @@ class MinBleps:
     return q * self.outrate + self.outi[k], self.shape[k]
 
   def paste(self, ctrlx, out0, diffbuf, outbuf):
-    indexdtype = np.int32
-    pasten = indexdtype(len(diffbuf))
-    pasteminbleps(pasten, outbuf.buf, self.outi, indexdtype(len(outbuf)), indexdtype(self.mixinsize), self.minblep, self.shape, diffbuf.buf, indexdtype(self.scale), indexdtype(ctrlx), indexdtype(self.ctrlrate), indexdtype(self.outrate), indexdtype(out0))
+    i4 = np.int32
+    pasten = i4(len(diffbuf))
+    pasteminbleps(pasten, outbuf.buf, self.outi, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.shape, diffbuf.buf, i4(self.scale), i4(ctrlx), i4(self.ctrlrate), i4(self.outrate), i4(out0))
 
 def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
   pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0)
