@@ -90,9 +90,10 @@ log.debug('Compiling output stage.')
 
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
 def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
+  # Naming constants makes inspect_types easier to read:
   zero = 0
+  one = 1
   x = zero
-  one = 1 # Makes inspect_types easier to read.
   while x < n:
     a = amp[x]
     if a == zero:
