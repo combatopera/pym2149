@@ -78,22 +78,23 @@ class MinBleps:
     q = ctrlx // self.ctrlrate
     return q * self.outrate + self.outi[k], self.shape[k]
 
-  def paste(self, ctrlx, out0, diffbuf, outbuf):
+  def paste(self, ctrlx, diffbuf, outbuf):
     i4 = np.int32
     pasten = i4(len(diffbuf))
-    pasteminbleps(pasten, outbuf.buf, self.outi, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.shape, diffbuf.buf, i4(self.scale), i4(ctrlx), i4(self.ctrlrate), i4(self.outrate), i4(out0))
+    pasteminbleps(pasten, outbuf.buf, self.outi, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.shape, diffbuf.buf, i4(self.scale), i4(ctrlx), i4(self.ctrlrate), i4(self.outrate))
 
-def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
-  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0)
+def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate):
+  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate)
 
 log.debug('Compiling output stage.')
 
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate, out0):
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
+def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate):
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
   x = zero
+  out0 = (ctrlx // ctrlrate) * outrate + outi[ctrlx % ctrlrate]
   while x < n:
       a = amp[x]
       if a != zero:
