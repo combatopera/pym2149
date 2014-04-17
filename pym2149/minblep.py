@@ -93,13 +93,13 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
-  x = zero
+  naivex = zero
   out0 = (naive0 // naiverate) * outrate + naivex2outx[naive0 % naiverate]
-  while x < n:
-      a = amp[x]
+  while naivex < n:
+      a = amp[naivex]
       if a != zero:
-        k = (naive0 + x) % naiverate
-        q = (naive0 + x) // naiverate
+        k = (naive0 + naivex) % naiverate
+        q = (naive0 + naivex) // naiverate
         i = q * outrate + naivex2outx[k] - out0
         s = naivex2shape[k]
         j = i + mixinsize
@@ -116,6 +116,6 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
             i += one
             if i == outsize:
               break
-      x += one
+      naivex += one
 
 log.debug('Done compiling.')
