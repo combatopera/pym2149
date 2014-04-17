@@ -57,7 +57,7 @@ class MinBleps:
     realcepstrum[self.midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
-    # Prepend zeros to simplify outi calc:
+    # Prepend zeros to simplify naivex2outx calc:
     self.minblep = np.append(np.zeros(scale - 1, BufNode.floatdtype), self.minblep)
     # Append ones so that all mixins have the same length:
     ones = (-len(self.minblep)) % scale
@@ -66,8 +66,8 @@ class MinBleps:
     self.idealscale = ctrlrate // fractions.gcd(ctrlrate, outrate)
     # The ctrlrate and outrate will line up at 1 second:
     nearest = round(np.arange(ctrlrate) / ctrlrate * outrate * scale)
-    self.outi = nearest // scale
-    self.shape = self.outi * scale - nearest + scale - 1
+    self.naivex2outx = nearest // scale
+    self.naivex2shape = self.naivex2outx * scale - nearest + scale - 1
     log.debug('%s minBLEPs created.', scale)
     self.ctrlrate = ctrlrate
     self.outrate = outrate
@@ -76,32 +76,32 @@ class MinBleps:
   def getoutindexandshape(self, ctrlx):
     k = ctrlx % self.ctrlrate
     q = ctrlx // self.ctrlrate
-    return q * self.outrate + self.outi[k], self.shape[k]
+    return q * self.outrate + self.naivex2outx[k], self.naivex2shape[k]
 
   def paste(self, ctrlx, diffbuf, outbuf):
     i4 = np.int32
     pasten = i4(len(diffbuf))
-    pasteminbleps(pasten, outbuf.buf, self.outi, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.shape, diffbuf.buf, i4(self.scale), i4(ctrlx), i4(self.ctrlrate), i4(self.outrate))
+    pasteminbleps(pasten, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.naivex2shape, diffbuf.buf, i4(self.scale), i4(ctrlx), i4(self.ctrlrate), i4(self.outrate))
 
-def pasteminbleps(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate):
-  pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate)
+def pasteminbleps(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, ctrlx, ctrlrate, outrate):
+  pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, ctrlx, ctrlrate, outrate)
 
 log.debug('Compiling output stage.')
 
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, outi, outsize, mixinsize, minblep, shape, amp, scale, ctrlx, ctrlrate, outrate):
+def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, ctrlx, ctrlrate, outrate):
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
   x = zero
-  out0 = (ctrlx // ctrlrate) * outrate + outi[ctrlx % ctrlrate]
+  out0 = (ctrlx // ctrlrate) * outrate + naivex2outx[ctrlx % ctrlrate]
   while x < n:
       a = amp[x]
       if a != zero:
         k = (ctrlx + x) % ctrlrate
         q = (ctrlx + x) // ctrlrate
-        i = q * outrate + outi[k] - out0
-        s = shape[k]
+        i = q * outrate + naivex2outx[k] - out0
+        s = naivex2shape[k]
         j = i + mixinsize
         if i < j:
           while 1:
