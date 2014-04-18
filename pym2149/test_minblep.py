@@ -41,7 +41,8 @@ class TestMinBleps(unittest.TestCase):
     mixins = []
     MixinInfo = namedtuple('MixinInfo', 'outi shape data')
     for x in xrange(ctrlrate * 2):
-      outi, shape = minbleps.getoutindexandshape(x)
+      outi = minbleps.naivex2outx[x % ctrlrate]
+      shape = minbleps.naivex2shape[x % ctrlrate]
       data = minbleps.minblep[shape::scale]
       mixins.append(MixinInfo(outi, shape, data))
     return mixins
@@ -64,24 +65,28 @@ class TestMinBleps(unittest.TestCase):
       self.assertEqual(0, mixins[x].outi)
       self.assertEqual(0, mixins[x].shape)
       self.assertTrue((mixins[9].data == mixins[x].data).all())
-    for x in xrange(11, 14):
+    for x in xrange(11, 12):
       self.assertEqual(1, mixins[x].outi)
       self.assertEqual(3, mixins[x].shape)
       self.assertTrue((mixins[0].data == mixins[x].data).all())
+    for x in xrange(12, 14):
+      self.assertEqual(0, mixins[x].outi)
+      self.assertEqual(3, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(14, 17):
-      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].outi)
       self.assertEqual(2, mixins[x].shape)
       self.assertTrue((mixins[3].data == mixins[x].data).all())
     for x in xrange(17, 20):
-      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].outi)
       self.assertEqual(1, mixins[x].shape)
       self.assertTrue((mixins[6].data == mixins[x].data).all())
     for x in xrange(20, 23):
-      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].outi)
       self.assertEqual(0, mixins[x].shape)
       self.assertTrue((mixins[9].data == mixins[x].data).all())
     for x in xrange(23, 24):
-      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(1, mixins[x].outi)
       self.assertEqual(3, mixins[x].shape)
       self.assertTrue((mixins[0].data == mixins[x].data).all())
 
@@ -99,20 +104,24 @@ class TestMinBleps(unittest.TestCase):
       self.assertEqual(0, mixins[x].outi)
       self.assertEqual(0, mixins[x].shape)
       self.assertTrue((mixins[8].data == mixins[x].data).all())
-    for x in xrange(10, 14):
+    for x in xrange(10, 12):
       self.assertEqual(1, mixins[x].outi)
       self.assertEqual(2, mixins[x].shape)
       self.assertTrue((mixins[0].data == mixins[x].data).all())
+    for x in xrange(12, 14):
+      self.assertEqual(0, mixins[x].outi)
+      self.assertEqual(2, mixins[x].shape)
+      self.assertTrue((mixins[0].data == mixins[x].data).all())
     for x in xrange(14, 18):
-      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].outi)
       self.assertEqual(1, mixins[x].shape)
       self.assertTrue((mixins[4].data == mixins[x].data).all())
     for x in xrange(18, 22):
-      self.assertEqual(1, mixins[x].outi)
+      self.assertEqual(0, mixins[x].outi)
       self.assertEqual(0, mixins[x].shape)
       self.assertTrue((mixins[8].data == mixins[x].data).all())
     for x in xrange(22, 24):
-      self.assertEqual(2, mixins[x].outi)
+      self.assertEqual(1, mixins[x].outi)
       self.assertEqual(2, mixins[x].shape)
       self.assertTrue((mixins[0].data == mixins[x].data).all())
 
