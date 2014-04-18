@@ -100,7 +100,8 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
   x = zero
   out0 = naivex2outx[naivex]
   while n:
-    limit = min(naivex + n, naiverate)
+    m = min(n, naiverate - naivex)
+    limit = naivex + m
     while naivex < limit:
       a = amp[x]
       if a != zero:
@@ -122,7 +123,7 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
               break
       x += one
       naivex += one
-    n = n - limit
+    n = n - m
     naivex = zero
     out0 = out0 - outrate
 
