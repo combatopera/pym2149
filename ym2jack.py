@@ -57,7 +57,10 @@ class JackWriter(Node):
       self.cursor += m
       i += m
       if self.cursor == self.size:
-        jack.process(self.jack, self.empty)
+        try:
+          jack.process(self.jack, self.empty)
+        except (jack.InputSyncError, jack.OutputSyncError):
+          log.warn('JACK error:', exc_info = True)
         self.cursor = 0
 
   def close(self):
