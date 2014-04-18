@@ -98,7 +98,7 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
   zero = 0
   one = 1
   naivex = zero
-  out0 = (naive0 // naiverate) * outrate + naivex2outx[naive0 % naiverate]
+  out0 = naivex2outx[naive0]
   while naivex < n:
       a = amp[naivex]
       if a != zero:
