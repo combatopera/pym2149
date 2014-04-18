@@ -94,6 +94,7 @@ log.debug('Compiling output stage.')
 
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
 def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, naivex, naiverate, outrate):
+  # TODO: This code needs tests.
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
