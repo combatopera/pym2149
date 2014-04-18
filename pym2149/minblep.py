@@ -99,14 +99,13 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
   one = 1
   x = zero
   out0 = naivex2outx[naivex]
-  k = naivex
   while n:
-    limit = min(k + n, naiverate)
-    while k < limit:
+    limit = min(naivex + n, naiverate)
+    while naivex < limit:
       a = amp[x]
       if a != zero:
-        i = naivex2outx[k] - out0
-        s = naivex2shape[k]
+        i = naivex2outx[naivex] - out0
+        s = naivex2shape[naivex]
         j = i + mixinsize
         if i < j:
           while 1:
@@ -122,9 +121,9 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
             if i == outsize:
               break
       x += one
-      k += one
+      naivex += one
     n = n - limit
-    k = zero
+    naivex = zero
     out0 = out0 - outrate
 
 log.debug('Done compiling.')
