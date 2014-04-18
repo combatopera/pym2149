@@ -73,10 +73,14 @@ class MinBleps:
     self.outrate = outrate
     self.scale = scale
 
-  def getoutindexandshape(self, naive0):
-    k = naive0 % self.naiverate
-    q = naive0 // self.naiverate
-    return q * self.outrate + self.naivex2outx[k], self.naivex2shape[k]
+  def getoutcount(self, naivex, naiven):
+    out0 = self.naivex2outx[naivex]
+    naivex += naiven
+    while naivex >= self.naiverate:
+      out0 -= self.outrate
+      naivex -= self.naiverate
+    # Subtract from the first sample we can't output this block:
+    return self.naivex2outx[naivex] - out0
 
   def paste(self, naive0, diffbuf, outbuf):
     i4 = np.int32
