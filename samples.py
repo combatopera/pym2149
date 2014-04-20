@@ -32,6 +32,9 @@ orc = Orc(refreshrate) # A bar is exactly 1 second long.
 
 class Boring:
 
+  def __init__(self, orc):
+    pass
+
   def update(self, chip, chan, frame):
     pass
 
@@ -46,7 +49,7 @@ class silence(Boring):
 @orc.add
 class tone(Boring):
 
-  def __init__(self, period):
+  def __init__(self, orc, period):
     self.period = period
 
   def noteon(self, chip, chan):
@@ -58,13 +61,13 @@ class tone(Boring):
 @orc.add
 class Tone(tone):
 
-  def __init__(self, freq):
-    tone.__init__(self, Freq(freq).toneperiod(orc.nomclock))
+  def __init__(self, orc, freq):
+    tone.__init__(self, orc, Freq(freq).toneperiod(orc.nomclock))
 
 @orc.add
 class Noise(Boring):
 
-  def __init__(self, freq):
+  def __init__(self, orc, freq):
     self.period = Freq(freq).noiseperiod(orc.nomclock)
 
   def noteon(self, chip, chan):
@@ -76,7 +79,7 @@ class Noise(Boring):
 @orc.add
 class Both(Boring):
 
-  def __init__(self, tfreq, nfreq):
+  def __init__(self, orc, tfreq, nfreq):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
 
@@ -90,7 +93,7 @@ class Both(Boring):
 @orc.add
 class Env(Boring):
 
-  def __init__(self, freq, shape):
+  def __init__(self, orc, freq, shape):
     self.period = Freq(freq).envperiod(orc.nomclock, shape)
     self.shape = shape
 
@@ -104,7 +107,7 @@ class Env(Boring):
 @orc.add
 class All(Boring):
 
-  def __init__(self, tfreq, nfreq, efreq, shape):
+  def __init__(self, orc, tfreq, nfreq, efreq, shape):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
     self.eperiod = Freq(efreq).envperiod(orc.nomclock, shape)
@@ -122,7 +125,7 @@ class All(Boring):
 @orc.add
 class PWM(Boring):
 
-  def __init__(self, tfreq, tsfreq):
+  def __init__(self, orc, tfreq, tsfreq):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.tsfreq = Fraction(tsfreq)
 

@@ -58,10 +58,8 @@ class Orc(dict):
     self.timers = []
     self.ticksperbar = ticksperbar
 
-  def add(self, cls):
-    try:
-      key = cls.char
-    except AttributeError:
+  def add(self, cls, key = None):
+    if key is None:
       key = cls.__name__[0]
     if key in self:
       raise KeyError(key) # XXX: An abuse?
@@ -94,7 +92,7 @@ class Play:
       else:
         nargs = [getorlast(v, paramindex) for v in args]
         nkwargs = dict([k, getorlast(v, paramindex)] for k, v in kwargs.iteritems())
-        action = NoteAction(self.orc[char](*nargs, **nkwargs))
+        action = NoteAction(self.orc[char](self.orc, *nargs, **nkwargs))
         paramindex += 1
       frames.append(action)
       b, = self.timer.blocks(beatsperbar)
