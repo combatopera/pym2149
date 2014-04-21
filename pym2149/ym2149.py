@@ -84,3 +84,9 @@ class YM2149(Registers, Container):
       for maskable in self.maskables:
         maskable(self.block, True) # The masked flag tells the node we don't care about output.
     return result
+
+  def flagsoff(self, chan):
+    self.levelmodes[chan].value = 0 # Effectively the envelope flag.
+    self.toneflags[chan].value = False
+    self.noiseflags[chan].value = False
+    self.tsflags[chan].value = False

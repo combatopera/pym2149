@@ -21,12 +21,10 @@ from cli import Config
 import sys
 
 @singleton
-class voidnote:
+class nullnote:
 
   def noteon(self, chip, chan):
-    chip.levelmodes[chan].value = 0
-    chip.toneflags[chan].value = False
-    chip.noiseflags[chan].value = False
+    pass # Flags are turned off by NoteAction.
 
   def update(self, chip, chan, frameindex):
     pass
@@ -37,6 +35,8 @@ class NoteAction:
     self.note = note
 
   def onnoteornone(self, chip, chan):
+    # The note needn't know all the chip's features, so turn them off first:
+    chip.flagsoff(chan)
     self.note.noteon(chip, chan)
     return self.note
 
@@ -75,7 +75,7 @@ class Orc(dict):
 
 class Play:
 
-  voidaction = NoteAction(voidnote)
+  voidaction = NoteAction(nullnote)
 
   def __init__(self, orc, timer):
     self.orc = orc
