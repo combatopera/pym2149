@@ -18,7 +18,9 @@
 from pym2149.util import Timer
 from pym2149.buf import singleton
 from cli import Config
-import sys
+import sys, logging
+
+log = logging.getLogger(__name__)
 
 @singleton
 class nullnote:
@@ -92,7 +94,13 @@ class Play:
       else:
         nargs = [getorlast(v, paramindex) for v in args]
         nkwargs = dict([k, getorlast(v, paramindex)] for k, v in kwargs.iteritems())
-        action = NoteAction(self.orc[char](self.orc, *nargs, **nkwargs))
+        noteclass = self.orc[char]
+        try:
+          note = noteclass(self.orc, *nargs, **nkwargs)
+        except:
+          log.info("Note class that errored: %s", noteclass)
+          raise
+        action = NoteAction(note)
         paramindex += 1
       frames.append(action)
       b, = self.timer.blocks(beatsperbar)
