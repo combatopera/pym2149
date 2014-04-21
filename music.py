@@ -22,6 +22,10 @@ import sys, logging
 
 log = logging.getLogger(__name__)
 
+def voidzip(*chans):
+  n = max(len(c) for c in chans)
+  return zip(*(c + [Play.voidaction] * (n - len(c)) for c in chans))
+
 @singleton
 class nullnote:
 
