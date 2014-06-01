@@ -196,7 +196,6 @@ class YM56(YM):
       self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
     else:
       self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
-    self.logtimersynth = True
     self.logdigidrum = True
 
 class Frame56(PlainFrame):
@@ -209,13 +208,20 @@ class Frame56(PlainFrame):
     self.index = ym.frameindex
     self.flags = ym
 
+  def timersynthdenom(self, chip, chan, denom):
+    if denom:
+      # Note freq is half of the step freq, so divide by 2:
+      chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom * 2)
+      chip.tsflags[chan].value = True
+
 class Frame5(Frame56):
 
   def __call__(self, chip):
     PlainFrame.__call__(self, chip)
-    if self.flags.logtimersynth and (self.data[0x1] & 0x30):
-      log.warn("Timer-synth at frame %s.", self.index)
-      self.flags.logtimersynth = False
+    if self.data[0x1] & 0x30:
+      chan = ((self.data[0x1] & 0x30) >> 4) - 1
+      denom = self.prescalers[(self.data[0x6] & 0xe0) >> 5] * self.data[0xE]
+      self.timersynthdenom(chip, chan, denom)
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
@@ -232,10 +238,7 @@ class Frame6(Frame56):
         fx = self.data[r] & 0xc0
         if 0x00 == fx:
           denom = self.prescalers[(self.data[rr] & 0xe0) >> 5] * self.data[rrr]
-          if denom:
-            # Note freq is half of the step freq, so divide by 2:
-            chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom * 2)
-            chip.tsflags[chan].value = True
+          self.timersynthdenom(chip, chan, denom)
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
