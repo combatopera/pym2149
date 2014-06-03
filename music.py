@@ -74,7 +74,7 @@ class Orc(dict):
     if key is None:
       key = cls.__name__[0]
     if key in self:
-      raise KeyError(key) # XXX: An abuse?
+      raise Exception("Key already in use: %s" % key)
     self[key] = cls
     return cls
 
