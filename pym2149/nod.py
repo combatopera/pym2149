@@ -31,10 +31,10 @@ class Node:
   def __init__(self):
     self.block = None
 
-  def call(self, block):
+  def call(self, block): # XXX: Why not have masked default to False?
     return self(block, False)
 
-  def __call__(self, block, masked):
+  def __call__(self, block, masked): # XXX: Guard against masked going from True to False for same block?
     if self.block != block:
       self.block = block
       self.masked = masked
