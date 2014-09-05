@@ -17,21 +17,22 @@
 
 import re
 
+# Does not support quoted whitespace, but we're only interested in numbers:
 pattern = re.compile(r'^([^\s]+)?\s+([^\s]+)?\s+([^\s]+)?')
 
 def readbytecode(f, label):
   while True:
     line = f.readline()
     if not line:
-      raise Exception(label)
+      raise Exception("Label not found: %s" % label)
     groups = pattern.search(line).groups()
-    if label == groups[0]:
+    if label == groups[0]: # XXX: Support terminating colon?
       break
   bytecode = []
   while True:
     if groups[1] is not None:
       if 'dc.b' != groups[1].lower():
-        raise Exception(groups[1])
+        raise Exception("Unsupported: %s" % groups[1])
       for s in groups[2].split(','):
         if s[0] == '%':
           n = int(s[1:], 2)
@@ -48,6 +49,6 @@ def readbytecode(f, label):
           break
     line = f.readline()
     if not line:
-      raise Exception(bytecode)
+      raise Exception("Unterminated bytecode: %s" % bytecode)
     groups = pattern.search(line).groups()
   return bytecode
