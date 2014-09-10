@@ -22,7 +22,7 @@ from pym2149.util import Timer
 from pym2149.ymformat import ymopen
 from pym2149.nod import Node, BufNode
 from cli import Config
-from ym2wav import Roll
+from roll import Roll
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
