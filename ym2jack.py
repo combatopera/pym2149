@@ -28,6 +28,8 @@ import jack, numpy as np
 log = logging.getLogger(__name__)
 
 clientname = 'pym2149'
+# XXX: Can we detect how many system channels there are?
+systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
 class JackWriter(Node):
 
@@ -37,9 +39,10 @@ class JackWriter(Node):
     for i in xrange(len(wavs)):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     jack.activate()
-    for i in xrange(2):
-      chan = min(len(wavs) - 1, i)
-      jack.connect("%s:out_%s" % (clientname, 1 + chan), "system:playback_%s" % (1 + i))
+    # Connect all system channels, cycling over our streams if necessary:
+    for i, systemchannel in enumerate(systemchannels):
+      clientchannelindex = i % len(wavs)
+      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.size = jack.get_buffer_size()
     self.jack = np.empty((len(wavs), self.size), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
