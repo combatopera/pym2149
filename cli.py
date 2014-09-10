@@ -41,6 +41,7 @@ class Config:
     return False
 
   def __init__(self, args = sys.argv[1:]):
+    # TODO: Replace args with documented config file.
     options, self.args = getopt.getopt(args, 'q:H:l:r:k:p1sc', ['quant=', 'height=', 'law=', 'rate=', 'clock=', 'pause', 'once', 'stereo', 'clamp'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
     self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
