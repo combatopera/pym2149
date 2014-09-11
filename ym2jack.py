@@ -71,7 +71,7 @@ class JackWriter(Node):
 
 def main():
   config = getprocessconfig()
-  inpath, = config.args
+  inpath, = config.positional
   jack.attach(clientname)
   config.outrate = jack.get_sample_rate() # Override user setting if any.
   f = ymopen(inpath, config.once)
