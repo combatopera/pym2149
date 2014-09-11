@@ -141,23 +141,23 @@ class YM2(YM23): # FIXME: Work out format from ST-Sound source, it's not this si
 
   formatid = 'YM2!'
 
-  def __init__(self, f, config):
+  def __init__(self, f, once):
     YM23.__init__(self, f)
 
 class YM3(YM23):
 
   formatid = 'YM3!'
 
-  def __init__(self, f, config):
+  def __init__(self, f, once):
     YM23.__init__(self, f)
 
 class YM3b(YM23):
 
   formatid = 'YM3b'
 
-  def __init__(self, f, config):
+  def __init__(self, f, once):
     YM23.__init__(self, f)
-    if config.once:
+    if once:
       self.logignoringloopinfo()
     else:
       self.skip(self.framecount * self.framesize)
@@ -169,7 +169,7 @@ class YM56(YM):
 
   framesize = 16
 
-  def __init__(self, f, config):
+  def __init__(self, f, once):
     YM.__init__(self, f, True)
     self.framecount = self.lword()
     # We can ignore the other attributes as they are specific to sample data:
@@ -189,7 +189,7 @@ class YM56(YM):
       self.readframe = self.interleavedframe
     else:
       self.readframe = self.simpleframe
-    if config.once:
+    if once:
       self.logignoringloopinfo()
       self.loopinfo = None
     elif interleaved:
@@ -266,18 +266,18 @@ class YM6(YM56):
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
-def ymopen(path, config):
+def ymopen(path, once):
   f = open(path, 'rb')
   try:
     if 'YM' == f.read(2):
-      return impls['YM' + f.read(2)](f, config)
+      return impls['YM' + f.read(2)](f, once)
   except:
     f.close()
     raise
   f.close()
   f = UnpackedFile(path)
   try:
-    return impls[f.read(4)](f, config)
+    return impls[f.read(4)](f, once)
   except:
     f.close()
     raise

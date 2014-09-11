@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 def main():
   config = getprocessconfig()
   inpath, outpath = config.positional
-  f = ymopen(inpath, config)
+  f = ymopen(inpath, config.once)
   try:
     for info in f.info:
       log.info(info)
