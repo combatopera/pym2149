@@ -60,7 +60,7 @@ class Config:
     if self.nominalclockornone is not None:
       return self.nominalclockornone
     if altdefault is not None:
-      return stclock
+      return altdefault
     return stclock
 
   def createchip(self, nominalclock = None, bits = 16):
