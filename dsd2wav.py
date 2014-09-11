@@ -20,12 +20,12 @@
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
-from cli import Config
+from cli import getprocessconfig
 
 log = logging.getLogger(__name__)
 
 def main():
-  config = Config()
+  config = getprocessconfig()
   inpath, outpath = config.positional
   f = open(inpath, 'rb')
   try:

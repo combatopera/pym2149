@@ -20,13 +20,13 @@
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
-from cli import Config
+from cli import getprocessconfig
 from roll import Roll
 
 log = logging.getLogger(__name__)
 
 def main():
-  config = Config()
+  config = getprocessconfig()
   inpath, outpath = config.positional
   f = ymopen(inpath, config)
   try:

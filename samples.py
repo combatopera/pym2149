@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from music import Orc, Main
 from fractions import Fraction
-from cli import Config
+from cli import getprocessconfig
 import os, subprocess, time, sys
 
 log = logging.getLogger(__name__)
@@ -157,7 +157,7 @@ class Target:
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  orc.nomclock = Config().nominalclock()
+  orc.nomclock = getprocessconfig().nominalclock()
   target = Target()
   with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
   with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')

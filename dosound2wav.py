@@ -22,14 +22,14 @@ from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from budgie import readbytecode
-from cli import Config
+from cli import getprocessconfig
 
 log = logging.getLogger(__name__)
 
 extraseconds = 3
 
 def main():
-  config = Config()
+  config = getprocessconfig()
   inpath, label, outpath = config.positional
   f = open(inpath)
   try:

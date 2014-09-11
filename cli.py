@@ -23,6 +23,9 @@ from pym2149.mix import IdealMixer
 
 log = logging.getLogger(__name__)
 
+def getprocessconfig():
+  return Config(sys.argv[1:])
+
 class Config:
 
   @staticmethod
@@ -40,7 +43,7 @@ class Config:
         return True
     return False
 
-  def __init__(self, args = sys.argv[1:]):
+  def __init__(self, args):
     # TODO: Replace args with documented config file.
     options, self.positional = getopt.getopt(args, 'q:H:l:r:k:p1sc', ['quant=', 'height=', 'law=', 'rate=', 'clock=', 'pause', 'once', 'stereo', 'clamp'])
     self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))

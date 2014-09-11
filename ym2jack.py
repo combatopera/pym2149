@@ -21,7 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from pym2149.nod import Node, BufNode
-from cli import Config
+from cli import getprocessconfig
 from roll import Roll
 import jack, numpy as np
 
@@ -70,7 +70,7 @@ class JackWriter(Node):
     jack.deactivate()
 
 def main():
-  config = Config()
+  config = getprocessconfig()
   inpath, = config.args
   jack.attach(clientname)
   config.outrate = jack.get_sample_rate() # Override user setting if any.
