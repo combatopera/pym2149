@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 def main():
   config = Config()
-  inpath, outpath = config.args
+  inpath, outpath = config.positional
   f = ymopen(inpath, config)
   try:
     for info in f.info:

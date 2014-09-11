@@ -30,7 +30,7 @@ extraseconds = 3
 
 def main():
   config = Config()
-  inpath, label, outpath = config.args
+  inpath, label, outpath = config.positional
   f = open(inpath)
   try:
     bytecode = readbytecode(f, label)

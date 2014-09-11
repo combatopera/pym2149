@@ -142,7 +142,7 @@ class Main:
 
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
-    outpath, = config.args
+    outpath, = config.positional
     chip = config.createchip()
     stream = config.createstream(chip, outpath)
     try:

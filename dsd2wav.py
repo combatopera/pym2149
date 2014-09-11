@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 def main():
   config = Config()
-  inpath, outpath = config.args
+  inpath, outpath = config.positional
   f = open(inpath, 'rb')
   try:
     log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
