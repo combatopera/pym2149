@@ -56,7 +56,7 @@ class Config:
     self.stereo = self.booleanoption(options, ('-s', '--stereo'))
     self.clamp = self.booleanoption(options, ('-c', '--clamp'))
 
-  def nominalclock(self, altdefault = None):
+  def getnominalclock(self, altdefault = None):
     if self.nominalclockornone is not None:
       return self.nominalclockornone
     if altdefault is not None:
@@ -64,7 +64,7 @@ class Config:
     return stclock
 
   def createchip(self, nominalclock = None, bits = 16):
-    nominalclock = self.nominalclock(nominalclock)
+    nominalclock = self.getnominalclock(nominalclock)
     clockdiv = 8 // self.scale
     if nominalclock % clockdiv:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
