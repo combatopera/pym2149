@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.util import Timer
+from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from cli import Config
 from roll import Roll

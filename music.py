@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.util import Timer
+from pym2149.timer import Timer
 from pym2149.buf import singleton
 from cli import Config
 import sys, logging

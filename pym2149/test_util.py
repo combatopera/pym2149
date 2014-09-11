@@ -19,7 +19,7 @@
 
 from __future__ import division
 import unittest
-from util import Timer
+from timer import Timer
 
 class TestTimer(unittest.TestCase):
 
