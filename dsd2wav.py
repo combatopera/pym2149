@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
-from cli import getprocessconfig
+from config import getprocessconfig
 
 log = logging.getLogger(__name__)
 
