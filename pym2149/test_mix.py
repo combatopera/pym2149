@@ -44,7 +44,7 @@ class TestIdealMixer(unittest.TestCase):
 
   def test_works(self):
     c = Container([Counter(10), Counter()])
-    c.bits = 16
+    c.log2maxpeaktopeak = 16
     m = IdealMixer(c)
     self.expect(m, [10, 12, 14, 16, 18], m.call(Block(5)))
     # Check the buffer is actually cleared first:
@@ -53,7 +53,7 @@ class TestIdealMixer(unittest.TestCase):
   def test_masked(self):
     upstream = Counter(10), Counter()
     c = Container(upstream)
-    c.bits = 16
+    c.log2maxpeaktopeak = 16
     m = IdealMixer(c)
     self.assertEqual(NullBuf, m(Block(5), True))
     for n in upstream:

@@ -66,7 +66,8 @@ class IdealMixer(BufNode):
 
   def __init__(self, container, amps = None):
     BufNode.__init__(self, self.floatdtype)
-    self.datum = self.dtype(2 ** (container.bits - 1.5)) # Half power point, very close to -3 dB.
+    # TODO: The log2maxpeaktopeak interface is currently a bit hacky.
+    self.datum = self.dtype(2 ** (container.log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
     if amps is not None:
       self.contrib = MasterBuf(self.dtype)
     self.container = container
