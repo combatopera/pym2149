@@ -59,7 +59,7 @@ class Registers:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, clock, bits, scale = defaultscale, pause = False, clampoutrate = None):
+  def __init__(self, clock, log2maxpeaktopeak, scale = defaultscale, pause = False, clampoutrate = None):
     self.clock = clock
     self.scale = scale
     Registers.__init__(self, clampoutrate)
@@ -73,9 +73,9 @@ class YM2149(Registers, Container):
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
     levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(self.channels)]
-    Container.__init__(self, [Dac(level, bits, self.channels) for level in levels])
+    Container.__init__(self, [Dac(level, log2maxpeaktopeak, self.channels) for level in levels])
     self.pause = pause
-    self.bits = bits
+    self.bits = log2maxpeaktopeak
 
   def callimpl(self):
     result = Container.callimpl(self)
