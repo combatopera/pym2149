@@ -40,7 +40,7 @@ def main():
       for frame in f:
         frame(chip)
         roll.update()
-        for b in timer.blocks(f.framefreq):
+        for b in timer.blocksforperiod(f.framefreq):
           stream.call(b)
       stream.flush()
     finally:

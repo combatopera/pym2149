@@ -42,7 +42,7 @@ def main():
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)
     log.info("Streaming %.3f extra seconds.", extraseconds)
-    for b in timer.blocks(1 / extraseconds):
+    for b in timer.blocksforperiod(1 / extraseconds):
       stream.call(b)
     stream.flush()
   finally:

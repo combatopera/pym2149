@@ -113,7 +113,7 @@ class Play:
         action = NoteAction(note)
         paramindex += 1
       frames.append(action)
-      b, = self.timer.blocks(beatsperbar)
+      b, = self.timer.blocksforperiod(beatsperbar)
       for _ in xrange(b.framecount - 1):
         frames.append(sustainaction)
     return frames
@@ -156,7 +156,7 @@ class Main:
             chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
-        for b in timer.blocks(self.refreshrate):
+        for b in timer.blocksforperiod(self.refreshrate):
           stream.call(b)
       stream.flush()
     finally:

@@ -27,7 +27,7 @@ class TestTimer(unittest.TestCase):
     clock = 2000000
     t = Timer(clock, None)
     def nextframecount(rate):
-      blocks = list(t.blocks(rate))
+      blocks = list(t.blocksforperiod(rate))
       self.assertEqual(1, len(blocks))
       return blocks[0].framecount
     self.assertEqual(33333, nextframecount(60))
@@ -41,47 +41,47 @@ class TestTimer(unittest.TestCase):
 
   def test_minblockrate(self):
     t = Timer(1000, 2)
-    self.assertEqual([333], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([333], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(1, t.carryticks)
-    self.assertEqual([334], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([334], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(-1, t.carryticks)
-    self.assertEqual([333], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([333], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(0, t.carryticks)
-    self.assertEqual([500], [b.framecount for b in t.blocks(2)])
+    self.assertEqual([500], [b.framecount for b in t.blocksforperiod(2)])
     self.assertEqual(0, t.carryticks)
-    self.assertEqual([500, 500], [b.framecount for b in t.blocks(1)])
+    self.assertEqual([500, 500], [b.framecount for b in t.blocksforperiod(1)])
     self.assertEqual(0, t.carryticks)
     # Don't bother returning a block of size zero:
-    self.assertEqual([], [b.framecount for b in t.blocks(2001)])
+    self.assertEqual([], [b.framecount for b in t.blocksforperiod(2001)])
     self.assertEqual(1000, t.carryticks)
     t.carryticks = 0
 
   def test_inexactminblockrate(self):
     t = Timer(1000, 3)
     # Every block satisfies the given condition:
-    self.assertEqual([333, 333, 333, 1], [b.framecount for b in t.blocks(1)])
+    self.assertEqual([333, 333, 333, 1], [b.framecount for b in t.blocksforperiod(1)])
     self.assertEqual(0, t.carryticks)
 
   def test_fractionalrefreshrates(self):
     t = Timer(100, None)
-    self.assertEqual([200], [b.framecount for b in t.blocks(.5)])
+    self.assertEqual([200], [b.framecount for b in t.blocksforperiod(.5)])
     self.assertEqual(0, t.carryticks)
-    self.assertEqual([300], [b.framecount for b in t.blocks(1 / 3)])
+    self.assertEqual([300], [b.framecount for b in t.blocksforperiod(1 / 3)])
     self.assertEqual(0, t.carryticks)
-    self.assertEqual([67], [b.framecount for b in t.blocks(1.5)])
+    self.assertEqual([67], [b.framecount for b in t.blocksforperiod(1.5)])
     self.assertEqual(-.5, t.carryticks)
-    self.assertEqual([66], [b.framecount for b in t.blocks(1.5)])
+    self.assertEqual([66], [b.framecount for b in t.blocksforperiod(1.5)])
     self.assertEqual(.5, t.carryticks)
-    self.assertEqual([67], [b.framecount for b in t.blocks(1.5)])
+    self.assertEqual([67], [b.framecount for b in t.blocksforperiod(1.5)])
     self.assertEqual(0, t.carryticks)
 
   def test_nonintegerclock(self):
     t = Timer(100.5, None)
-    self.assertEqual([34], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([34], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(-1.5, t.carryticks)
-    self.assertEqual([33], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([33], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(0, t.carryticks)
-    self.assertEqual([34], [b.framecount for b in t.blocks(3)])
+    self.assertEqual([34], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(-1.5, t.carryticks)
     t.carryticks = 0
 

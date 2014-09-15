@@ -21,7 +21,7 @@ def dosound(bytecode, chip, timer, stream):
       yield b & 0xff # It's supposed to be bytecode.
   g = g()
   def tick():
-    for b in timer.blocks(50): # Authentic period.
+    for b in timer.blocksforperiod(50): # Authentic period.
       stream.call(b)
   while True:
     ctrl = g.next()

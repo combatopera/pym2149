@@ -34,7 +34,7 @@ class Timer:
     self.carryticks = 0
     self.clock = clock
 
-  def blocks(self, refreshrate):
+  def blocksforperiod(self, refreshrate):
     available = self.carryticks + self.clock
     blockticks = int(round(available / refreshrate))
     self.carryticks = available - blockticks * refreshrate
