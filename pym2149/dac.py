@@ -52,7 +52,7 @@ class Dac(BufNode):
 
   def __init__(self, level, log2maxpeaktopeak, ampshare):
     BufNode.__init__(self, self.floatdtype)
-    # TODO: Explain why we take off .5 here.
+    # We take off .5 so that the peak amplitude is about -3 dB:
     maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
     # Lookup of ideal amplitudes:
     self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
