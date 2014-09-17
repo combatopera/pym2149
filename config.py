@@ -54,7 +54,7 @@ class Config:
     self.scale = defaultscale // statestride
     self.heightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
-    self.outrate = g['outputrate']
+    self.outputrate = g['outputrate']
     self.nominalclockornone = g['nominalclockornone']
     self.oscpause = g['oscpause']
     self.ignoreloop = g['ignoreloop']
@@ -74,7 +74,7 @@ class Config:
     if nominalclock % clockdiv:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
     clock = nominalclock // clockdiv
-    clampoutrate = self.outrate if self.freqclamp else None
+    clampoutrate = self.outputrate if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial state stride.", chip.clock)
@@ -96,7 +96,7 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    return [WavBuf(chip.clock, naive, self.outrate) for naive in naives]
+    return [WavBuf(chip.clock, naive, self.outputrate) for naive in naives]
 
   def createstream(self, chip, outpath):
     return WavWriter(WavBuf.multi(self.createfloatstream(chip)), outpath)
