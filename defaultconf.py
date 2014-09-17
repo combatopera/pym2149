@@ -34,7 +34,7 @@ stereo = False
 
 panlaw = 3
 
-ignoreloop = False
+ignoreloop = False # FIXME: Default should be True when writing to a file.
 '''If True playback will not loop.'''
 
 pianorollheightornone = None
