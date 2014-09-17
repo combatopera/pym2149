@@ -44,6 +44,7 @@ class Config:
     return False
 
   def __init__(self, args):
+    # FIXME: Update the wiki.
     self.positional = args
     g = defaultconf.__dict__.copy()
     execfile('chipconf.py', g)
