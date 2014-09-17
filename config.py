@@ -55,10 +55,10 @@ class Config:
 
   def createchip(self, nominalclock = None, log2maxpeaktopeak = 16):
     nominalclock = self.getnominalclock(nominalclock)
-    clockdiv = 8 // self.scale
-    if nominalclock % clockdiv:
-      raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
-    clock = nominalclock // clockdiv
+    statestride = defaultscale // self.scale
+    if nominalclock % statestride:
+      raise Exception("Clock %s not divisible by statestride %s." % (nominalclock, statestride))
+    clock = nominalclock // statestride
     clampoutrate = self.outputrate if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
