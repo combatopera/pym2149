@@ -28,21 +28,6 @@ def getprocessconfig():
 
 class Config:
 
-  @staticmethod
-  def uniqueoption(options, keys, defaultval, xform):
-    vals = [v for k, v in options if k in keys]
-    if not vals:
-      return defaultval
-    v, = vals
-    return xform(v)
-
-  @staticmethod
-  def booleanoption(options, keys):
-    for k, _ in options:
-      if k in keys:
-        return True
-    return False
-
   def __init__(self, args):
     # FIXME: Update the wiki.
     self.positional = args
