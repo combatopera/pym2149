@@ -77,7 +77,7 @@ class Config:
     clampoutrate = self.outrate if self.clamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
-      log.debug("Clock adjusted to %s to take advantage of non-zero control quant level.", chip.clock)
+      log.debug("Clock adjusted to %s to take advantage of non-trivial state stride.", chip.clock)
     return chip
 
   def amppair(self, loc):
