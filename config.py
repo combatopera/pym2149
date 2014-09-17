@@ -50,7 +50,7 @@ class Config:
     execfile('chipconf.py', g)
     statestride = g['statestride']
     self.scale = defaultscale // statestride
-    if defaultscale != self.scale * statestride:
+    if self.scale < 0 or defaultscale != self.scale * statestride:
         raise Exception("statestride must be a power of 2 and at most %s." % defaultscale)
     self.height = g['pianorollheightornone']
     self.panlaw = g['panlaw']
