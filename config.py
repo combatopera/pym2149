@@ -52,7 +52,7 @@ class Config:
     if statestride < 1 or defaultscale % statestride:
         raise Exception("statestride must be a factor of %s." % defaultscale)
     self.scale = defaultscale // statestride
-    self.heightornone = g['pianorollheightornone']
+    self.pianorollheightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
     self.outputrate = g['outputrate']
     self.nominalclockornone = g['nominalclockornone']
@@ -102,7 +102,7 @@ class Config:
     return WavWriter(WavBuf.multi(self.createfloatstream(chip)), outpath)
 
   def getheight(self, defaultheight):
-    if self.heightornone is not None:
-      return self.heightornone
+    if self.pianorollheightornone is not None:
+      return self.pianorollheightornone
     else:
       return defaultheight
