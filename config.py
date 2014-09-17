@@ -49,9 +49,9 @@ class Config:
     g = defaultconf.__dict__.copy()
     execfile('chipconf.py', g)
     statestride = g['statestride']
+    if statestride < 1 or defaultscale % statestride:
+        raise Exception("statestride must be a factor of %s." % defaultscale)
     self.scale = defaultscale // statestride
-    if self.scale < 0 or defaultscale != self.scale * statestride:
-        raise Exception("statestride must be a power of 2 and at most %s." % defaultscale)
     self.heightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
     self.outrate = g['outputrate']
