@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, getopt, numpy as np
+import sys, logging, numpy as np, defaultconf
 from pym2149.ym2149 import YM2149, defaultscale, stclock
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
@@ -44,17 +44,21 @@ class Config:
     return False
 
   def __init__(self, args):
-    # TODO: Replace args with documented config file.
-    options, self.positional = getopt.getopt(args, 'q:H:l:r:k:p1sc', ['quant=', 'height=', 'law=', 'rate=', 'clock=', 'pause', 'once', 'stereo', 'clamp'])
-    self.scale = defaultscale // (2 ** self.uniqueoption(options, ('-q', '--quant'), 0, int))
-    self.height = self.uniqueoption(options, ('-H', '--height'), None, int)
-    self.panlaw = self.uniqueoption(options, ('-l', '--law'), 3, float)
-    self.outrate = self.uniqueoption(options, ('-r', '--rate'), 44100, int)
-    self.nominalclockornone = self.uniqueoption(options, ('-k', '--clock'), None, int)
-    self.pause = self.booleanoption(options, ('-p', '--pause'))
-    self.once = self.booleanoption(options, ('-1', '--once'))
-    self.stereo = self.booleanoption(options, ('-s', '--stereo'))
-    self.clamp = self.booleanoption(options, ('-c', '--clamp'))
+    self.positional = args
+    g = defaultconf.__dict__.copy()
+    execfile('chipconf.py', g)
+    statestride = g['statestride']
+    self.scale = defaultscale // statestride
+    if defaultscale != self.scale * statestride:
+        raise Exception("statestride must be a power of 2 and at most %s." % defaultscale)
+    self.height = g['pianorollheightornone']
+    self.panlaw = g['panlaw']
+    self.outrate = g['outputrate']
+    self.nominalclockornone = g['nominalclockornone']
+    self.pause = g['oscpause']
+    self.once = g['ignoreloop']
+    self.stereo = g['stereo']
+    self.clamp = g['freqclamp']
 
   def getnominalclock(self, altdefault = None):
     if self.nominalclockornone is not None:
