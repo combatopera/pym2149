@@ -59,7 +59,7 @@ class Config:
     self.pause = g['oscpause']
     self.once = g['ignoreloop']
     self.stereo = g['stereo']
-    self.clamp = g['freqclamp']
+    self.freqclamp = g['freqclamp']
 
   def getnominalclock(self, altdefault = None):
     if self.nominalclockornone is not None:
@@ -74,7 +74,7 @@ class Config:
     if nominalclock % clockdiv:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
     clock = nominalclock // clockdiv
-    clampoutrate = self.outrate if self.clamp else None
+    clampoutrate = self.outrate if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial state stride.", chip.clock)
