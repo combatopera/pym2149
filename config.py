@@ -56,7 +56,7 @@ class Config:
     self.panlaw = g['panlaw']
     self.outrate = g['outputrate']
     self.nominalclockornone = g['nominalclockornone']
-    self.pause = g['oscpause']
+    self.oscpause = g['oscpause']
     self.once = g['ignoreloop']
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
@@ -75,7 +75,7 @@ class Config:
       raise Exception("Clock %s not divisible by %s." % (nominalclock, clockdiv))
     clock = nominalclock // clockdiv
     clampoutrate = self.outrate if self.freqclamp else None
-    chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, pause = self.pause, clampoutrate = clampoutrate)
+    chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial state stride.", chip.clock)
     return chip
