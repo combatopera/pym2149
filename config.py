@@ -57,7 +57,7 @@ class Config:
     self.outrate = g['outputrate']
     self.nominalclockornone = g['nominalclockornone']
     self.oscpause = g['oscpause']
-    self.once = g['ignoreloop']
+    self.ignoreloop = g['ignoreloop']
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
 

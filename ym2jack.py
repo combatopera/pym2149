@@ -74,7 +74,7 @@ def main():
   inpath, = config.positional
   jack.attach(clientname)
   config.outrate = jack.get_sample_rate() # Override user setting if any.
-  f = ymopen(inpath, config.once)
+  f = ymopen(inpath, config.ignoreloop)
   try:
     for info in f.info:
       log.info(info)
