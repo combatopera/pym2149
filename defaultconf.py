@@ -34,6 +34,8 @@ stereo = False
 
 panlaw = 3
 
+maxpan = .75
+
 ignoreloop = False # FIXME: Default should be True when writing to a file.
 '''If True playback will not loop.'''
 

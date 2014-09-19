@@ -45,6 +45,7 @@ class Config:
     self.ignoreloop = g['ignoreloop']
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
+    self.maxpan = g['maxpan']
 
   def getnominalclock(self, altdefault = None):
     if self.nominalclockornone is not None:
@@ -69,8 +70,6 @@ class Config:
     l = ((1 - loc) / 2) ** (self.panlaw / 6)
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
-
-  maxpan = .75
 
   def createfloatstream(self, chip):
     if self.stereo:
