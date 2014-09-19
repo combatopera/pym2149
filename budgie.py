@@ -32,7 +32,7 @@ def readbytecode(f, label):
   while True:
     if groups[1] is not None:
       if 'dc.b' != groups[1].lower():
-        raise Exception("Unsupported: %s" % groups[1])
+        raise Exception("Unsupported directive: %s" % groups[1])
       for s in groups[2].split(','):
         if s[0] == '%':
           n = int(s[1:], 2)
