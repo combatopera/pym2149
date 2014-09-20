@@ -22,10 +22,12 @@ from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from config import getprocessconfig
 from roll import Roll
+import defaultconf
 
 log = logging.getLogger(__name__)
 
 def main():
+  defaultconf.ignoreloop = True # Even in stdout case, not sure if that's what we want.
   config = getprocessconfig()
   inpath, outpath = config.positional
   f = ymopen(inpath, config.ignoreloop)

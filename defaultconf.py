@@ -36,8 +36,8 @@ panlaw = 3
 
 maxpan = .75
 
-ignoreloop = False # FIXME: Default should be True when writing to a file.
-'''If True playback will not loop.'''
+ignoreloop = False
+'''If True playback will not loop. This default is modified to True when writing to a file.'''
 
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
