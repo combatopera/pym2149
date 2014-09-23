@@ -27,11 +27,11 @@ import jack, numpy as np
 
 log = logging.getLogger(__name__)
 
-clientname = 'pym2149'
-# XXX: Can we detect how many system channels there are?
-systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
-
 class JackWriter(Node):
+
+  clientname = 'pym2149'
+  # XXX: Can we detect how many system channels there are?
+  systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
   def __init__(self, wavs):
     Node.__init__(self)
@@ -40,9 +40,9 @@ class JackWriter(Node):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     jack.activate()
     # Connect all system channels, cycling over our streams if necessary:
-    for i, systemchannel in enumerate(systemchannels):
+    for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(wavs)
-      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
+      jack.connect("%s:out_%s" % (self.clientname, 1 + clientchannelindex), systemchannel)
     self.size = jack.get_buffer_size()
     self.jack = np.empty((len(wavs), self.size), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
@@ -72,7 +72,7 @@ class JackWriter(Node):
 def main():
   config = getprocessconfig()
   inpath, = config.positional
-  jack.attach(clientname)
+  jack.attach(JackWriter.clientname)
   config.outputrate = jack.get_sample_rate() # Override user setting if any.
   f = ymopen(inpath, config.ignoreloop)
   try:
