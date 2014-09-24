@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
-from pym2149.jack import JackWriter
+from pym2149.jackwriter import JackWriter
 from config import getprocessconfig
 from roll import Roll
 import jack
