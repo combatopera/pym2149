@@ -18,7 +18,7 @@
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
 
-freqclamp = False
+freqclamp = True # XXX: Does this sound worse, particularly at lower outputrates?
 '''Whether inaudible tones are clamped to the lowest such tone. Setting this to True improves performance when very high frequency tones are used to attenuate the envelope.'''
 
 underclock = 8

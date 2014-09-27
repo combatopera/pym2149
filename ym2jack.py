@@ -31,7 +31,7 @@ def main():
   config = getprocessconfig()
   inpath, = config.positional
   jack.attach(JackWriter.clientname)
-  config.outputrate = jack.get_sample_rate() # Override user setting if any.
+  config.outputrate = jack.get_sample_rate() # Override user setting if any. TODO: Feedback.
   f = ymopen(inpath, config.ignoreloop)
   try:
     for info in f.info:
