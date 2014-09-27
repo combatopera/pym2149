@@ -35,12 +35,14 @@ class Node:
   def call(self, block): # XXX: Why not have masked default to False?
     return self(block, False)
 
-  def __call__(self, block, masked): # XXX: Guard against masked going from True to False for same block?
+  def __call__(self, block, masked):
     if self.block != block:
       self.block = block
       self.masked = masked
       self.result = None # Otherwise numpy ref-counting may complain on resize.
       self.result = self.callimpl()
+    elif not masked and self.masked:
+      log.warn("This node has already executed masked: %s", self)
     return self.result
 
   def callimpl(self):
