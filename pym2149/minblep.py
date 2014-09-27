@@ -73,6 +73,10 @@ class MinBleps:
     nearest = np.arange(naiverate) * dualscale
     self.naivex2outx = nearest // scale
     self.naivex2shape = self.naivex2outx * scale - nearest + scale - 1
+    self.demultiplexed = np.empty(self.minblep.shape, dtype = self.minblep.dtype)
+    for i in xrange(scale):
+      self.demultiplexed[i * self.mixinsize:(i + 1) * self.mixinsize] = self.minblep[i::scale]
+    self.naivex2off = self.naivex2shape * self.mixinsize
     log.debug('%s minBLEPs created.', scale)
     self.naiverate = naiverate
     self.outrate = outrate
@@ -90,15 +94,15 @@ class MinBleps:
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
     pasten = i4(len(diffbuf))
-    pasteminbleps(pasten, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.minblep, self.naivex2shape, diffbuf.buf, i4(self.scale), i4(naivex), i4(self.naiverate), i4(self.outrate))
+    pasteminbleps(pasten, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(self.scale), i4(naivex), i4(self.naiverate), i4(self.outrate))
 
-def pasteminbleps(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, naivex, naiverate, outrate):
-  pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, naivex, naiverate, outrate)
+def pasteminbleps(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, scale, naivex, naiverate, outrate):
+  pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, scale, naivex, naiverate, outrate)
 
 log.debug('Compiling output stage.')
 
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2shape, amp, scale, naivex, naiverate, outrate):
+def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, scale, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   # Naming constants makes inspect_types easier to read:
   zero = 0
@@ -112,13 +116,14 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
       a = amp[x]
       if a != zero:
         i = naivex2outx[naivex] - out0
-        s = naivex2shape[naivex]
+        s = naivex2off[naivex]
         j = i + mixinsize
         if i < j:
           while 1:
-            out[i] += minblep[s] * a
+            out[i] += demultiplexed[s] * a
+            # XXX: Do we really need 2 increments?
             i += one
-            s += scale # XXX: Could we eliminate this increment if we demultiplexed the minbleps?
+            s += one
             if i == j:
               break
         if i < outsize:
