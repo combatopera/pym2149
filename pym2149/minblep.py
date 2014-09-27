@@ -70,8 +70,7 @@ class MinBleps:
     self.mixinsize = len(self.minblep) // scale
     # The naiverate and outrate will line up at 1 second:
     dualscale = outrate // fractions.gcd(naiverate, outrate)
-    nearest = np.arange(naiverate) * dualscale
-    print nearest.dtype
+    nearest = np.arange(naiverate, dtype = np.int32) * dualscale
     self.naivex2outx = nearest // scale
     self.naivex2shape = self.naivex2outx * scale - nearest + scale - 1
     self.demultiplexed = np.empty(self.minblep.shape, dtype = self.minblep.dtype)
