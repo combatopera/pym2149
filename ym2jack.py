@@ -37,7 +37,7 @@ def main():
     for info in f.info:
       log.info(info)
     # For jack the available amplitude range is 2 ** 1:
-    chip = config.createchip(nominalclock = f.clock, log2maxpeaktopeak = 1)
+    chip = config.createchip(contextclockornone = f.clock, log2maxpeaktopeak = 1)
     stream = JackWriter(config.createfloatstream(chip))
     try:
       timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.

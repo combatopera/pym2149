@@ -27,9 +27,11 @@ underclock = 8
 oscpause = False
 '''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
 
-# XXX: Perhaps separate default and override, for this and refreshrate.
-nominalclockornone = None
-'''Overrides any context clock rate. If None and there is no context clock, the default is the ST rate of 2 MHz.'''
+from pym2149.ym2149 import stclock as defaultclock
+'''Used when there is no context clock or override.'''
+
+clockoverrideornone = None
+'''If not None, override the context clock.'''
 
 stereo = False
 

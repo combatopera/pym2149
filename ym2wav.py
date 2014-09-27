@@ -34,7 +34,7 @@ def main():
   try:
     for info in f.info:
       log.info(info)
-    chip = config.createchip(nominalclock = f.clock)
+    chip = config.createchip(contextclockornone = f.clock)
     stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)

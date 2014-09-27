@@ -40,22 +40,25 @@ class Config:
     self.pianorollheightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
     self.outputrate = g['outputrate']
-    self.nominalclockornone = g['nominalclockornone']
+    self.defaultclock = g['defaultclock']
+    self.clockoverrideornone = g['clockoverrideornone']
     self.oscpause = g['oscpause']
     self.ignoreloop = g['ignoreloop']
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
     self.maxpan = g['maxpan']
 
-  def getnominalclock(self, altdefault = None):
-    if self.nominalclockornone is not None:
-      return self.nominalclockornone
-    if altdefault is not None:
-      return altdefault
-    return stclock
+  def getnominalclock(self, contextclockornone = None):
+    if self.clockoverrideornone is not None:
+      if contextclockornone is not None:
+        log.info("Context clock %s overridden to: %s", contextclockornone, self.clockoverrideornone)
+      return self.clockoverrideornone
+    if contextclockornone is not None:
+      return contextclockornone
+    return self.defaultclock
 
-  def createchip(self, nominalclock = None, log2maxpeaktopeak = 16):
-    nominalclock = self.getnominalclock(nominalclock)
+  def createchip(self, contextclockornone = None, log2maxpeaktopeak = 16):
+    nominalclock = self.getnominalclock(contextclockornone)
     underclock = defaultscale // self.scale
     if nominalclock % underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (nominalclock, underclock))
