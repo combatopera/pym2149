@@ -16,7 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from buf import MasterBuf, NullBuf
-import numpy as np
+import numpy as np, logging
+
+log = logging.getLogger(__name__)
 
 class Block:
 
