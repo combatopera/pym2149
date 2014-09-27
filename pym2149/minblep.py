@@ -117,7 +117,7 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, minblep, naivex2s
           while 1:
             out[i] += minblep[s] * a
             i += one
-            s += scale
+            s += scale # XXX: Could we eliminate this increment if we demultiplexed the minbleps?
             if i == j:
               break
         if i < outsize:
