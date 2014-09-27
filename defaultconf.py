@@ -21,8 +21,7 @@ outputrate = 44100
 freqclamp = False
 '''Whether inaudible tones are clamped to the lowest such tone. Setting this to True improves performance when very high frequency tones are used to attenuate the envelope.'''
 
-# TODO: Rename to underclock.
-statestride = 1
+underclock = 8
 '''The number of nominal clock ticks until the chip state can next be updated, must be a factor of 8 i.e. in {1, 2, 4, 8}. Higher numbers improve performance but the authentic setting is currently unknown.'''
 
 oscpause = False

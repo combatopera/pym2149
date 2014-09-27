@@ -33,10 +33,10 @@ class Config:
     self.positional = args
     g = defaultconf.__dict__.copy()
     execfile('chipconf.py', g)
-    statestride = g['statestride']
-    if statestride < 1 or defaultscale % statestride:
-        raise Exception("statestride must be a factor of %s." % defaultscale)
-    self.scale = defaultscale // statestride
+    underclock = g['underclock']
+    if underclock < 1 or defaultscale % underclock:
+        raise Exception("underclock must be a factor of %s." % defaultscale)
+    self.scale = defaultscale // underclock
     self.pianorollheightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
     self.outputrate = g['outputrate']
@@ -56,14 +56,14 @@ class Config:
 
   def createchip(self, nominalclock = None, log2maxpeaktopeak = 16):
     nominalclock = self.getnominalclock(nominalclock)
-    statestride = defaultscale // self.scale
-    if nominalclock % statestride:
-      raise Exception("Clock %s not divisible by statestride %s." % (nominalclock, statestride))
-    clock = nominalclock // statestride
+    underclock = defaultscale // self.scale
+    if nominalclock % underclock:
+      raise Exception("Clock %s not divisible by underclock %s." % (nominalclock, underclock))
+    clock = nominalclock // underclock
     clampoutrate = self.outputrate if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
-      log.debug("Clock adjusted to %s to take advantage of non-trivial state stride.", chip.clock)
+      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
     return chip
 
   def amppair(self, loc):
