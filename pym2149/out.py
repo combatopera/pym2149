@@ -59,11 +59,9 @@ class WavBuf(Node):
 
   def __init__(self, clock, naive, outrate):
     Node.__init__(self)
-    # XXX: Why does a tenth of ideal scale look better than ideal scale itself?
-    scale = 1000 # Smaller values result in worse-looking spectrograms.
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
-    self.minbleps = MinBleps(clock, outrate, scale)
+    self.minbleps = MinBleps(clock, outrate, None)
     # Need space for a whole mixin in case it is rooted at sample outcount:
     self.overflowsize = self.minbleps.mixinsize
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))

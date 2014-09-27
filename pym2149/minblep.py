@@ -29,6 +29,11 @@ class MinBleps:
   minmag = np.exp(-100)
 
   def __init__(self, naiverate, outrate, scale, cutoff = .475, transition = .05):
+    idealscale = naiverate // fractions.gcd(naiverate, outrate)
+    if scale is None:
+      scale = idealscale
+    elif scale != idealscale:
+      raise Exception("Expected scale %s but ideal is %s." % (scale, idealscale))
     log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
@@ -63,7 +68,6 @@ class MinBleps:
     ones = (-len(self.minblep)) % scale
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
-    self.idealscale = naiverate // fractions.gcd(naiverate, outrate)
     # The naiverate and outrate will line up at 1 second:
     nearest = round(np.arange(naiverate) / naiverate * outrate * scale)
     self.naivex2outx = nearest // scale

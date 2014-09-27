@@ -31,7 +31,7 @@ def plotmin(plt, mb, shift, signal, style):
 
 def main():
   import matplotlib.pyplot as plt
-  mb = MinBleps(1, 1, 5, cutoff = .5, transition = 4 / 10)
+  mb = MinBleps(5, 1, 5, cutoff = .5, transition = 4 / 10)
   plot(plt, mb, mb.bli * mb.scale, 'b+', 'c+')
   plot(plt, mb, mb.blep, 'bo', 'co')
   plotmin(plt, mb, 0, mb.minbli * mb.scale, 'r+')
