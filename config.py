@@ -17,7 +17,7 @@
 
 from __future__ import division
 import sys, logging, numpy as np, defaultconf
-from pym2149.ym2149 import YM2149, defaultscale, stclock
+from pym2149.ym2149 import YM2149, defaultscale
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
 

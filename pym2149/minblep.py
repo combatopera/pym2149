@@ -69,7 +69,8 @@ class MinBleps:
     self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
     self.mixinsize = len(self.minblep) // scale
     # The naiverate and outrate will line up at 1 second:
-    nearest = round(np.arange(naiverate) / naiverate * outrate * scale)
+    dualscale = outrate // fractions.gcd(naiverate, outrate)
+    nearest = np.arange(naiverate) * dualscale
     self.naivex2outx = nearest // scale
     self.naivex2shape = self.naivex2outx * scale - nearest + scale - 1
     log.debug('%s minBLEPs created.', scale)
