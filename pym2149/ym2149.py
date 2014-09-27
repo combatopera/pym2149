@@ -22,6 +22,9 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
+import logging
+
+log = logging.getLogger(__name__)
 
 stclock = 2000000
 defaultscale = 8
@@ -37,9 +40,10 @@ class Registers:
   def __init__(self, clampoutrate):
     # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg(0) for i in xrange(16))
-    # Clamping is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
+    # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
     mintoneperiod = max(toneperiodclamp(self, clampoutrate), 1) if (clampoutrate is not None) else 1
+    log.debug("Minimum tone period: %s", mintoneperiod)
     TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
