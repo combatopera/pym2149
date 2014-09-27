@@ -34,7 +34,7 @@ class Node:
   def __init__(self):
     self.block = None
 
-  def call(self, block): # XXX: Why not have masked default to False?
+  def call(self, block): # I think we don't default masked to False to ensure it is propagated.
     return self(block, False)
 
   def __call__(self, block, masked):
