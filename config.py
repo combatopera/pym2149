@@ -29,7 +29,6 @@ def getprocessconfig():
 class Config:
 
   def __init__(self, args):
-    # FIXME: Update the wiki.
     self.positional = args
     g = defaultconf.__dict__.copy()
     if os.path.exists('chipconf.py'):
