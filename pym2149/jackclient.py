@@ -41,6 +41,9 @@ class JackClient:
     stream = JackStream(self.config.createfloatstream(chip))
     return chip, stream
 
+  def dispose(self):
+    jack.detach()
+
 class JackStream(Node):
 
   # XXX: Can we detect how many system channels there are?
