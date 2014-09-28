@@ -34,7 +34,7 @@ class MinBleps:
       scale = idealscale
     elif scale != idealscale:
       raise Exception("Expected scale %s but ideal is %s." % (scale, idealscale))
-    log.debug('Creating minBLEPs.') # TODO: Only do once in stereo mode.
+    log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2

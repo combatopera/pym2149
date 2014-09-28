@@ -17,7 +17,6 @@
 
 import numpy as np, logging
 from buf import MasterBuf, Buf
-from minblep import MinBleps
 from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
@@ -57,20 +56,20 @@ class WavBuf(Node):
     wav.channels = channels
     return wav
 
-  def __init__(self, clock, naive, outrate):
+  def __init__(self, naive, minbleps):
     Node.__init__(self)
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
-    self.minbleps = MinBleps(clock, outrate, None)
     # Need space for a whole mixin in case it is rooted at sample outcount:
-    self.overflowsize = self.minbleps.mixinsize
+    self.overflowsize = minbleps.mixinsize
     self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naive = naive
-    self.outrate = outrate
-    self.clock = clock
+    self.outrate = minbleps.outrate
+    self.clock = minbleps.naiverate
+    self.minbleps = minbleps
 
   def callimpl(self):
     # TODO: Unit-test that results do not depend on block size.
