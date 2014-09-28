@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, numpy as np, defaultconf
+import sys, logging, numpy as np, defaultconf, os
 from pym2149.ym2149 import YM2149, defaultscale
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
@@ -32,10 +32,11 @@ class Config:
     # FIXME: Update the wiki.
     self.positional = args
     g = defaultconf.__dict__.copy()
-    execfile('chipconf.py', g)
+    if os.path.exists('chipconf.py'):
+      execfile('chipconf.py', g)
     underclock = g['underclock']
     if underclock < 1 or defaultscale % underclock:
-        raise Exception("underclock must be a factor of %s." % defaultscale)
+      raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // underclock
     self.pianorollheightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
