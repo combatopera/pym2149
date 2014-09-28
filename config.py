@@ -20,6 +20,7 @@ import sys, logging, numpy as np, defaultconf, os
 from pym2149.ym2149 import YM2149, defaultscale
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
+from pym2149.minblep import MinBleps
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,8 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    return [WavBuf(chip.clock, naive, self.outputrate) for naive in naives]
+    minbleps = MinBleps(chip.clock, self.outputrate, None)
+    return [WavBuf(naive, minbleps) for naive in naives]
 
   def createstream(self, chip, outpath):
     return WavWriter(WavBuf.multi(self.createfloatstream(chip)), outpath)
