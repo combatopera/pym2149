@@ -30,11 +30,7 @@ log = logging.getLogger(__name__)
 def main():
   config = getprocessconfig()
   inpath, = config.positional
-  jack.attach(JackWriter.clientname)
-  jackrate = jack.get_sample_rate()
-  if config.outputrate != jackrate:
-    log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
-    config.outputrate = jackrate
+  JackWriter.attach(config)
   f = ymopen(inpath, config.ignoreloop)
   try:
     for info in f.info:
