@@ -33,6 +33,13 @@ class JackClient:
     if config.outputrate != jackrate:
       log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
       config.outputrate = jackrate
+    self.config = config
+
+  def newchipandstream(self, contextclockornone):
+    # For jack the available amplitude range is 2 ** 1:
+    chip = self.config.createchip(contextclockornone = contextclockornone, log2maxpeaktopeak = 1)
+    stream = JackWriter(self.config.createfloatstream(chip))
+    return chip, stream
 
 class JackWriter(Node):
 
