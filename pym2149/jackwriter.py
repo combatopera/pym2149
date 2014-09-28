@@ -38,10 +38,10 @@ class JackClient:
   def newchipandstream(self, contextclockornone):
     # For jack the available amplitude range is 2 ** 1:
     chip = self.config.createchip(contextclockornone = contextclockornone, log2maxpeaktopeak = 1)
-    stream = JackWriter(self.config.createfloatstream(chip))
+    stream = JackStream(self.config.createfloatstream(chip))
     return chip, stream
 
-class JackWriter(Node):
+class JackStream(Node):
 
   # XXX: Can we detect how many system channels there are?
   systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
