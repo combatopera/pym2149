@@ -44,7 +44,6 @@ class BinMix(BufNode):
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
 
-# TODO: This could be a BufNode if block size could be spoofed for downstream.
 class Multiplexer(Node):
 
   def __init__(self, dtype, streams):
@@ -57,6 +56,7 @@ class Multiplexer(Node):
     for i, stream in enumerate(self.streams):
       buf = self.chain(stream)
       if not i:
+        # BufNode can't do this because size is not framecount:
         size = len(buf)
         multi = self.multi.ensureandcrop(size * self.channels)
       RingCursor(buf).put(multi, i, self.channels, size)

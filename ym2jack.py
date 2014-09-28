@@ -31,7 +31,10 @@ def main():
   config = getprocessconfig()
   inpath, = config.positional
   jack.attach(JackWriter.clientname)
-  config.outputrate = jack.get_sample_rate() # Override user setting if any. TODO: Feedback.
+  jackrate = jack.get_sample_rate()
+  if config.outputrate != jackrate:
+    log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
+    config.outputrate = jackrate
   f = ymopen(inpath, config.ignoreloop)
   try:
     for info in f.info:
