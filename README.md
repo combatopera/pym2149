@@ -6,4 +6,4 @@ Continuous integration: [![Build Status](https://drone.io/bitbucket.org/combatop
 
 File bugs and feature requests in [Issues](https://bitbucket.org/combatopera/pym2149/issues).
 
-Support pym2149 development with Bitcoin: [![combatopera's bitcoin address](https://blockchain.info/qr?data=17xqLXK5YhrhVqtYrxcoYDzHoNPX3FYu3n&size=87)](https://bitcoin.org/en/getting-started)
+Support pym2149 development with Bitcoin: [![combatopera's bitcoin address](https://blockchain.info/qr?data=17xqLXK5YhrhVqtYrxcoYDzHoNPX3FYu3n&size=87)](https://play.google.com/store/apps/details?id=com.mycelium.wallet)
