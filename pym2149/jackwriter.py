@@ -23,19 +23,21 @@ import jack, numpy as np
 
 log = logging.getLogger(__name__)
 
-class JackWriter(Node):
+clientname = 'pym2149'
 
-  clientname = 'pym2149'
-  # XXX: Can we detect how many system channels there are?
-  systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
+class JackClient:
 
-  @classmethod
-  def attach(cls, config):
-    jack.attach(cls.clientname)
+  def __init__(self, config):
+    jack.attach(clientname)
     jackrate = jack.get_sample_rate()
     if config.outputrate != jackrate:
       log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
       config.outputrate = jackrate
+
+class JackWriter(Node):
+
+  # XXX: Can we detect how many system channels there are?
+  systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
   def __init__(self, wavs):
     Node.__init__(self)
@@ -46,7 +48,7 @@ class JackWriter(Node):
     # Connect all system channels, cycling over our streams if necessary:
     for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(wavs)
-      jack.connect("%s:out_%s" % (self.clientname, 1 + clientchannelindex), systemchannel)
+      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.size = jack.get_buffer_size()
     self.jack = np.empty((len(wavs), self.size), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
