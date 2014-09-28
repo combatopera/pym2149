@@ -29,6 +29,14 @@ class JackWriter(Node):
   # XXX: Can we detect how many system channels there are?
   systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
+  @classmethod
+  def attach(cls, config):
+    jack.attach(cls.clientname)
+    jackrate = jack.get_sample_rate()
+    if config.outputrate != jackrate:
+      log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
+      config.outputrate = jackrate
+
   def __init__(self, wavs):
     Node.__init__(self)
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
