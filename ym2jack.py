@@ -23,7 +23,6 @@ from pym2149.ymformat import ymopen
 from pym2149.jackclient import JackClient
 from config import getprocessconfig
 from roll import Roll
-import jack
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ def main():
       stream.close()
   finally:
     f.close()
-  jack.detach()
+  jackclient.dispose()
 
 if '__main__' == __name__:
   main()
