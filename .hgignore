@@ -1,0 +1,10 @@
+^target$
+^observations$
+^ymfiles$
+^ataridev$
+^resources$
+[.]pyc$
+[.]O$
+[.]swp$
+[.]dsd$
+^chipconf.py$
