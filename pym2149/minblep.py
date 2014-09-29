@@ -85,11 +85,18 @@ class MinBleps:
   def getoutcount(self, naivex, naiven):
     out0 = self.naivex2outx[naivex]
     naivex += naiven
-    while naivex >= self.naiverate:
-      out0 -= self.outrate
-      naivex -= self.naiverate
+    shift = naivex // self.naiverate
+    out0 -= self.outrate * shift
+    naivex -= self.naiverate * shift
     # Subtract from the first sample we can't output this block:
     return self.naivex2outx[naivex] - out0
+
+  def getminnaiven(self, naivex, outcount):
+    # FIXME: Correct but completely unacceptable!
+    naiven = 0
+    while self.getoutcount(naivex, naiven) < outcount:
+      naiven += 1
+    return naiven
 
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
