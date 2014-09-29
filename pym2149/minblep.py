@@ -77,6 +77,9 @@ class MinBleps:
     for i in xrange(scale):
       self.demultiplexed[i * self.mixinsize:(i + 1) * self.mixinsize] = self.minblep[i::scale]
     self.naivex2off = self.naivex2shape * self.mixinsize
+    self.outx2minnaivex = np.empty(outrate, dtype = self.naivex2outx.dtype)
+    for naivex in xrange(naiverate - 1, -1, -1):
+      self.outx2minnaivex[self.naivex2outx[naivex]] = naivex
     log.debug('%s minBLEPs created.', scale)
     self.naiverate = naiverate
     self.outrate = outrate
@@ -92,11 +95,11 @@ class MinBleps:
     return self.naivex2outx[naivex] - out0
 
   def getminnaiven(self, naivex, outcount):
-    # FIXME: Correct but completely unacceptable!
-    naiven = 0
-    while self.getoutcount(naivex, naiven) < outcount:
-      naiven += 1
-    return naiven
+    outx = self.naivex2outx[naivex] + outcount
+    shift = outx // self.outrate
+    outx -= self.outrate * shift
+    naivex -= self.naiverate * shift
+    return self.outx2minnaivex[outx] - naivex
 
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
