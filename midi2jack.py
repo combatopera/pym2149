@@ -28,8 +28,9 @@ log = logging.getLogger(__name__)
 
 class Midi:
 
-  def __init__(self):
+  def __enter__(self):
     pypm.Initialize()
+    return self
 
   def selectdevice(self):
     for i in xrange(pypm.CountDevices()):
@@ -39,7 +40,7 @@ class Midi:
     print >> sys.stderr, 'Index? ',
     return Device(int(raw_input())) # Apparently int ignores whitespace.
 
-  def dispose(self):
+  def __exit__(self, *args):
     pypm.Terminate()
 
 class Device:
@@ -55,25 +56,24 @@ class Device:
 
 def main():
   config = getprocessconfig()
-  midi = Midi()
-  device = midi.selectdevice()
-  jackclient = JackClient(config)
-  chip, stream = jackclient.newchipandstream(None)
-  try:
-    log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
-    minbleps = stream.wavs[0].minbleps
-    naivex = 0
-    while True:
-      for event in device.iterevents():
-        print event
-      # Make min amount of chip data to get one JACK block:
-      naiven = minbleps.getminnaiven(naivex, stream.size)
-      stream.call(Block(naiven))
-      naivex = (naivex + naiven) % chip.clock
-  finally:
-    stream.close()
-  jackclient.dispose()
-  midi.dispose()
+  with Midi() as midi:
+    device = midi.selectdevice()
+    jackclient = JackClient(config)
+    chip, stream = jackclient.newchipandstream(None)
+    try:
+      log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
+      minbleps = stream.wavs[0].minbleps
+      naivex = 0
+      while True:
+        for event in device.iterevents():
+          print event
+        # Make min amount of chip data to get one JACK block:
+        naiven = minbleps.getminnaiven(naivex, stream.size)
+        stream.call(Block(naiven))
+        naivex = (naivex + naiven) % chip.clock
+    finally:
+      stream.close()
+    jackclient.dispose()
 
 if '__main__' == __name__:
   main()
