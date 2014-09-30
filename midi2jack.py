@@ -58,22 +58,21 @@ def main():
   config = getprocessconfig()
   with Midi() as midi:
     device = midi.selectdevice()
-    jackclient = JackClient(config)
-    chip, stream = jackclient.newchipandstream(None)
-    try:
-      log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
-      minbleps = stream.wavs[0].minbleps
-      naivex = 0
-      while True:
-        for event in device.iterevents():
-          print event
-        # Make min amount of chip data to get one JACK block:
-        naiven = minbleps.getminnaiven(naivex, stream.size)
-        stream.call(Block(naiven))
-        naivex = (naivex + naiven) % chip.clock
-    finally:
-      stream.close()
-    jackclient.dispose()
+    with JackClient(config) as jackclient:
+      chip, stream = jackclient.newchipandstream(None)
+      try:
+        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
+        minbleps = stream.wavs[0].minbleps
+        naivex = 0
+        while True:
+          for event in device.iterevents():
+            print event
+          # Make min amount of chip data to get one JACK block:
+          naiven = minbleps.getminnaiven(naivex, stream.size)
+          stream.call(Block(naiven))
+          naivex = (naivex + naiven) % chip.clock
+      finally:
+        stream.close()
 
 if '__main__' == __name__:
   main()

@@ -29,25 +29,24 @@ log = logging.getLogger(__name__)
 def main():
   config = getprocessconfig()
   inpath, = config.positional
-  jackclient = JackClient(config)
-  f = ymopen(inpath, config.ignoreloop)
-  try:
-    for info in f.info:
-      log.info(info)
-    chip, stream = jackclient.newchipandstream(f.clock)
+  with JackClient(config) as jackclient:
+    f = ymopen(inpath, config.ignoreloop)
     try:
-      timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
-      roll = Roll(config.getheight(f.framefreq), chip, f.clock)
-      for frame in f:
-        frame(chip)
-        roll.update()
-        for b in timer.blocksforperiod(f.framefreq):
-          stream.call(b)
+      for info in f.info:
+        log.info(info)
+      chip, stream = jackclient.newchipandstream(f.clock)
+      try:
+        timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
+        roll = Roll(config.getheight(f.framefreq), chip, f.clock)
+        for frame in f:
+          frame(chip)
+          roll.update()
+          for b in timer.blocksforperiod(f.framefreq):
+            stream.call(b)
+      finally:
+        stream.close()
     finally:
-      stream.close()
-  finally:
-    f.close()
-  jackclient.dispose()
+      f.close()
 
 if '__main__' == __name__:
   main()
