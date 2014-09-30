@@ -28,12 +28,14 @@ clientname = 'pym2149'
 class JackClient:
 
   def __init__(self, config):
+    self.config = config
+
+  def __enter__(self):
     jack.attach(clientname)
     jackrate = jack.get_sample_rate()
-    if config.outputrate != jackrate:
-      log.warn("Configured outputrate %s cannot override JACK rate: %s", config.outputrate, jackrate)
-      config.outputrate = jackrate # FIXME: Perhaps have an effective rate instead of editing.
-    self.config = config
+    if self.config.outputrate != jackrate:
+      log.warn("Configured outputrate %s cannot override JACK rate: %s", self.config.outputrate, jackrate)
+      self.config.outputrate = jackrate # FIXME: Perhaps have an effective rate instead of editing.
 
   def newchipandstream(self, contextclockornone):
     # For jack the available amplitude range is 2 ** 1:
@@ -41,7 +43,7 @@ class JackClient:
     stream = JackStream(self.config.createfloatstream(chip))
     return chip, stream
 
-  def dispose(self):
+  def __exit__(self, *args):
     jack.detach()
 
 class JackStream(Node):
