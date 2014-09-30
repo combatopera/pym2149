@@ -36,6 +36,7 @@ class JackClient:
     if self.config.outputrate != jackrate:
       log.warn("Configured outputrate %s cannot override JACK rate: %s", self.config.outputrate, jackrate)
       self.config.outputrate = jackrate # FIXME: Perhaps have an effective rate instead of editing.
+    return self
 
   def newchipandstream(self, contextclockornone):
     # For jack the available amplitude range is 2 ** 1:
