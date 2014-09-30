@@ -50,6 +50,7 @@ class Device:
   def iterevents(self):
     while self.input.Poll():
       event, = self.input.Read(1)
+      event, _ = event # XXX: What is the second field?
       yield event
 
 def main():
