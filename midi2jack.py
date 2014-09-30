@@ -22,18 +22,47 @@ from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient
 from pym2149.nod import Block
 from config import getprocessconfig
+import pypm, sys
 
 log = logging.getLogger(__name__)
 
+class Midi:
+
+  def __init__(self):
+    pypm.Initialize()
+
+  def selectdevice(self):
+    for i in xrange(pypm.CountDevices()):
+      info = pypm.GetDeviceInfo(i)
+      if info[2]: # It's an input device.
+        print >> sys.stderr, "%2d) %s" % (i, info[1])
+    print >> sys.stderr, 'Index? ',
+    return Device(int(raw_input())) # Apparently int ignores whitespace.
+
+  def dispose(self):
+    pypm.Terminate()
+
+class Device:
+
+  def __init__(self, index):
+    self.input = pypm.Input(index)
+
+  def iterevents(self):
+    while self.input.Poll():
+      yield self.input.Read(1)
+
 def main():
   config = getprocessconfig()
+  midi = Midi()
+  device = midi.selectdevice()
   jackclient = JackClient(config)
   chip, stream = jackclient.newchipandstream(None)
   try:
     minbleps = stream.wavs[0].minbleps
     naivex = 0
     while True:
-      # Midi goes here.
+      for event in device.iterevents():
+        print event
       # Make min amount of chip data to get one JACK block:
       naiven = minbleps.getminnaiven(naivex, stream.size)
       stream.call(Block(naiven))
@@ -41,6 +70,7 @@ def main():
   finally:
     stream.close()
   jackclient.dispose()
+  midi.dispose()
 
 if '__main__' == __name__:
   main()
