@@ -49,7 +49,8 @@ class Device:
 
   def iterevents(self):
     while self.input.Poll():
-      yield self.input.Read(1)
+      event, = self.input.Read(1)
+      yield event
 
 def main():
   config = getprocessconfig()
