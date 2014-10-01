@@ -46,7 +46,10 @@ class Midi:
 class Device:
 
   def __init__(self, index):
-    self.input = pypm.Input(index)
+    self.index = index
+
+  def start(self):
+    self.input = pypm.Input(self.index) # Deferring this helps avoid PortMidi buffer overflow.
 
   def iterevents(self):
     while self.input.Poll():
@@ -64,6 +67,7 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.getoutputrate())
         minbleps = stream.wavs[0].minbleps
         naivex = 0
+        device.start()
         while True:
           for event in device.iterevents():
             print event
