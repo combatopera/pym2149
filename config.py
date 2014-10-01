@@ -40,7 +40,7 @@ class Config:
     self.scale = defaultscale // underclock
     self.pianorollheightornone = g['pianorollheightornone']
     self.panlaw = g['panlaw']
-    self.outputrate = g['outputrate']
+    self.useroutputrate = g['outputrate']
     self.defaultclock = g['defaultclock']
     self.clockoverrideornone = g['clockoverrideornone']
     self.oscpause = g['oscpause']
@@ -48,6 +48,7 @@ class Config:
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
     self.maxpan = g['maxpan']
+    self.outputratewarningarmed = True
 
   def getnominalclock(self, contextclockornone = None):
     if self.clockoverrideornone is not None:
@@ -58,13 +59,21 @@ class Config:
       return contextclockornone
     return self.defaultclock
 
+  def getoutputrate(self):
+    if self.outputrateoverride is not None:
+      if self.outputratewarningarmed and self.useroutputrate != self.outputrateoverride:
+        log.warn("Configured outputrate %s overriden to %s: %s", self.useroutputrate, self.outputrateoverridelabel, self.outputrateoverride)
+        self.outputratewarningarmed = False
+      return self.outputrateoverride
+    return self.useroutputrate
+
   def createchip(self, contextclockornone = None, log2maxpeaktopeak = 16):
     nominalclock = self.getnominalclock(contextclockornone)
     underclock = defaultscale // self.scale
     if nominalclock % underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (nominalclock, underclock))
     clock = nominalclock // underclock
-    clampoutrate = self.outputrate if self.freqclamp else None
+    clampoutrate = self.getoutputrate() if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
@@ -84,7 +93,7 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    minbleps = MinBleps(chip.clock, self.outputrate, None)
+    minbleps = MinBleps(chip.clock, self.getoutputrate(), None)
     return [WavBuf(naive, minbleps) for naive in naives]
 
   def createstream(self, chip, outpath):
