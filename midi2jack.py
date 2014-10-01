@@ -61,7 +61,7 @@ def main():
     with JackClient(config) as jackclient:
       chip, stream = jackclient.newchipandstream(None)
       try:
-        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / jackclient.outputrate)
+        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.getoutputrate())
         minbleps = stream.wavs[0].minbleps
         naivex = 0
         while True:
