@@ -32,10 +32,10 @@ class JackClient:
 
   def __enter__(self):
     jack.attach(clientname)
-    jackrate = jack.get_sample_rate()
-    if self.config.outputrate != jackrate:
-      log.warn("Configured outputrate %s cannot override JACK rate: %s", self.config.outputrate, jackrate)
-      self.config.outputrate = jackrate # FIXME: Perhaps have an effective rate instead of editing.
+    self.outputrate = jack.get_sample_rate()
+    if self.config.outputrate != self.outputrate:
+      log.warn("Configured outputrate %s cannot override JACK rate: %s", self.config.outputrate, self.outputrate)
+      self.config.outputrate = self.outputrate # FIXME: Perhaps have an effective rate instead of editing.
     return self
 
   def newchipandstream(self, contextclockornone):
