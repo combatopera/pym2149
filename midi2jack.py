@@ -55,7 +55,16 @@ class Device:
     while self.input.Poll():
       event, = self.input.Read(1)
       event, _ = event # XXX: What is the second field?
-      yield event
+      if 0xf8 != event[0]: # Timing clock.
+        yield Event(event)
+
+class Event:
+
+  def __init__(self, bytes):
+    self.bytes = bytes[:3] # We only care about non-sysex for now.
+
+  def __str__(self):
+    return ' '.join("%02x" % b for b in self.bytes)
 
 def main():
   config = getprocessconfig()
