@@ -64,22 +64,55 @@ class Device:
 class NoteOnOff:
 
   def __init__(self, event):
-    self.chan = 1 + (event[0] & 0x0f)
+    self.midichan = 1 + (event[0] & 0x0f)
     self.note = event[1]
 
   def __str__(self):
-    return "%s %2d %3d" % (self.char, self.chan, self.note)
+    return "%s %2d %3d" % (self.char, self.midichan, self.note)
 
 class NoteOn(NoteOnOff):
 
   char = 'I'
 
+  def __call__(self, channels):
+    channels.noteon(self.midichan, self.note)
+
 class NoteOff(NoteOnOff):
 
   char = 'O'
 
+  def __call__(self, channels):
+    channels.noteoff(self.midichan, self.note)
+
+class Channel:
+
+  def __init__(self, chipindex):
+    self.chipindex = chipindex
+
+class Channels:
+
+  def __init__(self, config):
+    self.midichantochannels = {}
+    for chipindex, midichan in enumerate(config.midichannels):
+      channel = Channel(chipindex)
+      try:
+        self.midichantochannels[midichan].append(channel)
+      except KeyError:
+        self.midichantochannels[midichan] = [channel]
+
+  def noteon(self, midichan, note):
+    pass
+
+  def noteoff(self, midichan, note):
+    pass
+
+  def __str__(self):
+    return ', '.join("%s -> %s" % (midichan, ''.join(chr(ord('A') + c.chipindex) for c in channels)) for midichan, channels in sorted(self.midichantochannels.iteritems()))
+
 def main():
   config = getprocessconfig()
+  channels = Channels(config)
+  log.info(channels)
   with Midi() as midi:
     device = midi.selectdevice()
     with JackClient(config) as jackclient:
@@ -91,7 +124,8 @@ def main():
         device.start()
         while True:
           for event in device.iterevents():
-            print event
+            log.debug(event)
+            event(channels)
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
