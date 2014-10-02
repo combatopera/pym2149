@@ -55,16 +55,28 @@ class Device:
     while self.input.Poll():
       event, = self.input.Read(1)
       event, _ = event # XXX: What is the second field?
-      if 0xf8 != event[0]: # Timing clock.
-        yield Event(event)
+      kind = event[0] & 0xf0
+      if 0x90 == kind:
+        yield NoteOn(event)
+      elif 0x80 == kind:
+        yield NoteOff(event)
 
-class Event:
+class NoteOnOff:
 
-  def __init__(self, bytes):
-    self.bytes = bytes[:3] # We only care about non-sysex for now.
+  def __init__(self, event):
+    self.chan = 1 + (event[0] & 0x0f)
+    self.note = event[1]
 
   def __str__(self):
-    return ' '.join("%02x" % b for b in self.bytes)
+    return "%s %2d %3d" % (self.char, self.chan, self.note)
+
+class NoteOn(NoteOnOff):
+
+  char = 'I'
+
+class NoteOff(NoteOnOff):
+
+  char = 'O'
 
 def main():
   config = getprocessconfig()
