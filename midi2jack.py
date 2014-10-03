@@ -84,30 +84,58 @@ class NoteOff(NoteOnOff):
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note)
 
+class Patch:
+
+  def __init__(self, chip):
+    self.chip = chip
+
+  def noteoninit(self): pass
+
+  def noteon(self, frame): pass
+
+  def noteoffinit(self): pass
+
+  def noteoff(self, frame): pass
+
 class Channel:
 
-  def __init__(self, chipindex):
-    self.on = None
+  def __init__(self, chipindex, patch):
+    self.onornone = None
     self.chipindex = chipindex
+    self.patch = patch
 
   def noteon(self, frame, note):
-    self.on = True
+    self.onornone = True
     self.note = note
     self.onframe = frame
 
   def noteoff(self, frame):
-    self.on = False
+    self.onornone = False
     self.offframe = frame
+
+  def update(self, frame):
+    if self.onornone:
+      f = frame - self.onframe
+      if not f:
+        self.patch.noteoninit()
+      self.patch.noteon(f)
+    elif self.onornone is not None:
+      f = frame - self.offframe
+      if not f:
+        self.patch.noteoffinit()
+      self.patch.noteoff(f)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
 
 class Channels:
 
-  def __init__(self, config):
+  def __init__(self, config, chip):
     self.midichantochannels = {}
+    self.channels = []
     for chipindex, midichan in enumerate(config.midichannels):
-      channel = Channel(chipindex)
+      channel = Channel(chipindex, Patch(chip)) # TODO: Real patches.
+      self.channels.append(channel)
       try:
         self.midichantochannels[midichan].append(channel)
       except KeyError:
@@ -120,13 +148,13 @@ class Channels:
       return
     # Use a blank channel if there is one:
     for c in channels:
-      if c.on is None:
+      if c.onornone is None:
         c.noteon(frame, note)
         return c
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
     for c in channels:
-      if not c.on and (oldest is None or c.offframe < oldest.offframe):
+      if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
         oldest = c
     if oldest is not None:
       oldest.noteon(frame, note)
@@ -146,24 +174,28 @@ class Channels:
     # Find the matching channel that has been in the on state for longest:
     oldest = None
     for c in channels:
-      if c.on and note == c.note and (oldest is None or c.onframe < oldest.onframe):
+      if c.onornone and note == c.note and (oldest is None or c.onframe < oldest.onframe):
         oldest = c
     if oldest is not None:
       oldest.noteoff(frame)
       return oldest
+
+  def update(self, frame):
+    for channel in self.channels:
+      channel.update(frame)
 
   def __str__(self):
     return ', '.join("%s -> %s" % (midichan, ''.join(map(str, channels))) for midichan, channels in sorted(self.midichantochannels.iteritems()))
 
 def main():
   config = getprocessconfig()
-  channels = Channels(config)
-  log.info(channels)
   with Midi() as midi:
     device = midi.selectdevice()
     with JackClient(config) as jackclient:
       chip, stream = jackclient.newchipandstream(None)
       try:
+        channels = Channels(config, chip)
+        log.info(channels)
         log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.getoutputrate())
         minbleps = stream.wavs[0].minbleps
         naivex = 0
@@ -173,6 +205,7 @@ def main():
         while True:
           for event in device.iterevents():
             log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
+          channels.update(frame)
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
