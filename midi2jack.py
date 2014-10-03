@@ -169,9 +169,10 @@ def main():
         naivex = 0
         frame = 0
         device.start()
+        log.debug('MIDI listener started.')
         while True:
           for event in device.iterevents():
-            log.debug("%s -> %s", event, event(channels, frame))
+            log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
