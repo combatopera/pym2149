@@ -74,20 +74,33 @@ class NoteOn(NoteOnOff):
 
   char = 'I'
 
-  def __call__(self, channels):
-    channels.noteon(self.midichan, self.note)
+  def __call__(self, channels, frame):
+    return channels.noteon(frame, self.midichan, self.note)
 
 class NoteOff(NoteOnOff):
 
   char = 'O'
 
-  def __call__(self, channels):
-    channels.noteoff(self.midichan, self.note)
+  def __call__(self, channels, frame):
+    return channels.noteoff(frame, self.midichan, self.note)
 
 class Channel:
 
   def __init__(self, chipindex):
+    self.on = None
     self.chipindex = chipindex
+
+  def noteon(self, frame, note):
+    self.on = True
+    self.note = note
+    self.onframe = frame
+
+  def noteoff(self, frame):
+    self.on = False
+    self.offframe = frame
+
+  def __str__(self):
+    return chr(ord('A') + self.chipindex)
 
 class Channels:
 
@@ -100,14 +113,47 @@ class Channels:
       except KeyError:
         self.midichantochannels[midichan] = [channel]
 
-  def noteon(self, midichan, note):
-    pass
+  def noteon(self, frame, midichan, note):
+    try:
+      channels = self.midichantochannels[midichan]
+    except KeyError:
+      return
+    # Use a blank channel if there is one:
+    for c in channels:
+      if c.on is None:
+        c.noteon(frame, note)
+        return c
+    # If any channels are in the off state, use the one that has been for longest:
+    oldest = None
+    for c in channels:
+      if not c.on and (oldest is None or c.offframe < oldest.offframe):
+        oldest = c
+    if oldest is not None:
+      oldest.noteon(frame, note)
+      return oldest
+    # They're all in the on state, use the one that has been for longest:
+    for c in channels:
+      if oldest is None or c.onframe < oldest.onframe:
+        oldest = c
+    oldest.noteon(frame, note)
+    return oldest
 
-  def noteoff(self, midichan, note):
-    pass
+  def noteoff(self, frame, midichan, note):
+    try:
+      channels = self.midichantochannels[midichan]
+    except KeyError:
+      return
+    # Find the matching channel that has been in the on state for longest:
+    oldest = None
+    for c in channels:
+      if c.on and note == c.note and (oldest is None or c.onframe < oldest.onframe):
+        oldest = c
+    if oldest is not None:
+      oldest.noteoff(frame)
+      return oldest
 
   def __str__(self):
-    return ', '.join("%s -> %s" % (midichan, ''.join(chr(ord('A') + c.chipindex) for c in channels)) for midichan, channels in sorted(self.midichantochannels.iteritems()))
+    return ', '.join("%s -> %s" % (midichan, ''.join(map(str, channels))) for midichan, channels in sorted(self.midichantochannels.iteritems()))
 
 def main():
   config = getprocessconfig()
@@ -121,15 +167,16 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.getoutputrate())
         minbleps = stream.wavs[0].minbleps
         naivex = 0
+        frame = 0
         device.start()
         while True:
           for event in device.iterevents():
-            log.debug(event)
-            event(channels)
+            log.debug("%s -> %s", event, event(channels, frame))
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
           naivex = (naivex + naiven) % chip.clock
+          frame += 1
       finally:
         stream.close()
 
