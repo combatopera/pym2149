@@ -47,3 +47,7 @@ pianorollheightornone = None
 
 midichannels = 1, 2, 3
 '''For each chip channel, the 1-based MIDI channel mapping to it. Note one MIDI channel can map to more than one chip channel for polyphony.'''
+
+from pym2149.midi import DefaultPatch
+patches = (DefaultPatch,) * len(midichannels)
+'''For each chip channel, the patch class for that channel.'''

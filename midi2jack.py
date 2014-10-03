@@ -21,6 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient
 from pym2149.nod import Block
+from pym2149.pitch import Pitch
 from config import getprocessconfig
 import pypm, sys
 
@@ -84,25 +85,13 @@ class NoteOff(NoteOnOff):
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note)
 
-class Patch:
-
-  def __init__(self, chip):
-    self.chip = chip
-
-  def noteoninit(self): pass
-
-  def noteon(self, frame): pass
-
-  def noteoffinit(self): pass
-
-  def noteoff(self, frame): pass
-
 class Channel:
 
-  def __init__(self, chipindex, patch):
+  def __init__(self, chipindex, patch, chip):
     self.onornone = None
     self.chipindex = chipindex
     self.patch = patch
+    self.chip = chip
 
   def noteon(self, frame, note):
     self.onornone = True
@@ -117,13 +106,15 @@ class Channel:
     if self.onornone:
       f = frame - self.onframe
       if not f:
-        self.patch.noteoninit()
-      self.patch.noteon(f)
+        # Make it so that the patch only has to switch things on:
+        self.chip.flagsoff(self.chipindex)
+        self.patch.noteon(Pitch(self.note))
+      self.patch.noteonframe(f)
     elif self.onornone is not None:
       f = frame - self.offframe
       if not f:
-        self.patch.noteoffinit()
-      self.patch.noteoff(f)
+        self.patch.noteoff()
+      self.patch.noteoffframe(f)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
@@ -134,7 +125,7 @@ class Channels:
     self.midichantochannels = {}
     self.channels = []
     for chipindex, midichan in enumerate(config.midichannels):
-      channel = Channel(chipindex, Patch(chip)) # TODO: Real patches.
+      channel = Channel(chipindex, config.patches[chipindex](chip, config.getnominalclock(), chipindex), chip)
       self.channels.append(channel)
       try:
         self.midichantochannels[midichan].append(channel)
