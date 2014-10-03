@@ -49,6 +49,7 @@ class Config:
     self.freqclamp = g['freqclamp']
     self.maxpan = g['maxpan']
     self.midichannels = g['midichannels']
+    self.patches = g['patches']
     self.outputratewarningarmed = True
 
   def getnominalclock(self, contextclockornone = None):
