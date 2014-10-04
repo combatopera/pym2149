@@ -125,7 +125,7 @@ class Channels:
     self.midichantochannels = {}
     self.channels = []
     for chipindex, midichan in enumerate(config.midichannels):
-      channel = Channel(chipindex, config.patches[chipindex](chip, config.getnominalclock(), chipindex), chip)
+      channel = Channel(chipindex, config.patches[chipindex](chip, chipindex), chip)
       self.channels.append(channel)
       try:
         self.midichantochannels[midichan].append(channel)
