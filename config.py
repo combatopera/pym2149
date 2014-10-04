@@ -51,6 +51,7 @@ class Config:
     self.midichannels = g['midichannels']
     self.patches = g['patches']
     self.outputratewarningarmed = True
+    self.outputrateoverride = None
 
   def getnominalclock(self, contextclockornone = None):
     if self.clockoverrideornone is not None:
