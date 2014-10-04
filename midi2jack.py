@@ -22,68 +22,10 @@ from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient
 from pym2149.nod import Block
 from pym2149.pitch import Pitch
+from pym2149.midi import Midi
 from config import getprocessconfig
-import pypm, sys
 
 log = logging.getLogger(__name__)
-
-class Midi:
-
-  def __enter__(self):
-    pypm.Initialize()
-    return self
-
-  def selectdevice(self):
-    for i in xrange(pypm.CountDevices()):
-      info = pypm.GetDeviceInfo(i)
-      if info[2]: # It's an input device.
-        print >> sys.stderr, "%2d) %s" % (i, info[1])
-    print >> sys.stderr, 'Index? ',
-    return Device(int(raw_input())) # Apparently int ignores whitespace.
-
-  def __exit__(self, *args):
-    pypm.Terminate()
-
-class Device:
-
-  def __init__(self, index):
-    self.index = index
-
-  def start(self):
-    self.input = pypm.Input(self.index) # Deferring this helps avoid PortMidi buffer overflow.
-
-  def iterevents(self):
-    while self.input.Poll():
-      event, = self.input.Read(1)
-      event, _ = event # XXX: What is the second field?
-      kind = event[0] & 0xf0
-      if 0x90 == kind:
-        yield NoteOn(event)
-      elif 0x80 == kind:
-        yield NoteOff(event)
-
-class NoteOnOff:
-
-  def __init__(self, event):
-    self.midichan = 1 + (event[0] & 0x0f)
-    self.note = event[1]
-
-  def __str__(self):
-    return "%s %2d %3d" % (self.char, self.midichan, self.note)
-
-class NoteOn(NoteOnOff):
-
-  char = 'I'
-
-  def __call__(self, channels, frame):
-    return channels.noteon(frame, self.midichan, self.note)
-
-class NoteOff(NoteOnOff):
-
-  char = 'O'
-
-  def __call__(self, channels, frame):
-    return channels.noteoff(frame, self.midichan, self.note)
 
 class Channel:
 
