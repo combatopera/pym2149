@@ -75,27 +75,3 @@ class NoteOff(NoteOnOff):
 
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note)
-
-class Patch:
-
-  def __init__(self, chip, index):
-    self.chip = chip
-    self.index = index
-
-  def noteon(self, pitch): pass
-
-  def noteonframe(self, frame): pass
-
-  def noteoff(self): pass
-
-  def noteoffframe(self, frame): pass
-
-class DefaultPatch(Patch):
-
-  def noteon(self, pitch):
-    self.chip.toneperiods[self.index].value = pitch.freq().toneperiod(self.chip.nominalclock())
-    self.chip.toneflags[self.index].value = True
-    self.chip.fixedlevels[self.index].value = 15
-
-  def noteoffframe(self, frame):
-    self.chip.fixedlevels[self.index].value = max(14 - frame // 2, 0)
