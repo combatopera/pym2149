@@ -17,9 +17,8 @@
 
 class Patch:
 
-  def __init__(self, chip, nominalclock, index):
+  def __init__(self, chip, index):
     self.chip = chip
-    self.nominalclock = nominalclock
     self.index = index
 
   def noteon(self, pitch): pass
@@ -33,7 +32,7 @@ class Patch:
 class DefaultPatch(Patch):
 
   def noteon(self, pitch):
-    self.chip.toneperiods[self.index].value = pitch.freq().toneperiod(self.nominalclock)
+    self.chip.toneperiods[self.index].value = pitch.freq().toneperiod(self.chip.nominalclock())
     self.chip.toneflags[self.index].value = True
     self.chip.fixedlevels[self.index].value = 15
 
