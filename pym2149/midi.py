@@ -24,10 +24,10 @@ class Midi:
     return self
 
   def selectdevice(self):
-    for i in xrange(pypm.CountDevices()):
-      info = pypm.GetDeviceInfo(i)
+    for index in xrange(pypm.CountDevices()):
+      info = pypm.GetDeviceInfo(index)
       if info[2]: # It's an input device.
-        print >> sys.stderr, "%2d) %s" % (i, info[1])
+        print >> sys.stderr, "%2d) %s" % (index, info[1])
     print >> sys.stderr, 'Index? ',
     return Device(int(raw_input())) # Apparently int ignores whitespace.
 
