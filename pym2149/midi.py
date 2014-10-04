@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import pypm, sys
 
 class Midi:
@@ -97,4 +98,4 @@ class DefaultPatch(Patch):
     self.chip.fixedlevels[self.index].value = 15
 
   def noteoffframe(self, frame):
-    self.chip.fixedlevels[self.index].value = max(14 - frame, 0)
+    self.chip.fixedlevels[self.index].value = max(14 - frame // 2, 0)
