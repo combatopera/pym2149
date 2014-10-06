@@ -35,9 +35,10 @@ class Channel:
     self.patch = patch
     self.chip = chip
 
-  def noteon(self, frame, note):
+  def noteon(self, frame, note, vel):
     self.onornone = True
     self.note = note
+    self.vel = vel
     self.onframe = frame
 
   def noteoff(self, frame):
@@ -82,7 +83,7 @@ class Channels:
     # Use a blank channel if there is one:
     for c in channels:
       if c.onornone is None:
-        c.noteon(frame, note)
+        c.noteon(frame, note, vel)
         return c
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
@@ -90,13 +91,13 @@ class Channels:
       if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
         oldest = c
     if oldest is not None:
-      oldest.noteon(frame, note)
+      oldest.noteon(frame, note, vel)
       return oldest
     # They're all in the on state, use the one that has been for longest:
     for c in channels:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
-    oldest.noteon(frame, note)
+    oldest.noteon(frame, note, vel)
     return oldest
 
   def noteoff(self, frame, midichan, note, vel):
