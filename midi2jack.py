@@ -74,7 +74,7 @@ class Channels:
       except KeyError:
         self.midichantochannels[midichan] = [channel]
 
-  def noteon(self, frame, midichan, note):
+  def noteon(self, frame, midichan, note, vel):
     try:
       channels = self.midichantochannels[midichan]
     except KeyError:
@@ -99,7 +99,7 @@ class Channels:
     oldest.noteon(frame, note)
     return oldest
 
-  def noteoff(self, frame, midichan, note):
+  def noteoff(self, frame, midichan, note, vel):
     try:
       channels = self.midichantochannels[midichan]
     except KeyError:

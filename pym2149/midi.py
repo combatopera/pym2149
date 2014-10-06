@@ -37,20 +37,21 @@ class NoteOnOff:
   def __init__(self, event):
     self.midichan = 1 + (event[0] & 0x0f)
     self.note = event[1]
+    self.vel = event[2]
 
   def __str__(self):
-    return "%s %2d %3d" % (self.char, self.midichan, self.note)
+    return "%s %2d %3d %3d" % (self.char, self.midichan, self.note, self.vel)
 
 class NoteOn(NoteOnOff):
 
   char = 'I'
 
   def __call__(self, channels, frame):
-    return channels.noteon(frame, self.midichan, self.note)
+    return channels.noteon(frame, self.midichan, self.note, self.vel)
 
 class NoteOff(NoteOnOff):
 
   char = 'O'
 
   def __call__(self, channels, frame):
-    return channels.noteoff(frame, self.midichan, self.note)
+    return channels.noteoff(frame, self.midichan, self.note, self.vel)
