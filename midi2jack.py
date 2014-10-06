@@ -27,6 +27,9 @@ from config import getprocessconfig
 
 log = logging.getLogger(__name__)
 
+def veltovoladj(vel):
+  return (vel - 52) // 24
+
 class Channel:
 
   def __init__(self, chipindex, patch, chip):
@@ -51,7 +54,7 @@ class Channel:
       if not f:
         # Make it so that the patch only has to switch things on:
         self.chip.flagsoff(self.chipindex)
-        self.patch.noteon(Pitch(self.note))
+        self.patch.noteon(Pitch(self.note), veltovoladj(self.vel))
       self.patch.noteonframe(f)
     elif self.onornone is not None:
       f = frame - self.offframe

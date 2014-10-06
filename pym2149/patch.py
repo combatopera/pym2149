@@ -27,7 +27,10 @@ class Patch:
   def settoneperiod(self, pitch):
     self.toneperiod.value = pitch.freq().toneperiod(self.chip.nominalclock())
 
-  def noteon(self, pitch): pass
+  def setfixedlevel(self, unclamped):
+    self.fixedlevel.value = max(0, min(15, unclamped))
+
+  def noteon(self, pitch, voladj): pass
 
   def noteonframe(self, frame): pass
 
@@ -37,10 +40,11 @@ class Patch:
 
 class DefaultPatch(Patch):
 
-  def noteon(self, pitch):
+  def noteon(self, pitch, voladj):
     self.settoneperiod(pitch)
     self.toneflag.value = True
-    self.fixedlevel.value = 15
+    self.setfixedlevel(voladj + 13)
+    self.voladj = voladj
 
   def noteoffframe(self, frame):
-    self.fixedlevel.value = max(14 - frame // 2, 0)
+    self.setfixedlevel(self.voladj + 12 - frame // 2)
