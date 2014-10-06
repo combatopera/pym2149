@@ -122,9 +122,8 @@ class Channels:
 
 def main():
   config = getprocessconfig()
-  with Midi() as midi:
-    device = midi.selectdevice()
-    with JackClient(config) as jackclient:
+  midi = Midi()
+  with JackClient(config) as jackclient:
       chip, stream = jackclient.newchipandstream(None)
       try:
         channels = Channels(config, chip)
@@ -133,10 +132,8 @@ def main():
         minbleps = stream.wavs[0].minbleps
         naivex = 0
         frame = 0
-        device.start()
-        log.debug('MIDI listener started.')
         while True:
-          for event in device.iterevents():
+          for event in midi.iterevents():
             log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
           channels.update(frame)
           # Make min amount of chip data to get one JACK block:
