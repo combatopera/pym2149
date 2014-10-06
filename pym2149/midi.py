@@ -16,42 +16,21 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import pypm, sys
+from jackclient import clientname
+import alsaseq
 
 class Midi:
 
-  def __enter__(self):
-    pypm.Initialize()
-    return self
-
-  def selectdevice(self):
-    for index in xrange(pypm.CountDevices()):
-      info = pypm.GetDeviceInfo(index)
-      if info[2]: # It's an input device.
-        print >> sys.stderr, "%2d) %s" % (index, info[1])
-    print >> sys.stderr, 'Index? ',
-    return Device(int(raw_input())) # Apparently int ignores whitespace.
-
-  def __exit__(self, *args):
-    pypm.Terminate()
-
-class Device:
-
-  def __init__(self, index):
-    self.index = index
-
-  def start(self):
-    self.input = pypm.Input(self.index) # Deferring this helps avoid PortMidi buffer overflow.
+  def __init__(self):
+    alsaseq.client(clientname, 1, 0, False)
 
   def iterevents(self):
-    while self.input.Poll():
-      event, = self.input.Read(1)
-      event, _ = event # XXX: What is the second field?
-      kind = event[0] & 0xf0
-      if 0x90 == kind:
-        yield NoteOn(event)
-      elif 0x80 == kind:
-        yield NoteOff(event)
+    while alsaseq.inputpending():
+      type, _, _, _, _, _, _, data = alsaseq.input()
+      if alsaseq.SND_SEQ_EVENT_NOTEON == type:
+        yield NoteOn(data)
+      elif alsaseq.SND_SEQ_EVENT_NOTEOFF == type:
+        yield NoteOff(data)
 
 class NoteOnOff:
 
