@@ -25,7 +25,10 @@ class Patch:
     self.index = index
 
   def applypitch(self, pitch):
-    self.toneperiod.value = pitch.freq().toneperiod(self.chip.nominalclock())
+    self.applyfreq(pitch.freq())
+
+  def applyfreq(self, freq):
+    self.toneperiod.value = freq.toneperiod(self.chip.nominalclock())
 
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
