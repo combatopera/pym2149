@@ -39,7 +39,7 @@ class Patch:
 
   def noteoff(self): pass
 
-  def noteoffframe(self, frame, bend): pass
+  def noteoffframe(self, onframes, frame, bend): pass
 
 class DefaultPatch(Patch):
 
@@ -49,5 +49,5 @@ class DefaultPatch(Patch):
     self.setfixedlevel(voladj + 13)
     self.voladj = voladj
 
-  def noteoffframe(self, frame, bend):
+  def noteoffframe(self, onframes, frame, bend):
     self.setfixedlevel(self.voladj + 12 - frame // 2)

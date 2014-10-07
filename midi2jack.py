@@ -60,7 +60,7 @@ class Channel:
       f = frame - self.offframe
       if not f:
         self.patch.noteoff()
-      self.patch.noteoffframe(f, 0)
+      self.patch.noteoffframe(self.offframe - self.onframe, f, 0)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
