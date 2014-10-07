@@ -55,12 +55,12 @@ class Channel:
         # Make it so that the patch only has to switch things on:
         self.chip.flagsoff(self.chipindex)
         self.patch.noteon(Pitch(self.note), veltovoladj(self.vel))
-      self.patch.noteonframe(f)
+      self.patch.noteonframe(f, 0) # TODO: Implement bend.
     elif self.onornone is not None:
       f = frame - self.offframe
       if not f:
         self.patch.noteoff()
-      self.patch.noteoffframe(f)
+      self.patch.noteoffframe(f, 0)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
