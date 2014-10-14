@@ -28,7 +28,7 @@ from config import getprocessconfig
 log = logging.getLogger(__name__)
 
 def veltovoladj(vel):
-  return (vel - 52) // 24
+  return (vel - 52) // 24 # TODO: Make configurable.
 
 class Channel:
 
