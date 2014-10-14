@@ -49,18 +49,19 @@ class Channel:
     self.offframe = frame
 
   def update(self, frame):
+    bend = 0 # TODO: Implement bend and other fx.
     if self.onornone:
       f = frame - self.onframe
       if not f:
         # Make it so that the patch only has to switch things on:
         self.chip.flagsoff(self.chipindex)
         self.patch.noteon(Pitch(self.note), veltovoladj(self.vel))
-      self.patch.noteonframe(f, 0) # TODO: Implement bend.
-    elif self.onornone is not None:
+      self.patch.noteonframe(f, bend)
+    elif self.onornone is not None: # It's False.
       f = frame - self.offframe
       if not f:
         self.patch.noteoff()
-      self.patch.noteoffframe(self.offframe - self.onframe, f, 0)
+      self.patch.noteoffframe(self.offframe - self.onframe, f, bend)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
