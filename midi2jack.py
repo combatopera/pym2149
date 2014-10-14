@@ -118,7 +118,7 @@ class Channels:
       oldest.noteoff(frame)
       return oldest
 
-  def update(self, frame):
+  def updateall(self, frame):
     for channel in self.channels:
       channel.update(frame)
 
@@ -140,7 +140,7 @@ def main():
         while True:
           for event in midi.iterevents():
             log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
-          channels.update(frame)
+          channels.updateall(frame)
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
