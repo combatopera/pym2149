@@ -45,6 +45,7 @@ ignoreloop = False
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
 
+# TODO: Instead, map each midi channel to a patch/kit and a restriction to 1 or more chip channels.
 midichannels = 1, 2, 3
 '''For each chip channel, the 1-based MIDI channel mapping to it. Note one MIDI channel can map to more than one chip channel for polyphony.'''
 
