@@ -107,7 +107,7 @@ class RationalDiff(BinDiff):
         self.progress += self.block.framecount
         return self.hold
     stepsize = self.halfclock / self.freqreg.value
-    if not self.progress:
+    if 0 == self.progress:
       stepindex = 0
     else:
       stepindex = stepsize - self.progress
