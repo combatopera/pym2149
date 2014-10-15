@@ -58,6 +58,9 @@ class PatchInfo:
     self.patch = patch
     self.restrict = restrict
 
+  def __str__(self):
+    return "(%s %s)" % (self.restrict, self.patch.__name__)
+
 class Patches:
 
   def __init__(self):
@@ -68,3 +71,6 @@ class Patches:
 
   def __getitem__(self, midichan):
     return self.infos[midichan]
+
+  def iteritems(self):
+    return self.infos.iteritems()

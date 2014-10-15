@@ -118,7 +118,7 @@ class Channels:
       channel.update(frame)
 
   def __str__(self):
-    return ', '.join("%s -> %s" % (midichan, ''.join(map(str, channels))) for midichan, channels in sorted(self.midichantochannels.iteritems()))
+    return ', '.join("%s -> %s" % entry for entry in sorted(self.patches.iteritems()))
 
 def main():
   config = getprocessconfig()
