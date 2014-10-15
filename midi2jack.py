@@ -114,7 +114,8 @@ class Channels:
       return oldest
 
   def updateall(self, frame):
-    for channel in self.channels:
+    # Sort them so that chip-wide effects are deterministic:
+    for _, channel in sorted(self.channels.iteritems()):
       channel.update(frame)
 
   def __str__(self):
