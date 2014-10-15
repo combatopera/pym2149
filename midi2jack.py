@@ -40,7 +40,7 @@ class Channel:
   def noteon(self, frame, patch, note, vel):
     self.onornone = True
     self.onframe = frame
-    self.patch = patch
+    self.patch = patch(self.chip, self.chipindex)
     self.note = note
     self.vel = vel
 
@@ -53,15 +53,20 @@ class Channel:
     if self.onornone:
       f = frame - self.onframe
       if not f:
-        # Make it so that the patch only has to switch things on:
-        self.chip.flagsoff(self.chipindex)
-        self.patch.noteon(Pitch(self.note), veltovoladj(self.vel))
+        self.noteonimpl()
       self.patch.noteonframe(f, bend)
     elif self.onornone is not None: # It's False.
+      if self.onframe == self.offframe:
+        self.noteonimpl()
       f = frame - self.offframe
       if not f:
         self.patch.noteoff()
       self.patch.noteoffframe(self.offframe - self.onframe, f, bend)
+
+  def noteonimpl(self):
+    # Make it so that the patch only has to switch things on:
+    self.chip.flagsoff(self.chipindex)
+    self.patch.noteon(Pitch(self.note), veltovoladj(self.vel))
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
