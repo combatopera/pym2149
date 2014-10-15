@@ -32,17 +32,17 @@ def veltovoladj(vel):
 
 class Channel:
 
-  def __init__(self, chipindex, patch, chip):
+  def __init__(self, chipindex, chip):
     self.onornone = None
     self.chipindex = chipindex
-    self.patch = patch
     self.chip = chip
 
-  def noteon(self, frame, note, vel):
+  def noteon(self, frame, patch, note, vel):
     self.onornone = True
+    self.onframe = frame
+    self.patch = patch
     self.note = note
     self.vel = vel
-    self.onframe = frame
 
   def noteoff(self, frame):
     self.onornone = False
@@ -69,25 +69,19 @@ class Channel:
 class Channels:
 
   def __init__(self, config, chip):
-    self.midichantochannels = {}
-    self.channels = []
-    for chipindex, midichan in enumerate(config.midichannels):
-      channel = Channel(chipindex, config.patches[chipindex](chip, chipindex), chip)
-      self.channels.append(channel)
-      try:
-        self.midichantochannels[midichan].append(channel)
-      except KeyError:
-        self.midichantochannels[midichan] = [channel]
+    self.channels = dict([chr(ord('A') + i), Channel(i, chip)] for i in xrange(chip.channels))
+    self.patches = config.patches
 
   def noteon(self, frame, midichan, note, vel):
     try:
-      channels = self.midichantochannels[midichan]
+      patchinfo = self.patches[midichan]
     except KeyError:
       return
+    channels = [self.channels[c] for c in patchinfo.restrict]
     # Use a blank channel if there is one:
     for c in channels:
       if c.onornone is None:
-        c.noteon(frame, note, vel)
+        c.noteon(frame, patchinfo.patch, note, vel)
         return c
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
@@ -95,20 +89,21 @@ class Channels:
       if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
         oldest = c
     if oldest is not None:
-      oldest.noteon(frame, note, vel)
+      oldest.noteon(frame, patchinfo.patch, note, vel)
       return oldest
     # They're all in the on state, use the one that has been for longest:
     for c in channels:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
-    oldest.noteon(frame, note, vel)
+    oldest.noteon(frame, patchinfo.patch, note, vel)
     return oldest
 
   def noteoff(self, frame, midichan, note, vel):
     try:
-      channels = self.midichantochannels[midichan]
+      patchinfo = self.patches[midichan]
     except KeyError:
       return
+    channels = [self.channels[c] for c in patchinfo.restrict]
     # Find the matching channel that has been in the on state for longest:
     oldest = None
     for c in channels:
