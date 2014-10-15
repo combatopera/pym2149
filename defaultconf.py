@@ -45,10 +45,7 @@ ignoreloop = False
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
 
-# TODO: Instead, map each midi channel to a patch/kit and a restriction to 1 or more chip channels.
-midichannels = 1, 2, 3
-'''For each chip channel, the 1-based MIDI channel mapping to it. Note one MIDI channel can map to more than one chip channel for polyphony.'''
-
-from pym2149.patch import DefaultPatch
-patches = (DefaultPatch,) * len(midichannels)
-'''For each chip channel, the patch class for that channel.'''
+from pym2149.patch import Patches, DefaultPatch
+patches = Patches()
+'''For each MIDI channel, the patch class and chip channel restriction string. For example, the string may be 'AB' for 2-note polyphony.'''
+for i in xrange(3): patches[1 + i] = DefaultPatch, chr(ord('A') + i)
