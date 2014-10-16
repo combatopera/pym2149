@@ -20,6 +20,7 @@ class Patch:
   def __init__(self, chip, index):
     self.toneperiod = chip.toneperiods[index]
     self.toneflag = chip.toneflags[index]
+    self.noiseflag = chip.noiseflags[index]
     self.fixedlevel = chip.fixedlevels[index]
     self.chip = chip
     self.index = index
