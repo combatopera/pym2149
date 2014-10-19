@@ -40,7 +40,8 @@ class Patch:
 
   def noteoff(self): pass
 
-  def noteoffframe(self, onframes, frame, bend): pass
+  def noteoffframe(self, onframes, frame, bend):
+    self.noteonframe(onframes + frame, bend)
 
 class DefaultPatch(Patch):
 
