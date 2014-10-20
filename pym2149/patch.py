@@ -43,6 +43,8 @@ class Patch:
   def noteoffframe(self, onframes, frame, bend):
     self.noteonframe(onframes + frame, bend)
 
+class NullPatch(Patch): pass
+
 class DefaultPatch(Patch):
 
   def noteon(self, pitch, voladj):
@@ -76,3 +78,25 @@ class Patches:
 
   def iteritems(self):
     return self.infos.iteritems()
+
+class Kit(Patch):
+
+  def __init__(self, *args, **kwargs):
+    Patch.__init__(self, *args, **kwargs)
+    self.midinotetopatch = {}
+
+  def __setitem__(self, midinote, patch):
+    self.midinotetopatch[midinote] = patch
+
+  def noteon(self, pitch, voladj):
+    self.patch = self.midinotetopatch.get(pitch, NullPatch)(self.chip, self.index)
+    self.patch.noteon(None, voladj)
+
+  def noteonframe(self, frame, bend):
+    self.patch.noteonframe(frame, bend)
+
+  def noteoff(self):
+    self.patch.noteoff()
+
+  def noteoffframe(self, onframes, frame, bend):
+    self.patch.noteoffframe(onframes, frame, bend)
