@@ -38,13 +38,13 @@ class DerivedReg(object):
     version = object.__getattribute__(self, 'version')
     newversion = tuple(r.version for r in self.regs) + (version[-1],)
     if newversion != version:
-      object.__setattr__(self, 'value', self.xform(*(r.value for r in self.regs)))
+      self.valueimpl = self.xform(*(r.value for r in self.regs))
       self.version = newversion
 
   def __getattribute__(self, name):
     if 'value' == name:
       self.updateifnecessary()
-      return object.__getattribute__(self, 'value')
+      return self.valueimpl
     if 'version' == name:
       self.updateifnecessary()
       return object.__getattribute__(self, 'version')
@@ -53,5 +53,6 @@ class DerivedReg(object):
   def __setattr__(self, name, value):
     object.__setattr__(self, name, value)
     if 'value' == name:
+      self.valueimpl = value
       version = object.__getattribute__(self, 'version')
       self.version = version[:-1] + (version[-1] + 1,)
