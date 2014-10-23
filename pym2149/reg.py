@@ -42,8 +42,12 @@ class DerivedReg(object):
       self.version = newversion
 
   def __getattribute__(self, name):
-    if 'value' == name or 'version' == name:
+    if 'value' == name:
       self.updateifnecessary()
+      return object.__getattribute__(self, 'value')
+    if 'version' == name:
+      self.updateifnecessary()
+      return object.__getattribute__(self, 'version')
     return object.__getattribute__(self, name)
 
   def __setattr__(self, name, value):
