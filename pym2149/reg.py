@@ -41,14 +41,14 @@ class DerivedReg(object):
       self.valueimpl = self.xform(*(r.value for r in self.regs))
       self.versionimpl = newversion
 
-  def __getattribute__(self, name):
+  def __getattr__(self, name):
     if 'value' == name:
       self.updateifnecessary()
       return self.valueimpl
     if 'version' == name:
       self.updateifnecessary()
       return self.versionimpl
-    return object.__getattribute__(self, name)
+    raise AttributeError(name)
 
   def __setattr__(self, name, value):
     if 'value' == name:
