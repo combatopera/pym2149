@@ -51,8 +51,9 @@ class DerivedReg(object):
     return object.__getattribute__(self, name)
 
   def __setattr__(self, name, value):
-    object.__setattr__(self, name, value)
     if 'value' == name:
       self.valueimpl = value
       version = self.versionimpl
       self.versionimpl = version[:-1] + (version[-1] + 1,)
+    else:
+      object.__setattr__(self, name, value)
