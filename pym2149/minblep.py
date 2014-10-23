@@ -111,7 +111,7 @@ def pasteminbleps(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex
 
 log.debug('Compiling output stage.')
 
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4, nb.i4), nopython = True)
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
 def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   # Naming constants makes inspect_types easier to read:
