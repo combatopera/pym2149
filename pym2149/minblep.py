@@ -117,13 +117,13 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
-  x = zero
+  ampindex = zero
   out0 = naivex2outx[naivex]
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
     while naivex < limit:
-      a = amp[x]
+      a = amp[ampindex]
       if a != zero:
         i = naivex2outx[naivex] - out0
         s = naivex2off[naivex]
@@ -141,7 +141,7 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
             i += one
             if i == outsize:
               break
-      x += one
+      ampindex += one
       naivex += one
     ampsize = ampsize - ampchunk
     naivex = zero
