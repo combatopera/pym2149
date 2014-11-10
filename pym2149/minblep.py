@@ -103,25 +103,25 @@ class MinBleps:
 
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
-    pasten = i4(len(diffbuf))
-    pasteminbleps(pasten, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
+    ampsize = i4(len(diffbuf))
+    pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
 
-def pasteminbleps(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
-  pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate)
+def pasteminbleps(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
+  pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate)
 
 log.debug('Compiling output stage.')
 
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
+def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   # Naming constants makes inspect_types easier to read:
   zero = 0
   one = 1
   x = zero
   out0 = naivex2outx[naivex]
-  while n:
-    m = min(n, naiverate - naivex)
-    limit = naivex + m
+  while ampsize:
+    ampchunk = min(ampsize, naiverate - naivex)
+    limit = naivex + ampchunk
     while naivex < limit:
       a = amp[x]
       if a != zero:
@@ -143,7 +143,7 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, na
               break
       x += one
       naivex += one
-    n = n - m
+    ampsize = ampsize - ampchunk
     naivex = zero
     out0 = out0 - outrate
 
