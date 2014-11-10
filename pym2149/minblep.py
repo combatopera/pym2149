@@ -119,6 +119,8 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
   one = 1
   ampindex = zero
   out0 = naivex2outx[naivex]
+  dclevel = zero
+  dcindex = zero
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
@@ -126,8 +128,14 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
       a = amp[ampindex]
       if a != zero:
         i = naivex2outx[naivex] - out0
-        s = naivex2off[naivex]
         j = i + mixinsize
+        if dcindex < j:
+          while 1:
+            out[dcindex] += dclevel
+            dcindex += one
+            if dcindex == j:
+              break
+        s = naivex2off[naivex]
         while 1: # Assume the mixin isn't empty.
             out[i] += demultiplexed[s] * a
             # XXX: Do we really need 2 increments?
@@ -135,16 +143,17 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
             s += one
             if i == j:
               break
-        if i < outsize:
-          while 1:
-            out[i] += a
-            i += one
-            if i == outsize:
-              break
+        dclevel += a
       ampindex += one
       naivex += one
     ampsize = ampsize - ampchunk
     naivex = zero
     out0 = out0 - outrate
+  if dcindex < outsize:
+    while 1:
+      out[dcindex] += dclevel
+      dcindex += one
+      if dcindex == outsize:
+        break
 
 log.debug('Done compiling.')
