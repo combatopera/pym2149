@@ -128,8 +128,7 @@ def pasteminblepsimpl(n, out, naivex2outx, outsize, mixinsize, demultiplexed, na
         i = naivex2outx[naivex] - out0
         s = naivex2off[naivex]
         j = i + mixinsize
-        if i < j:
-          while 1:
+        while 1:
             out[i] += demultiplexed[s] * a
             # XXX: Do we really need 2 increments?
             i += one
