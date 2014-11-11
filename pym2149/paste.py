@@ -1,3 +1,4 @@
+mixinsize=100
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -32,7 +33,7 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2
   one = 1
   ampindex = zero
   out0 = naivex2outx[naivex]
-  dclevel = zero
+  dclevel = nb.f4(0)
   dcindex = zero
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
