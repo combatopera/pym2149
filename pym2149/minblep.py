@@ -16,8 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging, numba as nb
+import numpy as np, fractions, logging
 from nod import BufNode
+from paste import pasteminbleps
 
 log = logging.getLogger(__name__)
 
@@ -105,55 +106,3 @@ class MinBleps:
     i4 = np.int32
     ampsize = i4(len(diffbuf))
     pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
-
-def pasteminbleps(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
-  pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate)
-
-log.debug('Compiling output stage.')
-
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
-  # TODO: This code needs tests.
-  # Naming constants makes inspect_types easier to read:
-  zero = 0
-  one = 1
-  ampindex = zero
-  out0 = naivex2outx[naivex]
-  dclevel = zero
-  dcindex = zero
-  while ampsize:
-    ampchunk = min(ampsize, naiverate - naivex)
-    limit = naivex + ampchunk
-    while naivex < limit:
-      a = amp[ampindex]
-      if a != zero:
-        i = naivex2outx[naivex] - out0
-        j = i + mixinsize
-        if dcindex < j:
-          while 1:
-            out[dcindex] += dclevel
-            dcindex += one
-            if dcindex == j:
-              break
-        s = naivex2off[naivex]
-        while 1: # Assume the mixin isn't empty.
-            out[i] += demultiplexed[s] * a
-            # XXX: Do we really need 2 increments?
-            i += one
-            s += one
-            if i == j:
-              break
-        dclevel += a
-      ampindex += one
-      naivex += one
-    ampsize = ampsize - ampchunk
-    naivex = zero
-    out0 = out0 - outrate
-  if dcindex < outsize:
-    while 1:
-      out[dcindex] += dclevel
-      dcindex += one
-      if dcindex == outsize:
-        break
-
-log.debug('Done compiling.')
