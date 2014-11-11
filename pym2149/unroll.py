@@ -17,22 +17,48 @@
 
 import os, re
 
-pattern = re.compile(r'^\s*for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
+pattern = re.compile(r'^(\s*)for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
+indentregex = re.compile(r'^\s*')
 
 def unroll(frompath, topath, **kwargs):
     f = open(os.path.join(os.path.dirname(__file__), frompath))
     try:
         g = open(os.path.join(os.path.dirname(__file__), topath), 'w')
         try:
-            for name, value in kwargs.iteritems():
-                print >> g, "%s = %r" % (name, value)
-            for line in f:
-                m = pattern.search(line)
-                if m is not None:
-                    print m.group(1)
-                g.write(line)
+            unrollimpl(f, g, kwargs)
             g.flush()
         finally:
             g.close()
     finally:
         f.close()
+
+def unrollimpl(f, g, options):
+    for name, value in options.iteritems():
+        print >> g, "%s = %r" % (name, value)
+    buffer = []
+    while True:
+        line = buffer.pop(0) if buffer else f.readline()
+        if not line:
+            break
+        m = pattern.search(line)
+        if m is None:
+            g.write(line)
+            continue
+        outerindent = m.group(1)
+        variable = m.group(2)
+        line = f.readline()
+        m = indentregex.search(line)
+        innerindent = m.group()
+        body = []
+        while line.startswith(innerindent):
+            body.append(line)
+            line = f.readline()
+        buffer.append(line)
+        if variable in options:
+            for _ in xrange(options[variable]):
+                for line in body:
+                    g.write(outerindent + line[len(innerindent):])
+        else:
+            print >> g, "%sfor _ in xrange(%s):" % (outerindent, variable)
+            for line in body:
+                g.write(line)
