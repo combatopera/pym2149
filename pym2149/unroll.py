@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, re
+
+pattern = re.compile(r'^\s*for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
 
 def unroll(frompath, topath, **kwargs):
     f = open(os.path.join(os.path.dirname(__file__), frompath))
@@ -25,8 +27,9 @@ def unroll(frompath, topath, **kwargs):
             for name, value in kwargs.iteritems():
                 print >> g, "%s = %r" % (name, value)
             for line in f:
-                if 'UNROLL' in line:
-                    print line,
+                m = pattern.search(line)
+                if m is not None:
+                    print m.group(1)
                 g.write(line)
             g.flush()
         finally:
