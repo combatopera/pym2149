@@ -20,14 +20,16 @@ import os
 def unroll(frompath, topath, **kwargs):
     f = open(os.path.join(os.path.dirname(__file__), frompath))
     try:
-        text = f.read()
-    finally:
-        f.close()
-    f = open(os.path.join(os.path.dirname(__file__), topath), 'w')
-    try:
-        for name, value in kwargs.iteritems():
-            print >> f, "%s = %r" % (name, value)
-        f.write(text)
-        f.flush()
+        g = open(os.path.join(os.path.dirname(__file__), topath), 'w')
+        try:
+            for name, value in kwargs.iteritems():
+                print >> g, "%s = %r" % (name, value)
+            for line in f:
+                if 'UNROLL' in line:
+                    print line,
+                g.write(line)
+            g.flush()
+        finally:
+            g.close()
     finally:
         f.close()

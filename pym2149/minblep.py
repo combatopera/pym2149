@@ -87,8 +87,9 @@ class MinBleps:
     self.scale = scale
     modulename = "paste%s" % self.mixinsize
     fqmodulename = 'pym2149.' + modulename
-    unroll('paste.py', modulename + '.py', mixinsize = self.mixinsize)
-    importlib.import_module(fqmodulename)
+    if fqmodulename not in sys.modules:
+      unroll('paste.py', modulename + '.py', mixinsize = self.mixinsize)
+      importlib.import_module(fqmodulename)
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
 
   def getoutcount(self, naivex, naiven):
