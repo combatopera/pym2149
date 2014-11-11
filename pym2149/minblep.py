@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging
+import numpy as np, fractions, logging, importlib, sys
 from nod import BufNode
-from paste import pasteminbleps
+from unroll import unroll
 
 log = logging.getLogger(__name__)
 
@@ -85,6 +85,11 @@ class MinBleps:
     self.naiverate = naiverate
     self.outrate = outrate
     self.scale = scale
+    modulename = "paste%s" % self.mixinsize
+    fqmodulename = 'pym2149.' + modulename
+    unroll('paste.py', modulename + '.py', mixinsize = self.mixinsize)
+    importlib.import_module(fqmodulename)
+    self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
 
   def getoutcount(self, naivex, naiven):
     out0 = self.naivex2outx[naivex]
@@ -105,4 +110,4 @@ class MinBleps:
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
     ampsize = i4(len(diffbuf))
-    pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), i4(self.mixinsize), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
+    self.pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))

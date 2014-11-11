@@ -19,13 +19,13 @@ import logging, numba as nb
 
 log = logging.getLogger(__name__)
 
-def pasteminbleps(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
-  pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate)
+def pasteminbleps(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
+  pasteminblepsimpl(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate)
 
 log.debug('Compiling output stage.')
 
-@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
-def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
+@nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
+def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   # Naming constants makes inspect_types easier to read:
   zero = 0
@@ -42,31 +42,25 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, mixinsize, demultiplex
       if a != zero:
         i = naivex2outx[naivex] - out0
         j = i + mixinsize
-        if dcindex < j:
-          while 1:
+        dccount = j - dcindex
+        for UNROLL in xrange(dccount):
             out[dcindex] += dclevel
             dcindex += one
-            if dcindex == j:
-              break
         s = naivex2off[naivex]
-        while 1: # Assume the mixin isn't empty.
+        for UNROLL in xrange(mixinsize):
             out[i] += demultiplexed[s] * a
             # XXX: Do we really need 2 increments?
             i += one
             s += one
-            if i == j:
-              break
         dclevel += a
       ampindex += one
       naivex += one
     ampsize = ampsize - ampchunk
     naivex = zero
     out0 = out0 - outrate
-  if dcindex < outsize:
-    while 1:
+  dccount = outsize - dcindex
+  for UNROLL in xrange(dccount):
       out[dcindex] += dclevel
       dcindex += one
-      if dcindex == outsize:
-        break
 
 log.debug('Done compiling.')
