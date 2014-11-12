@@ -36,10 +36,9 @@ def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2
     limit = naivex + ampchunk
     while naivex < limit:
       a = amp[ampindex]
-      if a != 0:
+      if a:
         i = naivex2outx[naivex] - out0
-        j = i + mixinsize
-        dccount = j - dcindex
+        dccount = i + mixinsize - dcindex
         for UNROLL in xrange(dccount):
             out[dcindex] += dclevel
             dcindex += 1
