@@ -19,6 +19,7 @@ import os, re
 
 pattern = re.compile(r'^(\s*)for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
 indentregex = re.compile(r'^\s*')
+maxchunk = 0x80
 
 def unroll(frompath, topath, **kwargs):
     f = open(os.path.join(os.path.dirname(__file__), frompath))
@@ -59,6 +60,15 @@ def unrollimpl(f, g, options):
                 for line in body:
                     g.write(outerindent + line[len(innerindent):])
         else:
-            print >> g, "%sfor _ in xrange(%s):" % (outerindent, variable)
-            for line in body:
-                g.write(line)
+            mask = 0x01
+            while mask < maxchunk:
+                print >> g, "%sif %s & 0x%x:" % (outerindent, variable, mask)
+                for _ in xrange(mask):
+                    for line in body:
+                        g.write(line)
+                mask <<= 1
+            print >> g, "%swhile %s >= 0x%x:" % (outerindent, variable, maxchunk)
+            for _ in xrange(maxchunk):
+                for line in body:
+                    g.write(line)
+            print >> g, "%s%s -= 0x%x" % (innerindent, variable, maxchunk)
