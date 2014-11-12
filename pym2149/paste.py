@@ -27,40 +27,37 @@ log.debug('Compiling output stage.')
 @nb.jit(nb.void(nb.i4, nb.f4[:], nb.i4[:], nb.i4, nb.f4[:], nb.i4[:], nb.f4[:], nb.i4, nb.i4, nb.i4), nopython = True)
 def pasteminblepsimpl(ampsize, out, naivex2outx, outsize, demultiplexed, naivex2off, amp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
-  # Naming constants makes inspect_types easier to read:
-  zero = 0
-  one = 1
-  ampindex = zero
+  ampindex = 0
   out0 = naivex2outx[naivex]
   dclevel = nb.f4(0)
-  dcindex = zero
+  dcindex = 0
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
     while naivex < limit:
       a = amp[ampindex]
-      if a != zero:
+      if a != 0:
         i = naivex2outx[naivex] - out0
         j = i + mixinsize
         dccount = j - dcindex
         for UNROLL in xrange(dccount):
             out[dcindex] += dclevel
-            dcindex += one
+            dcindex += 1
         s = naivex2off[naivex]
         for UNROLL in xrange(mixinsize):
             out[i] += demultiplexed[s] * a
             # XXX: Do we really need 2 increments?
-            i += one
-            s += one
+            i += 1
+            s += 1
         dclevel += a
-      ampindex += one
-      naivex += one
+      ampindex += 1
+      naivex += 1
     ampsize = ampsize - ampchunk
-    naivex = zero
+    naivex = 0
     out0 = out0 - outrate
   dccount = outsize - dcindex
   for UNROLL in xrange(dccount):
       out[dcindex] += dclevel
-      dcindex += one
+      dcindex += 1
 
 log.debug('Done compiling.')
