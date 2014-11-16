@@ -85,10 +85,14 @@ class MinBleps:
     self.naiverate = naiverate
     self.outrate = outrate
     self.scale = scale
-    import pyximport
-    pyximport.install()
-    import cpaste
-    self.pasteminbleps = cpaste.pasteminbleps
+    modulename = "cpaste%s" % self.mixinsize
+    fqmodulename = 'pym2149.' + modulename
+    if fqmodulename not in sys.modules:
+      unroll('cpaste.pyx', modulename + '.pyx', gmixinsize = self.mixinsize)
+      import pyximport
+      pyximport.install()
+      importlib.import_module(fqmodulename)
+    self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
 
   def getoutcount(self, naivex, naiven):
     out0 = self.naivex2outx[naivex]
@@ -109,4 +113,4 @@ class MinBleps:
   def paste(self, naivex, diffbuf, outbuf):
     i4 = np.int32
     ampsize = i4(len(diffbuf))
-    self.pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate), self.mixinsize)
+    self.pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
