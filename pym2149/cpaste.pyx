@@ -19,8 +19,9 @@ cimport numpy as np
 import cython
 
 @cython.boundscheck(False)
-def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray[np.int32_t] naivex2outx, unsigned int outsize, np.ndarray[np.float32_t] demultiplexed, np.ndarray[np.int32_t] naivex2off, np.ndarray[np.float32_t] amp, unsigned int naivex, unsigned int naiverate, unsigned int outrate, unsigned int mixinsize):
+def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray[np.int32_t] naivex2outx, unsigned int outsize, np.ndarray[np.float32_t] demultiplexed, np.ndarray[np.int32_t] naivex2off, np.ndarray[np.float32_t] amp, unsigned int naivex, unsigned int naiverate, unsigned int outrate):
   # TODO: This code needs tests.
+  cdef unsigned int mixinsize = gmixinsize
   cdef np.float32_t [::1] outv = out
   cdef np.float32_t [::1] demultiplexedv = demultiplexed
   cdef np.float32_t [::1] ampv = amp
