@@ -27,8 +27,13 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   cdef np.float32_t [::1] ampv = amp
   cdef np.int32_t [::1] naivex2outxv = naivex2outx
   cdef np.int32_t [::1] naivex2offv = naivex2off
+  cdef np.float32_t* outp = &outv[0]
+  cdef np.float32_t* demultiplexedp = &demultiplexedv[0]
+  cdef np.float32_t* ampp = &ampv[0]
+  cdef np.int32_t* naivex2outxp = &naivex2outxv[0]
+  cdef np.int32_t* naivex2offp = &naivex2offv[0]
   cdef unsigned int ampindex = 0
-  cdef unsigned int out0 = naivex2outxv[naivex]
+  cdef unsigned int out0 = naivex2outxp[naivex]
   cdef np.float32_t dclevel = 0
   cdef unsigned int dcindex = 0
   cdef unsigned int ampchunk
@@ -41,16 +46,16 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
     while naivex < limit:
-      a = ampv[ampindex]
+      a = ampp[ampindex]
       if a:
-        i = naivex2outxv[naivex] - out0
+        i = naivex2outxp[naivex] - out0
         dccount = i + mixinsize - dcindex
         for UNROLL in xrange(dccount):
-            outv[dcindex] += dclevel
+            outp[dcindex] += dclevel
             dcindex += 1
-        s = naivex2offv[naivex]
+        s = naivex2offp[naivex]
         for UNROLL in xrange(gmixinsize):
-            outv[i] += demultiplexedv[s] * a
+            outp[i] += demultiplexedp[s] * a
             # XXX: Do we really need 2 increments?
             i += 1
             s += 1
@@ -62,5 +67,5 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     out0 = out0 - outrate
   dccount = outsize - dcindex
   for UNROLL in xrange(dccount):
-      outv[dcindex] += dclevel
+      outp[dcindex] += dclevel
       dcindex += 1
