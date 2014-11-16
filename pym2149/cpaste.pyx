@@ -23,11 +23,11 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   # TODO: This code needs tests.
   cdef unsigned int ampindex = 0
   cdef unsigned int out0 = naivex2outx[naivex]
-  cdef float dclevel = 0
+  cdef np.float32_t dclevel = 0
   cdef unsigned int dcindex = 0
   cdef unsigned int ampchunk
   cdef unsigned int limit
-  cdef float a
+  cdef np.float32_t a
   cdef unsigned int i
   cdef unsigned int dccount
   cdef unsigned int s
