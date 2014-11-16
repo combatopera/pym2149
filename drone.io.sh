@@ -16,6 +16,6 @@ PATH="$PWD/y/bin:$PATH"
 
 cd -
 
-conda install numba pyflakes nose
+conda install cython pyflakes nose
 
 ./tests
