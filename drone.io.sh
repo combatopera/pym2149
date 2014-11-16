@@ -16,6 +16,6 @@ PATH="$PWD/y/bin:$PATH"
 
 cd -
 
-conda install cython pyflakes nose
+conda install numpy cython pyflakes nose
 
 ./tests
