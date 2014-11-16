@@ -21,8 +21,13 @@ import cython
 @cython.boundscheck(False)
 def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray[np.int32_t] naivex2outx, unsigned int outsize, np.ndarray[np.float32_t] demultiplexed, np.ndarray[np.int32_t] naivex2off, np.ndarray[np.float32_t] amp, unsigned int naivex, unsigned int naiverate, unsigned int outrate, unsigned int mixinsize):
   # TODO: This code needs tests.
+  cdef np.float32_t [::1] outv = out
+  cdef np.float32_t [::1] demultiplexedv = demultiplexed
+  cdef np.float32_t [::1] ampv = amp
+  cdef np.int32_t [::1] naivex2outxv = naivex2outx
+  cdef np.int32_t [::1] naivex2offv = naivex2off
   cdef unsigned int ampindex = 0
-  cdef unsigned int out0 = naivex2outx[naivex]
+  cdef unsigned int out0 = naivex2outxv[naivex]
   cdef np.float32_t dclevel = 0
   cdef unsigned int dcindex = 0
   cdef unsigned int ampchunk
@@ -35,16 +40,16 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
     while naivex < limit:
-      a = amp[ampindex]
+      a = ampv[ampindex]
       if a:
-        i = naivex2outx[naivex] - out0
+        i = naivex2outxv[naivex] - out0
         dccount = i + mixinsize - dcindex
         for _ in xrange(dccount):
-            out[dcindex] += dclevel
+            outv[dcindex] += dclevel
             dcindex += 1
-        s = naivex2off[naivex]
+        s = naivex2offv[naivex]
         for _ in xrange(mixinsize):
-            out[i] += demultiplexed[s] * a
+            outv[i] += demultiplexedv[s] * a
             # XXX: Do we really need 2 increments?
             i += 1
             s += 1
@@ -56,5 +61,5 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     out0 = out0 - outrate
   dccount = outsize - dcindex
   for _ in xrange(dccount):
-      out[dcindex] += dclevel
+      outv[dcindex] += dclevel
       dcindex += 1
