@@ -37,7 +37,6 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   cdef np.float32_t dclevel = 0
   cdef unsigned int dcindex = 0
   cdef unsigned int ampchunk
-  cdef unsigned int limit
   cdef np.float32_t a
   cdef unsigned int i
   cdef unsigned int dccount
@@ -45,8 +44,7 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   cdef np.float32_t* writep
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
-    limit = naivex + ampchunk
-    while naivex < limit:
+    for naivex in xrange(naivex, naivex + ampchunk):
       a = ampp[ampindex]
       if a:
         i = naivex2outxp[naivex] - out0
@@ -62,7 +60,6 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
             mixinp += 1
         dclevel += a
       ampindex += 1
-      naivex += 1
     ampsize = ampsize - ampchunk
     naivex = 0
     out0 = out0 - outrate
