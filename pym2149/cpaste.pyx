@@ -52,14 +52,14 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
         writep = outp + dcindex
         dcindex += dccount
         for UNROLL in xrange(dccount):
-            writep[0] += dclevel
-            writep += 1
+          writep[0] += dclevel
+          writep += 1
         writep = outp + i
         mixinp = demultiplexedp + naivex2offp[naivex]
         for UNROLL in xrange(gmixinsize):
-            writep[0] += mixinp[0] * a
-            writep += 1
-            mixinp += 1
+          writep[0] += mixinp[0] * a
+          writep += 1
+          mixinp += 1
         dclevel += a
       ampindex += 1
     ampsize = ampsize - ampchunk
@@ -68,5 +68,5 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   dccount = outsize - dcindex
   writep = outp + dcindex
   for UNROLL in xrange(dccount):
-      writep[0] += dclevel
-      writep += 1
+    writep[0] += dclevel
+    writep += 1
