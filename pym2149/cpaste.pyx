@@ -22,16 +22,11 @@ import cython
 def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray[np.int32_t] naivex2outx, unsigned int outsize, np.ndarray[np.float32_t] demultiplexed, np.ndarray[np.int32_t] naivex2off, np.ndarray[np.float32_t] amp, unsigned int naivex, unsigned int naiverate, unsigned int outrate):
   # TODO: This code needs tests.
   cdef unsigned int mixinsize = gmixinsize
-  cdef np.float32_t [::1] outv = out
-  cdef np.float32_t [::1] demultiplexedv = demultiplexed
-  cdef np.float32_t [::1] ampv = amp
-  cdef np.int32_t [::1] naivex2outxv = naivex2outx
-  cdef np.int32_t [::1] naivex2offv = naivex2off
-  cdef np.float32_t* outp = &outv[0]
-  cdef np.float32_t* demultiplexedp = &demultiplexedv[0]
-  cdef np.float32_t* ampp = &ampv[0]
-  cdef np.int32_t* naivex2outxp = &naivex2outxv[0]
-  cdef np.int32_t* naivex2offp = &naivex2offv[0]
+  cdef np.float32_t* outp = &out[0]
+  cdef np.float32_t* demultiplexedp = &demultiplexed[0]
+  cdef np.float32_t* ampp = &amp[0]
+  cdef np.int32_t* naivex2outxp = &naivex2outx[0]
+  cdef np.int32_t* naivex2offp = &naivex2off[0]
   cdef unsigned int ampindex = 0
   cdef unsigned int out0 = naivex2outxp[naivex]
   cdef np.float32_t dclevel = 0
