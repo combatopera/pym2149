@@ -49,9 +49,11 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
       if a:
         i = naivex2outxp[naivex] - out0
         dccount = i + mixinsize - dcindex
+        writep = outp + dcindex
+        dcindex += dccount
         for UNROLL in xrange(dccount):
-            outp[dcindex] += dclevel
-            dcindex += 1
+            writep[0] += dclevel
+            writep += 1
         writep = outp + i
         mixinp = demultiplexedp + naivex2offp[naivex]
         for UNROLL in xrange(gmixinsize):
@@ -64,6 +66,7 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     naivex = 0
     out0 = out0 - outrate
   dccount = outsize - dcindex
+  writep = outp + dcindex
   for UNROLL in xrange(dccount):
-      outp[dcindex] += dclevel
-      dcindex += 1
+      writep[0] += dclevel
+      writep += 1
