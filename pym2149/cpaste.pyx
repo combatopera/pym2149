@@ -42,6 +42,7 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   cdef unsigned int i
   cdef unsigned int dccount
   cdef np.float32_t* mixinp
+  cdef np.float32_t* writep
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     limit = naivex + ampchunk
@@ -53,11 +54,11 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
         for UNROLL in xrange(dccount):
             outp[dcindex] += dclevel
             dcindex += 1
+        writep = outp + i
         mixinp = demultiplexedp + naivex2offp[naivex]
         for UNROLL in xrange(gmixinsize):
-            outp[i] += mixinp[0] * a
-            # XXX: Do we really need 2 increments?
-            i += 1
+            writep[0] += mixinp[0] * a
+            writep += 1
             mixinp += 1
         dclevel += a
       ampindex += 1
