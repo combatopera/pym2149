@@ -35,7 +35,6 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
   cdef unsigned int i
   cdef unsigned int dccount
   cdef np.float32_t* mixinp
-  cdef np.float32_t* writep = outp
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     for naivex in xrange(naivex, naivex + ampchunk):
@@ -47,21 +46,21 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
         if dcindex <= i: # We can DC-adjust while pasting this mixin.
           dccount = i - dcindex
           for UNROLL in xrange(dccount):
-            writep[0] += dclevel
-            writep += 1
+            outp[0] += dclevel
+            outp += 1
           for UNROLL in xrange(gmixinsize):
-            writep[0] += mixinp[0] * a + dclevel
-            writep += 1
+            outp[0] += mixinp[0] * a + dclevel
+            outp += 1
             mixinp += 1
         else: # The mixin starts before the pending DC adjustment.
           dccount = i + mixinsize - dcindex
           for UNROLL in xrange(dccount):
-            writep[0] += dclevel
-            writep += 1
-          writep = outp + i
+            outp[0] += dclevel
+            outp += 1
+          outp -= mixinsize
           for UNROLL in xrange(gmixinsize):
-            writep[0] += mixinp[0] * a
-            writep += 1
+            outp[0] += mixinp[0] * a
+            outp += 1
             mixinp += 1
         dcindex = i + mixinsize
         dclevel += a
@@ -70,5 +69,5 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
     out0 -= outrate
   dccount = outsize - dcindex
   for UNROLL in xrange(dccount):
-    writep[0] += dclevel
-    writep += 1
+    outp[0] += dclevel
+    outp += 1
