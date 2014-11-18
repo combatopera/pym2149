@@ -44,12 +44,12 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
       if a:
         i = naivex2outxp[naivex] - out0
         writep = outp + dcindex
+        mixinp = demultiplexedp + naivex2offp[naivex]
         if dcindex <= i: # We can DC-adjust while pasting this mixin.
           dccount = i - dcindex
           for UNROLL in xrange(dccount):
             writep[0] += dclevel
             writep += 1
-          mixinp = demultiplexedp + naivex2offp[naivex]
           for UNROLL in xrange(gmixinsize):
             writep[0] += mixinp[0] * a + dclevel
             writep += 1
@@ -60,7 +60,6 @@ def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray
             writep[0] += dclevel
             writep += 1
           writep = outp + i
-          mixinp = demultiplexedp + naivex2offp[naivex]
           for UNROLL in xrange(gmixinsize):
             writep[0] += mixinp[0] * a
             writep += 1
