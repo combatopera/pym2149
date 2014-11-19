@@ -111,6 +111,4 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def paste(self, naivex, diffbuf, outbuf):
-    i4 = np.int32
-    ampsize = i4(len(diffbuf))
-    self.pasteminbleps(ampsize, outbuf.buf, self.naivex2outx, i4(len(outbuf)), self.demultiplexed, self.naivex2off, diffbuf.buf, i4(naivex), i4(self.naiverate), i4(self.outrate))
+    self.pasteminbleps(len(diffbuf), outbuf.buf, self.naivex2outx, len(outbuf), self.demultiplexed, self.naivex2off, diffbuf.buf, naivex, self.naiverate, self.outrate)
