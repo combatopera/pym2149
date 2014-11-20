@@ -90,6 +90,7 @@ class MinBleps:
     if fqmodulename not in sys.modules:
       unroll('cpaste.pyx', modulename + '.pyx', gmixinsize = self.mixinsize)
       import pyximport
+      # Note -O3 is apparently the default:
       pyximport.install(setup_args = {'include_dirs': np.get_include()})
       importlib.import_module(fqmodulename)
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
