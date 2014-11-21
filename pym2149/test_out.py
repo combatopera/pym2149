@@ -61,7 +61,7 @@ class TestWavWriter(unittest.TestCase):
     self.minperiodperformance(False, 1)
 
   def test_minperiodperformancebigblocks(self):
-    self.minperiodperformance(True, 3) # FIXME: Get this under a second.
+    self.minperiodperformance(True, .1) # Wow!
 
 if __name__ == '__main__':
   unittest.main()
