@@ -10,9 +10,9 @@ cd
 
 wget http://repo.continuum.io/miniconda/Miniconda-3.0.5-Linux-x86_64.sh
 
-yes | bash Miniconda-3.0.5-Linux-x86_64.sh
+bash Miniconda-3.0.5-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
-PATH="$PWD/y/bin:$PATH"
+PATH="$PWD/miniconda/bin:$PATH"
 
 cd -
 
