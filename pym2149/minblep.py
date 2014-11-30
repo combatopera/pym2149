@@ -92,7 +92,9 @@ class MinBleps:
       import pyximport
       # Note -O3 is apparently the default:
       pyximport.install(setup_args = {'include_dirs': np.get_include()})
+      log.debug("Compiling: %s", fqmodulename)
       importlib.import_module(fqmodulename)
+      log.debug("%s compiled.", fqmodulename)
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
 
   def getoutcount(self, naivex, naiven):
