@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+bpm=100
+lpb=8
+lpp=128
+
+path="$1"
+total=$(soxi -D "$path")
+
+chunktimes=($(python -c "from __future__ import division
+lpm = $lpb * $bpm
+i = 0
+while True:
+    t = i * 60 * $lpp / lpm
+    print t
+    if t >= $total:
+        break
+    i += 1
+"))
+
+function doit {
+    local part=1 extension="${path##*.}"
+    while [[ $# -ge 2 ]]; do
+        echo part $part $1 $2 >&2
+        sox "$path" "${path%.*}-$part.$extension" trim $1 =$2
+        shift
+        part=$((part + 1))
+    done
+}
+
+doit "${chunktimes[@]}"
