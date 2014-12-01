@@ -15,6 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+class FX:
+
+  def __init__(self):
+    self.bend = 0
+
 class Patch:
 
   def __init__(self, chip, index):
@@ -34,26 +39,27 @@ class Patch:
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
 
-  def noteon(self, pitch, voladj): pass
+  # This is the point at which a logical channel (self) is mapped to a physical one (index).
+  def noteon(self, pitch, voladj, fx): pass
 
-  def noteonframe(self, frame, bend): pass
+  def noteonframe(self, frame): pass
 
   def noteoff(self): pass
 
-  def noteoffframe(self, onframes, frame, bend):
-    self.noteonframe(onframes + frame, bend)
+  def noteoffframe(self, onframes, frame):
+    self.noteonframe(onframes + frame)
 
 class NullPatch(Patch): pass
 
 class DefaultPatch(Patch):
 
-  def noteon(self, pitch, voladj):
+  def noteon(self, pitch, voladj, fx):
     self.applypitch(pitch)
     self.toneflag.value = True
     self.setfixedlevel(voladj + 13)
     self.voladj = voladj
 
-  def noteoffframe(self, onframes, frame, bend):
+  def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
 
 class PatchInfo:
@@ -88,15 +94,15 @@ class Kit(Patch):
   def __setitem__(self, midinote, patch):
     self.midinotetopatch[midinote] = patch
 
-  def noteon(self, pitch, voladj):
+  def noteon(self, pitch, voladj, fx):
     self.patch = self.midinotetopatch.get(pitch, NullPatch)(self.chip, self.index)
-    self.patch.noteon(None, voladj)
+    self.patch.noteon(None, voladj, fx)
 
-  def noteonframe(self, frame, bend):
-    self.patch.noteonframe(frame, bend)
+  def noteonframe(self, frame):
+    self.patch.noteonframe(frame)
 
   def noteoff(self):
     self.patch.noteoff()
 
-  def noteoffframe(self, onframes, frame, bend):
-    self.patch.noteoffframe(onframes, frame, bend)
+  def noteoffframe(self, onframes, frame):
+    self.patch.noteoffframe(onframes, frame)
