@@ -41,4 +41,4 @@ function doit {
     done
 }
 
-doit "${chunktimes[@]}"
+doit ${chunktimes[@]}
