@@ -21,7 +21,7 @@ while True:
 "))
 
 function doit {
-    local part=1 extension="${path##*.}"
+    local part=0 extension="${path##*.}"
     while [[ $# -ge 2 ]]; do
         echo part $part $1 $2 >&2
         sox "$path" "${path%.*}-$part.$extension" trim $1 =$2
