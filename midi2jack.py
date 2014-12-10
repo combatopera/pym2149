@@ -28,8 +28,12 @@ from config import getprocessconfig
 
 log = logging.getLogger(__name__)
 
+# TODO: Make configurable.
+veldatum = 0x60
+velpervol = 0x10
+
 def veltovoladj(vel):
-  return (vel - 52) // 24 # TODO: Make configurable.
+  return (vel - veldatum + velpervol // 2) // velpervol
 
 class Channel:
 
