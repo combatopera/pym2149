@@ -5,7 +5,7 @@ set -e
 bpm=100
 lpb=8
 lpp=128
-gain=9
+gain=12
 
 path="$1"
 total=$(soxi -D "$path")
