@@ -20,6 +20,6 @@ PATH="$PWD/miniconda/bin:$PATH"
 
 cd -
 
-conda install numpy cython pyflakes nose
+conda install openssl=1.0.1h numpy cython pyflakes nose
 
 ./tests
