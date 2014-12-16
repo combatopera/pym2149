@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 cd ..
 
 hg clone https://bitbucket.org/combatopera/devutils
