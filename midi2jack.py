@@ -125,6 +125,9 @@ class Channels:
       oldest.noteoff(frame)
       return oldest
 
+  def pitchbend(self, frame, midichan, bend):
+    self.midichantofx[midichan].bend = bend
+
   def updateall(self, frame):
     # Sort them so that chip-wide effects are deterministic:
     for _, channel in sorted(self.channels.iteritems()):

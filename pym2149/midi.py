@@ -31,6 +31,8 @@ class Midi:
         yield NoteOn(data)
       elif alsaseq.SND_SEQ_EVENT_NOTEOFF == type:
         yield NoteOff(data)
+      elif alsaseq.SND_SEQ_EVENT_PITCHBEND == type:
+        yield PitchBend(data)
 
 class NoteOnOff:
 
@@ -55,3 +57,15 @@ class NoteOff(NoteOnOff):
 
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note, self.vel)
+
+class PitchBend:
+
+  def __init__(self, event):
+    self.midichan = 1 + (event[0] & 0x0f)
+    self.bend = ((event[2] << 7) | event[1]) - 0x2000
+
+  def __call__(self, channels, frame):
+    return channels.pitchbend(frame, self.midichan, self.bend)
+
+  def __str__(self):
+    return "B %2d %5d" % (self.midichan, self.bend)

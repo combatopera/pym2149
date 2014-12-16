@@ -17,6 +17,8 @@
 
 class FX:
 
+  maxbend = 1 << 13
+
   def __init__(self):
     self.bend = 0
 
