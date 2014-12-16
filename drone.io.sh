@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 pwd
 
-cd ..; pwd
+cd ..
 
 hg clone https://bitbucket.org/combatopera/devutils
 
-cd -; pwd
+cd -
 
 cd; pwd
 
@@ -18,7 +18,7 @@ bash Miniconda-3.0.5-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
 PATH="$PWD/miniconda/bin:$PATH"
 
-cd -; pwd
+cd -
 
 conda install numpy cython pyflakes nose
 
