@@ -89,9 +89,6 @@ class MinBleps:
     fqmodulename = 'pym2149.' + modulename
     if fqmodulename not in sys.modules:
       unroll('cpaste.pyx', modulename + '.pyx', gmixinsize = self.mixinsize)
-      import pyximport
-      # Note -O3 is apparently the default:
-      pyximport.install(setup_args = {'include_dirs': np.get_include()})
       log.debug("Compiling: %s", fqmodulename)
       importlib.import_module(fqmodulename)
       log.debug("%s compiled.", fqmodulename)
