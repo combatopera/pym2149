@@ -1,1 +1,1 @@
--path './ymtests/dosound?.py' -or -path './ymtests/q?*.py' -or -path './defaultconf.py'
+-path './ymtests/dosound?.py' -or -path './ymtests/q?*.py' -or -path './defaultconf.py' -or -path './configs/?*.py'
