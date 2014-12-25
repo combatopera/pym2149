@@ -85,10 +85,9 @@ class MinBleps:
     self.naiverate = naiverate
     self.outrate = outrate
     self.scale = scale
-    modulename = "cpaste%s" % self.mixinsize
-    fqmodulename = 'pym2149.' + modulename
+    fqmodulename = "pym2149.cpaste%s" % self.mixinsize
     if fqmodulename not in sys.modules:
-      unroll('cpaste.pyx', modulename + '.pyx', gmixinsize = self.mixinsize)
+      unroll('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
       log.debug("Compiling: %s", fqmodulename)
       importlib.import_module(fqmodulename)
       log.debug("%s compiled.", fqmodulename)

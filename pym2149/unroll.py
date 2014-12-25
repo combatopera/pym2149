@@ -15,18 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, re
+import os, re, anchor
 
+rootdir = os.path.dirname(anchor.__file__)
 pattern = re.compile(r'^(\s*)for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
 indentregex = re.compile(r'^\s*')
 maxchunk = 0x80
 
-def unroll(frompath, topath, **kwargs):
-    f = open(os.path.join(os.path.dirname(__file__), frompath))
+def unroll(fromfqname, tofqname, options):
+    fqnametopath = lambda fqname: os.path.join(*[rootdir] + fqname.split('.')) + '.pyx'
+    f = open(fqnametopath(fromfqname))
     try:
-        g = open(os.path.join(os.path.dirname(__file__), topath), 'w')
+        g = open(fqnametopath(tofqname), 'w')
         try:
-            unrollimpl(f, g, kwargs)
+            unrollimpl(f, g, options)
             g.flush()
         finally:
             g.close()
