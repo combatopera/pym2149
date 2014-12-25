@@ -33,13 +33,13 @@ class Config:
     self.positional = args
     g = defaultconf.__dict__.copy()
     if os.path.exists('configs'):
-      configs = sorted(os.listdir('configs'))
-      if configs:
-        for i, config in enumerate(configs):
-          print >> sys.stderr, "%s) %s" % (1 + i, config)
-        sys.stderr.write('#? ')
-        n = raw_input()
-        execfile(os.path.join('configs', configs[int(n) - 1]), g)
+      configs = ['defaults'] + sorted(os.listdir('configs'))
+      for i, config in enumerate(configs):
+        print >> sys.stderr, "%s) %s" % (i, config)
+      sys.stderr.write('#? ')
+      i = int(raw_input())
+      if i:
+        execfile(os.path.join('configs', configs[i]), g)
     underclock = g['underclock']
     if underclock < 1 or defaultscale % underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
