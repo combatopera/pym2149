@@ -8,6 +8,7 @@
 [.]swp$
 [.]dsd$
 [.]c$
+[.]so$
 ^chipconf.py$
 ^configs$
 ^pym2149/cpaste[0-9]+[.]pyx$
