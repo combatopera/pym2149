@@ -15,18 +15,43 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, re, anchor
+import os, re, anchor, logging, importlib
+
+log = logging.getLogger(__name__)
 
 rootdir = os.path.dirname(anchor.__file__)
 pattern = re.compile(r'^(\s*)for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
 indentregex = re.compile(r'^\s*')
 maxchunk = 0x80
 
-def unroll(fromfqname, tofqname, options):
-    fqnametopath = lambda fqname: os.path.join(*[rootdir] + fqname.split('.')) + '.pyx'
-    f = open(fqnametopath(fromfqname))
+def importunrolled(fromfqname, tofqname, options):
+    fqnametopath = lambda fqname: os.path.join(*[rootdir] + fqname.split('.'))
+    frompath = fqnametopath(fromfqname) + '.pyx'
+    topath = fqnametopath(tofqname) + '.pyx'
+    binpath = fqnametopath(tofqname) + '.so'
+    if isuptodate(frompath, binpath):
+        if os.path.exists(topath):
+            log.debug("Deleting: %s", topath)
+            os.remove(topath)
+        formats = "Importing: %s", "%s imported."
+    else:
+        unroll(frompath, topath, options)
+        formats = "Compiling: %s", "%s compiled."
+    log.debug(formats[0], tofqname)
+    importlib.import_module(tofqname)
+    log.debug(formats[1], tofqname)
+
+def isuptodate(frompath, binpath):
+    if os.path.exists(binpath):
+        frommtime = os.path.getmtime(frompath)
+        binmtime = os.path.getmtime(binpath)
+        if binmtime >= frommtime:
+            return True
+
+def unroll(frompath, topath, options):
+    f = open(frompath)
     try:
-        g = open(fqnametopath(tofqname), 'w')
+        g = open(topath, 'w')
         try:
             unrollimpl(f, g, options)
             g.flush()

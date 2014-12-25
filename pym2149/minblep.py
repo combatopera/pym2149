@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging, importlib, sys
+import numpy as np, fractions, logging, sys
 from nod import BufNode
-from unroll import unroll
+from unroll import importunrolled
 
 log = logging.getLogger(__name__)
 
@@ -87,10 +87,7 @@ class MinBleps:
     self.scale = scale
     fqmodulename = "pym2149.cpaste%s" % self.mixinsize
     if fqmodulename not in sys.modules:
-      unroll('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
-      log.debug("Compiling: %s", fqmodulename)
-      importlib.import_module(fqmodulename)
-      log.debug("%s compiled.", fqmodulename)
+      importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
 
   def getoutcount(self, naivex, naiven):
