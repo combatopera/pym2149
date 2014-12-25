@@ -45,7 +45,7 @@ def isuptodate(frompath, binpath):
     if os.path.exists(binpath):
         frommtime = os.path.getmtime(frompath)
         binmtime = os.path.getmtime(binpath)
-        if binmtime >= frommtime:
+        if binmtime >= frommtime: # Don't bother checking dependencies.
             return True
 
 def unroll(frompath, topath, options):
