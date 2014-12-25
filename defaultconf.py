@@ -47,5 +47,5 @@ pianorollheightornone = None
 
 from pym2149.patch import Patches, DefaultPatch
 patches = Patches()
-'''For each MIDI channel, the patch class and chip channel restriction string. For example, the string may be 'AB' for 2-note polyphony.'''
-for i in xrange(3): patches[1 + i] = DefaultPatch, chr(ord('A') + i)
+'''For each MIDI channel, the patch class.'''
+for i in xrange(3): patches[1 + i] = DefaultPatch
