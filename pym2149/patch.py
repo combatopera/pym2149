@@ -24,6 +24,8 @@ class FX:
 
 class Patch:
 
+  polyphony = 1
+
   def __init__(self, chip, index):
     self.toneperiod = chip.toneperiods[index]
     self.toneflag = chip.toneflags[index]
@@ -64,28 +66,19 @@ class DefaultPatch(Patch):
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
 
-class PatchInfo:
-
-  def __init__(self, patch, restrict):
-    self.patch = patch
-    self.restrict = restrict
-
-  def __str__(self):
-    return "(%s %s)" % (self.restrict, self.patch.__name__)
-
 class Patches:
 
   def __init__(self):
-    self.infos = {}
+    self.patches = {}
 
-  def __setitem__(self, midichan, t):
-    self.infos[midichan] = PatchInfo(*t)
+  def __setitem__(self, midichan, patch):
+    self.patches[midichan] = patch
 
   def __getitem__(self, midichan):
-    return self.infos[midichan]
+    return self.patches[midichan]
 
   def iteritems(self):
-    return self.infos.iteritems()
+    return self.patches.iteritems()
 
 class Kit(Patch):
 

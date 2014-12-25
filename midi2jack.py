@@ -79,46 +79,40 @@ class Channel:
 class Channels:
 
   def __init__(self, config, chip):
-    self.channels = dict([chr(ord('A') + i), Channel(i, chip)] for i in xrange(chip.channels))
+    self.channels = [Channel(i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
 
   def noteon(self, frame, midichan, note, vel):
     try:
-      patchinfo = self.patches[midichan]
+      patch = self.patches[midichan]
     except KeyError:
       return
-    channels = [self.channels[c] for c in patchinfo.restrict]
     fx = self.midichantofx[midichan]
     # Use a blank channel if there is one:
-    for c in channels:
+    for c in self.channels:
       if c.onornone is None:
-        c.noteon(frame, patchinfo.patch, note, vel, fx)
+        c.noteon(frame, patch, note, vel, fx)
         return c
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
-    for c in channels:
+    for c in self.channels:
       if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
         oldest = c
     if oldest is not None:
-      oldest.noteon(frame, patchinfo.patch, note, vel, fx)
+      oldest.noteon(frame, patch, note, vel, fx)
       return oldest
     # They're all in the on state, use the one that has been for longest:
-    for c in channels:
+    for c in self.channels:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
-    oldest.noteon(frame, patchinfo.patch, note, vel, fx)
+    oldest.noteon(frame, patch, note, vel, fx)
     return oldest
 
   def noteoff(self, frame, midichan, note, vel):
-    try:
-      patchinfo = self.patches[midichan]
-    except KeyError:
-      return
-    channels = [self.channels[c] for c in patchinfo.restrict]
     # Find the matching channel that has been in the on state for longest:
     oldest = None
-    for c in channels:
+    for c in self.channels:
       if c.onornone and note == c.note and (oldest is None or c.onframe < oldest.onframe):
         oldest = c
     if oldest is not None:
@@ -129,8 +123,7 @@ class Channels:
     self.midichantofx[midichan].bend = bend
 
   def updateall(self, frame):
-    # Sort them so that chip-wide effects are deterministic:
-    for _, channel in sorted(self.channels.iteritems()):
+    for channel in self.channels:
       channel.update(frame)
 
   def __str__(self):
