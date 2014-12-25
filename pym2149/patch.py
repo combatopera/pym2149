@@ -24,8 +24,6 @@ class FX:
 
 class Patch:
 
-  polyphony = 1
-
   def __init__(self, chip, index):
     self.toneperiod = chip.toneperiods[index]
     self.toneflag = chip.toneflags[index]
