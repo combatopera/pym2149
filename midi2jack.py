@@ -95,25 +95,26 @@ class Channels:
     # Use a blank channel if there is one:
     for c in self.channels:
       if c.onornone is None:
-        c.noteon(frame, patch, note, vel, fx)
-        self.midichans[c.chipindex] = midichan
-        return c
+        return self.noteoninchan(frame, midichan, note, vel, c)
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
     for c in self.channels:
       if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
         oldest = c
     if oldest is not None:
-      oldest.noteon(frame, patch, note, vel, fx)
-      self.midichans[oldest.chipindex] = midichan
-      return oldest
+      return self.noteoninchan(frame, midichan, note, vel, oldest)
     # They're all in the on state, use the one that has been for longest:
     for c in self.channels:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
-    oldest.noteon(frame, patch, note, vel, fx)
-    self.midichans[oldest.chipindex] = midichan
-    return oldest
+    return self.noteoninchan(frame, midichan, note, vel, oldest)
+
+  def noteoninchan(self, frame, midichan, note, vel, channel):
+    patch = self.patches[midichan]
+    fx = self.midichantofx[midichan]
+    channel.noteon(frame, patch, note, vel, fx)
+    self.midichans[channel.chipindex] = midichan
+    return channel
 
   def noteoff(self, frame, midichan, note, vel):
     # Find the matching channel that has been in the on state for longest:
