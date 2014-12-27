@@ -96,6 +96,7 @@ class Channels:
     # Use a blank channel if there is one:
     for c in self.miditopriority[midichan]:
       if c.onornone is None:
+        log.debug("[%s] First note on channel.", chr(ord('A') + c.chipindex))
         return self.noteoninchan(frame, midichan, note, vel, c)
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
@@ -108,6 +109,7 @@ class Channels:
     for c in self.miditopriority[midichan]:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
+    log.warn("[%s] Interrupting note on channel.", chr(ord('A') + c.chipindex))
     return self.noteoninchan(frame, midichan, note, vel, oldest)
 
   def noteoninchan(self, frame, midichan, note, vel, channel):
