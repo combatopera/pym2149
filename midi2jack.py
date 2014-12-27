@@ -94,6 +94,7 @@ class Channels:
       return
     fx = self.midichantofx[midichan]
     # Use a blank channel if there is one:
+    # FIXME: Limit polyphony to that of the midichan.
     for c in self.miditopriority[midichan]:
       if c.onornone is None:
         log.debug("[%s] First note on channel.", chr(ord('A') + c.chipindex))
