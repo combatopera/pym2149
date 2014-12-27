@@ -41,6 +41,7 @@ class Channel:
     self.onornone = None
     self.chipindex = chipindex
     self.chip = chip
+    self.patch = None
 
   def noteon(self, frame, patch, note, vel, fx):
     self.onornone = True
@@ -82,6 +83,8 @@ class Channels:
     self.channels = [Channel(i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
+    self.midichans = [None] * chip.channels
+    self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):
     try:
@@ -93,6 +96,7 @@ class Channels:
     for c in self.channels:
       if c.onornone is None:
         c.noteon(frame, patch, note, vel, fx)
+        self.midichans[c.chipindex] = midichan
         return c
     # If any channels are in the off state, use the one that has been for longest:
     oldest = None
@@ -101,12 +105,14 @@ class Channels:
         oldest = c
     if oldest is not None:
       oldest.noteon(frame, patch, note, vel, fx)
+      self.midichans[oldest.chipindex] = midichan
       return oldest
     # They're all in the on state, use the one that has been for longest:
     for c in self.channels:
       if oldest is None or c.onframe < oldest.onframe:
         oldest = c
     oldest.noteon(frame, patch, note, vel, fx)
+    self.midichans[oldest.chipindex] = midichan
     return oldest
 
   def noteoff(self, frame, midichan, note, vel):
@@ -123,6 +129,10 @@ class Channels:
     self.midichantofx[midichan].bend = bend
 
   def updateall(self, frame):
+    text = ' | '.join("%s@%s" % (c.patch, self.midichans[c.chipindex]) for c in self.channels)
+    if text != self.prevtext:
+      log.debug(text)
+      self.prevtext = text
     for channel in self.channels:
       channel.update(frame)
 

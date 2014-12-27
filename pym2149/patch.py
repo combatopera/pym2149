@@ -51,6 +51,9 @@ class Patch:
   def noteoffframe(self, onframes, frame):
     self.noteonframe(onframes + frame)
 
+  def __str__(self):
+    return str(self.__class__) # XXX: Disambiguate instances?
+
 class NullPatch(Patch): pass
 
 class DefaultPatch(Patch):
