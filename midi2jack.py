@@ -84,7 +84,8 @@ class Channels:
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
     self.midichans = [None] * chip.channels
-    self.miditopriority = [list(self.channels) for _ in xrange(16)]
+    self.miditopriority = dict([1 + i, list(self.channels)] for i in xrange(16))
+    self.onnotes = dict([1 + i, set()] for i in xrange(16))
     self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):
@@ -120,6 +121,7 @@ class Channels:
     self.midichans[channel.chipindex] = midichan
     self.miditopriority[midichan].remove(channel)
     self.miditopriority[midichan][0:0] = [channel]
+    self.onnotes[midichan].add(note)
     return channel
 
   def noteoff(self, frame, midichan, note, vel):
@@ -130,6 +132,7 @@ class Channels:
         oldest = c
     if oldest is not None:
       oldest.noteoff(frame)
+      self.onnotes[midichan].discard(note)
       return oldest
 
   def pitchbend(self, frame, midichan, bend):
