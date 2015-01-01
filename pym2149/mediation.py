@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
+log = logging.getLogger(__name__)
+
 class Mediation:
 
     midichanbase = 1
@@ -24,30 +28,37 @@ class Mediation:
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [None] * chipchancount
         self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
+        self.chipchantoonframe = [None] * chipchancount
 
     def acquirechipchan(self, midichan, note, frame):
         if (midichan, note) in self.midichanandnotetochipchan:
             return self.midichanandnotetochipchan[midichan, note] # Spurious case.
+        chipchanhistory = self.midichantochipchanhistory[midichan]
+        def acquire(chipchan):
+            self.midichanandnotetochipchan[midichan, note] = chipchan
+            self.chipchantomidichanandnote[chipchan] = midichan, note
+            del chipchanhistory[i]
+            chipchanhistory.insert(0, chipchan)
+            self.chipchantoonframe[chipchan] = frame
+            return chipchan
         offchipchans = set()
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
             if midichanandnote is None:
                 offchipchans.add(chipchan)
         if offchipchans:
-            chipchanhistory = self.midichantochipchanhistory[midichan]
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in offchipchans:
-                    self.midichanandnotetochipchan[midichan, note] = chipchan
-                    self.chipchantomidichanandnote[chipchan] = midichan, note
-                    del chipchanhistory[i]
-                    chipchanhistory.insert(0, chipchan)
-                    return chipchan
-            else:
-                raise Exception # Should not be possible.
-        raise Exception('Implement me!')
+                    return acquire(chipchan)
+        else:
+            bestonframe = min(self.chipchantoonframe) # May be None.
+            bestchipchans = set(c for c, f in enumerate(self.chipchantoonframe) if f == bestonframe)
+            for i, chipchan in enumerate(chipchanhistory):
+                if chipchan in bestchipchans:
+                    log.warn("[%s] Interrupting note on channel.", chr(ord('A') + chipchan))
+                    return acquire(chipchan)
 
     def releasechipchan(self, midichan, note):
         chipchan = self.midichanandnotetochipchan.pop((midichan, note), None)
-        if chipchan is None:
-            return
-        self.chipchantomidichanandnote[chipchan] = None
-        return chipchan
+        if chipchan is not None: # Non-spurious case.
+            self.chipchantomidichanandnote[chipchan] = None
+            return chipchan
