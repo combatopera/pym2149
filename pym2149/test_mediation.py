@@ -59,7 +59,8 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(0, m.acquirechipchan(1, 60))
 
     def test_spuriousnoteoff(self):
-        raise Exception('Implement me!')
+        m = Mediation(3)
+        self.assertIs(None, m.releasechipchan(1, 60))
 
 if __name__ == '__main__':
     unittest.main()
