@@ -25,7 +25,7 @@ class Mediation:
         self.chipchantomidichanandnote = [None] * chipchancount
         self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
 
-    def acquirechipchan(self, midichan, note):
+    def acquirechipchan(self, midichan, note, frame):
         if (midichan, note) in self.midichanandnotetochipchan:
             return self.midichanandnotetochipchan[midichan, note] # Spurious case.
         offchipchans = set()
