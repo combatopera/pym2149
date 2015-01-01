@@ -75,5 +75,30 @@ class TestMediation(unittest.TestCase):
         m = Mediation(3)
         self.assertIs(None, m.releasechipchan(1, 60))
 
+    def test_overload(self):
+        m = Mediation(3)
+        self.assertEquals(0, m.acquirechipchan(1, 60, 0))
+        self.assertEquals(1, m.acquirechipchan(2, 60, 1))
+        self.assertEquals(2, m.acquirechipchan(3, 60, 2))
+        self.assertEquals(0, m.releasechipchan(1, 60))
+        self.assertEquals(0, m.acquirechipchan(1, 61, 3))
+        # Chip channel 1 had note-on least recently:
+        self.assertEquals(1, m.acquirechipchan(4, 60, 4))
+
+    def test_overloadwhenthereisachoice(self):
+        m = Mediation(3)
+        self.assertEquals(0, m.acquirechipchan(1, 60, 0))
+        self.assertEquals(1, m.acquirechipchan(2, 60, 1))
+        self.assertEquals(2, m.acquirechipchan(3, 60, 2))
+        self.assertEquals(0, m.releasechipchan(1, 60))
+        self.assertEquals(1, m.releasechipchan(2, 60))
+        self.assertEquals(2, m.releasechipchan(3, 60))
+        # Make all 3 chip channels equally attractive time-wise:
+        self.assertEquals(0, m.acquirechipchan(4, 60, 3))
+        self.assertEquals(1, m.acquirechipchan(4, 61, 3))
+        self.assertEquals(2, m.acquirechipchan(4, 62, 3))
+        # Last chip channel for MIDI 2 was 1:
+        self.assertEquals(1, m.acquirechipchan(2, 61, 4))
+
 if __name__ == '__main__':
     unittest.main()
