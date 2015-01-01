@@ -17,18 +17,32 @@
 
 class Mediation:
 
+    midichanbase = 1
+    midichancount = 16
+
     def __init__(self, chipchancount):
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [None] * chipchancount
+        self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
 
     def acquirechipchan(self, midichan, note):
         if (midichan, note) in self.midichanandnotetochipchan:
             return self.midichanandnotetochipchan[midichan, note] # Spurious case.
+        offchipchans = set()
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
             if midichanandnote is None:
-                self.midichanandnotetochipchan[midichan, note] = chipchan
-                self.chipchantomidichanandnote[chipchan] = midichan, note
-                return chipchan
+                offchipchans.add(chipchan)
+        if offchipchans:
+            chipchanhistory = self.midichantochipchanhistory[midichan]
+            for i, chipchan in enumerate(chipchanhistory):
+                if chipchan in offchipchans:
+                    self.midichanandnotetochipchan[midichan, note] = chipchan
+                    self.chipchantomidichanandnote[chipchan] = midichan, note
+                    del chipchanhistory[i]
+                    chipchanhistory.insert(0, chipchan)
+                    return chipchan
+            else:
+                raise Exception
         raise Exception('Implement me!')
 
     def releasechipchan(self, midichan, note):
