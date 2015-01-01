@@ -53,7 +53,10 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(1, 61))
 
     def test_spuriousnoteon(self):
-        raise Exception('Implement me!')
+        m = Mediation(3)
+        self.assertEquals(0, m.acquirechipchan(1, 60))
+        # Simply return the already-acquired chip channel:
+        self.assertEquals(0, m.acquirechipchan(1, 60))
 
     def test_spuriousnoteoff(self):
         raise Exception('Implement me!')
