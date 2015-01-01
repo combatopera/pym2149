@@ -22,6 +22,8 @@ class Mediation:
         self.chipchantomidichanandnote = [None] * chipchancount
 
     def acquirechipchan(self, midichan, note):
+        if (midichan, note) in self.midichanandnotetochipchan:
+            return self.midichanandnotetochipchan[midichan, note] # Spurious case.
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
             if midichanandnote is None:
                 self.midichanandnotetochipchan[midichan, note] = chipchan
