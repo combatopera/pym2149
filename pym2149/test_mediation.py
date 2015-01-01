@@ -43,7 +43,14 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(4, 62))
 
     def test_polyphony(self):
-        raise Exception('Implement me!')
+        m = Mediation(3)
+        # MIDI channel should only use as many chip channels as its current polyphony:
+        self.assertEquals(0, m.acquirechipchan(1, 60))
+        self.assertEquals(1, m.acquirechipchan(1, 61))
+        self.assertEquals(0, m.releasechipchan(1, 60))
+        self.assertEquals(0, m.acquirechipchan(1, 60))
+        self.assertEquals(1, m.releasechipchan(1, 61))
+        self.assertEquals(1, m.acquirechipchan(1, 61))
 
     def test_spuriousnoteon(self):
         raise Exception('Implement me!')
