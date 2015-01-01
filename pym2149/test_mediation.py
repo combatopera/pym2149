@@ -42,6 +42,19 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.releasechipchan(2, 61))
         self.assertEquals(1, m.acquirechipchan(4, 62))
 
+    def test_reusewhenthereisachoice(self):
+        m = Mediation(3)
+        self.assertEquals(0, m.acquirechipchan(1, 60))
+        self.assertEquals(1, m.acquirechipchan(2, 60))
+        self.assertEquals(2, m.acquirechipchan(3, 60))
+        self.assertEquals(0, m.releasechipchan(1, 60))
+        self.assertEquals(1, m.releasechipchan(2, 60))
+        self.assertEquals(2, m.releasechipchan(3, 60))
+        # MIDI 2 should reuse chip channel 1:
+        self.assertEquals(1, m.acquirechipchan(2, 60))
+        # MIDI 3 should reuse chip channel 2:
+        self.assertEquals(2, m.acquirechipchan(3, 60))
+
     def test_polyphony(self):
         m = Mediation(3)
         # MIDI channel should only use as many chip channels as its current polyphony:
