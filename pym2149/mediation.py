@@ -42,7 +42,7 @@ class Mediation:
                     chipchanhistory.insert(0, chipchan)
                     return chipchan
             else:
-                raise Exception
+                raise Exception # Should not be possible.
         raise Exception('Implement me!')
 
     def releasechipchan(self, midichan, note):
