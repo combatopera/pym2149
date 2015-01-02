@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging, sys
+import numpy as np, fractions, logging, sys, os, cPickle as pickle
 from nod import BufNode
 from unroll import importunrolled
 
@@ -36,6 +36,29 @@ class MinBleps:
     if scaleornone is not None and scaleornone != idealscale:
       raise Exception("Expected scale %s but ideal is %s." % (scaleornone, idealscale))
     return idealscale
+
+  @classmethod
+  def loadorcreate(cls, naiverate, outrate, scaleornone, cutoff = .475, transition = .05):
+    scale = cls.resolvescale(naiverate, outrate, scaleornone)
+    name = "%s(%s)" % (cls.__name__, ','.join(map(repr, [naiverate, outrate, scale, cutoff, transition])))
+    path = os.path.join(os.path.expanduser('~'), '.pym2149', 'cache', name)
+    if os.path.exists(path):
+      log.debug('Loading minBLEPs.')
+      f = open(path, 'rb')
+      try:
+        minbleps = pickle.load(f)
+      finally:
+        f.close()
+    else:
+      minbleps = cls(naiverate, outrate, scale, cutoff, transition)
+      os.makedirs(os.path.dirname(path))
+      f = open(path, 'wb')
+      try:
+        pickle.dump(minbleps, f, pickle.HIGHEST_PROTOCOL)
+        f.flush()
+      finally:
+        f.close()
+    return minbleps
 
   def __init__(self, naiverate, outrate, scaleornone, cutoff = .475, transition = .05):
     scale = self.resolvescale(naiverate, outrate, scaleornone)
@@ -87,10 +110,7 @@ class MinBleps:
     log.debug('%s minBLEPs created.', scale)
     self.naiverate = naiverate
     self.outrate = outrate
-    fqmodulename = "pym2149.cpaste%s" % self.mixinsize
-    if fqmodulename not in sys.modules:
-      importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
-    self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
+    self.pasteminbleps = None # Not to be pickled.
 
   def getoutcount(self, naivex, naiven):
     out0 = self.naivex2outx[naivex]
@@ -109,4 +129,9 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def paste(self, naivex, diffbuf, outbuf):
+    if self.pasteminbleps is None:
+      fqmodulename = "pym2149.cpaste%s" % self.mixinsize
+      if fqmodulename not in sys.modules:
+        importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
+      self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
     self.pasteminbleps(len(diffbuf), outbuf.buf, self.naivex2outx, len(outbuf), self.demultiplexed, self.naivex2off, diffbuf.buf, naivex, self.naiverate, self.outrate)
