@@ -39,17 +39,17 @@ class MinBleps:
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
     order = int(round(4 / transition / 2)) * 2
-    self.kernelsize = order * scale + 1
+    kernelsize = order * scale + 1
     # The fft/ifft are too slow unless size is a power of 2:
     self.size = 2 ** 0
-    while self.size < self.kernelsize:
+    while self.size < kernelsize:
       self.size <<= 1
     self.midpoint = self.size // 2 # Index of peak of sinc.
-    x = (np.arange(self.kernelsize) / (self.kernelsize - 1) * 2 - 1) * order * cutoff
+    x = (np.arange(kernelsize) / (kernelsize - 1) * 2 - 1) * order * cutoff
     # If cutoff is .5 the sinc starts and ends with zero.
     # The window is necessary for a reliable integral height later:
-    self.bli = np.blackman(self.kernelsize) * np.sinc(x) / scale * cutoff * 2
-    self.rpad = (self.size - self.kernelsize) // 2 # Observe floor of odd difference.
+    self.bli = np.blackman(kernelsize) * np.sinc(x) / scale * cutoff * 2
+    self.rpad = (self.size - kernelsize) // 2 # Observe floor of odd difference.
     self.lpad = 1 + self.rpad
     self.bli = np.concatenate([np.zeros(self.lpad), self.bli, np.zeros(self.rpad)])
     self.blep = np.cumsum(self.bli)
