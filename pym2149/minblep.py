@@ -44,7 +44,7 @@ class MinBleps:
     size = 2 ** 0
     while size < kernelsize:
       size <<= 1
-    self.midpoint = size // 2 # Index of peak of sinc.
+    midpoint = size // 2 # Index of peak of sinc.
     x = (np.arange(kernelsize) / (kernelsize - 1) * 2 - 1) * order * cutoff
     # If cutoff is .5 the sinc starts and ends with zero.
     # The window is necessary for a reliable integral height later:
@@ -59,8 +59,8 @@ class MinBleps:
     realcepstrum = np.fft.ifft(np.log(np.maximum(self.minmag, absdft)))
     # Leave first point, zero max phase part, double min phase part to compensate.
     # The midpoint is shared between parts so it doesn't change:
-    realcepstrum[1:self.midpoint] *= 2
-    realcepstrum[self.midpoint + 1:] = 0
+    realcepstrum[1:midpoint] *= 2
+    realcepstrum[midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
     self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
     # Prepend zeros to simplify naivex2outx calc:
