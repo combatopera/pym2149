@@ -52,7 +52,6 @@ class MinBleps:
     rpad = (size - kernelsize) // 2 # Observe floor of odd difference.
     lpad = 1 + rpad
     self.bli = np.concatenate([np.zeros(lpad), self.bli, np.zeros(rpad)])
-    self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
     # The "real cepstrum" is symmetric apart from its first element:
