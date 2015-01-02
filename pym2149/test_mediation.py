@@ -17,13 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import unittest, mock
 from mediation import Mediation
 
 class TestMediation(unittest.TestCase):
 
+    def setUp(self):
+        self.warn = mock.Mock().warn
+        self.m = Mediation(3, warn = self.warn)
+
+    def tearDown(self):
+        self.assertEquals(0, self.warn.call_count)
+
     def test_normalcase(self):
-        m = Mediation(3)
+        m = self.m
         # First-come first-served:
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         self.assertEquals(1, m.acquirechipchan(2, 60, 1))
@@ -43,7 +50,7 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(4, 62, 7))
 
     def test_reusewhenthereisachoice(self):
-        m = Mediation(3)
+        m = self.m
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         self.assertEquals(1, m.acquirechipchan(2, 60, 1))
         self.assertEquals(2, m.acquirechipchan(3, 60, 2))
@@ -56,7 +63,7 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(2, m.acquirechipchan(3, 60, 4))
 
     def test_polyphony(self):
-        m = Mediation(3)
+        m = self.m
         # MIDI channel should only use as many chip channels as its current polyphony:
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         self.assertEquals(1, m.acquirechipchan(1, 61, 1))
@@ -66,17 +73,17 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(1, 61, 3))
 
     def test_spuriousnoteon(self):
-        m = Mediation(3)
+        m = self.m
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         # Simply return the already-acquired chip channel:
         self.assertEquals(0, m.acquirechipchan(1, 60, 1))
 
     def test_spuriousnoteoff(self):
-        m = Mediation(3)
+        m = self.m
         self.assertIs(None, m.releasechipchan(1, 60))
 
     def test_overload(self):
-        m = Mediation(3)
+        m = self.m
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         self.assertEquals(1, m.acquirechipchan(2, 60, 1))
         self.assertEquals(2, m.acquirechipchan(3, 60, 2))
@@ -86,7 +93,7 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(4, 60, 4))
 
     def test_overloadwhenthereisachoice(self):
-        m = Mediation(3)
+        m = self.m
         self.assertEquals(0, m.acquirechipchan(1, 60, 0))
         self.assertEquals(1, m.acquirechipchan(2, 60, 1))
         self.assertEquals(2, m.acquirechipchan(3, 60, 2))
