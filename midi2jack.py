@@ -29,16 +29,12 @@ from config import getprocessconfig
 
 log = logging.getLogger(__name__)
 
-# TODO: Make configurable.
-veldatum = 0x60
-velpervol = 0x10
-
-def veltovoladj(vel):
-  return (vel - veldatum + velpervol // 2) // velpervol
-
 class Channel:
 
-  def __init__(self, chipindex, chip):
+  def __init__(self, config, chipindex, chip):
+    neutralvel = config.neutralvelocity
+    velperlevel = config.velocityperlevel
+    self.getvoladj = lambda: (self.vel - neutralvel + velperlevel // 2) // velperlevel
     self.onornone = None
     self.chipindex = chipindex
     self.chip = chip
@@ -73,7 +69,7 @@ class Channel:
   def noteonimpl(self):
     # Make it so that the patch only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.patch.noteon(Pitch(self.note), veltovoladj(self.vel), self.fx)
+    self.patch.noteon(Pitch(self.note), self.getvoladj(), self.fx)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
@@ -81,7 +77,7 @@ class Channel:
 class Channels:
 
   def __init__(self, config, chip):
-    self.channels = [Channel(i, chip) for i in xrange(chip.channels)]
+    self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
     self.mediation = Mediation(chip.channels)
