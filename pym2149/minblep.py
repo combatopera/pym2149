@@ -30,12 +30,15 @@ class MinBleps:
   def round(v):
     return np.int32(v + .5)
 
-  def __init__(self, naiverate, outrate, scale, cutoff = .475, transition = .05):
+  @staticmethod
+  def resolvescale(naiverate, outrate, scaleornone):
     idealscale = naiverate // fractions.gcd(naiverate, outrate)
-    if scale is None:
-      scale = idealscale
-    elif scale != idealscale:
-      raise Exception("Expected scale %s but ideal is %s." % (scale, idealscale))
+    if scaleornone is not None and scaleornone != idealscale:
+      raise Exception("Expected scale %s but ideal is %s." % (scaleornone, idealscale))
+    return idealscale
+
+  def __init__(self, naiverate, outrate, scaleornone, cutoff = .475, transition = .05):
+    scale = self.resolvescale(naiverate, outrate, scaleornone)
     log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
