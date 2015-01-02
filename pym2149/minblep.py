@@ -22,12 +22,13 @@ from unroll import importunrolled
 
 log = logging.getLogger(__name__)
 
-def round(v):
-  return np.int32(v + .5)
-
 class MinBleps:
 
   minmag = np.exp(-100)
+
+  @staticmethod
+  def round(v):
+    return np.int32(v + .5)
 
   def __init__(self, naiverate, outrate, scale, cutoff = .475, transition = .05):
     idealscale = naiverate // fractions.gcd(naiverate, outrate)
@@ -38,7 +39,7 @@ class MinBleps:
     log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
-    order = int(round(4 / transition / 2)) * 2
+    order = int(self.round(4 / transition / 2)) * 2
     kernelsize = order * scale + 1
     # The fft/ifft are too slow unless size is a power of 2:
     size = 2 ** 0
