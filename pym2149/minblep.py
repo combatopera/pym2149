@@ -83,7 +83,6 @@ class MinBleps:
     log.debug('%s minBLEPs created.', scale)
     self.naiverate = naiverate
     self.outrate = outrate
-    self.scale = scale
     fqmodulename = "pym2149.cpaste%s" % self.mixinsize
     if fqmodulename not in sys.modules:
       importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
