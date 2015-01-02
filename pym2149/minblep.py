@@ -49,9 +49,9 @@ class MinBleps:
     # If cutoff is .5 the sinc starts and ends with zero.
     # The window is necessary for a reliable integral height later:
     self.bli = np.blackman(kernelsize) * np.sinc(x) / scale * cutoff * 2
-    self.rpad = (size - kernelsize) // 2 # Observe floor of odd difference.
-    self.lpad = 1 + self.rpad
-    self.bli = np.concatenate([np.zeros(self.lpad), self.bli, np.zeros(self.rpad)])
+    rpad = (size - kernelsize) // 2 # Observe floor of odd difference.
+    lpad = 1 + rpad
+    self.bli = np.concatenate([np.zeros(lpad), self.bli, np.zeros(rpad)])
     self.blep = np.cumsum(self.bli)
     # Everything is real after we discard the phase info here:
     absdft = np.abs(np.fft.fft(self.bli))
