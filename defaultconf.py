@@ -45,6 +45,10 @@ ignoreloop = False
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
 
+neutralvelocity = 0x60
+
+velocityperlevel = 0x10
+
 from pym2149.patch import Patches, DefaultPatch
 patches = Patches()
 '''For each MIDI channel, the patch class.'''
