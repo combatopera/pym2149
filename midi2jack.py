@@ -24,6 +24,7 @@ from pym2149.nod import Block
 from pym2149.pitch import Pitch
 from pym2149.patch import FX
 from pym2149.midi import Midi
+from pym2149.mediation import Mediation
 from config import getprocessconfig
 
 log = logging.getLogger(__name__)
@@ -83,9 +84,7 @@ class Channels:
     self.channels = [Channel(i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
-    self.midichans = [None] * chip.channels
-    self.miditopriority = dict([1 + i, list(self.channels)] for i in xrange(16))
-    self.onnotes = dict([1 + i, set()] for i in xrange(16))
+    self.mediation = Mediation(chip.channels)
     self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):
@@ -94,52 +93,22 @@ class Channels:
     except KeyError:
       return
     fx = self.midichantofx[midichan]
-    # Use a blank channel if there is one:
-    # FIXME: Limit polyphony to that of the midichan.
-    for c in self.miditopriority[midichan]:
-      if c.onornone is None:
-        log.debug("[%s] First note on channel.", chr(ord('A') + c.chipindex))
-        return self.noteoninchan(frame, midichan, note, vel, c)
-    # If any channels are in the off state, use the one that has been for longest:
-    oldest = None
-    for c in self.miditopriority[midichan]:
-      if not c.onornone and (oldest is None or c.offframe < oldest.offframe):
-        oldest = c
-    if oldest is not None:
-      return self.noteoninchan(frame, midichan, note, vel, oldest)
-    # They're all in the on state, use the one that has been for longest:
-    for c in self.miditopriority[midichan]:
-      if oldest is None or c.onframe < oldest.onframe:
-        oldest = c
-    log.warn("[%s] Interrupting note on channel.", chr(ord('A') + c.chipindex))
-    return self.noteoninchan(frame, midichan, note, vel, oldest)
-
-  def noteoninchan(self, frame, midichan, note, vel, channel):
-    patch = self.patches[midichan]
-    fx = self.midichantofx[midichan]
+    channel = self.channels[self.mediation.acquirechipchan(midichan, note, frame)]
     channel.noteon(frame, patch, note, vel, fx)
-    self.midichans[channel.chipindex] = midichan
-    self.miditopriority[midichan].remove(channel)
-    self.miditopriority[midichan][0:0] = [channel]
-    self.onnotes[midichan].add(note)
     return channel
 
   def noteoff(self, frame, midichan, note, vel):
-    # Find the matching channel that has been in the on state for longest:
-    oldest = None
-    for c in self.miditopriority[midichan]:
-      if c.onornone and note == c.note and (oldest is None or c.onframe < oldest.onframe):
-        oldest = c
-    if oldest is not None:
-      oldest.noteoff(frame)
-      self.onnotes[midichan].discard(note)
-      return oldest
+    chipchan = self.mediation.releasechipchan(midichan, note)
+    if chipchan is not None:
+      channel = self.channels[chipchan]
+      channel.noteoff(frame)
+      return channel
 
   def pitchbend(self, frame, midichan, bend):
     self.midichantofx[midichan].bend = bend
 
   def updateall(self, frame):
-    text = ' | '.join("%s@%s" % (c.patch, self.midichans[c.chipindex]) for c in self.channels)
+    text = ' | '.join("%s@%s" % (c.patch, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
     if text != self.prevtext:
       log.debug(text)
       self.prevtext = text

@@ -27,7 +27,7 @@ class Mediation:
 
     def __init__(self, chipchancount, warn = log.warn):
         self.midichanandnotetochipchan = {}
-        self.chipchantomidichanandnote = [None] * chipchancount
+        self.chipchantomidichanandnote = [(None, None)] * chipchancount
         self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
         self.chipchantoonframe = [None] * chipchancount
         self.warn = warn
@@ -38,14 +38,14 @@ class Mediation:
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
             self.midichanandnotetochipchan[midichan, note] = chipchan
-            self.chipchantomidichanandnote[chipchan] = midichan, note
+            self.chipchantomidichanandnote[chipchan] = [midichan, note]
             del chipchanhistory[i]
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
             return chipchan
         offchipchans = set()
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
-            if midichanandnote is None:
+            if midichanandnote[1] is None:
                 offchipchans.add(chipchan)
         if offchipchans:
             for i, chipchan in enumerate(chipchanhistory):
@@ -63,7 +63,7 @@ class Mediation:
     def releasechipchan(self, midichan, note):
         chipchan = self.midichanandnotetochipchan.pop((midichan, note), None)
         if chipchan is not None: # Non-spurious case.
-            self.chipchantomidichanandnote[chipchan] = None
+            self.chipchantomidichanandnote[chipchan][1] = None
             return chipchan
 
     def currentmidichanandnote(self, chipchan):
