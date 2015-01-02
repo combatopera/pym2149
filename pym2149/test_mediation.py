@@ -94,6 +94,8 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(4, 60, 4))
         self.warn.assert_called_once_with(m.interruptingformat, 'B')
         self.warn.reset_mock()
+        # Note-off for interrupted note is now spurious:
+        self.assertIs(None, m.releasechipchan(2, 60))
 
     def test_overloadwhenthereisachoice(self):
         m = self.m
@@ -112,6 +114,8 @@ class TestMediation(unittest.TestCase):
         self.assertEquals(1, m.acquirechipchan(2, 61, 4))
         self.warn.assert_called_once_with(m.interruptingformat, 'B')
         self.warn.reset_mock()
+        # Note-off for interrupted note is now spurious:
+        self.assertIs(None, m.releasechipchan(4, 61))
 
 if __name__ == '__main__':
     unittest.main()
