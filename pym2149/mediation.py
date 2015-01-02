@@ -57,6 +57,7 @@ class Mediation:
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in bestchipchans:
                     self.warn(self.interruptingformat, chr(ord('A') + chipchan))
+                    self.releasechipchan(*self.chipchantomidichanandnote[chipchan])
                     return acquire(chipchan)
 
     def releasechipchan(self, midichan, note):
@@ -64,3 +65,6 @@ class Mediation:
         if chipchan is not None: # Non-spurious case.
             self.chipchantomidichanandnote[chipchan] = None
             return chipchan
+
+    def currentmidichanandnote(self, chipchan):
+        return self.chipchantomidichanandnote[chipchan]
