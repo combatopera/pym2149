@@ -103,7 +103,7 @@ class Config:
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    minbleps = MinBleps(chip.clock, self.getoutputrate(), None)
+    minbleps = MinBleps.loadorcreate(chip.clock, self.getoutputrate(), None)
     return [WavBuf(naive, minbleps) for naive in naives]
 
   def createstream(self, chip, outpath):
