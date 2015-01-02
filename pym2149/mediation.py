@@ -24,11 +24,12 @@ class Mediation:
     midichanbase = 1
     midichancount = 16
 
-    def __init__(self, chipchancount):
+    def __init__(self, chipchancount, warn = log.warn):
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [None] * chipchancount
         self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
         self.chipchantoonframe = [None] * chipchancount
+        self.warn = warn
 
     def acquirechipchan(self, midichan, note, frame):
         if (midichan, note) in self.midichanandnotetochipchan:
@@ -54,7 +55,7 @@ class Mediation:
             bestchipchans = set(c for c, f in enumerate(self.chipchantoonframe) if f == bestonframe)
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in bestchipchans:
-                    log.warn("[%s] Interrupting note on channel.", chr(ord('A') + chipchan))
+                    self.warn("[%s] Interrupting note on channel.", chr(ord('A') + chipchan))
                     return acquire(chipchan)
 
     def releasechipchan(self, midichan, note):
