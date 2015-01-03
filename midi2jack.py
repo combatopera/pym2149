@@ -23,7 +23,7 @@ from pym2149.jackclient import JackClient
 from pym2149.nod import Block
 from pym2149.pitch import Pitch
 from pym2149.patch import FX
-from pym2149.midi import Midi
+from pym2149.midi import Midi, midichannelcount
 from pym2149.mediation import Mediation
 from config import getprocessconfig
 
@@ -79,7 +79,7 @@ class Channels:
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
-    self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
+    self.midichantofx = dict([config.midichannelbase + i, FX()] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
 

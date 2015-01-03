@@ -19,6 +19,8 @@ from __future__ import division
 from jackclient import clientname
 import alsaseq
 
+midichannelcount = 16
+
 class ChannelMessage:
 
   def __init__(self, midi, event):
