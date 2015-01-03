@@ -1,1 +1,1 @@
-PATH="$MINICONDA_HOME/bin:$PATH"
+[[ "$(which python)" = "$MINICONDA_HOME/bin/python" ]] || PATH="$MINICONDA_HOME/bin:$PATH"
