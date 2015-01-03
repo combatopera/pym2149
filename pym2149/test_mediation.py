@@ -24,7 +24,7 @@ class TestMediation(unittest.TestCase):
 
     def setUp(self):
         self.warn = mock.Mock().warn
-        self.m = Mediation(3, warn = self.warn)
+        self.m = Mediation(1, 3, warn = self.warn)
 
     def tearDown(self):
         self.assertEquals(0, self.warn.call_count)

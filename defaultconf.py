@@ -45,6 +45,10 @@ ignoreloop = False
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
 
+midichannelbase = 1
+
+midiprogrambase = 0
+
 neutralvelocity = 0x60
 
 velocityperlevel = 0x10
