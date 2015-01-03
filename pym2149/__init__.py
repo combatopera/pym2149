@@ -21,3 +21,4 @@ import pyximport, numpy as np
 pyximport.install(setup_args = {'include_dirs': np.get_include()}, inplace = True)
 
 clientname = 'pym2149'
+midichannelcount = 16
