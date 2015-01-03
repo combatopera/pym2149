@@ -51,6 +51,7 @@ class MinBleps:
         minbleps = pickle.load(f)
       finally:
         f.close()
+      log.debug("Cached minBLEPs loaded.")
     else:
       minbleps = cls(naiverate, outrate, scale, cutoff, transition)
       parent = os.path.dirname(path)
