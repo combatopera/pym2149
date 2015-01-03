@@ -21,18 +21,21 @@ import alsaseq
 
 class Midi:
 
+  classes = {
+    alsaseq.SND_SEQ_EVENT_NOTEON: NoteOn,
+    alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
+    alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
+  }
+
   def __init__(self):
     alsaseq.client(clientname, 1, 0, False)
 
   def iterevents(self):
     while alsaseq.inputpending():
       type, _, _, _, _, _, _, data = alsaseq.input()
-      if alsaseq.SND_SEQ_EVENT_NOTEON == type:
-        yield NoteOn(data)
-      elif alsaseq.SND_SEQ_EVENT_NOTEOFF == type:
-        yield NoteOff(data)
-      elif alsaseq.SND_SEQ_EVENT_PITCHBEND == type:
-        yield PitchBend(data)
+      cls = self.classes.get(type)
+      if cls is not None:
+        yield cls(data)
 
 class NoteOnOff:
 
