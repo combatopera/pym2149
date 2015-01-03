@@ -119,7 +119,7 @@ class Channels:
 
 def main():
   config = getprocessconfig()
-  midi = Midi()
+  midi = Midi(config)
   with JackClient(config) as jackclient:
       chip, stream = jackclient.newchipandstream(None)
       try:
