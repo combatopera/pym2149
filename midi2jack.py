@@ -103,6 +103,9 @@ class Channels:
   def pitchbend(self, frame, midichan, bend):
     self.midichantofx[midichan].bend = bend
 
+  def programchange(self, frame, midichan, program):
+    raise Exception('Implement me!')
+
   def updateall(self, frame):
     text = ' | '.join("%s@%s" % (c.patch, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
     if text != self.prevtext:

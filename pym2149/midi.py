@@ -25,6 +25,7 @@ class Midi:
     alsaseq.SND_SEQ_EVENT_NOTEON: NoteOn,
     alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
     alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
+    alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
   }
 
   def __init__(self):
@@ -37,15 +38,17 @@ class Midi:
       if cls is not None:
         yield cls(data)
 
-class ChannelEvent:
+class ChannelMessage:
+
+  midichanbase = 1
 
   def __init__(self, event):
-    self.midichan = 1 + (event[0] & 0x0f)
+    self.midichan = self.midichanbase + (event[0] & 0x0f)
 
-class NoteOnOff(ChannelEvent):
+class NoteOnOff(ChannelMessage):
 
   def __init__(self, event):
-    ChannelEvent.__init__(event)
+    ChannelMessage.__init__(event)
     self.note = event[1]
     self.vel = event[2]
 
@@ -66,10 +69,10 @@ class NoteOff(NoteOnOff):
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note, self.vel)
 
-class PitchBend(ChannelEvent):
+class PitchBend(ChannelMessage):
 
   def __init__(self, event):
-    ChannelEvent.__init__(event)
+    ChannelMessage.__init__(event)
     self.bend = ((event[2] << 7) | event[1]) - 0x2000
 
   def __call__(self, channels, frame):
@@ -77,3 +80,17 @@ class PitchBend(ChannelEvent):
 
   def __str__(self):
     return "B %2d %5d" % (self.midichan, self.bend)
+
+class ProgramChange(ChannelMessage):
+
+  programbase = 0
+
+  def __init__(self, event):
+    ChannelMessage.__init__(event)
+    self.program = self.programbase + event[1]
+
+  def __call__(self, channels, frame):
+    return channels.programchange(frame, self.midichan, self.program)
+
+  def __str__(self):
+    return "P %2d %3d" % (self.midichan, self.program)
