@@ -21,14 +21,13 @@ log = logging.getLogger(__name__)
 
 class Mediation:
 
-    midichanbase = 1
     midichancount = 16
     interruptingformat = "[%s] Interrupting note on channel."
 
-    def __init__(self, chipchancount, warn = log.warn):
+    def __init__(self, midichanbase, chipchancount, warn = log.warn):
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [(None, None)] * chipchancount
-        self.midichantochipchanhistory = dict([self.midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
+        self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
         self.chipchantoonframe = [None] * chipchancount
         self.warn = warn
 

@@ -80,7 +80,7 @@ class Channels:
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.patches = config.patches
     self.midichantofx = dict([1 + i, FX()] for i in xrange(16))
-    self.mediation = Mediation(chip.channels)
+    self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):

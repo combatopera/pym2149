@@ -19,36 +19,15 @@ from __future__ import division
 from jackclient import clientname
 import alsaseq
 
-class Midi:
-
-  classes = {
-    alsaseq.SND_SEQ_EVENT_NOTEON: NoteOn,
-    alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
-    alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
-    alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
-  }
-
-  def __init__(self):
-    alsaseq.client(clientname, 1, 0, False)
-
-  def iterevents(self):
-    while alsaseq.inputpending():
-      type, _, _, _, _, _, _, data = alsaseq.input()
-      cls = self.classes.get(type)
-      if cls is not None:
-        yield cls(data)
-
 class ChannelMessage:
 
-  midichanbase = 1
-
-  def __init__(self, event):
-    self.midichan = self.midichanbase + (event[0] & 0x0f)
+  def __init__(self, midi, event):
+    self.midichan = midi.chanbase + (event[0] & 0x0f)
 
 class NoteOnOff(ChannelMessage):
 
-  def __init__(self, event):
-    ChannelMessage.__init__(event)
+  def __init__(self, midi, event):
+    ChannelMessage.__init__(midi, event)
     self.note = event[1]
     self.vel = event[2]
 
@@ -71,8 +50,8 @@ class NoteOff(NoteOnOff):
 
 class PitchBend(ChannelMessage):
 
-  def __init__(self, event):
-    ChannelMessage.__init__(event)
+  def __init__(self, midi, event):
+    ChannelMessage.__init__(midi, event)
     self.bend = ((event[2] << 7) | event[1]) - 0x2000
 
   def __call__(self, channels, frame):
@@ -83,14 +62,33 @@ class PitchBend(ChannelMessage):
 
 class ProgramChange(ChannelMessage):
 
-  programbase = 0
-
-  def __init__(self, event):
-    ChannelMessage.__init__(event)
-    self.program = self.programbase + event[1]
+  def __init__(self, midi, event):
+    ChannelMessage.__init__(midi, event)
+    self.program = midi.programbase + event[1]
 
   def __call__(self, channels, frame):
     return channels.programchange(frame, self.midichan, self.program)
 
   def __str__(self):
     return "P %2d %3d" % (self.midichan, self.program)
+
+class Midi:
+
+  classes = {
+    alsaseq.SND_SEQ_EVENT_NOTEON: NoteOn,
+    alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
+    alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
+    alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
+  }
+
+  def __init__(self, config):
+    self.chanbase = config.midichannelbase
+    self.programbase = config.midiprogrambase
+    alsaseq.client(clientname, 1, 0, False)
+
+  def iterevents(self):
+    while alsaseq.inputpending():
+      type, _, _, _, _, _, _, data = alsaseq.input()
+      cls = self.classes.get(type)
+      if cls is not None:
+        yield cls(self, data)
