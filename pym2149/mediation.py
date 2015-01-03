@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from midi import midichannelcount
+from pym2149 import midichannelcount
 
 log = logging.getLogger(__name__)
 

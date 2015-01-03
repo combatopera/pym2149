@@ -19,8 +19,6 @@ from __future__ import division
 from pym2149 import clientname
 import alsaseq
 
-midichannelcount = 16
-
 class ChannelMessage:
 
   def __init__(self, midi, event):

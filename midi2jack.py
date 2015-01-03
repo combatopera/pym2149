@@ -23,7 +23,8 @@ from pym2149.jackclient import JackClient
 from pym2149.nod import Block
 from pym2149.pitch import Pitch
 from pym2149.patch import FX
-from pym2149.midi import Midi, midichannelcount
+from pym2149.midi import Midi
+from pym2149 import midichannelcount
 from pym2149.mediation import Mediation
 from config import getprocessconfig
 
