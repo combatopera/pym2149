@@ -16,18 +16,18 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from midi import midichannelcount
 
 log = logging.getLogger(__name__)
 
 class Mediation:
 
-    midichancount = 16
     interruptingformat = "[%s] Interrupting note on channel."
 
     def __init__(self, midichanbase, chipchancount, warn = log.warn):
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [(None, None)] * chipchancount
-        self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(self.midichancount))
+        self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(midichannelcount))
         self.chipchantoonframe = [None] * chipchancount
         self.warn = warn
 
