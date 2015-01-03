@@ -45,7 +45,7 @@ class MinBleps:
     name = "%s(%s)" % (cls.__name__, ','.join(map(repr, [naiverate, outrate, scale, cutoff, transition])))
     path = os.path.join(os.path.expanduser('~'), '.pym2149', 'cache', name)
     if os.path.exists(path):
-      log.debug('Loading minBLEPs.')
+      log.debug("Loading cached minBLEPs: %s", path)
       f = open(path, 'rb')
       try:
         minbleps = pickle.load(f)
@@ -53,7 +53,9 @@ class MinBleps:
         f.close()
     else:
       minbleps = cls(naiverate, outrate, scale, cutoff, transition)
-      os.makedirs(os.path.dirname(path))
+      parent = os.path.dirname(path)
+      if not os.path.exists(parent):
+        os.makedirs(parent)
       f = open(path, 'wb')
       try:
         pickle.dump(minbleps, f, pickle.HIGHEST_PROTOCOL)
