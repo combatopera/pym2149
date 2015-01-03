@@ -29,7 +29,7 @@ class ChannelMessage:
 class NoteOnOff(ChannelMessage):
 
   def __init__(self, midi, event):
-    ChannelMessage.__init__(midi, event)
+    ChannelMessage.__init__(self, midi, event)
     self.note = event[1]
     self.vel = event[2]
 
@@ -53,7 +53,7 @@ class NoteOff(NoteOnOff):
 class PitchBend(ChannelMessage):
 
   def __init__(self, midi, event):
-    ChannelMessage.__init__(midi, event)
+    ChannelMessage.__init__(self, midi, event)
     self.bend = ((event[2] << 7) | event[1]) - 0x2000
 
   def __call__(self, channels, frame):
@@ -65,7 +65,7 @@ class PitchBend(ChannelMessage):
 class ProgramChange(ChannelMessage):
 
   def __init__(self, midi, event):
-    ChannelMessage.__init__(midi, event)
+    ChannelMessage.__init__(self, midi, event)
     self.program = midi.programbase + event[1]
 
   def __call__(self, channels, frame):
