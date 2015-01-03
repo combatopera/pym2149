@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from jackclient import clientname
+from pym2149 import clientname
 import alsaseq
 
 midichannelcount = 16
