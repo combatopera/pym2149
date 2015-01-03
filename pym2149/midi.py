@@ -37,10 +37,15 @@ class Midi:
       if cls is not None:
         yield cls(data)
 
-class NoteOnOff:
+class ChannelEvent:
 
   def __init__(self, event):
     self.midichan = 1 + (event[0] & 0x0f)
+
+class NoteOnOff(ChannelEvent):
+
+  def __init__(self, event):
+    ChannelEvent.__init__(event)
     self.note = event[1]
     self.vel = event[2]
 
@@ -61,10 +66,10 @@ class NoteOff(NoteOnOff):
   def __call__(self, channels, frame):
     return channels.noteoff(frame, self.midichan, self.note, self.vel)
 
-class PitchBend:
+class PitchBend(ChannelEvent):
 
   def __init__(self, event):
-    self.midichan = 1 + (event[0] & 0x0f)
+    ChannelEvent.__init__(event)
     self.bend = ((event[2] << 7) | event[1]) - 0x2000
 
   def __call__(self, channels, frame):
