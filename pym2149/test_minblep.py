@@ -25,18 +25,18 @@ from collections import namedtuple
 class TestMinBleps(unittest.TestCase):
 
   def test_minphasereconstruction(self):
-    minbleps = MinBleps(500, 1, 500)
+    minbleps = MinBleps.create(500, 1, 500)
     absdft = np.abs(np.fft.fft(minbleps.bli))
     absdft2 = np.abs(np.fft.fft(minbleps.minbli))
     self.assertTrue(np.allclose(absdft, absdft2))
 
   def test_types(self):
-    minbleps = MinBleps(500, 1, 500)
+    minbleps = MinBleps.create(500, 1, 500)
     self.assertEqual(BufNode.floatdtype, minbleps.minblep.dtype)
 
   def test_xform(self):
     ctrlrate, outrate, scale = 10, 6, 5
-    minbleps = MinBleps(ctrlrate, outrate, scale)
+    minbleps = MinBleps.create(ctrlrate, outrate, scale)
     mixins = []
     MixinInfo = namedtuple('MixinInfo', 'outi shape data')
     for x in xrange(ctrlrate * 2):
@@ -48,7 +48,7 @@ class TestMinBleps(unittest.TestCase):
     self.assertEqual([4, 1, 3, 0, 2] * 4, [m.shape for m in mixins])
 
   def test_counts(self):
-    mb = MinBleps(10, 6, 5)
+    mb = MinBleps.create(10, 6, 5)
     self.assertEqual([0, 0, 1, 1, 2, 3, 3, 4, 4, 5], [mb.getoutcount(0, n) for n in xrange(10)])
     self.assertEqual([0, 1, 1, 2, 3, 3, 4, 4, 5, 6], [mb.getoutcount(1, n) for n in xrange(10)])
     self.assertEqual([0, 0, 1, 2, 2, 3, 3, 4, 5, 5], [mb.getoutcount(2, n) for n in xrange(10)])

@@ -24,6 +24,8 @@ log = logging.getLogger(__name__)
 
 class MinBleps:
 
+  defaultcutoff = .475
+  defaulttransition = .05
   minmag = np.exp(-100)
 
   @staticmethod
@@ -38,7 +40,7 @@ class MinBleps:
     return idealscale
 
   @classmethod
-  def loadorcreate(cls, naiverate, outrate, scaleornone, cutoff = .475, transition = .05):
+  def loadorcreate(cls, naiverate, outrate, scaleornone, cutoff = defaultcutoff, transition = defaulttransition):
     scale = cls.resolvescale(naiverate, outrate, scaleornone)
     name = "%s(%s)" % (cls.__name__, ','.join(map(repr, [naiverate, outrate, scale, cutoff, transition])))
     path = os.path.join(os.path.expanduser('~'), '.pym2149', 'cache', name)
@@ -58,10 +60,13 @@ class MinBleps:
         f.flush()
       finally:
         f.close()
-    return minbleps
+    return minbleps.link()
 
-  def __init__(self, naiverate, outrate, scaleornone, cutoff = .475, transition = .05):
-    scale = self.resolvescale(naiverate, outrate, scaleornone)
+  @classmethod
+  def create(cls, naiverate, outrate, scaleornone, cutoff = defaultcutoff, transition = defaulttransition):
+    return cls(naiverate, outrate, cls.resolvescale(naiverate, outrate, scaleornone), cutoff, transition).link()
+
+  def __init__(self, naiverate, outrate, scale, cutoff, transition):
     log.debug('Creating minBLEPs.')
     # XXX: Use kaiser and/or satisfy min transition?
     # Closest even order to 4/transition:
@@ -110,7 +115,6 @@ class MinBleps:
     log.debug('%s minBLEPs created.', scale)
     self.naiverate = naiverate
     self.outrate = outrate
-    self.pasteminbleps = None # Not to be pickled.
 
   def getoutcount(self, naivex, naiven):
     out0 = self.naivex2outx[naivex]
@@ -128,10 +132,12 @@ class MinBleps:
     naivex -= self.naiverate * shift
     return self.outx2minnaivex[outx] - naivex
 
+  def link(self):
+    fqmodulename = "pym2149.cpaste%s" % self.mixinsize
+    if fqmodulename not in sys.modules:
+      importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
+    self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
+    return self
+
   def paste(self, naivex, diffbuf, outbuf):
-    if self.pasteminbleps is None:
-      fqmodulename = "pym2149.cpaste%s" % self.mixinsize
-      if fqmodulename not in sys.modules:
-        importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
-      self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
     self.pasteminbleps(len(diffbuf), outbuf.buf, self.naivex2outx, len(outbuf), self.demultiplexed, self.naivex2off, diffbuf.buf, naivex, self.naiverate, self.outrate)
