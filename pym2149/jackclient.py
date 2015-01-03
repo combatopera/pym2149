@@ -19,11 +19,10 @@
 
 from pym2149.initlogging import logging
 from pym2149.nod import Node, BufNode
+from pym2149 import clientname
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
-
-clientname = 'pym2149'
 
 class JackClient:
 
