@@ -54,6 +54,8 @@ class Config:
     self.stereo = g['stereo']
     self.freqclamp = g['freqclamp']
     self.maxpan = g['maxpan']
+    self.midichannelbase = g['midichannelbase']
+    self.midiprogrambase = g['midiprogrambase']
     self.neutralvelocity = g['neutralvelocity']
     self.velocityperlevel = g['velocityperlevel']
     self.patches = g['patches']
