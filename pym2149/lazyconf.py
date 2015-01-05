@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
+import re, logging
+
+log = logging.getLogger(__name__)
 
 class Expression:
 
@@ -24,27 +26,26 @@ class Expression:
         self.code = code
         self.name = name
 
-    def __call__(self, config):
-        g = dict(config = config)
+    def __call__(self, view):
+        g = dict(config = view)
         exec (self.head, g)
         exec (self.code, g)
         return g[self.name]
 
-class ConfigView:
+class View:
 
-    def __init__(self, lazyconf):
-        self.lazyconf = lazyconf
+    def __init__(self, loader):
+        self.loader = loader
 
     def __getattr__(self, name):
-        return self.lazyconf.get(name)
+        return self.loader.expressions[name](self)
 
-class LazyConf:
+class Loader:
 
     assignment = re.compile(r'^([^\s]+)\s*=')
 
     def __init__(self):
         self.expressions = {}
-        self.view = ConfigView(self)
 
     def load(self, path):
         f = open(path)
@@ -55,6 +56,7 @@ class LazyConf:
                 head.append(line)
                 line = f.readline()
             tocode = lambda block: compile(block, '<string>', 'exec')
+            log.debug("[%s] Header is first %s lines.", path, len(head))
             head = tocode(''.join(head))
             while line:
                 m = self.assignment.search(line)
@@ -64,6 +66,3 @@ class LazyConf:
                 line = f.readline()
         finally:
             f.close()
-
-    def get(self, name):
-        return self.expressions[name](self.view)
