@@ -42,7 +42,8 @@ class View:
 
 class Loader:
 
-    assignment = re.compile(r'^([^\s]+)\s*=')
+    # TODO LATER: Ideally inspect the AST as this can give false positives.
+    toplevelassignment = re.compile(r'^([^\s]+)\s*=')
 
     def __init__(self):
         self.expressions = {}
@@ -52,14 +53,14 @@ class Loader:
         try:
             head = []
             line = f.readline()
-            while line and self.assignment.search(line) is None:
+            while line and self.toplevelassignment.search(line) is None:
                 head.append(line)
                 line = f.readline()
             tocode = lambda block: compile(block, '<string>', 'exec')
             log.debug("[%s] Header is first %s lines.", path, len(head))
             head = tocode(''.join(head))
             while line:
-                m = self.assignment.search(line)
+                m = self.toplevelassignment.search(line)
                 if m is not None:
                     name = m.group(1)
                     self.expressions[name] = Expression(head, tocode(line), name)
