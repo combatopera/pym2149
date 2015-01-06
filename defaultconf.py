@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from pym2149.ym2149 import stclock
+from pym2149.patch import Patches, DefaultPatch
+
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
 
@@ -27,7 +30,7 @@ underclock = 8
 oscpause = False
 '''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
 
-from pym2149.ym2149 import stclock as defaultclock
+defaultclock = stclock
 '''Used when there is no context clock or override.'''
 
 clockoverrideornone = None
@@ -53,7 +56,6 @@ neutralvelocity = 0x60
 
 velocityperlevel = 0x10
 
-from pym2149.patch import Patches, DefaultPatch
 patches = Patches()
 '''For each MIDI channel, the patch class.'''
-for i in xrange(3): patches[1 + i] = DefaultPatch
+for i in xrange(3): patches[1 + i] = DefaultPatch # FIXME: Not supported by lazyconf.
