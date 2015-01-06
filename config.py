@@ -16,22 +16,25 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, numpy as np, defaultconf, os
+import sys, logging, numpy as np, os
 from pym2149.ym2149 import YM2149, defaultscale
 from pym2149.out import WavWriter, WavBuf
 from pym2149.mix import IdealMixer
 from pym2149.minblep import MinBleps
+from pym2149.lazyconf import Loader, View
 
 log = logging.getLogger(__name__)
 
 def getprocessconfig():
   return Config(sys.argv[1:])
 
-class Config:
+class Config(View):
 
   def __init__(self, args):
+    loader = Loader()
+    View.__init__(self, loader)
     self.positional = args
-    g = defaultconf.__dict__.copy()
+    loader.load(os.path.join(os.path.dirname(__file__), 'defaultconf.py'))
     if os.path.exists('configs'):
       configs = ['defaults'] + sorted(os.listdir('configs'))
       for i, config in enumerate(configs):
@@ -39,26 +42,11 @@ class Config:
       sys.stderr.write('#? ')
       i = int(raw_input())
       if i:
-        execfile(os.path.join('configs', configs[i]), g)
-    underclock = g['underclock']
-    if underclock < 1 or defaultscale % underclock:
+        loader.load(os.path.join('configs', configs[i]))
+    if self.underclock < 1 or defaultscale % self.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
-    self.scale = defaultscale // underclock
-    self.pianorollheightornone = g['pianorollheightornone']
-    self.panlaw = g['panlaw']
-    self.useroutputrate = g['outputrate']
-    self.defaultclock = g['defaultclock']
-    self.clockoverrideornone = g['clockoverrideornone']
-    self.oscpause = g['oscpause']
-    self.ignoreloop = g['ignoreloop']
-    self.stereo = g['stereo']
-    self.freqclamp = g['freqclamp']
-    self.maxpan = g['maxpan']
-    self.midichannelbase = g['midichannelbase']
-    self.midiprogrambase = g['midiprogrambase']
-    self.neutralvelocity = g['neutralvelocity']
-    self.velocityperlevel = g['velocityperlevel']
-    self.patches = g['patches']
+    self.scale = defaultscale // self.underclock
+    self.useroutputrate = self.outputrate
     self.outputratewarningarmed = True
     self.outputrateoverride = None
 
@@ -91,7 +79,7 @@ class Config:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
     return chip
 
-  def amppair(self, loc):
+  def getamppair(self, loc):
     l = ((1 - loc) / 2) ** (self.panlaw / 6)
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
@@ -100,7 +88,7 @@ class Config:
     if self.stereo:
       n = chip.channels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
-      amppairs = [self.amppair(loc) for loc in locs]
+      amppairs = [self.getamppair(loc) for loc in locs]
       chantoamps = zip(*amppairs)
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
