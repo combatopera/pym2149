@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.ym2149 import stclock
-from pym2149.patch import Patches, DefaultPatch
+from pym2149.patch import DefaultPatch
 
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
@@ -56,6 +56,8 @@ neutralvelocity = 0x60
 
 velocityperlevel = 0x10
 
-patches = Patches()
+patches = {}
 '''For each MIDI channel, the patch class.'''
-for i in xrange(3): patches[1 + i] = DefaultPatch # FIXME: Not supported by lazyconf.
+patches[1] = DefaultPatch
+patches[2] = DefaultPatch
+patches[3] = DefaultPatch

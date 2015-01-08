@@ -67,20 +67,6 @@ class DefaultPatch(Patch):
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
 
-class Patches:
-
-  def __init__(self):
-    self.patches = {}
-
-  def __setitem__(self, midichan, patch):
-    self.patches[midichan] = patch
-
-  def __getitem__(self, midichan):
-    return self.patches[midichan]
-
-  def iteritems(self):
-    return self.patches.iteritems()
-
 class Kit(Patch):
 
   def __init__(self, *args, **kwargs):

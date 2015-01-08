@@ -26,11 +26,14 @@ class Expression:
         self.code = code
         self.name = name
 
-    def __call__(self, view):
+    def __call__(self, view, itemornone = None):
         g = dict(config = view)
+        if itemornone is not None:
+            g[itemornone[0]] = itemornone[1]
         exec (self.head, g)
         exec (self.code, g)
-        return g[self.name]
+        if itemornone is None:
+            return g[self.name]
 
 class View:
 
@@ -38,7 +41,10 @@ class View:
         self.loader = loader
 
     def __getattr__(self, name):
-        return self.loader.expressions[name](self)
+        obj = self.loader.expressions[name](self)
+        for mod in self.loader.modifiers(name):
+            mod(self, (name, obj))
+        return obj
 
 class Loader:
 
@@ -67,3 +73,8 @@ class Loader:
                 line = f.readline()
         finally:
             f.close()
+
+    def modifiers(self, name):
+        for modname, e in self.expressions.iteritems():
+            if modname.startswith(name + '['):
+                yield e
