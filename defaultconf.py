@@ -17,6 +17,7 @@
 
 from pym2149.ym2149 import stclock
 from pym2149.patch import DefaultPatch
+from pym2149 import midichannelcount
 
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
@@ -56,8 +57,6 @@ neutralvelocity = 0x60
 
 velocityperlevel = 0x10
 
-patches = {}
-'''For each MIDI channel, the patch class.'''
-patches[1] = DefaultPatch
-patches[2] = DefaultPatch
-patches[3] = DefaultPatch
+midiprograms = {config.midiprogrambase: DefaultPatch}
+
+midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase] for i in xrange(midichannelcount))
