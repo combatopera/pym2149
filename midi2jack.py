@@ -85,10 +85,7 @@ class Channels:
     self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):
-    try:
-      patch = self.patches[midichan]
-    except KeyError:
-      return
+    patch = self.patches[midichan]
     fx = self.midichantofx[midichan]
     channel = self.channels[self.mediation.acquirechipchan(midichan, note, frame)]
     channel.noteon(frame, patch, note, vel, fx)
