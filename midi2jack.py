@@ -79,7 +79,8 @@ class Channels:
 
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
-    self.patches = dict([c, config.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
+    self.midiprograms = config.midiprograms
+    self.patches = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX()] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
@@ -102,7 +103,7 @@ class Channels:
     self.midichantofx[midichan].bend = bend
 
   def programchange(self, frame, midichan, program):
-    raise Exception('Implement me!')
+    self.patches[midichan] = self.midiprograms[program]
 
   def updateall(self, frame):
     text = ' | '.join("%s@%s" % (c.patch, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
