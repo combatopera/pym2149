@@ -64,7 +64,7 @@ class ProgramChange(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.program = midi.programbase + event[1]
+    self.program = midi.programbase + event[5]
 
   def __call__(self, channels, frame):
     return channels.programchange(frame, self.midichan, self.program)
