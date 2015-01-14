@@ -80,13 +80,13 @@ class Channels:
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.midiprograms = config.midiprograms
-    self.programs = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
+    self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX()] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
 
   def noteon(self, frame, midichan, note, vel):
-    program = self.programs[midichan]
+    program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
     channel = self.channels[self.mediation.acquirechipchan(midichan, note, frame)]
     channel.noteon(frame, program, note, vel, fx)
@@ -103,7 +103,7 @@ class Channels:
     self.midichantofx[midichan].bend = bend
 
   def programchange(self, frame, midichan, program):
-    self.programs[midichan] = self.midiprograms[program]
+    self.midichantoprogram[midichan] = self.midiprograms[program]
 
   def updateall(self, frame):
     text = ' | '.join("%s@%s" % (c.patch, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
@@ -114,7 +114,7 @@ class Channels:
       channel.update(frame)
 
   def __str__(self):
-    return ', '.join("%s -> %s" % entry for entry in sorted(self.programs.iteritems()))
+    return ', '.join("%s -> %s" % entry for entry in sorted(self.midichantoprogram.iteritems()))
 
 def main():
   config = getprocessconfig()
