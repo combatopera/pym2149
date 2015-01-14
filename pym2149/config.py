@@ -17,11 +17,11 @@
 
 from __future__ import division
 import sys, logging, numpy as np, os
-from pym2149.ym2149 import YM2149, defaultscale
-from pym2149.out import WavWriter, WavBuf
-from pym2149.mix import IdealMixer
-from pym2149.minblep import MinBleps
-from pym2149.lazyconf import Loader, View
+from ym2149 import YM2149, defaultscale
+from out import WavWriter, WavBuf
+from mix import IdealMixer
+from minblep import MinBleps
+from lazyconf import Loader, View
 
 log = logging.getLogger(__name__)
 
