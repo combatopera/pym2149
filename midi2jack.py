@@ -35,7 +35,7 @@ class Channel:
   def __init__(self, config, chipindex, chip):
     neutralvel = config.neutralvelocity
     velperlevel = config.velocityperlevel
-    self.getvoladj = lambda: (self.vel - neutralvel + velperlevel // 2) // velperlevel
+    self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
     self.onornone = None
     self.chipindex = chipindex
     self.chip = chip
@@ -48,7 +48,7 @@ class Channel:
     self.onornone = True
     self.onframe = frame
     self.note = program(self.chip, self.chipindex, Pitch(midinote), fx)
-    self.vel = vel
+    self.voladj = self.tovoladj(vel)
 
   def noteoff(self, frame):
     self.onornone = False
@@ -71,7 +71,7 @@ class Channel:
   def noteonimpl(self):
     # Make it so that the note only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.note.noteon(self.getvoladj())
+    self.note.noteon(self.voladj)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
