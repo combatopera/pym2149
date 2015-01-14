@@ -17,7 +17,7 @@
 
 from __future__ import division
 import struct, logging, os, tempfile, subprocess, shutil, sys
-from pym2149.ym2149 import stclock
+from ym2149 import stclock
 from fractions import Fraction
 
 log = logging.getLogger(__name__)

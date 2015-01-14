@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
-from pym2149.nod import Node, BufNode
+from initlogging import logging
+from nod import Node, BufNode
 from pym2149 import clientname
 import jack, numpy as np
 
