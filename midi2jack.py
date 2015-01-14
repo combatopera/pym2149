@@ -26,7 +26,7 @@ from pym2149.patch import FX
 from pym2149.midi import Midi
 from pym2149 import midichannelcount
 from pym2149.mediation import Mediation
-from config import getprocessconfig
+from pym2149.config import getprocessconfig
 
 log = logging.getLogger(__name__)
 

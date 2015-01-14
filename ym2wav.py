@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
-from config import getprocessconfig
+from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 import defaultconf
 

@@ -17,7 +17,7 @@
 
 from pym2149.timer import Timer
 from pym2149.buf import singleton
-from config import Config
+from pym2149.config import Config
 import sys, logging
 
 log = logging.getLogger(__name__)
