@@ -39,12 +39,12 @@ class Channel:
     self.onornone = None
     self.chipindex = chipindex
     self.chip = chip
-    self.patch = None
+    self.note = None
 
   def noteon(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
-    self.patch = program(self.chip, self.chipindex)
+    self.note = program(self.chip, self.chipindex)
     self.midinote = midinote
     self.vel = vel
     self.fx = fx
@@ -58,19 +58,19 @@ class Channel:
       f = frame - self.onframe
       if not f:
         self.noteonimpl()
-      self.patch.noteonframe(f)
+      self.note.noteonframe(f)
     elif self.onornone is not None: # It's False.
       if self.onframe == self.offframe:
         self.noteonimpl()
       f = frame - self.offframe
       if not f:
-        self.patch.noteoff()
-      self.patch.noteoffframe(self.offframe - self.onframe, f)
+        self.note.noteoff()
+      self.note.noteoffframe(self.offframe - self.onframe, f)
 
   def noteonimpl(self):
-    # Make it so that the patch only has to switch things on:
+    # Make it so that the note only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.patch.noteon(Pitch(self.midinote), self.getvoladj(), self.fx)
+    self.note.noteon(Pitch(self.midinote), self.getvoladj(), self.fx)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
@@ -106,7 +106,7 @@ class Channels:
     self.midichantoprogram[midichan] = self.midiprograms[program]
 
   def updateall(self, frame):
-    text = ' | '.join("%s@%s" % (c.patch, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
+    text = ' | '.join("%s@%s" % (c.note, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
     if text != self.prevtext:
       log.debug(text)
       self.prevtext = text
