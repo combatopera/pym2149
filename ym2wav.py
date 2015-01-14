@@ -21,7 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from config import getprocessconfig
-from roll import Roll
+from pym2149.vis import Roll
 import defaultconf
 
 log = logging.getLogger(__name__)
