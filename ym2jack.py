@@ -22,7 +22,7 @@ from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from pym2149.jackclient import JackClient
 from config import getprocessconfig
-from roll import Roll
+from pym2149.vis import Roll
 
 log = logging.getLogger(__name__)
 
