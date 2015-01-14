@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from music import Orc, Main
+from sampleslib import Orc, Main
 from fractions import Fraction
 from config import getprocessconfig
 import os, subprocess, time, sys
