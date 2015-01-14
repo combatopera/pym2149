@@ -22,6 +22,7 @@ from out import WavWriter, WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
 from lazyconf import Loader, View
+from pym2149 import appconfigdir
 
 log = logging.getLogger(__name__)
 
@@ -35,14 +36,15 @@ class Config(View):
     View.__init__(self, loader)
     self.positional = args
     loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
-    if os.path.exists('configs'):
-      configs = ['defaults'] + sorted(os.listdir('configs'))
+    configspath = os.path.join(appconfigdir, 'configs')
+    if os.path.exists(configspath):
+      configs = ['defaults'] + sorted(os.listdir(configspath))
       for i, config in enumerate(configs):
         print >> sys.stderr, "%s) %s" % (i, config)
       sys.stderr.write('#? ')
       i = int(raw_input())
       if i:
-        loader.load(os.path.join('configs', configs[i]))
+        loader.load(os.path.join(configspath, configs[i]))
     if self.underclock < 1 or defaultscale % self.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // self.underclock

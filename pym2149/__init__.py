@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyximport, numpy as np
+import pyximport, numpy as np, os
 
 # Note -O3 is apparently the default:
 pyximport.install(setup_args = {'include_dirs': np.get_include()}, inplace = True)
 
 clientname = 'pym2149'
+appconfigdir = os.path.join(os.path.expanduser('~'), '.pym2149')
 midichannelcount = 16
