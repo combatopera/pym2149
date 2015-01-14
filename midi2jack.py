@@ -44,7 +44,7 @@ class Channel:
   def programornone(self):
     return None if self.note is None else self.note.__class__
 
-  def noteon(self, frame, program, midinote, vel, fx):
+  def newnote(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
     self.note = program(self.chip, self.chipindex, Pitch(midinote), fx)
@@ -90,7 +90,7 @@ class Channels:
     program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
     channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
-    channel.noteon(frame, program, midinote, vel, fx)
+    channel.newnote(frame, program, midinote, vel, fx)
     return channel
 
   def noteoff(self, frame, midichan, midinote, vel):
