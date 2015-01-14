@@ -47,10 +47,8 @@ class Channel:
   def noteon(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
-    self.note = program(self.chip, self.chipindex)
-    self.midinote = midinote
+    self.note = program(self.chip, self.chipindex, Pitch(midinote), fx)
     self.vel = vel
-    self.fx = fx
 
   def noteoff(self, frame):
     self.onornone = False
@@ -73,7 +71,7 @@ class Channel:
   def noteonimpl(self):
     # Make it so that the note only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.note.noteon(Pitch(self.midinote), self.getvoladj(), self.fx)
+    self.note.noteon(self.getvoladj())
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
