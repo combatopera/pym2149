@@ -52,7 +52,7 @@ class PitchBend(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.bend = ((event[2] << 7) | event[1]) - 0x2000 # FIXME: I think we want event[5].
+    self.bend = event[5]
 
   def __call__(self, channels, frame):
     return channels.pitchbend(frame, self.midichan, self.bend)
