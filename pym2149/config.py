@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, numpy as np, os
+import sys, logging, numpy as np, os, anchor
 from ym2149 import YM2149, defaultscale
 from out import WavWriter, WavBuf
 from mix import IdealMixer
@@ -34,7 +34,7 @@ class Config(View):
     loader = Loader()
     View.__init__(self, loader)
     self.positional = args
-    loader.load(os.path.join(os.path.dirname(__file__), 'defaultconf.py'))
+    loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
     if os.path.exists('configs'):
       configs = ['defaults'] + sorted(os.listdir('configs'))
       for i, config in enumerate(configs):
