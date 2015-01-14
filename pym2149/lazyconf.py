@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, sys
+import re, logging, sys, os
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +41,8 @@ class View:
         self.loader = loader
 
     def __getattr__(self, name):
+        if 'configpath' == name:
+            return self.loader.paths[-1]
         obj = self.loader.expressions[name](self)
         for mod in self.loader.modifiers(name):
             mod(self, (name, obj))
@@ -55,8 +57,18 @@ class Loader:
     # TODO LATER: Ideally inspect the AST as this can give false positives.
     toplevelassignment = re.compile(r'^([^\s]+)\s*=')
 
+    @staticmethod
+    def canonicalize(path):
+        while True:
+            try:
+                link = os.readlink(path)
+            except OSError:
+                return path
+            path = os.path.join(os.path.dirname(path), link)
+
     def __init__(self):
         self.expressions = {}
+        self.paths = []
 
     def load(self, path):
         f = open(path)
@@ -77,6 +89,7 @@ class Loader:
                 line = f.readline()
         finally:
             f.close()
+        self.paths.append(self.canonicalize(path))
 
     def modifiers(self, name):
         for modname, e in self.expressions.iteritems():
