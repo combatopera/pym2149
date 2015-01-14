@@ -31,13 +31,13 @@ class Mediation:
         self.chipchantoonframe = [None] * chipchancount
         self.warn = warn
 
-    def acquirechipchan(self, midichan, note, frame):
-        if (midichan, note) in self.midichanandnotetochipchan:
-            return self.midichanandnotetochipchan[midichan, note] # Spurious case.
+    def acquirechipchan(self, midichan, midinote, frame):
+        if (midichan, midinote) in self.midichanandnotetochipchan:
+            return self.midichanandnotetochipchan[midichan, midinote] # Spurious case.
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
-            self.midichanandnotetochipchan[midichan, note] = chipchan
-            self.chipchantomidichanandnote[chipchan] = [midichan, note]
+            self.midichanandnotetochipchan[midichan, midinote] = chipchan
+            self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
             del chipchanhistory[i]
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
@@ -59,8 +59,8 @@ class Mediation:
                     self.releasechipchan(*self.chipchantomidichanandnote[chipchan])
                     return acquire(chipchan)
 
-    def releasechipchan(self, midichan, note):
-        chipchan = self.midichanandnotetochipchan.pop((midichan, note), None)
+    def releasechipchan(self, midichan, midinote):
+        chipchan = self.midichanandnotetochipchan.pop((midichan, midinote), None)
         if chipchan is not None: # Non-spurious case.
             self.chipchantomidichanandnote[chipchan][1] = None
             return chipchan
