@@ -41,6 +41,9 @@ class Channel:
     self.chip = chip
     self.note = None
 
+  def programornone(self):
+    return None if self.note is None else self.note.__class__
+
   def noteon(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
@@ -106,7 +109,7 @@ class Channels:
     self.midichantoprogram[midichan] = self.midiprograms[program]
 
   def updateall(self, frame):
-    text = ' | '.join("%s@%s" % (c.note, self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
+    text = ' | '.join("%s@%s" % (c.programornone(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
     if text != self.prevtext:
       log.debug(text)
       self.prevtext = text
