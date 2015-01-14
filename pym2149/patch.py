@@ -71,20 +71,20 @@ class Kit(Patch):
 
   def __init__(self, *args, **kwargs):
     Patch.__init__(self, *args, **kwargs)
-    self.midinotetopatch = {}
+    self.midinotetoprogram = {}
 
-  def __setitem__(self, midinote, patch):
-    self.midinotetopatch[midinote] = patch
+  def __setitem__(self, midinote, program):
+    self.midinotetoprogram[midinote] = program
 
   def noteon(self, pitch, voladj, fx):
-    self.patch = self.midinotetopatch.get(pitch, NullPatch)(self.chip, self.index)
-    self.patch.noteon(None, voladj, fx)
+    self.program = self.midinotetoprogram.get(pitch, NullPatch)(self.chip, self.index)
+    self.program.noteon(None, voladj, fx)
 
   def noteonframe(self, frame):
-    self.patch.noteonframe(frame)
+    self.program.noteonframe(frame)
 
   def noteoff(self):
-    self.patch.noteoff()
+    self.program.noteoff()
 
   def noteoffframe(self, onframes, frame):
-    self.patch.noteoffframe(onframes, frame)
+    self.program.noteoffframe(onframes, frame)
