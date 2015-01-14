@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.ym2149 import stclock
-from pym2149.patch import DefaultProgram
+from pym2149.program import DefaultProgram
 from pym2149 import midichannelcount
 
 outputrate = 44100
