@@ -22,7 +22,7 @@ class FX:
   def __init__(self):
     self.bend = 0
 
-class Program:
+class Note:
 
   def __init__(self, chip, index):
     self.toneperiod = chip.toneperiods[index]
@@ -54,9 +54,9 @@ class Program:
   def __str__(self):
     return str(self.__class__) # XXX: Disambiguate instances?
 
-class NullProgram(Program): pass
+class NullNote(Note): pass
 
-class DefaultProgram(Program):
+class DefaultNote(Note):
 
   def noteon(self, pitch, voladj, fx):
     self.applypitch(pitch)
@@ -67,24 +67,24 @@ class DefaultProgram(Program):
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
 
-class Kit(Program):
+class Unpitched(Note):
 
   def __init__(self, *args, **kwargs):
-    Program.__init__(self, *args, **kwargs)
+    Note.__init__(self, *args, **kwargs)
     self.midinotetoprogram = {}
 
   def __setitem__(self, midinote, program):
     self.midinotetoprogram[midinote] = program
 
   def noteon(self, pitch, voladj, fx):
-    self.program = self.midinotetoprogram.get(pitch, NullProgram)(self.chip, self.index)
-    self.program.noteon(None, voladj, fx)
+    self.note = self.midinotetoprogram.get(pitch, NullNote)(self.chip, self.index)
+    self.note.noteon(None, voladj, fx)
 
   def noteonframe(self, frame):
-    self.program.noteonframe(frame)
+    self.note.noteonframe(frame)
 
   def noteoff(self):
-    self.program.noteoff()
+    self.note.noteoff()
 
   def noteoffframe(self, onframes, frame):
-    self.program.noteoffframe(onframes, frame)
+    self.note.noteoffframe(onframes, frame)

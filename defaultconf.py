@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.ym2149 import stclock
-from pym2149.program import DefaultProgram
+from pym2149.program import DefaultNote
 from pym2149 import midichannelcount
 
 outputrate = 44100
@@ -57,6 +57,6 @@ neutralvelocity = 0x60
 
 velocityperlevel = 0x10
 
-midiprograms = dict([config.midiprogrambase + i, DefaultProgram] for i in xrange(midichannelcount))
+midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(midichannelcount))
 
 midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
