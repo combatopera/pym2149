@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from sampleslib import Orc, Main
 from fractions import Fraction
-from config import getprocessconfig
+from pym2149.config import getprocessconfig
 import os, subprocess, time, sys
 
 log = logging.getLogger(__name__)
