@@ -28,25 +28,25 @@ class NoteOnOff(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.note = event[1]
+    self.midinote = event[1]
     self.vel = event[2]
 
   def __str__(self):
-    return "%s %2d %3d %3d" % (self.char, self.midichan, self.note, self.vel)
+    return "%s %2d %3d %3d" % (self.char, self.midichan, self.midinote, self.vel)
 
 class NoteOn(NoteOnOff):
 
   char = 'I'
 
   def __call__(self, channels, frame):
-    return channels.noteon(frame, self.midichan, self.note, self.vel)
+    return channels.noteon(frame, self.midichan, self.midinote, self.vel)
 
 class NoteOff(NoteOnOff):
 
   char = 'O'
 
   def __call__(self, channels, frame):
-    return channels.noteoff(frame, self.midichan, self.note, self.vel)
+    return channels.noteoff(frame, self.midichan, self.midinote, self.vel)
 
 class PitchBend(ChannelMessage):
 
