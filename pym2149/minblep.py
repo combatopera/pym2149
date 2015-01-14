@@ -19,6 +19,7 @@ from __future__ import division
 import numpy as np, fractions, logging, sys, os, cPickle as pickle
 from nod import BufNode
 from unroll import importunrolled
+from pym2149 import appconfigdir
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class MinBleps:
   def loadorcreate(cls, naiverate, outrate, scaleornone, cutoff = defaultcutoff, transition = defaulttransition):
     scale = cls.resolvescale(naiverate, outrate, scaleornone)
     name = "%s(%s)" % (cls.__name__, ','.join(map(repr, [naiverate, outrate, scale, cutoff, transition])))
-    path = os.path.join(os.path.expanduser('~'), '.pym2149', 'cache', name)
+    path = os.path.join(appconfigdir, 'cache', name)
     if os.path.exists(path):
       log.debug("Loading cached minBLEPs: %s", path)
       f = open(path, 'rb')
