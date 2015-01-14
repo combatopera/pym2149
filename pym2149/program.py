@@ -29,6 +29,7 @@ class Note:
     self.toneflag = chip.toneflags[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = chip.fixedlevels[chipchan]
+    self.levelmode = chip.levelmodes[chipchan]
     self.chip = chip
     self.chipchan = chipchan
     self.pitch = pitch
