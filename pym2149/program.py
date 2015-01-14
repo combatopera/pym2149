@@ -24,13 +24,13 @@ class FX:
 
 class Note:
 
-  def __init__(self, chip, index):
-    self.toneperiod = chip.toneperiods[index]
-    self.toneflag = chip.toneflags[index]
-    self.noiseflag = chip.noiseflags[index]
-    self.fixedlevel = chip.fixedlevels[index]
+  def __init__(self, chip, chipchan):
+    self.toneperiod = chip.toneperiods[chipchan]
+    self.toneflag = chip.toneflags[chipchan]
+    self.noiseflag = chip.noiseflags[chipchan]
+    self.fixedlevel = chip.fixedlevels[chipchan]
     self.chip = chip
-    self.index = index
+    self.chipchan = chipchan
 
   def applypitch(self, pitch):
     self.applyfreq(pitch.freq())
@@ -41,7 +41,6 @@ class Note:
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
 
-  # This is the point at which a logical channel (self) is mapped to a physical one (index).
   def noteon(self, pitch, voladj, fx): pass
 
   def noteonframe(self, frame): pass
@@ -67,7 +66,7 @@ class DefaultNote(Note):
 class Unpitched(Note):
 
   def noteon(self, pitch, voladj, fx):
-    self.note = self.midinotetoprogram.get(pitch, NullNote)(self.chip, self.index)
+    self.note = self.midinotetoprogram.get(pitch, NullNote)(self.chip, self.chipchan)
     self.note.noteon(None, voladj, fx)
 
   def noteonframe(self, frame):
