@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 seconds=5
 blurb="$seconds second delay: "
 
