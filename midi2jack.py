@@ -41,11 +41,11 @@ class Channel:
     self.chip = chip
     self.patch = None
 
-  def noteon(self, frame, program, note, vel, fx):
+  def noteon(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
     self.patch = program(self.chip, self.chipindex)
-    self.note = note
+    self.midinote = midinote
     self.vel = vel
     self.fx = fx
 
@@ -70,7 +70,7 @@ class Channel:
   def noteonimpl(self):
     # Make it so that the patch only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.patch.noteon(Pitch(self.note), self.getvoladj(), self.fx)
+    self.patch.noteon(Pitch(self.midinote), self.getvoladj(), self.fx)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)
@@ -85,15 +85,15 @@ class Channels:
     self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
 
-  def noteon(self, frame, midichan, note, vel):
+  def noteon(self, frame, midichan, midinote, vel):
     program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
-    channel = self.channels[self.mediation.acquirechipchan(midichan, note, frame)]
-    channel.noteon(frame, program, note, vel, fx)
+    channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
+    channel.noteon(frame, program, midinote, vel, fx)
     return channel
 
-  def noteoff(self, frame, midichan, note, vel):
-    chipchan = self.mediation.releasechipchan(midichan, note)
+  def noteoff(self, frame, midichan, midinote, vel):
+    chipchan = self.mediation.releasechipchan(midichan, midinote)
     if chipchan is not None:
       channel = self.channels[chipchan]
       channel.noteoff(frame)
