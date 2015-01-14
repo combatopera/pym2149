@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging
+import re, logging, sys
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +45,10 @@ class View:
         for mod in self.loader.modifiers(name):
             mod(self, (name, obj))
         return obj
+
+    def addpath(self, path):
+        if path not in sys.path:
+            sys.path.append(path)
 
 class Loader:
 
