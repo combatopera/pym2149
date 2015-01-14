@@ -24,16 +24,18 @@ class FX:
 
 class Note:
 
-  def __init__(self, chip, chipchan):
+  def __init__(self, chip, chipchan, pitch, fx):
     self.toneperiod = chip.toneperiods[chipchan]
     self.toneflag = chip.toneflags[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = chip.fixedlevels[chipchan]
     self.chip = chip
     self.chipchan = chipchan
+    self.pitch = pitch
+    self.fx = fx
 
-  def applypitch(self, pitch):
-    self.applyfreq(pitch.freq())
+  def applypitch(self, pitch = None):
+    self.applyfreq((self.pitch if pitch is None else pitch).freq())
 
   def applyfreq(self, freq):
     self.toneperiod.value = freq.toneperiod(self.chip.nominalclock())
@@ -41,7 +43,7 @@ class Note:
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
 
-  def noteon(self, pitch, voladj, fx): pass
+  def noteon(self, voladj): pass
 
   def noteonframe(self, frame): pass
 
@@ -54,8 +56,8 @@ class NullNote(Note): pass
 
 class DefaultNote(Note):
 
-  def noteon(self, pitch, voladj, fx):
-    self.applypitch(pitch)
+  def noteon(self, voladj):
+    self.applypitch()
     self.toneflag.value = True
     self.setfixedlevel(voladj + 13)
     self.voladj = voladj
@@ -65,9 +67,9 @@ class DefaultNote(Note):
 
 class Unpitched(Note):
 
-  def noteon(self, pitch, voladj, fx):
-    self.note = self.midinotetoprogram.get(pitch, NullNote)(self.chip, self.chipchan)
-    self.note.noteon(None, voladj, fx)
+  def noteon(self, voladj):
+    self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.chip, self.chipchan, None, self.fx)
+    self.note.noteon(voladj)
 
   def noteonframe(self, frame):
     self.note.noteonframe(frame)
