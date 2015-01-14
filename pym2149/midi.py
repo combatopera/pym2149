@@ -22,7 +22,7 @@ import alsaseq
 class ChannelMessage:
 
   def __init__(self, midi, event):
-    self.midichan = midi.chanbase + (event[0] & 0x0f)
+    self.midichan = midi.chanbase + event[0]
 
 class NoteOnOff(ChannelMessage):
 
