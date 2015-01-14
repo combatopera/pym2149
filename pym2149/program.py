@@ -69,13 +69,6 @@ class DefaultNote(Note):
 
 class Unpitched(Note):
 
-  def __init__(self, *args, **kwargs):
-    Note.__init__(self, *args, **kwargs)
-    self.midinotetoprogram = {}
-
-  def __setitem__(self, midinote, program):
-    self.midinotetoprogram[midinote] = program
-
   def noteon(self, pitch, voladj, fx):
     self.note = self.midinotetoprogram.get(pitch, NullNote)(self.chip, self.index)
     self.note.noteon(None, voladj, fx)
