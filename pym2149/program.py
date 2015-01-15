@@ -49,7 +49,7 @@ class Note:
     self.fx = fx
 
   def applypitch(self, pitch = None):
-    self.applyfreq((self.pitch if pitch is None else pitch).freq())
+    self.applyfreq(((self.pitch if pitch is None else pitch) + self.fx.bendsemitones()).freq())
 
   def applyfreq(self, freq):
     self.toneperiod.value = freq.toneperiod(self.chip.nominalclock())
@@ -76,7 +76,7 @@ class DefaultNote(Note):
     self.voladj = voladj
 
   def noteonframe(self, frame):
-    self.applypitch(self.pitch + self.fx.bendsemitones())
+    self.applypitch()
 
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
