@@ -83,7 +83,7 @@ class Channels:
     self.midiprograms = config.midiprograms
     self.bendisrate = config.pitchbendisrate
     self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
-    self.midichantofx = dict([config.midichannelbase + i, FX()] for i in xrange(midichannelcount))
+    self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
     self.prevtext = None
 
