@@ -90,6 +90,9 @@ class Channels:
   def noteon(self, frame, midichan, midinote, vel):
     program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
+    if self.bendisrate:
+      fx.resetbend() # XXX: Or only when there are no other notes playing?
+    # TODO: For best mediation, ensure all note-offs are processed before the first note-on.
     channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
     channel.newnote(frame, program, midinote, vel, fx)
     return channel

@@ -15,14 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
+
 class FX:
 
   def __init__(self):
+    self.resetbend()
+
+  def resetbend(self):
     self.bend = 0
     self.bendrate = 0
 
   def applyrates(self):
-    self.bend += self.bendrate
+    self.bend = max(-0x2000, min(0x1fff, self.bend + self.bendrate))
+
+  def bendfloat(self):
+    return self.bend / 0x2000
 
 class Note:
 
@@ -60,10 +68,12 @@ class NullNote(Note): pass
 class DefaultNote(Note):
 
   def noteon(self, voladj):
-    self.applypitch()
     self.toneflag.value = True
     self.setfixedlevel(voladj + 13)
     self.voladj = voladj
+
+  def noteonframe(self, frame):
+    self.applypitch(self.pitch + self.fx.bendfloat() * 12)
 
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
