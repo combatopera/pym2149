@@ -19,7 +19,10 @@ from __future__ import division
 
 class FX:
 
-  def __init__(self):
+  bendlimit = 0x2000
+
+  def __init__(self, config):
+    self.bendradius = config.pitchbendradius
     self.resetbend()
 
   def resetbend(self):
@@ -27,10 +30,10 @@ class FX:
     self.bendrate = 0
 
   def applyrates(self):
-    self.bend = max(-0x2000, min(0x1fff, self.bend + self.bendrate))
+    self.bend = max(-self.bendlimit, min(self.bendlimit - 1, self.bend + self.bendrate))
 
-  def bendfloat(self):
-    return self.bend / 0x2000
+  def bendsemitones(self):
+    return self.bend / self.bendlimit * self.bendradius
 
 class Note:
 
@@ -73,7 +76,7 @@ class DefaultNote(Note):
     self.voladj = voladj
 
   def noteonframe(self, frame):
-    self.applypitch(self.pitch + self.fx.bendfloat() * 12)
+    self.applypitch(self.pitch + self.fx.bendsemitones())
 
   def noteoffframe(self, onframes, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
