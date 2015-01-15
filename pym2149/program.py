@@ -19,6 +19,10 @@ class FX:
 
   def __init__(self):
     self.bend = 0
+    self.bendrate = 0
+
+  def applyrates(self):
+    self.bend += self.bendrate
 
 class Note:
 

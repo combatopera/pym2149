@@ -81,6 +81,7 @@ class Channels:
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.midiprograms = config.midiprograms
+    self.bendisrate = config.pitchbendisrate
     self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX()] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
@@ -101,7 +102,11 @@ class Channels:
       return channel
 
   def pitchbend(self, frame, midichan, bend):
-    self.midichantofx[midichan].bend = bend
+    fx = self.midichantofx[midichan]
+    if self.bendisrate:
+      fx.bendrate = bend
+    else:
+      fx.bend = bend
 
   def programchange(self, frame, midichan, program):
     self.midichantoprogram[midichan] = self.midiprograms[program]
@@ -114,6 +119,10 @@ class Channels:
     for channel in self.channels:
       channel.update(frame)
 
+  def applyrates(self):
+    for fx in self.midichantofx.itervalues():
+      fx.applyrates()
+
   def __str__(self):
     return ', '.join("%s -> %s" % entry for entry in sorted(self.midichantoprogram.iteritems()))
 
@@ -125,7 +134,9 @@ def main():
       try:
         channels = Channels(config, chip)
         log.info(channels)
-        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.getoutputrate())
+        blocksizeseconds = stream.size / config.getoutputrate()
+        log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
+        log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         minbleps = stream.wavs[0].minbleps
         naivex = 0
         frame = 0
@@ -136,6 +147,7 @@ def main():
           # Make min amount of chip data to get one JACK block:
           naiven = minbleps.getminnaiven(naivex, stream.size)
           stream.call(Block(naiven))
+          channels.applyrates()
           naivex = (naivex + naiven) % chip.clock
           frame += 1
       finally:
