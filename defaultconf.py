@@ -60,3 +60,6 @@ velocityperlevel = 0x10
 midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(midichannelcount))
 
 midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
+
+pitchbendisrate = False
+'''If True, pitch bend is interpreted as a rate per chip update.'''
