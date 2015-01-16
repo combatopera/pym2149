@@ -18,12 +18,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import unittest, lfsr, time, sys, numpy as np
-from osc import ToneOsc, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
+import unittest, time, sys, numpy as np
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
 from nod import Block, BufNode
 from reg import Reg, DerivedReg
 from buf import DiffRing, RingCursor, Buf
 from fractions import Fraction
+from lfsr import Lfsr, ym2149nzdegrees
 
 class TestToneOsc(unittest.TestCase):
 
@@ -161,10 +162,12 @@ class TestRationalDiff(unittest.TestCase):
 
 class TestNoiseOsc(unittest.TestCase):
 
+  noisediffs = NoiseDiffs(ym2149nzdegrees)
+
   def test_works(self):
     n = 100
-    o = NoiseOsc(8, Reg(3))
-    u = lfsr.Lfsr(lfsr.ym2149nzdegrees)
+    o = NoiseOsc(8, Reg(3), self.noisediffs)
+    u = Lfsr(ym2149nzdegrees)
     for _ in xrange(2):
       v = o.call(Block(48 * n)).tolist()
       for i in xrange(n):
@@ -173,16 +176,16 @@ class TestNoiseOsc(unittest.TestCase):
   def test_carry(self):
     r = Reg(0x01)
     size = 17 * 16 + 1
-    ref = NoiseOsc(8, r).call(Block(size)).tolist()
+    ref = NoiseOsc(8, r, self.noisediffs).call(Block(size)).tolist()
     for n in xrange(size + 1):
-      o = NoiseOsc(8, r)
+      o = NoiseOsc(8, r, self.noisediffs)
       v1 = o.call(Block(n)).tolist()
       v2 = o.call(Block(size - n)).tolist()
       self.assertEqual(ref, v1 + v2)
 
   def test_increaseperiodonboundary(self):
     r = Reg(0x01)
-    o = NoiseOsc(4, r)
+    o = NoiseOsc(4, r, self.noisediffs)
     o.diff.ringcursor = RingCursor(DiffRing([1, 0], 0, BufNode.bindiffdtype))
     self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
     r.value = 0x02
@@ -192,7 +195,7 @@ class TestNoiseOsc(unittest.TestCase):
 
   def test_decreaseperiodonboundary(self):
     r = Reg(0x03)
-    o = NoiseOsc(4, r)
+    o = NoiseOsc(4, r, self.noisediffs)
     o.diff.ringcursor = RingCursor(DiffRing([1, 0], 0, BufNode.bindiffdtype))
     self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
     r.value = 0x02
@@ -205,7 +208,7 @@ class TestNoiseOsc(unittest.TestCase):
     blocksize = 2000000 // blockrate
     for p in 0x01, 0x1f:
       r = Reg(p)
-      o = NoiseOsc(8, r)
+      o = NoiseOsc(8, r, self.noisediffs)
       start = time.time()
       for _ in xrange(blockrate):
         o.call(Block(blocksize))

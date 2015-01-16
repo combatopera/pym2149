@@ -17,11 +17,12 @@
 
 from __future__ import division
 from reg import Reg, DerivedReg
-from osc import ToneOsc, NoiseOsc, EnvOsc, TimerSynth
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
+from lfsr import ym2149nzdegrees
 import logging
 
 log = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class YM2149(Registers, Container):
     self.scale = scale
     Registers.__init__(self, clampoutrate)
     # Chip-wide signals:
-    noise = NoiseOsc(scale, self.noiseperiod)
+    noise = NoiseOsc(scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
     env = EnvOsc(scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(scale, self.toneperiods[c]) for c in xrange(self.channels)]

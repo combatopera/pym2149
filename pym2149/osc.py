@@ -157,12 +157,10 @@ class NoiseDiffs(DiffRing):
 
 class NoiseOsc(BufNode):
 
-  diffs = NoiseDiffs(lfsr.ym2149nzdegrees)
-
-  def __init__(self, scale, periodreg):
+  def __init__(self, scale, periodreg, noisediffs):
     BufNode.__init__(self, self.binarydtype)
     scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-    self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, False).reset(self.diffs)
+    self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, False).reset(noisediffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
