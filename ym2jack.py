@@ -37,7 +37,8 @@ def main():
       chip, stream = jackclient.newchipandstream(f.clock)
       try:
         timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
-        roll = Roll(config.getheight(f.framefreq), chip, f.clock)
+        config.contextpianorollheight = f.framefreq
+        roll = Roll(config.pianorollheight, chip, f.clock)
         for frame in f:
           frame(chip)
           roll.update()

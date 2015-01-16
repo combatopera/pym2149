@@ -100,9 +100,3 @@ class Config(View):
 
   def createstream(self, chip, outpath):
     return WavWriter(WavBuf.multi(self.createfloatstream(chip)), outpath)
-
-  def getheight(self, defaultheight):
-    if self.pianorollheightornone is not None:
-      return self.pianorollheightornone
-    else:
-      return defaultheight

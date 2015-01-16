@@ -37,7 +37,8 @@ def main():
     stream = config.createstream(chip, outpath)
     try:
       timer = Timer(chip.clock)
-      roll = Roll(config.getheight(f.framefreq), chip, f.clock)
+      config.contextpianorollheight = f.framefreq
+      roll = Roll(config.pianorollheight, chip, f.clock)
       for frame in f:
         frame(chip)
         roll.update()
