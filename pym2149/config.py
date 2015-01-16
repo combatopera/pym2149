@@ -57,7 +57,7 @@ class Config(View):
       return self.outputrateoverride
     return self.useroutputrate
 
-  def createchip(self, contextclockornone = None, log2maxpeaktopeak = 16):
+  def createchip(self, log2maxpeaktopeak = 16):
     if self.nominalclock % self.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, self.underclock))
     clock = self.nominalclock // self.underclock
