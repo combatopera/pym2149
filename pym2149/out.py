@@ -88,5 +88,6 @@ class WavBuf(Node):
     return Buf(outbuf.buf[:outcount])
 
 def newchipandstream(config, outpath):
-    chip = config.createchip()
-    return chip, WavWriter(WavBuf.multi(config.createfloatstream(chip)), outpath)
+    log2maxpeaktopeak = 16
+    chip = config.createchip(log2maxpeaktopeak)
+    return chip, WavWriter(WavBuf.multi(config.createfloatstream(chip, log2maxpeaktopeak)), outpath)
