@@ -37,12 +37,13 @@ class FX:
 
 class Note:
 
-  def __init__(self, chip, chipchan, pitch, fx):
+  def __init__(self, nomclock, chip, chipchan, pitch, fx):
     self.toneperiod = chip.toneperiods[chipchan]
     self.toneflag = chip.toneflags[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = chip.fixedlevels[chipchan]
     self.levelmode = chip.levelmodes[chipchan]
+    self.nomclock = nomclock
     self.chip = chip
     self.chipchan = chipchan
     self.pitch = pitch
@@ -52,7 +53,7 @@ class Note:
     self.applyfreq(((self.pitch if pitch is None else pitch) + self.fx.bendsemitones()).freq())
 
   def applyfreq(self, freq):
-    self.toneperiod.value = freq.toneperiod(self.chip.nominalclock())
+    self.toneperiod.value = freq.toneperiod(self.nomclock)
 
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
