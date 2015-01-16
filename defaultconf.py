@@ -69,3 +69,5 @@ pitchbendradius = 12
 
 pitchbendisrate = False
 '''If True, pitch bend is interpreted as a rate per chip update, and every new note resets the bend.'''
+
+dosoundextraseconds = 3

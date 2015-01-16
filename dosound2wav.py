@@ -27,8 +27,6 @@ from pym2149.out import newchipandstream
 
 log = logging.getLogger(__name__)
 
-extraseconds = 3 # TODO: Make configurable.
-
 def main():
   config = getprocessconfig()
   inpath, label, outpath = config.positional
@@ -41,8 +39,8 @@ def main():
   try:
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)
-    log.info("Streaming %.3f extra seconds.", extraseconds)
-    for b in timer.blocksforperiod(1 / extraseconds):
+    log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
+    for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
       stream.call(b)
     stream.flush()
   finally:
