@@ -26,7 +26,7 @@ from pym2149.config import getprocessconfig
 
 log = logging.getLogger(__name__)
 
-extraseconds = 3
+extraseconds = 3 # TODO: Make configurable.
 
 def main():
   config = getprocessconfig()
