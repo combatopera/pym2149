@@ -66,6 +66,8 @@ class Config(View):
     scale = defaultscale // self.underclock
     clampoutrate = self.getoutputrate() if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
+    if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
+      log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
     if scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
     return chip
