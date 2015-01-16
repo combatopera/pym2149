@@ -35,9 +35,9 @@ class JackClient:
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
-  def newchipandstream(self, contextclockornone):
+  def newchipandstream(self):
     # For jack the available amplitude range is 2 ** 1:
-    chip = self.config.createchip(contextclockornone = contextclockornone, log2maxpeaktopeak = 1)
+    chip = self.config.createchip(log2maxpeaktopeak = 1)
     stream = JackStream(self.config.createfloatstream(chip))
     return chip, stream
 

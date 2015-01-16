@@ -31,11 +31,11 @@ underclock = 8
 oscpause = False
 '''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
 
-defaultclock = stclock
-'''Used when there is no context clock (e.g. specified by a file being played) or override.'''
+contextclock = stclock
+'''Modified if a file is being played that specifies its own clock.'''
 
-clockoverrideornone = None
-'''If not None, override the context clock.'''
+nominalclock = config.contextclock
+'''You can specify your own clock here, which overrides any other value.'''
 
 stereo = False
 

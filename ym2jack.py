@@ -34,11 +34,12 @@ def main():
     try:
       for info in f.info:
         log.info(info)
-      chip, stream = jackclient.newchipandstream(f.clock)
+      config.contextclock = f.clock
+      chip, stream = jackclient.newchipandstream()
       try:
         timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
         config.contextpianorollheight = f.framefreq
-        roll = Roll(config.pianorollheight, chip, f.clock)
+        roll = Roll(config.pianorollheight, chip, f.clock) # XXX: Surely we should pass in nominalclock?
         for frame in f:
           frame(chip)
           roll.update()
