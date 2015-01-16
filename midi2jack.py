@@ -59,10 +59,10 @@ class Channel:
       f = frame - self.onframe
       if not f:
         self.noteonimpl()
-      self.note.noteonframe(f)
+      self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
     elif self.onornone is not None: # It's False.
       if self.onframe == self.offframe:
-        self.noteonimpl() # XXX: What if noteonframe sets a field needed by noteoff or noteoffframe?
+        self.noteonimpl()
       f = frame - self.offframe
       if not f:
         self.note.noteoff()
