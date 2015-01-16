@@ -137,7 +137,7 @@ def main():
       try:
         channels = Channels(config, chip)
         log.info(channels)
-        blocksizeseconds = stream.size / config.getoutputrate()
+        blocksizeseconds = stream.size / config.outputrate
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         minbleps = stream.wavs[0].minbleps
