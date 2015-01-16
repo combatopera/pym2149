@@ -133,7 +133,7 @@ def main():
   config = getprocessconfig()
   midi = Midi(config)
   with JackClient(config) as jackclient:
-      chip, stream = jackclient.newchipandstream(None)
+      chip, stream = jackclient.newchipandstream()
       try:
         channels = Channels(config, chip)
         log.info(channels)

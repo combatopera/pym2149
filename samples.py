@@ -157,7 +157,7 @@ class Target:
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  orc.nomclock = getprocessconfig().getnominalclock()
+  orc.nomclock = getprocessconfig().nominalclock
   target = Target()
   with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
   with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')

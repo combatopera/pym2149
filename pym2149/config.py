@@ -52,15 +52,6 @@ class Config(View):
     self.outputratewarningarmed = True
     self.outputrateoverride = None
 
-  def getnominalclock(self, contextclockornone = None):
-    if self.clockoverrideornone is not None:
-      if contextclockornone is not None:
-        log.info("Context clock %s overridden to: %s", contextclockornone, self.clockoverrideornone)
-      return self.clockoverrideornone
-    if contextclockornone is not None:
-      return contextclockornone
-    return self.defaultclock
-
   def getoutputrate(self):
     if self.outputrateoverride is not None:
       if self.outputratewarningarmed and self.useroutputrate != self.outputrateoverride:
@@ -70,11 +61,10 @@ class Config(View):
     return self.useroutputrate
 
   def createchip(self, contextclockornone = None, log2maxpeaktopeak = 16):
-    nominalclock = self.getnominalclock(contextclockornone)
-    underclock = defaultscale // self.scale
-    if nominalclock % underclock:
-      raise Exception("Clock %s not divisible by underclock %s." % (nominalclock, underclock))
-    clock = nominalclock // underclock
+    underclock = defaultscale // self.scale # XXX: Don't we already know this?
+    if self.nominalclock % underclock:
+      raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, underclock))
+    clock = self.nominalclock // underclock
     clampoutrate = self.getoutputrate() if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if self.scale != defaultscale:
