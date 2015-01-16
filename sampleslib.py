@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.timer import Timer
-from pym2149.buf import singleton
+from pym2149.util import singleton
 from pym2149.config import Config
 import sys, logging
 
