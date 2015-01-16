@@ -152,7 +152,7 @@ class ToneOsc(BufNode):
 
 class NoiseOsc(BufNode):
 
-  diffs = DiffRing(lfsr.Lfsr(*lfsr.ym2149nzdegrees), 0, BufNode.bindiffdtype)
+  diffs = DiffRing(lfsr.Lfsr(lfsr.ym2149nzdegrees), 0, BufNode.bindiffdtype)
 
   def __init__(self, scale, periodreg):
     BufNode.__init__(self, self.binarydtype)
