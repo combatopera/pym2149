@@ -22,6 +22,7 @@ from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
+from pym2149.out import WavStream
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def main():
       log.info(info)
     config.contextclock = f.clock
     chip = config.createchip()
-    stream = config.createstream(chip, outpath)
+    stream = WavStream(config, chip, outpath)
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq

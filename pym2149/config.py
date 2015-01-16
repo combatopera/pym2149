@@ -18,7 +18,7 @@
 from __future__ import division
 import sys, logging, numpy as np, os, anchor
 from ym2149 import YM2149, defaultscale
-from out import WavWriter, WavBuf
+from out import WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
 from lazyconf import Loader, View
@@ -79,6 +79,3 @@ class Config(View):
       log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
     minbleps = MinBleps.loadorcreate(chip.clock, self.outputrate, None)
     return [WavBuf(naive, minbleps) for naive in naives]
-
-  def createstream(self, chip, outpath):
-    return WavWriter(WavBuf.multi(self.createfloatstream(chip)), outpath)
