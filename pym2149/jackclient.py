@@ -19,7 +19,7 @@
 
 from initlogging import logging
 from nod import Node, BufNode
-from pym2149 import clientname
+from const import clientname
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
