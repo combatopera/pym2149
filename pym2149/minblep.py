@@ -137,9 +137,10 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def link(self):
-    fqmodulename = "pym2149.cpaste%s" % self.mixinsize
+    fromfqname = ''.join(w + '.' for w in __name__.split('.')[:-1]) + 'cpaste'
+    fqmodulename = fromfqname + str(self.mixinsize)
     if fqmodulename not in sys.modules:
-      importunrolled('pym2149.cpaste', fqmodulename, dict(gmixinsize = self.mixinsize))
+      importunrolled(fromfqname, fqmodulename, dict(gmixinsize = self.mixinsize))
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
     return self
 
