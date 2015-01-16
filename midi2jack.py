@@ -92,7 +92,6 @@ class Channels:
     fx = self.midichantofx[midichan]
     if self.bendisrate:
       fx.resetbend() # XXX: Or only when there are no other notes playing?
-    # TODO: For best mediation, ensure all note-offs are processed before the first note-on.
     channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
     channel.newnote(frame, program, midinote, vel, fx)
     return channel
@@ -144,6 +143,7 @@ def main():
         naivex = 0
         frame = 0
         while True:
+          # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
           for event in midi.iterevents():
             log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
           channels.updateall(frame)
