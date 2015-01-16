@@ -45,13 +45,6 @@ class Config(View):
       i = int(raw_input())
       if i:
         loader.load(os.path.join(configspath, configs[i]))
-    self.outputratewarningarmed = True
-
-  def getoutputrate(self):
-    if self.outputratewarningarmed and self.outputrate != self.__getattr__('outputrate'):
-      log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
-      self.outputratewarningarmed = False
-    return self.outputrate
 
   def createchip(self, log2maxpeaktopeak = 16):
     if self.nominalclock % self.underclock:
@@ -60,7 +53,7 @@ class Config(View):
     if self.underclock < 1 or defaultscale % self.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     scale = defaultscale // self.underclock
-    clampoutrate = self.getoutputrate() if self.freqclamp else None
+    clampoutrate = self.outputrate if self.freqclamp else None
     chip = YM2149(clock, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
       log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
@@ -82,7 +75,9 @@ class Config(View):
       naives = [IdealMixer(chip, amps) for amps in chantoamps]
     else:
       naives = [IdealMixer(chip)]
-    minbleps = MinBleps.loadorcreate(chip.clock, self.getoutputrate(), None)
+    if self.outputrate != self.__getattr__('outputrate'):
+      log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
+    minbleps = MinBleps.loadorcreate(chip.clock, self.outputrate, None)
     return [WavBuf(naive, minbleps) for naive in naives]
 
   def createstream(self, chip, outpath):
