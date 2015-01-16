@@ -49,8 +49,8 @@ defaultignoreloop = False
 ignoreloop = config.defaultignoreloop
 '''If True playback will not loop.'''
 
-pianorollheightornone = None
-'''If not None, override the deduced piano roll height.'''
+pianorollheight = config.contextpianorollheight
+'''You can override the deduced piano roll height here.'''
 
 midichannelbase = 1
 
