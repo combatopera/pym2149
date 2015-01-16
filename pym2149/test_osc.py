@@ -164,7 +164,7 @@ class TestNoiseOsc(unittest.TestCase):
   def test_works(self):
     n = 100
     o = NoiseOsc(8, Reg(3))
-    u = lfsr.Lfsr(*lfsr.ym2149nzdegrees)
+    u = lfsr.Lfsr(lfsr.ym2149nzdegrees)
     for _ in xrange(2):
       v = o.call(Block(48 * n)).tolist()
       for i in xrange(n):

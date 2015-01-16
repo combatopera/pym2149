@@ -19,7 +19,7 @@ ym2149nzdegrees = 17, 14
 
 class Lfsr:
 
-  def __init__(self, *nzdegrees):
+  def __init__(self, nzdegrees):
     self.mask = sum(1 << (nzd - 1) for nzd in nzdegrees)
     self.x = 1
 
