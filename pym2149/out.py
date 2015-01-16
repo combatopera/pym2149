@@ -87,7 +87,6 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-class WavStream(WavWriter):
-
-  def __init__(self, config, chip, outpath):
-    WavWriter.__init__(self, WavBuf.multi(config.createfloatstream(chip)), outpath)
+def newchipandstream(config, outpath):
+    chip = config.createchip()
+    return chip, WavWriter(WavBuf.multi(config.createfloatstream(chip)), outpath)

@@ -23,7 +23,7 @@ from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
 from pym2149.config import getprocessconfig
-from pym2149.out import WavStream
+from pym2149.out import newchipandstream
 
 log = logging.getLogger(__name__)
 
@@ -37,8 +37,7 @@ def main():
     bytecode = readbytecode(f, label)
   finally:
     f.close()
-  chip = config.createchip()
-  stream = WavStream(config, chip, outpath)
+  chip, stream = newchipandstream(config, outpath)
   try:
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)

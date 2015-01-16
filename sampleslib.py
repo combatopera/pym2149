@@ -18,7 +18,7 @@
 from pym2149.timer import Timer
 from pym2149.util import singleton
 from pym2149.config import Config
-from pym2149.out import WavStream
+from pym2149.out import newchipandstream
 import sys, logging
 
 log = logging.getLogger(__name__)
@@ -144,8 +144,7 @@ class Main:
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
     outpath, = config.positional
-    chip = config.createchip()
-    stream = WavStream(config, chip, outpath)
+    chip, stream = newchipandstream(config, outpath)
     try:
       timer = Timer(chip.clock)
       chanupdaters = [voidupdater] * chip.channels
