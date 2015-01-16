@@ -45,17 +45,13 @@ class Config(View):
       i = int(raw_input())
       if i:
         loader.load(os.path.join(configspath, configs[i]))
-    self.useroutputrate = self.outputrate
     self.outputratewarningarmed = True
-    self.outputrateoverride = None
 
   def getoutputrate(self):
-    if self.outputrateoverride is not None:
-      if self.outputratewarningarmed and self.useroutputrate != self.outputrateoverride:
-        log.warn("Configured outputrate %s overriden to %s: %s", self.useroutputrate, self.outputrateoverridelabel, self.outputrateoverride)
-        self.outputratewarningarmed = False
-      return self.outputrateoverride
-    return self.useroutputrate
+    if self.outputratewarningarmed and self.outputrate != self.__getattr__('outputrate'):
+      log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
+      self.outputratewarningarmed = False
+    return self.outputrate
 
   def createchip(self, log2maxpeaktopeak = 16):
     if self.nominalclock % self.underclock:

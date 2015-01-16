@@ -31,7 +31,7 @@ class JackClient:
 
   def __enter__(self):
     jack.attach(clientname)
-    self.config.outputrateoverride = jack.get_sample_rate()
+    self.config.outputrate = jack.get_sample_rate()
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
