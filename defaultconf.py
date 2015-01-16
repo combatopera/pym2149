@@ -43,8 +43,11 @@ panlaw = 3
 
 maxpan = .75
 
-ignoreloop = False
-'''If True playback will not loop. This default is modified to True when writing to a file.'''
+defaultignoreloop = False
+'''Modified to True when writing to a file.'''
+
+ignoreloop = config.defaultignoreloop
+'''If True playback will not loop.'''
 
 pianorollheightornone = None
 '''If not None, override the deduced piano roll height.'''
