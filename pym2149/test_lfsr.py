@@ -18,7 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lfsr import Lfsr, ym2149nzdegrees
+from lfsr import Lfsr
+from ym2149 import ym2149nzdegrees
 
 class TestLfsr(unittest.TestCase):
 

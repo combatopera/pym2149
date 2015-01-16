@@ -24,7 +24,8 @@ from nod import Block, BufNode
 from reg import Reg, DerivedReg
 from buf import DiffRing, RingCursor, Buf
 from fractions import Fraction
-from lfsr import Lfsr, ym2149nzdegrees
+from lfsr import Lfsr
+from ym2149 import ym2149nzdegrees
 
 class TestToneOsc(unittest.TestCase):
 

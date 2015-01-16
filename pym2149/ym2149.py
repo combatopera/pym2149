@@ -22,13 +22,13 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-from lfsr import ym2149nzdegrees
 import logging
 
 log = logging.getLogger(__name__)
 
 stclock = 2000000
 defaultscale = 8
+ym2149nzdegrees = 17, 14
 
 def toneperiodclamp(chip, outrate):
   # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
