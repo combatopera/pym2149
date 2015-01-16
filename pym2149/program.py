@@ -59,7 +59,8 @@ class Note:
 
   def noteon(self, voladj): pass
 
-  def noteonframe(self, frame): pass
+  def noteonframe(self, frame):
+    """Note this may never be called, so should not make changes that noteoff or a custom impl of noteoffframe later relies on."""
 
   def noteoff(self): pass
 
