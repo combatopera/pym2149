@@ -82,9 +82,6 @@ class YM2149(Registers, Container):
     self.oscpause = oscpause
     self.log2maxpeaktopeak = log2maxpeaktopeak
 
-  def nominalclock(self):
-    return defaultscale // self.scale * self.clock
-
   def callimpl(self):
     result = Container.callimpl(self)
     if not self.oscpause:

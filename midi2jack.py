@@ -33,6 +33,7 @@ log = logging.getLogger(__name__)
 class Channel:
 
   def __init__(self, config, chipindex, chip):
+    self.nomclock = config.nominalclock
     neutralvel = config.neutralvelocity
     velperlevel = config.velocityperlevel
     self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
@@ -47,7 +48,7 @@ class Channel:
   def newnote(self, frame, program, midinote, vel, fx):
     self.onornone = True
     self.onframe = frame
-    self.note = program(self.chip, self.chipindex, Pitch(midinote), fx)
+    self.note = program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx)
     self.voladj = self.tovoladj(vel)
 
   def noteoff(self, frame):
