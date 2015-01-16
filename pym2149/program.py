@@ -86,7 +86,7 @@ class DefaultNote(Note):
 class Unpitched(Note):
 
   def noteon(self, voladj):
-    self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.chip, self.chipchan, None, self.fx)
+    self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.fx)
     self.note.noteon(voladj)
 
   def noteonframe(self, frame):
