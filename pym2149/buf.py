@@ -16,9 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-
-def singleton(f):
-  return f()
+from util import singleton
 
 class Ring:
 
