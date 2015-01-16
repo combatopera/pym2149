@@ -72,9 +72,9 @@ class Config(View):
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
       amppairs = [self.getamppair(loc) for loc in locs]
       chantoamps = zip(*amppairs)
-      naives = [IdealMixer(chip, amps) for amps in chantoamps]
+      naives = [IdealMixer(chip, chip.log2maxpeaktopeak, amps) for amps in chantoamps]
     else:
-      naives = [IdealMixer(chip)]
+      naives = [IdealMixer(chip, chip.log2maxpeaktopeak)]
     if self.outputrate != self.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
     minbleps = MinBleps.loadorcreate(chip.clock, self.outputrate, None)
