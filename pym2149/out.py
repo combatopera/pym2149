@@ -86,3 +86,8 @@ class WavBuf(Node):
     self.naivex = (self.naivex + self.block.framecount) % self.clock
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
+
+class WavStream(WavWriter):
+
+  def __init__(self, config, chip, outpath):
+    WavWriter.__init__(self, WavBuf.multi(config.createfloatstream(chip)), outpath)
