@@ -31,7 +31,7 @@ class BinMix(BufNode):
     # The truth table options are {AND, OR, XOR}.
     # Other functions are negations of these, the 2 constants, or not symmetric.
     # XOR sounds just like noise so it can't be that.
-    # AND and OR have the same frequency spectrum so either is good.
+    # AND and OR have the same frequency spectrum so either will sound good.
     # We use AND as zero is preferred over envelope, see qbmixenv:
     noiseflag = self.noiseflagreg.value
     if self.toneflagreg.value:
@@ -64,10 +64,9 @@ class Multiplexer(Node):
 
 class IdealMixer(BufNode):
 
-  def __init__(self, container, amps = None):
+  def __init__(self, container, log2maxpeaktopeak, amps = None):
     BufNode.__init__(self, self.floatdtype)
-    # TODO: The log2maxpeaktopeak interface is currently a bit hacky.
-    self.datum = self.dtype(2 ** (container.log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
+    self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
     if amps is not None:
       self.contrib = MasterBuf(self.dtype)
     self.container = container
