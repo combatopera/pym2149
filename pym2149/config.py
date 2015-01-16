@@ -45,9 +45,6 @@ class Config(View):
       i = int(raw_input())
       if i:
         loader.load(os.path.join(configspath, configs[i]))
-    if self.underclock < 1 or defaultscale % self.underclock:
-      raise Exception("underclock must be a factor of %s." % defaultscale)
-    self.scale = defaultscale // self.underclock
     self.useroutputrate = self.outputrate
     self.outputratewarningarmed = True
     self.outputrateoverride = None
@@ -61,13 +58,15 @@ class Config(View):
     return self.useroutputrate
 
   def createchip(self, contextclockornone = None, log2maxpeaktopeak = 16):
-    underclock = defaultscale // self.scale # XXX: Don't we already know this?
-    if self.nominalclock % underclock:
-      raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, underclock))
-    clock = self.nominalclock // underclock
+    if self.nominalclock % self.underclock:
+      raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, self.underclock))
+    clock = self.nominalclock // self.underclock
+    if self.underclock < 1 or defaultscale % self.underclock:
+      raise Exception("underclock must be a factor of %s." % defaultscale)
+    scale = defaultscale // self.underclock
     clampoutrate = self.getoutputrate() if self.freqclamp else None
-    chip = YM2149(clock, log2maxpeaktopeak, scale = self.scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
-    if self.scale != defaultscale:
+    chip = YM2149(clock, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
+    if scale != defaultscale:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
     return chip
 
