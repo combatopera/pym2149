@@ -46,7 +46,7 @@ class Config(View):
       if i:
         loader.load(os.path.join(configspath, configs[i]))
 
-  def createchip(self, log2maxpeaktopeak = 16):
+  def createchip(self, log2maxpeaktopeak):
     if self.nominalclock % self.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, self.underclock))
     clock = self.nominalclock // self.underclock
@@ -66,15 +66,15 @@ class Config(View):
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
 
-  def createfloatstream(self, chip):
+  def createfloatstream(self, chip, log2maxpeaktopeak):
     if self.stereo:
       n = chip.channels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
       amppairs = [self.getamppair(loc) for loc in locs]
       chantoamps = zip(*amppairs)
-      naives = [IdealMixer(chip, chip.log2maxpeaktopeak, amps) for amps in chantoamps]
+      naives = [IdealMixer(chip, log2maxpeaktopeak, amps) for amps in chantoamps]
     else:
-      naives = [IdealMixer(chip, chip.log2maxpeaktopeak)]
+      naives = [IdealMixer(chip, log2maxpeaktopeak)]
     if self.outputrate != self.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
     minbleps = MinBleps.loadorcreate(chip.clock, self.outputrate, None)
