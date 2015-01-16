@@ -39,7 +39,7 @@ def main():
       try:
         timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
         config.contextpianorollheight = f.framefreq
-        roll = Roll(config.pianorollheight, chip, f.clock) # XXX: Surely we should pass in nominalclock?
+        roll = Roll(config, chip)
         for frame in f:
           frame(chip)
           roll.update()

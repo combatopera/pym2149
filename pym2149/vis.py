@@ -22,14 +22,14 @@ class Roll:
 
   shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
 
-  def __init__(self, height, chip, nomclock):
+  def __init__(self, config, chip):
+    self.height = config.pianorollheight
+    self.nomclock = config.nominalclock
     self.line = 0
-    self.jump = "\x1b[%sA" % height
+    self.jump = "\x1b[%sA" % self.height
     self.format = ' | '.join(chip.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
     self.shapeversion = None
-    self.height = height
     self.chip = chip
-    self.nomclock = nomclock
 
   def update(self):
     if self.line == self.height:

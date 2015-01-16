@@ -39,7 +39,7 @@ def main():
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq
-      roll = Roll(config.pianorollheight, chip, f.clock)
+      roll = Roll(config, chip)
       for frame in f:
         frame(chip)
         roll.update()
