@@ -19,7 +19,7 @@ import os, re, logging, importlib
 
 log = logging.getLogger(__name__)
 
-rootdir = os.path.join(os.path.dirname(__file__), os.sep.join((len(__name__.split('.')) - 1) * ['..']))
+rootdir = os.path.join(*([os.path.dirname(__file__)] + (len(__name__.split('.')) - 1) * ['..']))
 pattern = re.compile(r'^(\s*)for\s+UNROLL\s+in\s+xrange\s*\(\s*([^\s]+)\s*\)\s*:\s*$')
 indentregex = re.compile(r'^\s*')
 maxchunk = 0x80
