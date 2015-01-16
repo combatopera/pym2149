@@ -19,7 +19,7 @@ from __future__ import division
 import numpy as np, fractions, logging, sys, os, cPickle as pickle
 from nod import BufNode
 from unroll import importunrolled
-from pym2149 import appconfigdir
+from const import appconfigdir
 
 log = logging.getLogger(__name__)
 

@@ -22,7 +22,7 @@ from out import WavWriter, WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
 from lazyconf import Loader, View
-from pym2149 import appconfigdir
+from const import appconfigdir
 
 log = logging.getLogger(__name__)
 

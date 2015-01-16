@@ -17,7 +17,7 @@
 
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
-from pym2149 import midichannelcount
+from pym2149.const import midichannelcount
 
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
