@@ -22,7 +22,7 @@ class FX:
   bendlimit = 0x2000
 
   def __init__(self, config):
-    self.bendradius = config.pitchbendradius
+    self.bendpersemitone = config.pitchbendpersemitone
     self.resetbend()
 
   def resetbend(self):
@@ -33,7 +33,7 @@ class FX:
     self.bend = max(-self.bendlimit, min(self.bendlimit - 1, self.bend + self.bendrate))
 
   def bendsemitones(self):
-    return self.bend / self.bendlimit * self.bendradius
+    return self.bend / self.bendpersemitone
 
 class Note:
 

@@ -64,8 +64,8 @@ midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(mi
 
 midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
 
-pitchbendradius = 12
-'''Maximum pitch bend is this many semitones.'''
+pitchbendpersemitone = 0x200
+'''The default of 0x200 is 4 coarse steps per semitone, or a radius of 16 semitones.'''
 
 pitchbendisrate = False
 '''If True, pitch bend is interpreted as a rate per chip update, and every new note resets the bend.'''
