@@ -22,12 +22,17 @@ class FX:
   bendlimit = 0x2000
 
   def __init__(self, config):
+    self.finebendisrate = config.finepitchbendisrate
     self.bendpersemitone = config.pitchbendpersemitone
-    self.resetbend()
-
-  def resetbend(self):
     self.bend = 0
     self.bendrate = 0
+
+  def setbend(self, bend):
+    if self.finebendisrate:
+      self.bend = bend & ~0x7f
+      self.bendrate = (bend & 0x7f) - 0x40
+    else:
+      self.bend = bend # We never change bendrate from 0.
 
   def applyrates(self):
     self.bend = max(-self.bendlimit, min(self.bendlimit - 1, self.bend + self.bendrate))

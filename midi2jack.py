@@ -82,7 +82,6 @@ class Channels:
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
     self.midiprograms = config.midiprograms
-    self.bendisrate = config.pitchbendisrate
     self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, chip.channels)
@@ -91,8 +90,6 @@ class Channels:
   def noteon(self, frame, midichan, midinote, vel):
     program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
-    if self.bendisrate:
-      fx.resetbend() # XXX: Or only when there are no other notes playing?
     channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
     channel.newnote(frame, program, midinote, vel, fx)
     return channel
@@ -105,11 +102,7 @@ class Channels:
       return channel
 
   def pitchbend(self, frame, midichan, bend):
-    fx = self.midichantofx[midichan]
-    if self.bendisrate:
-      fx.bendrate = bend
-    else:
-      fx.bend = bend
+    self.midichantofx[midichan].setbend(bend)
 
   def programchange(self, frame, midichan, program):
     self.midichantoprogram[midichan] = self.midiprograms[program]
