@@ -57,8 +57,8 @@ class Config(View):
     chip = YM2149(clock, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
       log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
-    if scale != defaultscale:
-      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", chip.clock)
+    if clock != self.nominalclock:
+      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", clock)
     return chip
 
   def getamppair(self, loc):
