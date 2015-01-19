@@ -68,6 +68,9 @@ pitchbendpersemitone = 0x200
 '''The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.'''
 
 finepitchbendisrate = False
-'''If True, the fine part of pitch bend is interpreted as a rate per chip update.'''
+'''If True, the fine part of pitch bend (times pitchbendratemultiplier) is interpreted as a rate per chip update.'''
+
+pitchbendratemultiplier = 4
+'''In finepitchbendisrate mode, the rate is the fine bend multiplied by this.'''
 
 dosoundextraseconds = 3

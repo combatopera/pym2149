@@ -25,13 +25,14 @@ class TestFX(unittest.TestCase):
   def test_setbend(self):
     class Config:
       finepitchbendisrate = True
+      pitchbendratemultiplier = 3
       pitchbendpersemitone = 1 # Don't care.
     fx = FX(Config())
     for coarse in xrange(0x80):
       for fine in xrange(0x80):
         fx.setbend(((coarse << 7) | fine) - 0x2000)
         self.assertEqual((coarse << 7) - 0x2000, fx.bend)
-        self.assertEqual(fine - 0x40, fx.bendrate)
+        self.assertEqual((fine - 0x40) * 3, fx.bendrate)
 
 if __name__ == '__main__':
   unittest.main()
