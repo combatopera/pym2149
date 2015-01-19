@@ -20,6 +20,7 @@ from buf import MasterBuf, Buf
 from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
+from ym2149 import YM2149
 
 log = logging.getLogger(__name__)
 
@@ -89,5 +90,5 @@ class WavBuf(Node):
 
 def newchipandstream(config, outpath):
     log2maxpeaktopeak = 16
-    chip = config.createchip(log2maxpeaktopeak)
+    chip = YM2149(config, log2maxpeaktopeak)
     return chip, WavWriter(WavBuf.multi(config.createfloatstream(chip, log2maxpeaktopeak)), outpath)
