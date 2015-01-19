@@ -35,8 +35,8 @@ class ClockInfo:
     if config.nominalclock % config.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
     self.implclock = config.nominalclock // config.underclock
-    if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
-      log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
+    if 'contextclock' in config.__dict__ and config.nominalclock != config.contextclock:
+      log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
     if self.implclock != config.nominalclock:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
 
