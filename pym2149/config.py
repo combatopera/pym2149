@@ -29,6 +29,17 @@ log = logging.getLogger(__name__)
 def getprocessconfig():
   return Config(sys.argv[1:])
 
+class ClockInfo:
+
+  def __init__(self, config):
+    if config.nominalclock % config.underclock:
+      raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
+    self.implclock = config.nominalclock // config.underclock
+    if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
+      log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
+    if self.implclock != config.nominalclock:
+      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
+
 class Config(View):
 
   def __init__(self, args):
@@ -47,18 +58,12 @@ class Config(View):
         loader.load(os.path.join(configspath, configs[i]))
 
   def createchip(self, log2maxpeaktopeak):
-    if self.nominalclock % self.underclock:
-      raise Exception("Clock %s not divisible by underclock %s." % (self.nominalclock, self.underclock))
-    clock = self.nominalclock // self.underclock
+    clockinfo = ClockInfo(self)
     if self.underclock < 1 or defaultscale % self.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     scale = defaultscale // self.underclock
     clampoutrate = self.outputrate if self.freqclamp else None
-    chip = YM2149(clock, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
-    if 'contextclock' in self.__dict__ and self.nominalclock != self.contextclock:
-      log.info("Context clock %s overridden to: %s", self.contextclock, self.nominalclock)
-    if clock != self.nominalclock:
-      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", clock)
+    chip = YM2149(clockinfo, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
     return chip
 
   def getamppair(self, loc):
