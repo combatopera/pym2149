@@ -23,6 +23,7 @@ class FX:
 
   def __init__(self, config):
     self.finebendisrate = config.finepitchbendisrate
+    self.bendratemultiplier = config.pitchbendratemultiplier
     self.bendpersemitone = config.pitchbendpersemitone
     self.bend = 0
     self.bendrate = 0
@@ -30,7 +31,7 @@ class FX:
   def setbend(self, bend):
     if self.finebendisrate:
       self.bend = bend & ~0x7f
-      self.bendrate = (bend & 0x7f) - 0x40
+      self.bendrate = ((bend & 0x7f) - 0x40) * self.bendratemultiplier
     else:
       self.bend = bend # We never change bendrate from 0.
 
