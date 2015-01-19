@@ -20,6 +20,7 @@
 from initlogging import logging
 from nod import Node, BufNode
 from const import clientname
+from ym2149 import YM2149
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ class JackClient:
   def newchipandstream(self):
     # For jack the available amplitude range is 2 ** 1:
     log2maxpeaktopeak = 1
-    chip = self.config.createchip(log2maxpeaktopeak)
+    chip = YM2149(self.config, log2maxpeaktopeak)
     stream = JackStream(self.config.createfloatstream(chip, log2maxpeaktopeak))
     return chip, stream
 

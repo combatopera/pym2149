@@ -17,7 +17,6 @@
 
 from __future__ import division
 import sys, logging, numpy as np, os, anchor
-from ym2149 import YM2149
 from out import WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
@@ -45,9 +44,6 @@ class Config(View):
       i = int(raw_input())
       if i:
         loader.load(os.path.join(configspath, configs[i]))
-
-  def createchip(self, log2maxpeaktopeak):
-    return YM2149(self, log2maxpeaktopeak)
 
   def getamppair(self, loc):
     l = ((1 - loc) / 2) ** (self.panlaw / 6)
