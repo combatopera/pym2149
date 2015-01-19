@@ -29,17 +29,6 @@ log = logging.getLogger(__name__)
 def getprocessconfig():
   return Config(sys.argv[1:])
 
-class ClockInfo:
-
-  def __init__(self, config):
-    if config.nominalclock % config.underclock:
-      raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
-    self.implclock = config.nominalclock // config.underclock
-    if 'contextclock' in config.__dict__ and config.nominalclock != config.contextclock:
-      log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
-    if self.implclock != config.nominalclock:
-      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
-
 class Config(View):
 
   def __init__(self, args):
@@ -58,7 +47,7 @@ class Config(View):
         loader.load(os.path.join(configspath, configs[i]))
 
   def createchip(self, log2maxpeaktopeak):
-    return YM2149(self, ClockInfo(self), log2maxpeaktopeak)
+    return YM2149(self, log2maxpeaktopeak)
 
   def getamppair(self, loc):
     l = ((1 - loc) / 2) ** (self.panlaw / 6)
