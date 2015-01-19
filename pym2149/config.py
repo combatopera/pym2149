@@ -17,7 +17,7 @@
 
 from __future__ import division
 import sys, logging, numpy as np, os, anchor
-from ym2149 import YM2149, defaultscale
+from ym2149 import YM2149
 from out import WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
@@ -58,13 +58,7 @@ class Config(View):
         loader.load(os.path.join(configspath, configs[i]))
 
   def createchip(self, log2maxpeaktopeak):
-    clockinfo = ClockInfo(self)
-    if self.underclock < 1 or defaultscale % self.underclock:
-      raise Exception("underclock must be a factor of %s." % defaultscale)
-    scale = defaultscale // self.underclock
-    clampoutrate = self.outputrate if self.freqclamp else None
-    chip = YM2149(clockinfo, log2maxpeaktopeak, scale = scale, oscpause = self.oscpause, clampoutrate = clampoutrate)
-    return chip
+    return YM2149(self, ClockInfo(self), log2maxpeaktopeak)
 
   def getamppair(self, loc):
     l = ((1 - loc) / 2) ** (self.panlaw / 6)

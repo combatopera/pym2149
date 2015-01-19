@@ -65,22 +65,25 @@ class Registers:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, clockinfo, log2maxpeaktopeak, scale = defaultscale, oscpause = False, clampoutrate = None):
+  def __init__(self, config, clockinfo, log2maxpeaktopeak):
+    if config.underclock < 1 or defaultscale % config.underclock:
+      raise Exception("underclock must be a factor of %s." % defaultscale)
+    self.scale = defaultscale // config.underclock
+    clampoutrate = config.outputrate if config.freqclamp else None
+    self.oscpause = config.oscpause
     self.clock = clockinfo.implclock
-    self.scale = scale
     Registers.__init__(self, clampoutrate)
     # Chip-wide signals:
-    noise = NoiseOsc(scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
-    env = EnvOsc(scale, self.envperiod, self.envshape)
+    noise = NoiseOsc(self.scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
+    env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
-    tones = [ToneOsc(scale, self.toneperiods[c]) for c in xrange(self.channels)]
+    tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(self.channels)]
     timersynths = [TimerSynth(self.clock, self.tsfreqs[c]) for c in xrange(self.channels)]
     # We don't add timersynths to maskables as it makes sense to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
     levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(self.channels)]
     Container.__init__(self, [Dac(level, log2maxpeaktopeak, self.channels) for level in levels])
-    self.oscpause = oscpause
 
   def callimpl(self):
     result = Container.callimpl(self)
