@@ -90,5 +90,6 @@ class WavBuf(Node):
 
 def newchipandstream(config, outpath):
     log2maxpeaktopeak = 16
-    chip = YM2149(config, ClockInfo(config), log2maxpeaktopeak)
-    return chip, WavWriter(WavBuf.multi(config.createfloatstream(chip, log2maxpeaktopeak)), outpath)
+    clockinfo = ClockInfo(config)
+    chip = YM2149(config, clockinfo, log2maxpeaktopeak)
+    return chip, WavWriter(WavBuf.multi(config.createfloatstream(clockinfo, chip, log2maxpeaktopeak)), outpath)
