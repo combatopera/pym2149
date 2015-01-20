@@ -63,21 +63,26 @@ class Registers:
     self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(self.channels))
     self.tsflags = tuple(Reg(0) for _ in xrange(self.channels))
 
+class ClockInfo:
+
+  def __init__(self, config):
+    if config.nominalclock % config.underclock:
+      raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
+    self.implclock = config.nominalclock // config.underclock
+    if 'contextclock' in config.__dict__ and config.nominalclock != config.contextclock:
+      log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
+    if self.implclock != config.nominalclock:
+      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
+
 class YM2149(Registers, Container):
 
-  def __init__(self, config, log2maxpeaktopeak):
+  def __init__(self, config, clockinfo, log2maxpeaktopeak):
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
     clampoutrate = config.outputrate if config.freqclamp else None
     self.oscpause = config.oscpause
-    if config.nominalclock % config.underclock:
-      raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
-    self.clock = config.nominalclock // config.underclock
-    if 'contextclock' in config.__dict__ and config.nominalclock != config.contextclock:
-      log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
-    if self.clock != config.nominalclock:
-      log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.clock)
+    self.clock = clockinfo.implclock
     Registers.__init__(self, clampoutrate)
     # Chip-wide signals:
     noise = NoiseOsc(self.scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
