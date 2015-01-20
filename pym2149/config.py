@@ -50,7 +50,7 @@ class Config(View):
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
 
-  def createfloatstream(self, chip, log2maxpeaktopeak):
+  def createfloatstream(self, clockinfo, chip, log2maxpeaktopeak):
     if self.stereo:
       n = chip.channels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
@@ -61,5 +61,5 @@ class Config(View):
       naives = [IdealMixer(chip, log2maxpeaktopeak)]
     if self.outputrate != self.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
-    minbleps = MinBleps.loadorcreate(chip.clock, self.outputrate, None)
+    minbleps = MinBleps.loadorcreate(clockinfo.implclock, self.outputrate, None)
     return [WavBuf(naive, minbleps) for naive in naives]

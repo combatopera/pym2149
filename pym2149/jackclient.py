@@ -39,8 +39,9 @@ class JackClient:
   def newchipandstream(self):
     # For jack the available amplitude range is 2 ** 1:
     log2maxpeaktopeak = 1
-    chip = YM2149(self.config, ClockInfo(self.config), log2maxpeaktopeak)
-    stream = JackStream(self.config.createfloatstream(chip, log2maxpeaktopeak))
+    clockinfo = ClockInfo(self.config)
+    chip = YM2149(self.config, clockinfo, log2maxpeaktopeak)
+    stream = JackStream(self.config.createfloatstream(clockinfo, chip, log2maxpeaktopeak))
     return chip, stream
 
   def __exit__(self, *args):
