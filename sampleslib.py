@@ -147,7 +147,7 @@ class Main:
     chip, stream = newchipandstream(config, outpath)
     try:
       timer = Timer(chip.clock)
-      chanupdaters = [voidupdater] * chip.channels
+      chanupdaters = [voidupdater] * config.chipchannels
       for frameindex, frame in enumerate(frames):
         for patternindex, action in enumerate(frame):
           chan = patternindex # TODO LATER: Utilise voids in channels.
