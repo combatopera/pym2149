@@ -57,7 +57,7 @@ class WavBuf(Node):
     wav.channels = channels
     return wav
 
-  def __init__(self, naive, minbleps):
+  def __init__(self, clockinfo, naive, minbleps):
     Node.__init__(self)
     self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
@@ -69,7 +69,7 @@ class WavBuf(Node):
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naive = naive
     self.outrate = minbleps.outrate
-    self.clock = minbleps.naiverate
+    self.naiverate = clockinfo.implclock
     self.minbleps = minbleps
 
   def callimpl(self):
@@ -84,7 +84,7 @@ class WavBuf(Node):
     outbuf.buf[self.overflowsize:] = self.dc
     self.minbleps.paste(self.naivex, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
-    self.naivex = (self.naivex + self.block.framecount) % self.clock
+    self.naivex = (self.naivex + self.block.framecount) % self.naiverate
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
