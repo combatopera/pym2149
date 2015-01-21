@@ -26,9 +26,9 @@ log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
-  def __init__(self, wav, path):
+  def __init__(self, wav, outrate, path):
     Node.__init__(self)
-    self.f = Wave16(path, wav.outrate, wav.channels)
+    self.f = Wave16(path, outrate, wav.channels)
     self.wavmaster = MasterBuf(dtype = self.f.dtype)
     self.wav = wav
 
@@ -53,7 +53,6 @@ class WavBuf(Node):
       wav, = wavs
     else:
       wav = Multiplexer(BufNode.floatdtype, wavs)
-      wav.outrate = wavs[0].outrate
     wav.channels = channels
     return wav
 
@@ -68,7 +67,6 @@ class WavBuf(Node):
     self.dc = 0 # Last naive value of previous block.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naive = naive
-    self.outrate = minbleps.outrate
     self.naiverate = clockinfo.implclock
     self.minbleps = minbleps
 
@@ -92,4 +90,4 @@ def newchipandstream(config, outpath):
     log2maxpeaktopeak = 16
     clockinfo = ClockInfo(config)
     chip = YM2149(config, clockinfo, log2maxpeaktopeak)
-    return chip, WavWriter(WavBuf.multi(config.createfloatstream(clockinfo, chip, log2maxpeaktopeak)), outpath)
+    return chip, WavWriter(WavBuf.multi(config.createfloatstream(clockinfo, chip, log2maxpeaktopeak)), config.outputrate, outpath)
