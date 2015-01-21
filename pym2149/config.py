@@ -52,7 +52,7 @@ class Config(View):
 
   def createfloatstream(self, clockinfo, chip, log2maxpeaktopeak):
     if self.stereo:
-      n = chip.channels
+      n = self.chipchannels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
       amppairs = [self.getamppair(loc) for loc in locs]
       chantoamps = zip(*amppairs)

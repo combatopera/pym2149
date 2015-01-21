@@ -25,9 +25,10 @@ class Roll:
   def __init__(self, config, chip):
     self.height = config.pianorollheight
     self.nomclock = config.nominalclock
+    self.channels = config.chipchannels
     self.line = 0
     self.jump = "\x1b[%sA" % self.height
-    self.format = ' | '.join(chip.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
+    self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
     self.shapeversion = None
     self.chip = chip
 
@@ -36,7 +37,7 @@ class Roll:
       sys.stderr.write(self.jump)
       self.line = 0
     vals = []
-    for c in xrange(self.chip.channels):
+    for c in xrange(self.channels):
       tone = self.chip.toneflags[c].value
       noise = self.chip.noiseflags[c].value
       env = self.chip.levelmodes[c].value

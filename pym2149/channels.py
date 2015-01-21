@@ -76,11 +76,11 @@ class Channel:
 class Channels:
 
   def __init__(self, config, chip):
-    self.channels = [Channel(config, i, chip) for i in xrange(chip.channels)]
+    self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
     self.midiprograms = config.midiprograms
     self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
-    self.mediation = Mediation(config.midichannelbase, chip.channels)
+    self.mediation = Mediation(config.midichannelbase, config.chipchannels)
     self.prevtext = None
 
   def noteon(self, frame, midichan, midinote, vel):

@@ -36,9 +36,7 @@ def toneperiodclamp(chip, outrate):
 
 class Registers:
 
-  channels = 3
-
-  def __init__(self, clampoutrate):
+  def __init__(self, channels, clampoutrate):
     # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
@@ -48,20 +46,20 @@ class Registers:
     TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
-    self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(self.channels))
+    self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(channels))
     self.noiseperiod = DerivedReg(NP, self.R[0x6])
     def flagxform(b):
       mask = 0x01 << b
       return lambda x: not (x & mask)
-    self.toneflags = tuple(DerivedReg(flagxform(c), self.R[0x7]) for c in xrange(self.channels))
-    self.noiseflags = tuple(DerivedReg(flagxform(self.channels + c), self.R[0x7]) for c in xrange(self.channels))
-    self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(self.channels))
-    self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(self.channels))
+    self.toneflags = tuple(DerivedReg(flagxform(c), self.R[0x7]) for c in xrange(channels))
+    self.noiseflags = tuple(DerivedReg(flagxform(channels + c), self.R[0x7]) for c in xrange(channels))
+    self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(channels))
+    self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
     # TODO: Let's support just one timer effect and get that right.
-    self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(self.channels))
-    self.tsflags = tuple(Reg(0) for _ in xrange(self.channels))
+    self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(channels))
+    self.tsflags = tuple(Reg(0) for _ in xrange(channels))
 
 class ClockInfo:
 
@@ -80,21 +78,22 @@ class YM2149(Registers, Container):
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
+    channels = config.chipchannels
     clampoutrate = config.outputrate if config.freqclamp else None
     self.oscpause = config.oscpause
     self.clock = clockinfo.implclock
-    Registers.__init__(self, clampoutrate)
+    Registers.__init__(self, channels, clampoutrate)
     # Chip-wide signals:
     noise = NoiseOsc(self.scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
-    tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(self.channels)]
-    timersynths = [TimerSynth(self.clock, self.tsfreqs[c]) for c in xrange(self.channels)]
+    tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
+    timersynths = [TimerSynth(self.clock, self.tsfreqs[c]) for c in xrange(channels)]
     # We don't add timersynths to maskables as it makes sense to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
-    binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(self.channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(self.channels)]
-    Container.__init__(self, [Dac(level, log2maxpeaktopeak, self.channels) for level in levels])
+    binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(channels)]
+    Container.__init__(self, [Dac(level, log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
     result = Container.callimpl(self)
