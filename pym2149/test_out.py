@@ -22,6 +22,7 @@ from nod import Node, Block
 from buf import Buf
 from out import WavWriter, WavBuf
 from minblep import MinBleps
+from collections import namedtuple
 
 class MinPeriodTone(Node):
 
@@ -43,7 +44,7 @@ class TestWavWriter(unittest.TestCase):
     clock = 250000
     blocksize = clock // (1000, 10)[bigblocks]
     tone = MinPeriodTone()
-    w = WavBuf(tone, MinBleps.create(clock, 44100, None))
+    w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, 44100, None))
     w.channels = 1
     w = WavWriter(w, '/dev/null')
     tone.cursor = 0

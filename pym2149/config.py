@@ -62,4 +62,4 @@ class Config(View):
     if self.outputrate != self.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, self.outputrate, None)
-    return [WavBuf(naive, minbleps) for naive in naives]
+    return [WavBuf(clockinfo, naive, minbleps) for naive in naives]
