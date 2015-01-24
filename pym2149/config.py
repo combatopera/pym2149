@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, numpy as np, os, anchor
+import sys, logging, numpy as np, os, anchor, util
 from out import WavBuf
 from mix import IdealMixer
 from minblep import MinBleps
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 def getprocessconfig():
   return Config(sys.argv[1:])
 
-class Config(View):
+class Config(View, util.Config):
 
   def __init__(self, args):
     loader = Loader()

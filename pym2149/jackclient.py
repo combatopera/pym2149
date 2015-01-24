@@ -21,6 +21,7 @@ from initlogging import logging
 from nod import Node, BufNode
 from const import clientname
 from ym2149 import ClockInfo, YM2149
+from util import AmpScale
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
@@ -46,8 +47,9 @@ class JackClient:
   def __exit__(self, *args):
     jack.detach()
 
-class JackStream(Node):
+class JackStream(object, Node):
 
+  __metaclass__ = AmpScale
   # For jack the available amplitude range is 2 ** 1:
   log2maxpeaktopeak = 1
   # XXX: Can we detect how many system channels there are?

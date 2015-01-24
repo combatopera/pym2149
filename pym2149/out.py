@@ -21,11 +21,13 @@ from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
+from util import AmpScale
 
 log = logging.getLogger(__name__)
 
-class WavWriter(Node):
+class WavWriter(object, Node):
 
+  __metaclass__ = AmpScale
   log2maxpeaktopeak = 16
 
   def __init__(self, wav, outrate, channels, path):
