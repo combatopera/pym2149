@@ -74,7 +74,7 @@ class ClockInfo:
 
 class YM2149(Registers, Container):
 
-  def __init__(self, config, clockinfo, log2maxpeaktopeak):
+  def __init__(self, config, clockinfo, ampscale):
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
@@ -93,7 +93,7 @@ class YM2149(Registers, Container):
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
     levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], timersynths[c], self.tsflags[c]) for c in xrange(channels)]
-    Container.__init__(self, [Dac(level, log2maxpeaktopeak, channels) for level in levels])
+    Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
     result = Container.callimpl(self)

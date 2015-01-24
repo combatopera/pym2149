@@ -26,6 +26,8 @@ log = logging.getLogger(__name__)
 
 class WavWriter(Node):
 
+  log2maxpeaktopeak = 16
+
   def __init__(self, wav, outrate, channels, path):
     Node.__init__(self)
     self.f = Wave16(path, outrate, channels)
@@ -85,8 +87,8 @@ class WavBuf(Node):
     return Buf(outbuf.buf[:outcount])
 
 def newchipandstream(config, outpath):
-    log2maxpeaktopeak = 16
+    streamclass = WavWriter
     clockinfo = ClockInfo(config)
-    chip = YM2149(config, clockinfo, log2maxpeaktopeak)
-    wavs = config.createfloatstream(clockinfo, chip, log2maxpeaktopeak)
-    return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
+    chip = YM2149(config, clockinfo, streamclass)
+    wavs = config.createfloatstream(clockinfo, chip, streamclass)
+    return chip, streamclass(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
