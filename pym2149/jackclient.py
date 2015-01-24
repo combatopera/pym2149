@@ -23,6 +23,7 @@ from const import clientname
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
+from out import createfloatstream
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class JackClient:
     di.add(YM2149)
     chip, = di(YM2149)
     clockinfo, = di(ClockInfo)
-    stream = JackStream(self.config.createfloatstream(clockinfo, chip, JackStream))
+    stream = JackStream(createfloatstream(self.config, clockinfo, chip, JackStream))
     return chip, stream
 
   def __exit__(self, *args):

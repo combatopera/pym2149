@@ -23,6 +23,8 @@ from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
+from mix import IdealMixer
+from minblep import MinBleps
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +91,20 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
+def createfloatstream(config, clockinfo, chip, ampscale):
+    if config.stereo:
+      n = config.chipchannels
+      locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
+      amppairs = [config.getamppair(loc) for loc in locs]
+      chantoamps = zip(*amppairs)
+      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in chantoamps]
+    else:
+      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak)]
+    if config.outputrate != config.__getattr__('outputrate'):
+      log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
+    minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
+    return [WavBuf(clockinfo, naive, minbleps) for naive in naives]
+
 def newchipandstream(config, outpath):
     di = DI()
     di.add(config)
@@ -97,5 +113,5 @@ def newchipandstream(config, outpath):
     di.add(YM2149)
     chip, = di(YM2149)
     clockinfo, = di(ClockInfo)
-    wavs = config.createfloatstream(clockinfo, chip, WavWriter)
+    wavs = createfloatstream(config, clockinfo, chip, WavWriter)
     return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
