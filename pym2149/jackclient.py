@@ -44,8 +44,8 @@ class JackClient:
     di.add(JackStream)
     di.add(ClockInfo)
     di.add(YM2149)
-    chip, = di.getorcreate(YM2149)
-    clockinfo, = di.getorcreate(ClockInfo)
+    chip, = di(YM2149)
+    clockinfo, = di(ClockInfo)
     stream = JackStream(self.config.createfloatstream(clockinfo, chip, JackStream))
     return chip, stream
 
