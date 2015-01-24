@@ -83,5 +83,20 @@ class DI:
     def addinstance(self, instance):
         self.addadapter(Instance(instance))
 
+    def add(self, obj):
+        if hasattr(obj, '__class__'):
+            clazz = obj.__class__
+            if clazz == type: # It's a non-fancy class.
+                addmethods = self.addclass,
+            elif isinstance(obj, type): # It's a fancy class.
+                addmethods = self.addclass, self.addinstance
+            else: # It's an instance.
+                addmethods = self.addinstance,
+        else: # It's an old-style class.
+            addmethods = self.addclass,
+        for m in addmethods:
+            m(obj)
+        return addmethods
+
     def getorcreate(self, type):
         return [adapter() for adapter in self.typetoadapters.get(type, [])]
