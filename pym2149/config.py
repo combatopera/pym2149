@@ -16,10 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, numpy as np, os, anchor, util
-from out import WavBuf
-from mix import IdealMixer
-from minblep import MinBleps
+import sys, logging, os, anchor, util
 from lazyconf import Loader, View
 from const import appconfigdir
 
@@ -49,17 +46,3 @@ class Config(View, util.Config):
     l = ((1 - loc) / 2) ** (self.panlaw / 6)
     r = ((1 + loc) / 2) ** (self.panlaw / 6)
     return l, r
-
-  def createfloatstream(self, clockinfo, chip, ampscale):
-    if self.stereo:
-      n = self.chipchannels
-      locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * self.maxpan
-      amppairs = [self.getamppair(loc) for loc in locs]
-      chantoamps = zip(*amppairs)
-      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in chantoamps]
-    else:
-      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak)]
-    if self.outputrate != self.__getattr__('outputrate'):
-      log.warn("Configured outputrate %s overriden to %s: %s", self.__getattr__('outputrate'), self.outputrateoverridelabel, self.outputrate)
-    minbleps = MinBleps.loadorcreate(clockinfo.implclock, self.outputrate, None)
-    return [WavBuf(clockinfo, naive, minbleps) for naive in naives]
