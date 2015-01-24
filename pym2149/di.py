@@ -65,7 +65,7 @@ class Class(Adapter):
             except AttributeError:
                 raise Exception("Missing types annotation: %s" % self.clazz)
             for t in types:
-                obj, = self.di.getorcreate(t)
+                obj, = self.di(t)
                 objs.append(obj)
             self.instance = self.clazz(*objs)
         return self.instance
@@ -103,5 +103,5 @@ class DI:
             m(obj)
         return addmethods
 
-    def getorcreate(self, type):
+    def __call__(self, type):
         return [adapter() for adapter in self.typetoadapters.get(type, [])]
