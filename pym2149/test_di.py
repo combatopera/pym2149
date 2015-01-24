@@ -51,5 +51,20 @@ class TestDI(unittest.TestCase):
         self.assertEqual('hmm', hmm.dep)
         self.assertEqual([hmm], di.getorcreate(Hmm)) # Should be same object.
 
+    def test_metaclass(self):
+        di = DI()
+        class HasVal(type): pass
+        class Impl:
+            __metaclass__ = HasVal
+            val = 'implval'
+        class Hmm:
+            @types(HasVal)
+            def __init__(self, hasval):
+                self.val = hasval.val
+        di.addinstance(Impl)
+        di.addclass(Hmm)
+        hmm, = di.getorcreate(Hmm)
+        self.assertEqual('implval', hmm.val)
+
 if __name__ == '__main__':
     unittest.main()
