@@ -28,12 +28,12 @@ class TestDI(unittest.TestCase):
         self.assertEqual([], di.getorcreate(unicode))
         self.assertEqual([], di.getorcreate(basestring))
         self.assertEqual([], di.getorcreate(list))
-        di.addinstance('hmm')
+        self.assertEqual((di.addinstance,), di.add('hmm'))
         self.assertEqual(['hmm'], di.getorcreate(str))
         self.assertEqual([], di.getorcreate(unicode))
         self.assertEqual(['hmm'], di.getorcreate(basestring))
         self.assertEqual([], di.getorcreate(list))
-        di.addinstance(u'hmmm')
+        self.assertEqual((di.addinstance,), di.add(u'hmmm'))
         self.assertEqual(['hmm'], di.getorcreate(str))
         self.assertEqual(['hmmm'], di.getorcreate(unicode))
         self.assertEqual(['hmm', 'hmmm'], di.getorcreate(basestring))
@@ -45,8 +45,8 @@ class TestDI(unittest.TestCase):
             @types(str)
             def __init__(self, dep):
                 self.dep = dep
-        di.addclass(Hmm)
-        di.addinstance('hmm')
+        self.assertEqual((di.addclass,), di.add(Hmm))
+        self.assertEqual((di.addinstance,), di.add('hmm'))
         hmm, = di.getorcreate(Hmm)
         self.assertEqual('hmm', hmm.dep)
         self.assertEqual([hmm], di.getorcreate(Hmm)) # Should be same object.
@@ -61,8 +61,8 @@ class TestDI(unittest.TestCase):
             @types(HasVal)
             def __init__(self, hasval):
                 self.val = hasval.val
-        di.addinstance(Impl)
-        di.addclass(Hmm)
+        self.assertEqual((di.addclass, di.addinstance), di.add(Impl))
+        self.assertEqual((di.addclass,), di.add(Hmm))
         hmm, = di.getorcreate(Hmm)
         self.assertEqual('implval', hmm.val)
 
