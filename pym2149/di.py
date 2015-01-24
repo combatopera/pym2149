@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
+log = logging.getLogger(__name__)
+
 def types(*types):
     def g(f):
         f.di_types = types
@@ -53,6 +57,7 @@ class Class(Adapter):
 
     def __call__(self):
         if self.instance is None:
+            log.debug("Instantiating: %s", self.clazz)
             objs = []
             for t in getattr(self.clazz, '__init__').di_types:
                 obj, = self.di.getorcreate(t)
