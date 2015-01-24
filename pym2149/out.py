@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np, logging
+import numpy as np, logging, di
 from buf import MasterBuf, Buf
 from nod import Node, BufNode
 from wav import Wave16
@@ -25,6 +25,7 @@ from util import AmpScale
 from di import DI
 from mix import IdealMixer
 from minblep import MinBleps
+from config import Config
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +94,7 @@ class WavBuf(Node):
 
 class FloatStream(list):
 
+  @di.types(Config, ClockInfo, YM2149, AmpScale)
   def __init__(self, config, clockinfo, chip, ampscale):
     if config.stereo:
       n = config.chipchannels
@@ -114,7 +116,7 @@ def newchipandstream(config, outpath):
     di.add(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)
+    di.add(FloatStream)
     chip, = di(YM2149)
-    clockinfo, = di(ClockInfo)
-    wavs = FloatStream(config, clockinfo, chip, WavWriter)
+    wavs, = di(FloatStream)
     return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
