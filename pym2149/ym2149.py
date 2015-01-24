@@ -64,6 +64,7 @@ class Registers:
 
 class ClockInfo:
 
+  @di.types(Config)
   def __init__(self, config):
     if config.nominalclock % config.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
