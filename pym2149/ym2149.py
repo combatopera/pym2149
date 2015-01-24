@@ -22,7 +22,8 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-import logging
+from util import AmpScale, Config
+import logging, di
 
 log = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ class ClockInfo:
 
 class YM2149(Registers, Container):
 
+  @di.types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
