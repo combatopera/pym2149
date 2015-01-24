@@ -91,7 +91,9 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-def createfloatstream(config, clockinfo, chip, ampscale):
+class FloatStream(list):
+
+  def __init__(self, config, clockinfo, chip, ampscale):
     if config.stereo:
       n = config.chipchannels
       locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
@@ -103,7 +105,8 @@ def createfloatstream(config, clockinfo, chip, ampscale):
     if config.outputrate != config.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
-    return [WavBuf(clockinfo, naive, minbleps) for naive in naives]
+    for naive in naives:
+      self.append(WavBuf(clockinfo, naive, minbleps))
 
 def newchipandstream(config, outpath):
     di = DI()
@@ -113,5 +116,5 @@ def newchipandstream(config, outpath):
     di.add(YM2149)
     chip, = di(YM2149)
     clockinfo, = di(ClockInfo)
-    wavs = createfloatstream(config, clockinfo, chip, WavWriter)
+    wavs = FloatStream(config, clockinfo, chip, WavWriter)
     return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
