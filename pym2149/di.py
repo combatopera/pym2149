@@ -59,7 +59,12 @@ class Class(Adapter):
         if self.instance is None:
             log.debug("Instantiating: %s", self.clazz)
             objs = []
-            for t in getattr(self.clazz, '__init__').di_types:
+            ctor = getattr(self.clazz, '__init__')
+            try:
+                types = ctor.di_types
+            except AttributeError:
+                raise Exception("Missing types annotation: %s" % self.clazz)
+            for t in types:
                 obj, = self.di.getorcreate(t)
                 objs.append(obj)
             self.instance = self.clazz(*objs)
