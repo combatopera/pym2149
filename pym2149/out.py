@@ -22,6 +22,7 @@ from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
+from di import DI
 
 log = logging.getLogger(__name__)
 
@@ -89,8 +90,12 @@ class WavBuf(Node):
     return Buf(outbuf.buf[:outcount])
 
 def newchipandstream(config, outpath):
-    streamclass = WavWriter
-    clockinfo = ClockInfo(config)
-    chip = YM2149(config, clockinfo, streamclass)
-    wavs = config.createfloatstream(clockinfo, chip, streamclass)
-    return chip, streamclass(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
+    di = DI()
+    di.add(config)
+    di.add(WavWriter)
+    di.add(ClockInfo)
+    di.add(YM2149)
+    chip, = di.getorcreate(YM2149)
+    clockinfo, = di.getorcreate(ClockInfo)
+    wavs = config.createfloatstream(clockinfo, chip, WavWriter)
+    return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
