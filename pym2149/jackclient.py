@@ -22,6 +22,7 @@ from nod import Node, BufNode
 from const import clientname
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
+from di import DI
 import jack, numpy as np
 
 log = logging.getLogger(__name__)
@@ -38,10 +39,14 @@ class JackClient:
     return self
 
   def newchipandstream(self):
-    streamclass = JackStream
-    clockinfo = ClockInfo(self.config)
-    chip = YM2149(self.config, clockinfo, streamclass)
-    stream = streamclass(self.config.createfloatstream(clockinfo, chip, streamclass))
+    di = DI()
+    di.add(self.config)
+    di.add(JackStream)
+    di.add(ClockInfo)
+    di.add(YM2149)
+    chip, = di.getorcreate(YM2149)
+    clockinfo, = di.getorcreate(ClockInfo)
+    stream = JackStream(self.config.createfloatstream(clockinfo, chip, JackStream))
     return chip, stream
 
   def __exit__(self, *args):
