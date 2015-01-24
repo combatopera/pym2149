@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+# Copyright 2014 Andrzej Cichocki
+
+# This file is part of pym2149.
+#
+# pym2149 is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pym2149 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
+
+def types(*types):
+    def g(f):
+        f.di_types = types
+        return f
+    return g
+
+class Adapter:
+
+    def __init__(self, type):
+        self.types = set()
+        def addtype(type):
+            self.types.add(type)
+            for base in type.__bases__:
+                if base not in self.types:
+                    addtype(base)
+        addtype(type)
+
+class Instance(Adapter):
+
+    def __init__(self, instance):
+        Adapter.__init__(self, instance.__class__)
+        self.instance = instance
+
+    def __call__(self):
+        return self.instance
+
+class Class(Adapter):
+
+    def __init__(self, clazz, di):
+        Adapter.__init__(self, clazz)
+        self.instance = None
+        self.clazz = clazz
+        self.di = di
+
+    def __call__(self):
+        if self.instance is None:
+            objs = []
+            for t in getattr(self.clazz, '__init__').di_types:
+                obj, = self.di.getorcreate(t)
+                objs.append(obj)
+            self.instance = self.clazz(*objs)
+        return self.instance
+
+class DI:
+
+    def __init__(self):
+        self.typetoadapters = {}
+
+    def addadapter(self, adapter):
+        for type in adapter.types:
+            try:
+                self.typetoadapters[type].append(adapter)
+            except KeyError:
+                self.typetoadapters[type] = [adapter]
+
+    def addclass(self, clazz):
+        self.addadapter(Class(clazz, self))
+
+    def addinstance(self, instance):
+        self.addadapter(Instance(instance))
+
+    def getorcreate(self, type):
+        return [adapter() for adapter in self.typetoadapters.get(type, [])]
