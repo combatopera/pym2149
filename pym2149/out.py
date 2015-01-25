@@ -117,6 +117,6 @@ def newchipandstream(config, outpath):
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(FloatStream)
-    chip, = di(YM2149)
-    wavs, = di(FloatStream)
+    chip = di(YM2149)
+    wavs = di(FloatStream)
     return chip, WavWriter(WavBuf.multi(wavs), config.outputrate, len(wavs), outpath)
