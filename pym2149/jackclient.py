@@ -24,7 +24,7 @@ from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
 from out import FloatStream
-import jack, numpy as np
+import jack, numpy as np, di
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class JackClient:
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(FloatStream)
-    return di(YM2149), JackStream(di(FloatStream))
+    return di(YM2149), di(JackStream)
 
   def __exit__(self, *args):
     jack.detach()
@@ -59,6 +59,7 @@ class JackStream(object, Node):
   # XXX: Can we detect how many system channels there are?
   systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
+  @di.types(FloatStream)
   def __init__(self, wavs):
     Node.__init__(self)
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
