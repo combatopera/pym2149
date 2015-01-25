@@ -46,9 +46,7 @@ class JackClient:
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(FloatStream)
-    chip, = di(YM2149)
-    wavs, = di(FloatStream)
-    return chip, JackStream(wavs)
+    return di(YM2149), JackStream(di(FloatStream))
 
   def __exit__(self, *args):
     jack.detach()

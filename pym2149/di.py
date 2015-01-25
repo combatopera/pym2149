@@ -58,16 +58,12 @@ class Class(Adapter):
     def __call__(self):
         if self.instance is None:
             log.debug("Instantiating: %s", self.clazz)
-            objs = []
             ctor = getattr(self.clazz, '__init__')
             try:
                 types = ctor.di_types
             except AttributeError:
                 raise Exception("Missing types annotation: %s" % self.clazz)
-            for t in types:
-                obj, = self.di(t)
-                objs.append(obj)
-            self.instance = self.clazz(*objs)
+            self.instance = self.clazz(*(self.di(t) for t in types))
         return self.instance
 
 class DI:
@@ -103,5 +99,9 @@ class DI:
             m(obj)
         return addmethods
 
-    def __call__(self, type):
+    def all(self, type):
         return [adapter() for adapter in self.typetoadapters.get(type, [])]
+
+    def __call__(self, type):
+        obj, = self.all(type)
+        return obj

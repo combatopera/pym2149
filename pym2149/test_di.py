@@ -24,20 +24,20 @@ class TestDI(unittest.TestCase):
 
     def test_instances(self):
         di = DI()
-        self.assertEqual([], di(str))
-        self.assertEqual([], di(unicode))
-        self.assertEqual([], di(basestring))
-        self.assertEqual([], di(list))
+        self.assertEqual([], di.all(str))
+        self.assertEqual([], di.all(unicode))
+        self.assertEqual([], di.all(basestring))
+        self.assertEqual([], di.all(list))
         self.assertEqual((di.addinstance,), di.add('hmm'))
-        self.assertEqual(['hmm'], di(str))
-        self.assertEqual([], di(unicode))
-        self.assertEqual(['hmm'], di(basestring))
-        self.assertEqual([], di(list))
+        self.assertEqual(['hmm'], di.all(str))
+        self.assertEqual([], di.all(unicode))
+        self.assertEqual(['hmm'], di.all(basestring))
+        self.assertEqual([], di.all(list))
         self.assertEqual((di.addinstance,), di.add(u'hmmm'))
-        self.assertEqual(['hmm'], di(str))
-        self.assertEqual(['hmmm'], di(unicode))
-        self.assertEqual(['hmm', 'hmmm'], di(basestring))
-        self.assertEqual([], di(list))
+        self.assertEqual(['hmm'], di.all(str))
+        self.assertEqual(['hmmm'], di.all(unicode))
+        self.assertEqual(['hmm', 'hmmm'], di.all(basestring))
+        self.assertEqual([], di.all(list))
 
     def test_simpleinjection(self):
         di = DI()
@@ -47,9 +47,9 @@ class TestDI(unittest.TestCase):
                 self.dep = dep
         self.assertEqual((di.addclass,), di.add(Hmm))
         self.assertEqual((di.addinstance,), di.add('hmm'))
-        hmm, = di(Hmm)
+        hmm = di(Hmm)
         self.assertEqual('hmm', hmm.dep)
-        self.assertEqual([hmm], di(Hmm)) # Should be same object.
+        self.assertIs(hmm, di(Hmm))
 
     def test_metaclass(self):
         di = DI()
@@ -63,7 +63,7 @@ class TestDI(unittest.TestCase):
                 self.val = hasval.val
         self.assertEqual((di.addclass, di.addinstance), di.add(Impl))
         self.assertEqual((di.addclass,), di.add(Hmm))
-        hmm, = di(Hmm)
+        hmm = di(Hmm)
         self.assertEqual('implval', hmm.val)
 
 if __name__ == '__main__':
