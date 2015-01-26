@@ -27,7 +27,7 @@ def types(*types):
         return f
     return g
 
-class Adapter:
+class Source:
 
     def __init__(self, type):
         self.types = set()
@@ -38,19 +38,19 @@ class Adapter:
                     addtype(base)
         addtype(type)
 
-class Instance(Adapter):
+class Instance(Source):
 
     def __init__(self, instance):
-        Adapter.__init__(self, instance.__class__)
+        Source.__init__(self, instance.__class__)
         self.instance = instance
 
     def __call__(self):
         return self.instance
 
-class Class(Adapter):
+class Class(Source):
 
     def __init__(self, clazz, di):
-        Adapter.__init__(self, clazz)
+        Source.__init__(self, clazz)
         self.instance = None
         self.clazz = clazz
         self.di = di
@@ -69,20 +69,20 @@ class Class(Adapter):
 class DI:
 
     def __init__(self):
-        self.typetoadapters = {}
+        self.typetosources = {}
 
-    def addadapter(self, adapter):
-        for type in adapter.types:
+    def addsource(self, source):
+        for type in source.types:
             try:
-                self.typetoadapters[type].append(adapter)
+                self.typetosources[type].append(source)
             except KeyError:
-                self.typetoadapters[type] = [adapter]
+                self.typetosources[type] = [source]
 
     def addclass(self, clazz):
-        self.addadapter(Class(clazz, self))
+        self.addsource(Class(clazz, self))
 
     def addinstance(self, instance):
-        self.addadapter(Instance(instance))
+        self.addsource(Instance(instance))
 
     def add(self, obj):
         if hasattr(obj, '__class__'):
@@ -100,7 +100,7 @@ class DI:
         return addmethods
 
     def all(self, type):
-        return [adapter() for adapter in self.typetoadapters.get(type, [])]
+        return [source() for source in self.typetosources.get(type, [])]
 
     def __call__(self, type):
         obj, = self.all(type)
