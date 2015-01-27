@@ -76,7 +76,7 @@ class TestDI(unittest.TestCase):
             return N(n) if n < 0 else P(n)
         self.assertEqual((di.addfactory,), di.add(factory))
         di.add(5)
-        i = di(I)
+        i = di(I) # No spin as DI thinks factory is I only.
         self.assertIs(P, i.__class__)
         self.assertEqual(5, i)
 
