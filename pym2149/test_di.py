@@ -66,5 +66,19 @@ class TestDI(unittest.TestCase):
         hmm = di(Hmm)
         self.assertEqual('implval', hmm.val)
 
+    def test_factory(self):
+        di = DI()
+        class I: pass
+        class N(int, I): pass
+        class P(int, I): pass
+        @types(int, this = I)
+        def factory(n):
+            return N(n) if n < 0 else P(n)
+        self.assertEqual((di.addfactory,), di.add(factory))
+        di.add(5)
+        i = di(I)
+        self.assertIs(P, i.__class__)
+        self.assertEqual(5, i)
+
 if __name__ == '__main__':
     unittest.main()

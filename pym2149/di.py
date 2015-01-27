@@ -21,9 +21,11 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def types(*types):
+def types(*deptypes, **kwargs):
     def g(f):
-        f.di_types = types
+        f.di_deptypes = deptypes
+        if 'this' in kwargs:
+            f.di_owntype = kwargs['this']
         return f
     return g
 
@@ -60,10 +62,24 @@ class Class(Source):
             log.debug("Instantiating: %s", self.clazz)
             ctor = getattr(self.clazz, '__init__')
             try:
-                types = ctor.di_types
+                types = ctor.di_deptypes
             except AttributeError:
                 raise Exception("Missing types annotation: %s" % self.clazz)
             self.instance = self.clazz(*(self.di(t) for t in types))
+        return self.instance
+
+class Factory(Source):
+
+    def __init__(self, factory, di):
+        Source.__init__(self, factory.di_owntype)
+        self.instance = None
+        self.factory = factory
+        self.di = di
+
+    def __call__(self):
+        if self.instance is None:
+            log.debug("Fabricating: %s", self.factory.di_owntype)
+            self.instance = self.factory(*(self.di(t) for t in self.factory.di_deptypes))
         return self.instance
 
 class DI:
@@ -84,8 +100,13 @@ class DI:
     def addinstance(self, instance):
         self.addsource(Instance(instance))
 
+    def addfactory(self, factory):
+        self.addsource(Factory(factory, self))
+
     def add(self, obj):
-        if hasattr(obj, '__class__'):
+        if hasattr(obj, 'di_owntype'):
+            addmethods = self.addfactory,
+        elif hasattr(obj, '__class__'):
             clazz = obj.__class__
             if clazz == type: # It's a non-fancy class.
                 addmethods = self.addclass,
