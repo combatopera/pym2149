@@ -93,6 +93,11 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
+class OutChannel:
+
+    def __init__(self, chipamps):
+        self.chipamps = chipamps
+
 class StereoInfo:
 
     @di.types(Config)
@@ -105,15 +110,16 @@ class StereoInfo:
                 r = ((1 + loc) / 2) ** (config.panlaw / 6)
                 return l, r
             amppairs = [getamppair(loc) for loc in locs]
-            self.outchan2chipamps = zip(*amppairs)
+            outchan2chipamps = zip(*amppairs)
         else:
-            self.outchan2chipamps = [[1] * n]
+            outchan2chipamps = [[1] * n]
+        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
 
 class FloatStream(list):
 
   @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, chipamps) for chipamps in stereoinfo.outchan2chipamps]
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
     if config.outputrate != config.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
