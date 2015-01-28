@@ -97,23 +97,23 @@ class StereoInfo:
 
     @di.types(Config)
     def __init__(self, config):
+        n = config.chipchannels
         if config.stereo:
-            n = config.chipchannels
             locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
             def getamppair(loc):
                 l = ((1 - loc) / 2) ** (config.panlaw / 6)
                 r = ((1 + loc) / 2) ** (config.panlaw / 6)
                 return l, r
             amppairs = [getamppair(loc) for loc in locs]
-            self.outchan2noneoramps = zip(*amppairs)
+            self.outchan2chipamps = zip(*amppairs)
         else:
-            self.outchan2noneoramps = [None]
+            self.outchan2chipamps = [[1] * n]
 
 class FloatStream(list):
 
   @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, noneoramps) for noneoramps in stereoinfo.outchan2noneoramps]
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, chipamps) for chipamps in stereoinfo.outchan2chipamps]
     if config.outputrate != config.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
