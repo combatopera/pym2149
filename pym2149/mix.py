@@ -64,13 +64,13 @@ class Multiplexer(Node):
 
 class IdealMixer(BufNode):
 
-  def __init__(self, container, log2maxpeaktopeak, amps = None):
+  def __init__(self, container, log2maxpeaktopeak, ampsornone = None):
     BufNode.__init__(self, self.floatdtype)
     self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
-    if amps is not None:
+    if ampsornone is not None:
       self.contrib = MasterBuf(self.dtype)
     self.container = container
-    self.ampsornone = amps
+    self.ampsornone = ampsornone
 
   def callimpl(self):
     self.blockbuf.fill(self.datum)

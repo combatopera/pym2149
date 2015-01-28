@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np, logging, di
 from buf import MasterBuf, Buf
 from nod import Node, BufNode
@@ -104,18 +105,15 @@ class StereoInfo:
                 r = ((1 + loc) / 2) ** (config.panlaw / 6)
                 return l, r
             amppairs = [getamppair(loc) for loc in locs]
-            self.chantoamps = zip(*amppairs)
+            self.outchan2noneoramps = zip(*amppairs)
         else:
-            self.chantoamps = None
+            self.outchan2noneoramps = [None]
 
 class FloatStream(list):
 
   @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
-    if stereoinfo.chantoamps is not None:
-      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in stereoinfo.chantoamps]
-    else:
-      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak)]
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, noneoramps) for noneoramps in stereoinfo.outchan2noneoramps]
     if config.outputrate != config.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
