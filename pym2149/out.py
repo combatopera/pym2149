@@ -92,16 +92,28 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
+class StereoInfo:
+
+    def __init__(self, config):
+        if config.stereo:
+            n = config.chipchannels
+            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
+            def getamppair(loc):
+                l = ((1 - loc) / 2) ** (config.panlaw / 6)
+                r = ((1 + loc) / 2) ** (config.panlaw / 6)
+                return l, r
+            amppairs = [getamppair(loc) for loc in locs]
+            self.chantoamps = zip(*amppairs)
+        else:
+            self.chantoamps = None
+
 class FloatStream(list):
 
   @di.types(Config, ClockInfo, YM2149, AmpScale)
   def __init__(self, config, clockinfo, chip, ampscale):
-    if config.stereo:
-      n = config.chipchannels
-      locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
-      amppairs = [config.getamppair(loc) for loc in locs]
-      chantoamps = zip(*amppairs)
-      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in chantoamps]
+    stereoinfo = StereoInfo(config)
+    if stereoinfo.chantoamps is not None:
+      naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in stereoinfo.chantoamps]
     else:
       naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak)]
     if config.outputrate != config.__getattr__('outputrate'):

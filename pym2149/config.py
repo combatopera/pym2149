@@ -41,8 +41,3 @@ class Config(View, util.Config):
       i = int(raw_input())
       if i:
         loader.load(os.path.join(configspath, configs[i]))
-
-  def getamppair(self, loc):
-    l = ((1 - loc) / 2) ** (self.panlaw / 6)
-    r = ((1 + loc) / 2) ** (self.panlaw / 6)
-    return l, r
