@@ -60,7 +60,7 @@ class Creator(Source):
 
     def __call__(self):
         if self.instance is None:
-            log.debug("%s: %s", self.action, self.owntype)
+            log.debug("%s: %s.%s", self.action, self.owntype.__module__, self.owntype.__name__)
             self.instance = self.callable(*(self.di(t) for t in self.getdeptypes(self.callable)))
         return self.instance
 
