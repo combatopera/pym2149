@@ -35,9 +35,9 @@ class WavWriter(object, Node):
   __metaclass__ = AmpScale
   log2maxpeaktopeak = 16
 
-  def __init__(self, config, wav, channels, path):
+  def __init__(self, config, wav, stereoinfo, path):
     Node.__init__(self)
-    self.f = Wave16(path, config.outputrate, channels)
+    self.f = Wave16(path, config.outputrate, len(stereoinfo.outchans))
     self.wavmaster = MasterBuf(dtype = self.f.dtype)
     self.wav = wav
 
@@ -136,4 +136,4 @@ def newchipandstream(config, outpath):
     di.add(FloatStream)
     chip = di(YM2149)
     wavs = di(FloatStream)
-    return chip, WavWriter(config, WavBuf.multi(wavs), len(wavs), outpath)
+    return chip, WavWriter(config, WavBuf.multi(wavs), di(StereoInfo), outpath)
