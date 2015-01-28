@@ -47,7 +47,9 @@ class BinMix(BufNode):
       # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
       self.blockbuf.fill(1)
 
-class Multiplexer(Node):
+class WavWritable: pass
+
+class Multiplexer(Node, WavWritable):
 
   def __init__(self, dtype, streams):
     Node.__init__(self)
