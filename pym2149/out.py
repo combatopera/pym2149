@@ -94,6 +94,7 @@ class WavBuf(Node):
 
 class StereoInfo:
 
+    @di.types(Config)
     def __init__(self, config):
         if config.stereo:
             n = config.chipchannels
@@ -109,9 +110,8 @@ class StereoInfo:
 
 class FloatStream(list):
 
-  @di.types(Config, ClockInfo, YM2149, AmpScale)
-  def __init__(self, config, clockinfo, chip, ampscale):
-    stereoinfo = StereoInfo(config)
+  @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
     if stereoinfo.chantoamps is not None:
       naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, amps) for amps in stereoinfo.chantoamps]
     else:
@@ -128,6 +128,7 @@ def newchipandstream(config, outpath):
     di.add(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)
+    di.add(StereoInfo)
     di.add(FloatStream)
     chip = di(YM2149)
     wavs = di(FloatStream)

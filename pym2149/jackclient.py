@@ -23,7 +23,7 @@ from const import clientname
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
-from out import FloatStream
+from out import FloatStream, StereoInfo
 import jack, numpy as np, di
 
 log = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class JackClient:
     di.add(JackStream)
     di.add(ClockInfo)
     di.add(YM2149)
+    di.add(StereoInfo)
     di.add(FloatStream)
     return di(YM2149), di(JackStream)
 
