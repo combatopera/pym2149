@@ -17,6 +17,9 @@
 
 from nod import BufNode, Node
 from buf import MasterBuf, RingCursor
+import logging
+
+log = logging.getLogger(__name__)
 
 class BinMix(BufNode):
 
@@ -64,19 +67,28 @@ class Multiplexer(Node):
 
 class IdealMixer(BufNode):
 
-  def __init__(self, container, log2maxpeaktopeak, ampsornone = None):
+  def __init__(self, container, log2maxpeaktopeak, chipamps):
     BufNode.__init__(self, self.floatdtype)
     self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
-    if ampsornone is not None:
+    if len(container) != len(chipamps):
+      raise Exception("Expected %s chipamps but got: %s" % (len(container), len(chipamps)))
+    for amp in chipamps:
+      if 1 != amp:
+        self.nontrivial = True
+        break
+    else:
+      self.nontrivial = False
+    log.debug("Mix is trivial: %s", not self.nontrivial)
+    if self.nontrivial:
       self.contrib = MasterBuf(self.dtype)
     self.container = container
-    self.ampsornone = ampsornone
+    self.chipamps = chipamps
 
   def callimpl(self):
     self.blockbuf.fill(self.datum)
-    if self.ampsornone is not None:
+    if self.nontrivial:
       contrib = self.contrib.ensureandcrop(self.block.framecount)
-      for buf, amp in zip(self.chain(self.container), self.ampsornone):
+      for buf, amp in zip(self.chain(self.container), self.chipamps):
         if amp:
           contrib.copybuf(buf)
           contrib.mul(amp)
