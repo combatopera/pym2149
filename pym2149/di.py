@@ -49,38 +49,48 @@ class Instance(Source):
     def __call__(self):
         return self.instance
 
-class Class(Source):
+class Creator(Source):
 
-    def __init__(self, clazz, di):
-        Source.__init__(self, clazz)
+    def __init__(self, callable, di):
+        self.owntype = self.getowntype(callable)
+        Source.__init__(self, self.owntype)
         self.instance = None
-        self.clazz = clazz
+        self.callable = callable
         self.di = di
 
     def __call__(self):
         if self.instance is None:
-            log.debug("Instantiating: %s", self.clazz)
-            ctor = getattr(self.clazz, '__init__')
-            try:
-                types = ctor.di_deptypes
-            except AttributeError:
-                raise Exception("Missing types annotation: %s" % self.clazz)
-            self.instance = self.clazz(*(self.di(t) for t in types))
+            log.debug("%s: %s", self.action, self.owntype)
+            self.instance = self.callable(*(self.di(t) for t in self.getdeptypes(self.callable)))
         return self.instance
 
-class Factory(Source):
+class Class(Creator):
 
-    def __init__(self, factory, di):
-        Source.__init__(self, factory.di_owntype)
-        self.instance = None
-        self.factory = factory
-        self.di = di
+    action = 'Instantiating'
 
-    def __call__(self):
-        if self.instance is None:
-            log.debug("Fabricating: %s", self.factory.di_owntype)
-            self.instance = self.factory(*(self.di(t) for t in self.factory.di_deptypes))
-        return self.instance
+    @staticmethod
+    def getowntype(clazz):
+        return clazz
+
+    @staticmethod
+    def getdeptypes(clazz):
+        ctor = getattr(clazz, '__init__')
+        try:
+            return ctor.di_deptypes
+        except AttributeError:
+            raise Exception("Missing types annotation: %s" % clazz)
+
+class Factory(Creator):
+
+    action = 'Fabricating'
+
+    @staticmethod
+    def getowntype(factory):
+        return factory.di_owntype
+
+    @staticmethod
+    def getdeptypes(factory):
+        return factory.di_deptypes
 
 class DI:
 
