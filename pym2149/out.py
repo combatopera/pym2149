@@ -24,7 +24,7 @@ from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
-from mix import IdealMixer
+from mix import IdealMixer, WavWritable
 from minblep import MinBleps
 from config import Config
 
@@ -53,9 +53,43 @@ class WavWriter(object, Node):
   def close(self):
     self.f.close()
 
-class WavBuf(Node):
+class OutChannel:
+
+    def __init__(self, chipamps):
+        self.chipamps = chipamps
+
+class StereoInfo:
+
+    @di.types(Config)
+    def __init__(self, config):
+        n = config.chipchannels
+        if config.stereo:
+            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
+            def getamppair(loc):
+                l = ((1 - loc) / 2) ** (config.panlaw / 6)
+                r = ((1 + loc) / 2) ** (config.panlaw / 6)
+                return l, r
+            amppairs = [getamppair(loc) for loc in locs]
+            outchan2chipamps = zip(*amppairs)
+        else:
+            outchan2chipamps = [[1] * n]
+        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
+
+class FloatStream(list):
+
+  @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
+    if config.outputrate != config.__getattr__('outputrate'):
+      log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
+    minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
+    for naive in naives:
+      self.append(WavBuf(clockinfo, naive, minbleps))
+
+class WavBuf(Node, WavWritable):
 
   @staticmethod
+  @di.types(FloatStream, this = WavWritable)
   def multi(wavs):
     if 1 == len(wavs):
       wav, = wavs
@@ -93,39 +127,6 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-class OutChannel:
-
-    def __init__(self, chipamps):
-        self.chipamps = chipamps
-
-class StereoInfo:
-
-    @di.types(Config)
-    def __init__(self, config):
-        n = config.chipchannels
-        if config.stereo:
-            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
-            def getamppair(loc):
-                l = ((1 - loc) / 2) ** (config.panlaw / 6)
-                r = ((1 + loc) / 2) ** (config.panlaw / 6)
-                return l, r
-            amppairs = [getamppair(loc) for loc in locs]
-            outchan2chipamps = zip(*amppairs)
-        else:
-            outchan2chipamps = [[1] * n]
-        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
-
-class FloatStream(list):
-
-  @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
-    if config.outputrate != config.__getattr__('outputrate'):
-      log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
-    minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
-    for naive in naives:
-      self.append(WavBuf(clockinfo, naive, minbleps))
-
 def newchipandstream(config, outpath):
     di = DI()
     di.add(config)
@@ -134,6 +135,5 @@ def newchipandstream(config, outpath):
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
-    chip = di(YM2149)
-    wavs = di(FloatStream)
-    return chip, WavWriter(config, WavBuf.multi(wavs), di(StereoInfo), outpath)
+    di.add(WavBuf.multi)
+    return di(YM2149), WavWriter(config, di(WavWritable), di(StereoInfo), outpath)
