@@ -24,7 +24,7 @@ from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI, types
-from mix import IdealMixer, WavWritable
+from mix import IdealMixer
 from minblep import MinBleps
 from config import Config
 
@@ -86,10 +86,12 @@ class FloatStream(list):
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
 
-class WavBuf(Node, WavWritable):
+class Multiplexed: pass
+
+class WavBuf(Node):
 
   @staticmethod
-  @types(FloatStream, this = WavWritable)
+  @types(FloatStream, this = Multiplexed)
   def multi(wavs):
     if 1 == len(wavs):
       wav, = wavs
@@ -136,7 +138,7 @@ def newchipandstream(config, outpath):
     di.add(StereoInfo)
     di.add(FloatStream)
     di.add(WavBuf.multi)
-    @types(Config, WavWritable, StereoInfo, this = WavWriter)
+    @types(Config, Multiplexed, StereoInfo, this = WavWriter)
     def writerfactory(config, writable, stereoinfo):
         return WavWriter(config, writable, stereoinfo, outpath)
     di.add(writerfactory)
