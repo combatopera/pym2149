@@ -16,14 +16,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, logging, di
+import numpy as np, logging
 from buf import MasterBuf, Buf
 from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
-from di import DI
+from di import DI, types
 from mix import IdealMixer, WavWritable
 from minblep import MinBleps
 from config import Config
@@ -60,7 +60,7 @@ class OutChannel:
 
 class StereoInfo:
 
-    @di.types(Config)
+    @types(Config)
     def __init__(self, config):
         n = config.chipchannels
         if config.stereo:
@@ -77,7 +77,7 @@ class StereoInfo:
 
 class FloatStream(list):
 
-  @di.types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
+  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
     naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
     if config.outputrate != config.__getattr__('outputrate'):
@@ -89,7 +89,7 @@ class FloatStream(list):
 class WavBuf(Node, WavWritable):
 
   @staticmethod
-  @di.types(FloatStream, this = WavWritable)
+  @types(FloatStream, this = WavWritable)
   def multi(wavs):
     if 1 == len(wavs):
       wav, = wavs
@@ -130,10 +130,14 @@ class WavBuf(Node, WavWritable):
 def newchipandstream(config, outpath):
     di = DI()
     di.add(config)
-    di.add(WavWriter)
+    di.addinstance(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
     di.add(WavBuf.multi)
-    return di(YM2149), WavWriter(config, di(WavWritable), di(StereoInfo), outpath)
+    @types(Config, WavWritable, StereoInfo, this = WavWriter)
+    def writerfactory(config, writable, stereoinfo):
+        return WavWriter(config, writable, stereoinfo, outpath)
+    di.add(writerfactory)
+    return di(YM2149), di(WavWriter)
