@@ -28,9 +28,9 @@ log = logging.getLogger(__name__)
 
 def main():
   config = getprocessconfig()
-  inpath, = config.positional
+  config.inpath, = config.positional
   with JackClient(config) as jackclient:
-    f = ymopen(inpath, config.ignoreloop)
+    f = ymopen(config.inpath, config.ignoreloop)
     try:
       for info in f.info:
         log.info(info)

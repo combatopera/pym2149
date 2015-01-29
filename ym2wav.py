@@ -29,13 +29,13 @@ log = logging.getLogger(__name__)
 def main():
   config = getprocessconfig()
   config.defaultignoreloop = True # Even in stdout case, not sure if that's what we want.
-  inpath, outpath = config.positional
-  f = ymopen(inpath, config.ignoreloop)
+  config.inpath, config.outpath = config.positional
+  f = ymopen(config.inpath, config.ignoreloop)
   try:
     for info in f.info:
       log.info(info)
     config.contextclock = f.clock
-    chip, stream = newchipandstream(config, outpath)
+    chip, stream = newchipandstream(config, config.outpath)
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq

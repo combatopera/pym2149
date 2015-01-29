@@ -143,8 +143,8 @@ class Main:
 
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
-    outpath, = config.positional
-    chip, stream = newchipandstream(config, outpath)
+    config.outpath, = config.positional
+    chip, stream = newchipandstream(config, config.outpath)
     try:
       timer = Timer(chip.clock)
       chanupdaters = [voidupdater] * config.chipchannels

@@ -27,14 +27,14 @@ log = logging.getLogger(__name__)
 
 def main():
   config = getprocessconfig()
-  inpath, outpath = config.positional
-  f = open(inpath, 'rb')
+  config.inpath, config.outpath = config.positional
+  f = open(config.inpath, 'rb')
   try:
     log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
     bytecode = [ord(c) for c in f.read()]
   finally:
     f.close()
-  chip, stream = newchipandstream(config, outpath)
+  chip, stream = newchipandstream(config, config.outpath)
   try:
     dosound(bytecode, chip, Timer(chip.clock), stream)
     stream.flush()

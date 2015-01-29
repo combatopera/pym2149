@@ -29,13 +29,13 @@ log = logging.getLogger(__name__)
 
 def main():
   config = getprocessconfig()
-  inpath, label, outpath = config.positional
-  f = open(inpath)
+  config.inpath, config.srclabel, config.outpath = config.positional
+  f = open(config.inpath)
   try:
-    bytecode = readbytecode(f, label)
+    bytecode = readbytecode(f, config.srclabel)
   finally:
     f.close()
-  chip, stream = newchipandstream(config, outpath)
+  chip, stream = newchipandstream(config, config.outpath)
   try:
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)
