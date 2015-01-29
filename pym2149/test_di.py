@@ -69,8 +69,8 @@ class TestDI(unittest.TestCase):
     def test_factory(self):
         di = DI()
         class I: pass
-        class N(int, I): pass
-        class P(int, I): pass
+        class N(int): pass
+        class P(int): pass
         @types(int, this = I)
         def factory(n):
             return N(n) if n < 0 else P(n)
