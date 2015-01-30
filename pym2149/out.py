@@ -132,11 +132,10 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-def newchipandstream(di):
+def configure(di):
     di.add(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
     di.add(WavBuf.multi)
-    return di(YM2149), di(Stream)

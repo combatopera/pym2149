@@ -25,6 +25,8 @@ from pym2149.midi import Midi
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.di import DI
+from pym2149.out import Stream
+from pym2149.ym2149 import Chip
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +36,9 @@ def main():
   with JackClient(config) as jackclient:
       di = DI()
       di.add(config)
-      chip, stream = jackclient.newchipandstream(di)
+      jackclient.configure(di)
+      chip = di(Chip)
+      stream = di(Stream)
       try:
         channels = Channels(config, chip)
         log.info(channels)

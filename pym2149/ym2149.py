@@ -75,7 +75,9 @@ class ClockInfo:
     if self.implclock != config.nominalclock:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
 
-class YM2149(Registers, Container):
+class Chip: pass
+
+class YM2149(Registers, Container, Chip):
 
   @types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
