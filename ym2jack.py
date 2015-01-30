@@ -30,7 +30,7 @@ def main():
   config = getprocessconfig()
   config.inpath, = config.positional
   with JackClient(config) as jackclient:
-    f = ymopen(config.inpath, config.ignoreloop)
+    f = ymopen(config)
     try:
       for info in f.info:
         log.info(info)
