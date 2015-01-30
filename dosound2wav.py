@@ -24,6 +24,7 @@ from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
 from pym2149.config import getprocessconfig
 from pym2149.out import newchipandstream
+from pym2149.di import DI
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,9 @@ def main():
     bytecode = readbytecode(f, config.srclabel)
   finally:
     f.close()
-  chip, stream = newchipandstream(config)
+  di = DI()
+  di.add(config)
+  chip, stream = newchipandstream(di)
   try:
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)

@@ -22,6 +22,7 @@ from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.config import getprocessconfig
 from pym2149.out import newchipandstream
+from pym2149.di import DI
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +35,9 @@ def main():
     bytecode = [ord(c) for c in f.read()]
   finally:
     f.close()
-  chip, stream = newchipandstream(config)
+  di = DI()
+  di.add(config)
+  chip, stream = newchipandstream(di)
   try:
     dosound(bytecode, chip, Timer(chip.clock), stream)
     stream.flush()

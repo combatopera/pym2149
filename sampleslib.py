@@ -19,6 +19,7 @@ from pym2149.timer import Timer
 from pym2149.util import singleton
 from pym2149.config import Config
 from pym2149.out import newchipandstream
+from pym2149.di import DI
 import sys, logging
 
 log = logging.getLogger(__name__)
@@ -144,7 +145,9 @@ class Main:
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
     config.outpath, = config.positional
-    chip, stream = newchipandstream(config)
+    di = DI()
+    di.add(config)
+    chip, stream = newchipandstream(di)
     try:
       timer = Timer(chip.clock)
       chanupdaters = [voidupdater] * config.chipchannels
