@@ -30,11 +30,31 @@ from config import Config
 
 log = logging.getLogger(__name__)
 
+class Multiplexed: pass
+
+class StereoInfo:
+
+    @types(Config)
+    def __init__(self, config):
+        n = config.chipchannels
+        if config.stereo:
+            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
+            def getamppair(loc):
+                l = ((1 - loc) / 2) ** (config.panlaw / 6)
+                r = ((1 + loc) / 2) ** (config.panlaw / 6)
+                return l, r
+            amppairs = [getamppair(loc) for loc in locs]
+            outchan2chipamps = zip(*amppairs)
+        else:
+            outchan2chipamps = [[1] * n]
+        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
+
 class WavWriter(object, Node):
 
   __metaclass__ = AmpScale
   log2maxpeaktopeak = 16
 
+  @types(Config, Multiplexed, StereoInfo)
   def __init__(self, config, wav, stereoinfo):
     Node.__init__(self)
     self.f = Wave16(config.outpath, config.outputrate, len(stereoinfo.outchans))
@@ -58,23 +78,6 @@ class OutChannel:
     def __init__(self, chipamps):
         self.chipamps = chipamps
 
-class StereoInfo:
-
-    @types(Config)
-    def __init__(self, config):
-        n = config.chipchannels
-        if config.stereo:
-            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
-            def getamppair(loc):
-                l = ((1 - loc) / 2) ** (config.panlaw / 6)
-                r = ((1 + loc) / 2) ** (config.panlaw / 6)
-                return l, r
-            amppairs = [getamppair(loc) for loc in locs]
-            outchan2chipamps = zip(*amppairs)
-        else:
-            outchan2chipamps = [[1] * n]
-        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
-
 class FloatStream(list):
 
   @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
@@ -85,8 +88,6 @@ class FloatStream(list):
     minbleps = MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
-
-class Multiplexed: pass
 
 class WavBuf(Node):
 
@@ -132,14 +133,10 @@ class WavBuf(Node):
 def newchipandstream(config):
     di = DI()
     di.add(config)
-    di.addinstance(WavWriter)
+    di.add(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
     di.add(WavBuf.multi)
-    @types(Config, Multiplexed, StereoInfo, this = WavWriter)
-    def writerfactory(config, writable, stereoinfo):
-        return WavWriter(config, writable, stereoinfo)
-    di.add(writerfactory)
     return di(YM2149), di(WavWriter)
