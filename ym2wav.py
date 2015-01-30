@@ -22,8 +22,9 @@ from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
-from pym2149.out import newchipandstream
+from pym2149.out import configure, Stream
 from pym2149.di import DI
+from pym2149.ym2149 import Chip
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +39,9 @@ def main():
     config.contextclock = f.clock
     di = DI()
     di.add(config)
-    chip, stream = newchipandstream(di)
+    configure(di)
+    chip = di(Chip)
+    stream = di(Stream)
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq

@@ -39,13 +39,12 @@ class JackClient:
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
-  def newchipandstream(di):
+  def configure(di):
     di.add(JackStream)
     di.add(ClockInfo)
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
-    return di(YM2149), di(Stream)
 
   def __exit__(self, *args):
     jack.detach()
