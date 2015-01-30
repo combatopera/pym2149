@@ -129,7 +129,7 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-def newchipandstream(config, outpath):
+def newchipandstream(config):
     di = DI()
     di.add(config)
     di.addinstance(WavWriter)
@@ -140,6 +140,6 @@ def newchipandstream(config, outpath):
     di.add(WavBuf.multi)
     @types(Config, Multiplexed, StereoInfo, this = WavWriter)
     def writerfactory(config, writable, stereoinfo):
-        return WavWriter(config, writable, stereoinfo, outpath)
+        return WavWriter(config, writable, stereoinfo, config.outpath)
     di.add(writerfactory)
     return di(YM2149), di(WavWriter)
