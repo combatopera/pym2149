@@ -35,7 +35,7 @@ def main():
     bytecode = readbytecode(f, config.srclabel)
   finally:
     f.close()
-  chip, stream = newchipandstream(config, config.outpath)
+  chip, stream = newchipandstream(config)
   try:
     timer = Timer(chip.clock)
     dosound(bytecode, chip, timer, stream)

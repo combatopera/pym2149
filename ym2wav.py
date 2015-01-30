@@ -35,7 +35,7 @@ def main():
     for info in f.info:
       log.info(info)
     config.contextclock = f.clock
-    chip, stream = newchipandstream(config, config.outpath)
+    chip, stream = newchipandstream(config)
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq
