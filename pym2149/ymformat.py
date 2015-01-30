@@ -266,7 +266,9 @@ class YM6(YM56):
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
-def ymopen(path, once):
+def ymopen(config):
+  path = config.inpath
+  once = config.ignoreloop
   f = open(path, 'rb')
   try:
     if 'YM' == f.read(2):

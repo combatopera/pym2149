@@ -30,7 +30,7 @@ def main():
   config = getprocessconfig()
   config.defaultignoreloop = True # Even in stdout case, not sure if that's what we want.
   config.inpath, config.outpath = config.positional
-  f = ymopen(config.inpath, config.ignoreloop)
+  f = ymopen(config)
   try:
     for info in f.info:
       log.info(info)
