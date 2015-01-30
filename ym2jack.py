@@ -23,6 +23,7 @@ from pym2149.ymformat import ymopen
 from pym2149.jackclient import JackClient
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
+from pym2149.di import DI
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,9 @@ def main():
       for info in f.info:
         log.info(info)
       config.contextclock = f.clock
-      chip, stream = jackclient.newchipandstream()
+      di = DI()
+      di.add(config)
+      chip, stream = jackclient.newchipandstream(di)
       try:
         timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
         config.contextpianorollheight = f.framefreq

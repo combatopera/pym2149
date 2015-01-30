@@ -23,7 +23,7 @@ from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
-from di import DI, types
+from di import types
 from mix import IdealMixer
 from minblep import MinBleps
 from config import Config
@@ -132,9 +132,7 @@ class WavBuf(Node):
     self.dc = naivebuf.buf[-1]
     return Buf(outbuf.buf[:outcount])
 
-def newchipandstream(config):
-    di = DI()
-    di.add(config)
+def newchipandstream(di):
     di.add(WavWriter)
     di.add(ClockInfo)
     di.add(YM2149)

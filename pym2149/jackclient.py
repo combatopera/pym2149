@@ -22,7 +22,6 @@ from nod import Node, BufNode
 from const import clientname
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
-from di import DI
 from out import FloatStream, StereoInfo, Stream
 import jack, numpy as np, di
 
@@ -39,9 +38,7 @@ class JackClient:
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
-  def newchipandstream(self):
-    di = DI()
-    di.add(self.config)
+  def newchipandstream(di):
     di.add(JackStream)
     di.add(ClockInfo)
     di.add(YM2149)
