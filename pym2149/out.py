@@ -49,7 +49,9 @@ class StereoInfo:
             outchan2chipamps = [[1] * n]
         self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
 
-class WavWriter(object, Node):
+class Stream: pass
+
+class WavWriter(object, Node, Stream):
 
   __metaclass__ = AmpScale
   log2maxpeaktopeak = 16
@@ -139,4 +141,4 @@ def newchipandstream(config):
     di.add(StereoInfo)
     di.add(FloatStream)
     di.add(WavBuf.multi)
-    return di(YM2149), di(WavWriter)
+    return di(YM2149), di(Stream)

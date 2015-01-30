@@ -23,7 +23,7 @@ from const import clientname
 from ym2149 import ClockInfo, YM2149
 from util import AmpScale
 from di import DI
-from out import FloatStream, StereoInfo
+from out import FloatStream, StereoInfo, Stream
 import jack, numpy as np, di
 
 log = logging.getLogger(__name__)
@@ -47,12 +47,12 @@ class JackClient:
     di.add(YM2149)
     di.add(StereoInfo)
     di.add(FloatStream)
-    return di(YM2149), di(JackStream)
+    return di(YM2149), di(Stream)
 
   def __exit__(self, *args):
     jack.detach()
 
-class JackStream(object, Node):
+class JackStream(object, Node, Stream):
 
   __metaclass__ = AmpScale
   # For jack the available amplitude range is 2 ** 1:
