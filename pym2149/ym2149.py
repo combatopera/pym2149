@@ -23,7 +23,8 @@ from mix import BinMix
 from nod import Container
 from fractions import Fraction
 from util import AmpScale, Config
-import logging, di
+from di import types
+import logging
 
 log = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ class Registers:
 
 class ClockInfo:
 
-  @di.types(Config)
+  @types(Config)
   def __init__(self, config):
     if config.nominalclock % config.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
@@ -76,7 +77,7 @@ class ClockInfo:
 
 class YM2149(Registers, Container):
 
-  @di.types(Config, ClockInfo, AmpScale)
+  @types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
