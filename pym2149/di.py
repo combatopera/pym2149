@@ -52,18 +52,16 @@ class Instance(Source):
 class Creator(Source):
 
     def __init__(self, callable, di):
-        self.owntype = self.getowntype(callable)
-        Source.__init__(self, self.owntype)
+        owntype = self.getowntype(callable)
+        Source.__init__(self, owntype)
+        self.typelabel = "%s.%s" % (owntype.__module__, owntype.__name__)
         self.instance = None
         self.callable = callable
         self.di = di
 
-    def owntypename(self):
-        return "%s.%s" % (self.owntype.__module__, self.owntype.__name__)
-
     def __call__(self):
         if self.instance is None:
-            log.debug("%s: %s", self.action, self.owntypename())
+            log.debug("%s: %s", self.action, self.typelabel)
             self.instance = self.callable(*(self.di(t) for t in self.getdeptypes(self.callable)))
         return self.instance
 
@@ -80,7 +78,7 @@ class Class(Creator):
         try:
             return ctor.di_deptypes
         except AttributeError:
-            raise Exception("Missing types annotation: %s" % self.owntypename())
+            raise Exception("Missing types annotation: %s" % self.typelabel)
 
 class Factory(Creator):
 
