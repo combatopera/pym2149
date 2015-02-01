@@ -19,6 +19,7 @@ from __future__ import division
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from fractions import Fraction
+from iface import YMFile
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class LoopInfo:
     self.frame = frame
     self.offset = offset
 
-class YM:
+class YM(YMFile):
 
   checkstr = 'LeOnArD!'
   wordstruct = struct.Struct('>H')
