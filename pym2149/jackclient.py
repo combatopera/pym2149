@@ -20,9 +20,8 @@
 from initlogging import logging
 from nod import Node, BufNode
 from const import clientname
-from ym2149 import ClockInfo, YM2149
 from util import AmpScale
-from out import FloatStream, StereoInfo, Stream
+from out import FloatStream, Stream
 from di import types
 import jack, numpy as np
 
@@ -41,10 +40,6 @@ class JackClient:
 
   def configure(di):
     di.add(JackStream)
-    di.add(ClockInfo)
-    di.add(YM2149)
-    di.add(StereoInfo)
-    di.add(FloatStream)
 
   def __exit__(self, *args):
     jack.detach()

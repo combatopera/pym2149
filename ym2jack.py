@@ -23,7 +23,7 @@ from pym2149.ymformat import ymopen
 from pym2149.jackclient import JackClient
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
-from pym2149.di import DI
+from pym2149.boot import createdi
 from pym2149.out import Stream
 from pym2149.ym2149 import Chip
 
@@ -38,8 +38,7 @@ def main():
       for info in f.info:
         log.info(info)
       config.contextclock = f.clock
-      di = DI()
-      di.add(config)
+      di = createdi(config)
       jackclient.configure(di)
       chip = di(Chip)
       stream = di(Stream)
