@@ -40,16 +40,17 @@ def main():
   di = createdi(config)
   configure(di)
   chip = di(Chip)
-  stream = di(Stream)
+  di.start()
   try:
     timer = Timer(chip.clock)
+    stream = di(Stream)
     dosound(bytecode, chip, timer, stream)
     log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
     for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
       stream.call(b)
     stream.flush()
   finally:
-    stream.close()
+    di.stop()
 
 if '__main__' == __name__:
   main()

@@ -39,12 +39,13 @@ def main():
   di = createdi(config)
   configure(di)
   chip = di(Chip)
-  stream = di(Stream)
+  di.start()
   try:
+    stream = di(Stream)
     dosound(bytecode, chip, Timer(chip.clock), stream)
     stream.flush()
   finally:
-    stream.close()
+    di.stop()
 
 if '__main__' == __name__:
   main()
