@@ -69,6 +69,9 @@ class WavWriter(object, Node, Stream):
     np.around(outbuf.buf, out = wavbuf.buf)
     self.f.block(wavbuf)
 
+  def flush(self):
+    self.f.flush()
+
   def stop(self):
     self.f.close()
 

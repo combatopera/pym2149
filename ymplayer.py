@@ -49,6 +49,7 @@ class Player:
             self.roll.update()
             for b in self.timer.blocksforperiod(self.ymfile.framefreq):
                 self.stream.call(b)
+        self.stream.flush()
 
     def stop(self):
         self.quit = True
