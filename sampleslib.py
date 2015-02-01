@@ -149,9 +149,10 @@ class Main:
     di = createdi(config)
     configure(di)
     chip = di(Chip)
-    stream = di(Stream)
+    di.start()
     try:
       timer = Timer(chip.clock)
+      stream = di(Stream)
       chanupdaters = [voidupdater] * config.chipchannels
       for frameindex, frame in enumerate(frames):
         for patternindex, action in enumerate(frame):
@@ -165,4 +166,4 @@ class Main:
           stream.call(b)
       stream.flush()
     finally:
-      stream.close()
+      di.stop()
