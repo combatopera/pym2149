@@ -16,12 +16,16 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pitch import Period, Freq
+from di import types
+from config import Config
+from iface import Chip
 import sys
 
 class Roll:
 
   shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
 
+  @types(Config, Chip)
   def __init__(self, config, chip):
     self.height = config.pianorollheight
     self.nomclock = config.nominalclock
