@@ -22,7 +22,7 @@ from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
-from util import AmpScale
+from iface import AmpScale
 from di import types
 from mix import IdealMixer
 from minblep import MinBleps
