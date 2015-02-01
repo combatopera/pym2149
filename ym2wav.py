@@ -22,9 +22,9 @@ from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
-from pym2149.out import configure, Stream
+from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.ym2149 import Chip
+from pym2149.iface import Chip, Stream
 
 log = logging.getLogger(__name__)
 

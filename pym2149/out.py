@@ -22,7 +22,7 @@ from nod import Node, BufNode
 from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
-from iface import AmpScale, Multiplexed
+from iface import AmpScale, Multiplexed, Stream
 from di import types
 from mix import IdealMixer
 from minblep import MinBleps
@@ -46,8 +46,6 @@ class StereoInfo:
         else:
             outchan2chipamps = [[1] * n]
         self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
-
-class Stream: pass
 
 class WavWriter(object, Node, Stream):
 
