@@ -84,6 +84,9 @@ class JackStream(object, Node, Stream):
           log.warn('JACK error:', exc_info = True)
         self.cursor = 0
 
+  def flush(self):
+    pass # Nothing to be done.
+
   def close(self):
     jack.deactivate()
 
