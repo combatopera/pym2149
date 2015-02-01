@@ -22,3 +22,5 @@ class Multiplexed: pass
 class Chip: pass
 
 class Stream: pass
+
+class YMFile: pass
