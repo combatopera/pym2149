@@ -15,5 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+import time, logging
+
+log = logging.getLogger(__name__)
+
 def singleton(f):
-  return f()
+    return f()
+
+def awaitinterrupt():
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        log.debug('Caught interrupt, shutting down.')

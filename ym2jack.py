@@ -25,8 +25,8 @@ from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from pym2149.util import awaitinterrupt
 from ymplayer import Player
-import time
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +52,7 @@ def main():
         di.add(timer)
         di.add(Player)
         di.start()
-        try:
-          while True:
-            time.sleep(1)
-        except KeyboardInterrupt:
-          log.debug('Caught interrupt, shutting down.')
+        awaitinterrupt()
         di.stop()
       finally:
         stream.close()
