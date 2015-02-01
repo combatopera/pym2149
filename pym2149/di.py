@@ -39,11 +39,13 @@ class Source:
                 if base not in self.types:
                     addtype(base)
         addtype(type)
+        self.typelabel = "%s.%s" % (type.__module__, type.__name__)
+        self.di = di
 
 class Instance(Source):
 
-    def __init__(self, instance):
-        Source.__init__(self, instance.__class__)
+    def __init__(self, instance, di):
+        Source.__init__(self, instance.__class__, di)
         self.instance = instance
 
     def __call__(self):
@@ -52,12 +54,9 @@ class Instance(Source):
 class Creator(Source):
 
     def __init__(self, callable, di):
-        owntype = self.getowntype(callable)
-        Source.__init__(self, owntype)
-        self.typelabel = "%s.%s" % (owntype.__module__, owntype.__name__)
+        Source.__init__(self, self.getowntype(callable), di)
         self.instance = None
         self.callable = callable
-        self.di = di
 
     def __call__(self):
         if self.instance is None:
@@ -108,7 +107,7 @@ class DI:
         self.addsource(Class(clazz, self))
 
     def addinstance(self, instance):
-        self.addsource(Instance(instance))
+        self.addsource(Instance(instance, self))
 
     def addfactory(self, factory):
         self.addsource(Factory(factory, self))
