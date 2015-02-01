@@ -74,5 +74,8 @@ class Wave16:
     self.writedatasize(filesize)
     self.f.seek(filesize)
 
+  def flush(self):
+    self.f.flush()
+
   def close(self):
     self.f.close()
