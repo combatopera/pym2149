@@ -55,9 +55,13 @@ class WavWriter(object, Node, Stream):
   @types(Config, Multiplexed, StereoInfo)
   def __init__(self, config, wav, stereoinfo):
     Node.__init__(self)
-    self.f = Wave16(config.outpath, config.outputrate, len(stereoinfo.outchans))
-    self.wavmaster = MasterBuf(dtype = self.f.dtype)
+    fclass = Wave16
+    self.open = lambda: fclass(config.outpath, config.outputrate, len(stereoinfo.outchans))
+    self.wavmaster = MasterBuf(dtype = fclass.dtype)
     self.wav = wav
+
+  def start(self):
+    self.f = self.open()
 
   def callimpl(self):
     outbuf = self.chain(self.wav)
@@ -65,10 +69,7 @@ class WavWriter(object, Node, Stream):
     np.around(outbuf.buf, out = wavbuf.buf)
     self.f.block(wavbuf)
 
-  def flush(self):
-    self.f.flush()
-
-  def close(self):
+  def stop(self):
     self.f.close()
 
 class OutChannel:

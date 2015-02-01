@@ -42,20 +42,15 @@ def main():
     di = createdi(config)
     configure(di)
     chip = di(Chip)
-    stream = di(Stream)
-    try:
-      timer = Timer(chip.clock)
-      config.contextpianorollheight = f.framefreq
-      di.add(f)
-      di.add(Roll)
-      di.add(timer)
-      di.add(Player)
-      di.start()
-      awaitinterrupt()
-      di.stop()
-      stream.flush()
-    finally:
-      stream.close()
+    timer = Timer(chip.clock)
+    config.contextpianorollheight = f.framefreq
+    di.add(f)
+    di.add(Roll)
+    di.add(timer)
+    di.add(Player)
+    di.start()
+    awaitinterrupt()
+    di.stop()
   finally:
     f.close()
 
