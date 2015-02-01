@@ -161,8 +161,10 @@ class DI:
         return [source() for source in self.typetosources.get(type, [])]
 
     def __call__(self, type):
-        obj, = self.all(type)
-        return obj
+        objs = self.all(type)
+        if 1 != len(objs):
+            raise Exception("Expected 1 object of type %s but got: %s" % (type, len(objs)))
+        return objs[0]
 
     def start(self):
         started = []
