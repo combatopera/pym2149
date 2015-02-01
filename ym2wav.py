@@ -24,7 +24,7 @@ from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
+from pym2149.iface import Chip
 from pym2149.util import awaitinterrupt
 from ymplayer import Player
 
