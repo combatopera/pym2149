@@ -39,10 +39,6 @@ class JackClient:
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
-  @staticmethod
-  def configure(di):
-    di.add(JackStream)
-
   def __exit__(self, *args):
     jack.detach()
 
@@ -90,3 +86,6 @@ class JackStream(object, Node, Stream):
 
   def close(self):
     jack.deactivate()
+
+def configure(di):
+    di.add(JackStream)

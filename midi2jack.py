@@ -19,7 +19,7 @@
 
 from __future__ import division
 from pym2149.initlogging import logging
-from pym2149.jackclient import JackClient
+from pym2149.jackclient import JackClient, configure
 from pym2149.nod import Block
 from pym2149.midi import Midi
 from pym2149.config import getprocessconfig
@@ -34,7 +34,7 @@ def main():
   midi = Midi(config)
   with JackClient(config) as jackclient:
       di = createdi(config)
-      jackclient.configure(di)
+      configure(di)
       chip = di(Chip)
       stream = di(Stream)
       try:

@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.ymformat import ymopen
-from pym2149.jackclient import JackClient
+from pym2149.jackclient import JackClient, configure
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
@@ -38,7 +38,7 @@ def main():
         log.info(info)
       config.contextclock = f.clock
       di = createdi(config)
-      jackclient.configure(di)
+      configure(di)
       chip = di(Chip)
       stream = di(Stream)
       try:
