@@ -39,6 +39,7 @@ class JackClient:
     self.config.outputrateoverridelabel = 'JACK rate'
     return self
 
+  @staticmethod
   def configure(di):
     di.add(JackStream)
 
