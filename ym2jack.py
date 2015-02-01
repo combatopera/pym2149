@@ -24,39 +24,11 @@ from pym2149.jackclient import JackClient, configure
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream, YMFile
-from pym2149.di import types
-import threading, time
+from pym2149.iface import Chip, Stream
+from ymplayer import Player
+import time
 
 log = logging.getLogger(__name__)
-
-class Player:
-
-    @types(YMFile, Chip, Roll, Timer, Stream)
-    def __init__(self, ymfile, chip, roll, timer, stream):
-        self.ymfile = ymfile
-        self.chip = chip
-        self.roll = roll
-        self.timer = timer
-        self.stream = stream
-
-    def start(self):
-        self.quit = False
-        self.thread = threading.Thread(target = self)
-        self.thread.start()
-
-    def __call__(self):
-        for frame in self.ymfile:
-            if self.quit:
-                break
-            frame(self.chip)
-            self.roll.update()
-            for b in self.timer.blocksforperiod(self.ymfile.framefreq):
-                self.stream.call(b)
-
-    def stop(self):
-        self.quit = True
-        self.thread.join()
 
 def main():
   config = getprocessconfig()
