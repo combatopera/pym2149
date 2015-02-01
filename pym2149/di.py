@@ -53,6 +53,7 @@ class Source:
     def tostarted(self):
         if self.lifecycle.startable:
             instance = self() # Observe we only instantiate if startable.
+            log.debug("Starting: %s", self.typelabel)
             instance.start() # On failure we assume state unchanged from Stopped.
             self.lifecycle = self.Started
             return True # Notify caller a transition to Started actually happened.
@@ -60,6 +61,7 @@ class Source:
     def tostopped(self):
         if self.lifecycle.stoppable:
             instance = self() # Should already exist.
+            log.debug("Stopping: %s", self.typelabel)
             try:
                 instance.stop()
             except:
