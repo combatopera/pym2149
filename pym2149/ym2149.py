@@ -22,7 +22,7 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-from util import AmpScale
+from iface import AmpScale
 from config import Config
 from di import types
 import logging

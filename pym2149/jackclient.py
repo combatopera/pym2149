@@ -20,7 +20,7 @@
 from initlogging import logging
 from nod import Node, BufNode
 from const import clientname
-from util import AmpScale
+from iface import AmpScale
 from out import FloatStream, Stream
 from di import types
 import jack, numpy as np
