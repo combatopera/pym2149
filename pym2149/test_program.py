@@ -23,11 +23,11 @@ from program import FX
 class TestFX(unittest.TestCase):
 
   def test_setbend(self):
-    class Config:
+    class config:
       finepitchbendisrate = True
       pitchbendratemultiplier = 3
       pitchbendpersemitone = 1 # Don't care.
-    fx = FX(Config())
+    fx = FX(config)
     for coarse in xrange(0x80):
       for fine in xrange(0x80):
         fx.setbend(((coarse << 7) | fine) - 0x2000)

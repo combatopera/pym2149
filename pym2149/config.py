@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, os, anchor, util
+import sys, logging, os, anchor
 from lazyconf import Loader, View
 from const import appconfigdir
 
@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 def getprocessconfig():
   return Config(sys.argv[1:])
 
-class Config(View, util.Config):
+class Config(View):
 
   def __init__(self, args):
     loader = Loader()
