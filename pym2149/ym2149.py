@@ -22,7 +22,7 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-from iface import AmpScale
+from iface import AmpScale, Chip
 from config import Config
 from di import types
 import logging
@@ -75,8 +75,6 @@ class ClockInfo:
       log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
     if self.implclock != config.nominalclock:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
-
-class Chip: pass
 
 class YM2149(Registers, Container, Chip):
 

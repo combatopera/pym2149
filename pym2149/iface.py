@@ -18,3 +18,7 @@
 class AmpScale(type): pass
 
 class Multiplexed: pass
+
+class Chip: pass
+
+class Stream: pass
