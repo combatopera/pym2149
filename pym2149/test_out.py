@@ -48,13 +48,14 @@ class TestWavWriter(unittest.TestCase):
     w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
     config = namedtuple('Config', 'outputrate outpath')(outrate, '/dev/null')
     w = WavWriter(config, w, namedtuple('StereoInfo', 'outchans')('M'))
+    w.start()
     tone.cursor = 0
     start = time.time()
     while tone.cursor < tone.size:
       block = Block(blocksize)
       w.call(block)
       tone.cursor += block.framecount
-    w.close()
+    w.stop()
     expression = "%.3f < %s" % (time.time() - start, strictlimit)
     print >> sys.stderr, expression
     self.assertTrue(eval(expression))
