@@ -24,7 +24,7 @@ from pym2149.nod import Block
 from pym2149.midi import Midi
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
-from pym2149.di import DI
+from pym2149.boot import createdi
 from pym2149.out import Stream
 from pym2149.ym2149 import Chip
 
@@ -34,8 +34,7 @@ def main():
   config = getprocessconfig()
   midi = Midi(config)
   with JackClient(config) as jackclient:
-      di = DI()
-      di.add(config)
+      di = createdi(config)
       jackclient.configure(di)
       chip = di(Chip)
       stream = di(Stream)

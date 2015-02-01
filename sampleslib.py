@@ -19,7 +19,7 @@ from pym2149.timer import Timer
 from pym2149.util import singleton
 from pym2149.config import Config
 from pym2149.out import configure, Stream
-from pym2149.di import DI
+from pym2149.boot import createdi
 from pym2149.ym2149 import Chip
 import sys, logging
 
@@ -146,8 +146,7 @@ class Main:
   def __call__(self, frames, args = sys.argv[1:]):
     config = Config(args)
     config.outpath, = config.positional
-    di = DI()
-    di.add(config)
+    di = createdi(config)
     configure(di)
     chip = di(Chip)
     stream = di(Stream)

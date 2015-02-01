@@ -134,8 +134,4 @@ class WavBuf(Node):
 
 def configure(di):
     di.add(WavWriter)
-    di.add(ClockInfo)
-    di.add(YM2149)
-    di.add(StereoInfo)
-    di.add(FloatStream)
     di.add(WavBuf.multi)
