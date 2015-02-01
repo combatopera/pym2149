@@ -46,9 +46,8 @@ def main():
     try:
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq
-      roll = Roll(config, chip)
       di.add(f)
-      di.add(roll)
+      di.add(Roll)
       di.add(timer)
       di.add(Player)
       di.start()
