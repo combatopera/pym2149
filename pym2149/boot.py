@@ -28,3 +28,4 @@ def createdi(config):
     di.add(StereoInfo)
     di.add(YM2149)
     di.add(FloatStream)
+    return di
