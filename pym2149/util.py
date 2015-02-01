@@ -19,5 +19,3 @@ def singleton(f):
   return f()
 
 class AmpScale(type): pass
-
-class Config: pass # FIXME: Really config.Config shouldn't depend on higher-level types.
