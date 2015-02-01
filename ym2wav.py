@@ -25,6 +25,8 @@ from pym2149.vis import Roll
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from pym2149.util import awaitinterrupt
+from ymplayer import Player
 
 log = logging.getLogger(__name__)
 
@@ -45,11 +47,13 @@ def main():
       timer = Timer(chip.clock)
       config.contextpianorollheight = f.framefreq
       roll = Roll(config, chip)
-      for frame in f:
-        frame(chip)
-        roll.update()
-        for b in timer.blocksforperiod(f.framefreq):
-          stream.call(b)
+      di.add(f)
+      di.add(roll)
+      di.add(timer)
+      di.add(Player)
+      di.start()
+      awaitinterrupt()
+      di.stop()
       stream.flush()
     finally:
       stream.close()
