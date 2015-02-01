@@ -80,5 +80,101 @@ class TestDI(unittest.TestCase):
         self.assertIs(P, i.__class__)
         self.assertEqual(5, i)
 
+    class Eventful:
+
+        @types(list)
+        def __init__(self, events): self.events = events
+
+    class OK(Eventful):
+
+        def start(self): self.events.append(self.__class__.__name__ + '.start')
+
+        def stop(self): self.events.append(self.__class__.__name__ + '.stop')
+
+    def test_lifecycle(self):
+        class A(self.OK): pass
+        class B(self.OK): pass
+        events = []
+        di = DI()
+        di.add(events)
+        di.add(A)
+        di.start()
+        self.assertEqual(['A.start'], events)
+        di.add(B)
+        di.start() # Should only start new stuff.
+        self.assertEqual(['A.start', 'B.start'], events)
+        di.start() # Nothing more to be done.
+        self.assertEqual(['A.start', 'B.start'], events)
+        di.stop()
+        self.assertEqual(['A.start', 'B.start', 'B.stop', 'A.stop'], events)
+        di.stop() # Should be idempotent.
+        self.assertEqual(['A.start', 'B.start', 'B.stop', 'A.stop'], events)
+
+    def test_startdoesnotinstantiatenonstartables(self):
+        class KaboomException: pass
+        class Kaboom:
+            @types()
+            def __init__(self): raise KaboomException
+            def stop(self): pass # Not significant.
+        di = DI()
+        di.add(Kaboom)
+        di.start() # Should do nothing.
+        try:
+            di(Kaboom)
+            self.fail('Expected a KaboomException.')
+        except KaboomException:
+            pass # Expected.
+
+    class BadStart(Eventful):
+
+        class BadStartException: pass
+
+        def start(self): raise self.BadStartException
+
+    def test_unrollduetobadstart(self):
+        class A(self.OK): pass
+        class B(self.OK): pass
+        class C(self.OK): pass
+        events = []
+        di = DI()
+        di.add(events)
+        di.add(A)
+        di.start()
+        self.assertEqual(['A.start'], events)
+        di.add(B)
+        di.add(C)
+        di.add(self.BadStart)
+        try:
+            di.start()
+            self.fail('Expected a BadStartException.')
+        except self.BadStart.BadStartException:
+            pass # Expected.
+        self.assertEqual(['A.start', 'B.start', 'C.start', 'C.stop', 'B.stop'], events)
+        di.stop()
+        self.assertEqual(['A.start', 'B.start', 'C.start', 'C.stop', 'B.stop', 'A.stop'], events)
+
+    class BadStop(OK):
+
+        class BadStopException: pass
+
+        def stop(self): raise self.BadStopException
+
+    def test_stoperrorislogged(self):
+        events = []
+        di = DI()
+        def error(msg, *args, **kwargs):
+            self.assertEqual({'exc_info': True}, kwargs)
+            self.assertEqual("Failed to stop an instance of %s:", msg)
+            arg, = args
+            events.append(arg)
+        di.error = error
+        di.add(events)
+        di.add(self.OK)
+        di.add(self.BadStop)
+        di.start()
+        self.assertEqual(['OK.start', 'BadStop.start'], events)
+        di.stop()
+        self.assertEqual(['OK.start', 'BadStop.start', "%s.%s" % (self.BadStop.__module__, self.BadStop.__name__), 'OK.stop'], events)
+
 if __name__ == '__main__':
     unittest.main()
