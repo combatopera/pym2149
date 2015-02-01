@@ -31,7 +31,7 @@ def types(*deptypes, **kwargs):
 
 class Source:
 
-    def __init__(self, type):
+    def __init__(self, type, di):
         self.types = set()
         def addtype(type):
             self.types.add(type)
