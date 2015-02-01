@@ -31,6 +31,12 @@ def types(*deptypes, **kwargs):
 
 class Source:
 
+    class Static: startable, stoppable = False, False
+
+    class Stopped: startable, stoppable = True, False
+
+    class Started: startable, stoppable = False, True
+
     def __init__(self, type, di):
         self.types = set()
         def addtype(type):
@@ -40,7 +46,25 @@ class Source:
                     addtype(base)
         addtype(type)
         self.typelabel = "%s.%s" % (type.__module__, type.__name__)
+        # We assume stop exists if start does:
+        self.lifecycle = self.Stopped if hasattr(type, 'start') else self.Static
         self.di = di
+
+    def tostarted(self):
+        if self.lifecycle.startable:
+            instance = self() # Observe we only instantiate if startable.
+            instance.start() # On failure we assume state unchanged from Stopped.
+            self.lifecycle = self.Started
+            return True # Notify caller a transition to Started actually happened.
+
+    def tostopped(self):
+        if self.lifecycle.stoppable:
+            instance = self() # Should already exist.
+            try:
+                instance.stop()
+            except:
+                self.di.error("Failed to stop an instance of %s:", self.typelabel, exc_info = True)
+            self.lifecycle = self.Stopped # Even on failure, we don't attempt to stop again.
 
 class Instance(Source):
 
@@ -93,8 +117,11 @@ class Factory(Creator):
 
 class DI:
 
+    error = log.error # Tests may override.
+
     def __init__(self):
         self.typetosources = {}
+        self.allsources = [] # Old-style classes won't be registered against object.
 
     def addsource(self, source):
         for type in source.types:
@@ -102,6 +129,7 @@ class DI:
                 self.typetosources[type].append(source)
             except KeyError:
                 self.typetosources[type] = [source]
+        self.allsources.append(source)
 
     def addclass(self, clazz):
         self.addsource(Class(clazz, self))
@@ -135,3 +163,17 @@ class DI:
     def __call__(self, type):
         obj, = self.all(type)
         return obj
+
+    def start(self):
+        started = []
+        for source in self.allsources:
+            try:
+                source.tostarted() and started.append(source)
+            except:
+                for t in reversed(started): # Don't unroll previous batches.
+                    t.tostopped()
+                raise
+
+    def stop(self):
+        for source in reversed(self.allsources):
+            source.tostopped()
