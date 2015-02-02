@@ -20,6 +20,9 @@ import numpy as np, fractions, logging, sys, os, cPickle as pickle
 from nod import BufNode
 from unroll import importunrolled
 from const import appconfigdir
+from di import types
+from config import Config
+from ym2149 import ClockInfo
 
 log = logging.getLogger(__name__)
 
@@ -147,5 +150,6 @@ class MinBleps:
   def paste(self, naivex, diffbuf, outbuf):
     self.pasteminbleps(len(diffbuf), outbuf.buf, self.naivex2outx, len(outbuf), self.demultiplexed, self.naivex2off, diffbuf.buf, naivex, self.naiverate, self.outrate)
 
+@types(Config, ClockInfo, this = MinBleps)
 def loadorcreate(config, clockinfo):
     return MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
