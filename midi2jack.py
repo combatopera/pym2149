@@ -58,12 +58,13 @@ class MidiPump(Background):
 def main():
   config = getprocessconfig()
   midi = Midi(config)
-  with JackClient(config) as jackclient:
-      di = createdi(config)
-      configure(di)
-      chip = di(Chip)
-      di.start()
-      try:
+  di = createdi(config)
+  di.add(JackClient)
+  di.start()
+  try:
+        configure(di)
+        chip = di(Chip)
+        di.start()
         stream = di(Stream)
         channels = Channels(config, chip)
         log.info(channels)
@@ -71,7 +72,7 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         MidiPump(midi, channels, di(MinBleps), stream, chip)()
-      finally:
+  finally:
         di.stop()
 
 if '__main__' == __name__:

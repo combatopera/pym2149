@@ -32,13 +32,12 @@ class JackClient:
   def __init__(self, config):
     self.config = config
 
-  def __enter__(self):
+  def start(self):
     jack.attach(clientname)
     self.config.outputrate = jack.get_sample_rate()
     self.config.outputrateoverridelabel = 'JACK rate'
-    return self
 
-  def __exit__(self, *args):
+  def stop(self):
     jack.detach()
 
 class JackStream(object, Node, Stream):
