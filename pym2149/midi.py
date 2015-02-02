@@ -17,6 +17,8 @@
 
 from __future__ import division
 from const import clientname
+from di import types
+from config import Config
 import alsaseq
 
 class ChannelMessage:
@@ -81,6 +83,7 @@ class Midi:
     alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
   }
 
+  @types(Config)
   def __init__(self, config):
     self.chanbase = config.midichannelbase
     self.programbase = config.midiprogrambase
