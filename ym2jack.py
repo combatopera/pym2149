@@ -31,11 +31,12 @@ log = logging.getLogger(__name__)
 def main():
   config = getprocessconfig()
   config.inpath, = config.positional
-  with JackClient(config) as jackclient:
-    di = createdi(config)
-    di.add(YMOpen)
-    di.start()
-    try:
+  di = createdi(config)
+  di.add(JackClient)
+  di.start()
+  try:
+      di.add(YMOpen)
+      di.start()
       f = di(YMOpen).ym
       config.contextclock = f.clock
       config.contextpianorollheight = f.framefreq
@@ -45,7 +46,7 @@ def main():
       di.add(Player)
       di.start()
       awaitinterrupt()
-    finally:
+  finally:
       di.stop()
 
 if '__main__' == __name__:
