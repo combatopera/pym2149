@@ -27,12 +27,14 @@ from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
+from pym2149.di import types
 from ymplayer import Background
 
 log = logging.getLogger(__name__)
 
 class MidiPump(Background):
 
+    @types(Midi, Channels, MinBleps, Stream, Chip)
     def __init__(self, midi, channels, minbleps, stream, chip):
         self.midi = midi
         self.channels = channels
@@ -72,7 +74,8 @@ def main():
         blocksizeseconds = stream.size / config.outputrate
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
-        MidiPump(midi, channels, di(MinBleps), stream, chip)()
+        di.add(MidiPump)
+        di(MidiPump)()
   finally:
         di.stop()
 
