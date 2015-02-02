@@ -23,6 +23,9 @@ from pym2149.pitch import Pitch
 from pym2149.program import FX
 from pym2149.const import midichannelcount
 from pym2149.mediation import Mediation
+from pym2149.di import types
+from pym2149.config import Config
+from pym2149.iface import Chip
 
 log = logging.getLogger(__name__)
 
@@ -75,6 +78,7 @@ class Channel:
 
 class Channels:
 
+  @types(Config, Chip)
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
     self.midiprograms = config.midiprograms
