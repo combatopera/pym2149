@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, logging, minblep
+import numpy as np, logging
 from buf import MasterBuf, Buf
 from nod import Node, BufNode
 from wav import Wave16
@@ -26,6 +26,7 @@ from iface import AmpScale, Multiplexed, Stream
 from di import types
 from mix import IdealMixer
 from config import Config
+from minblep import MinBleps
 
 log = logging.getLogger(__name__)
 
@@ -81,12 +82,11 @@ class OutChannel:
 
 class FloatStream(list):
 
-  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo):
+  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps):
     naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
     if config.outputrate != config.__getattr__('outputrate'):
       log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
-    minbleps = minblep.loadorcreate(config, clockinfo)
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
 
