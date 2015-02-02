@@ -18,15 +18,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.timer import Timer
 from pym2149.ymformat import YMOpen
 from pym2149.jackclient import JackClient, configure
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
-from pym2149.iface import Chip
 from pym2149.util import awaitinterrupt
-from ymplayer import Player
+from ymplayer import Player, ChipTimer
 
 log = logging.getLogger(__name__)
 
@@ -42,10 +40,8 @@ def main():
       config.contextclock = f.clock
       config.contextpianorollheight = f.framefreq
       configure(di)
-      chip = di(Chip)
-      timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
       di.add(Roll)
-      di.add(timer)
+      di.add(ChipTimer) # TODO LATER: Support sync with jack block schedule.
       di.add(Player)
       di.start()
       awaitinterrupt()
