@@ -23,12 +23,14 @@ from iface import AmpScale
 from out import FloatStream
 from iface import Stream
 from di import types
+from config import Config
 import jack, numpy as np, logging
 
 log = logging.getLogger(__name__)
 
 class JackClient:
 
+  @types(Config)
   def __init__(self, config):
     self.config = config
 
