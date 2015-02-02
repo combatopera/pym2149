@@ -40,10 +40,10 @@ def main():
   try:
     f = di(YMOpen).ym
     config.contextclock = f.clock
+    config.contextpianorollheight = f.framefreq
     configure(di)
     chip = di(Chip)
     timer = Timer(chip.clock)
-    config.contextpianorollheight = f.framefreq
     di.add(Roll)
     di.add(timer)
     di.add(Player)
