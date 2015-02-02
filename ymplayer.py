@@ -17,14 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream
 from pym2149.ymformat import YMOpen
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
-import threading
+import threading, logging
 
 log = logging.getLogger(__name__)
 

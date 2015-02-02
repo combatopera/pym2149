@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from pym2149.initlogging import logging
+import logging
 from pym2149.pitch import Pitch
 from pym2149.program import FX
 from pym2149.const import midichannelcount
