@@ -26,8 +26,33 @@ from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from ymplayer import Background
 
 log = logging.getLogger(__name__)
+
+class MidiPump(Background):
+
+    def __init__(self, midi, channels, minbleps, stream, chip):
+        self.midi = midi
+        self.channels = channels
+        self.minbleps = minbleps
+        self.stream = stream
+        self.chip = chip
+
+    def __call__(self):
+        naivex = 0
+        frame = 0
+        while True:
+            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
+            for event in self.midi.iterevents():
+                log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
+            self.channels.updateall(frame)
+            # Make min amount of chip data to get one JACK block:
+            naiven = self.minbleps.getminnaiven(naivex, self.stream.size)
+            self.stream.call(Block(naiven))
+            self.channels.applyrates()
+            naivex = (naivex + naiven) % self.chip.clock
+            frame += 1
 
 def main():
   config = getprocessconfig()
@@ -45,19 +70,7 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         minbleps = stream.wavs[0].minbleps
-        naivex = 0
-        frame = 0
-        while True:
-          # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
-          for event in midi.iterevents():
-            log.debug("%s @ %s -> %s", event, frame, event(channels, frame))
-          channels.updateall(frame)
-          # Make min amount of chip data to get one JACK block:
-          naiven = minbleps.getminnaiven(naivex, stream.size)
-          stream.call(Block(naiven))
-          channels.applyrates()
-          naivex = (naivex + naiven) % chip.clock
-          frame += 1
+        MidiPump(midi, channels, minbleps, stream, chip)()
       finally:
         di.stop()
 
