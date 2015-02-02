@@ -39,8 +39,6 @@ def main():
     di.start()
     try:
       f = di(YMOpen).ym
-      for info in f.info:
-        log.info(info)
       config.contextclock = f.clock
       configure(di)
       chip = di(Chip)
