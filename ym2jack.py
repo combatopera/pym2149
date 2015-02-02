@@ -24,7 +24,7 @@ from pym2149.jackclient import JackClient, configure
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
+from pym2149.iface import Chip
 from pym2149.util import awaitinterrupt
 from ymplayer import Player
 
@@ -42,19 +42,15 @@ def main():
       di = createdi(config)
       configure(di)
       chip = di(Chip)
-      stream = di(Stream)
-      try:
-        timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
-        config.contextpianorollheight = f.framefreq
-        di.add(f)
-        di.add(Roll)
-        di.add(timer)
-        di.add(Player)
-        di.start()
-        awaitinterrupt()
-        di.stop()
-      finally:
-        stream.close()
+      timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
+      config.contextpianorollheight = f.framefreq
+      di.add(f)
+      di.add(Roll)
+      di.add(timer)
+      di.add(Player)
+      di.start()
+      awaitinterrupt()
+      di.stop()
     finally:
       f.close()
 

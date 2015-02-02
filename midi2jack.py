@@ -36,8 +36,9 @@ def main():
       di = createdi(config)
       configure(di)
       chip = di(Chip)
-      stream = di(Stream)
+      di.start()
       try:
+        stream = di(Stream)
         channels = Channels(config, chip)
         log.info(channels)
         blocksizeseconds = stream.size / config.outputrate
@@ -58,7 +59,7 @@ def main():
           naivex = (naivex + naiven) % chip.clock
           frame += 1
       finally:
-        stream.close()
+        di.stop()
 
 if '__main__' == __name__:
   main()

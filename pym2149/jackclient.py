@@ -67,6 +67,9 @@ class JackStream(object, Node, Stream):
     self.cursor = 0
     self.wavs = wavs
 
+  def start(self):
+    pass # TODO: Move some constructor code here.
+
   def callimpl(self):
     outbufs = [self.chain(wav) for wav in self.wavs]
     n = len(outbufs[0])
@@ -87,7 +90,7 @@ class JackStream(object, Node, Stream):
   def flush(self):
     pass # Nothing to be done.
 
-  def close(self):
+  def stop(self):
     jack.deactivate()
 
 def configure(di):
