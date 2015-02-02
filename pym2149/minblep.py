@@ -146,3 +146,6 @@ class MinBleps:
 
   def paste(self, naivex, diffbuf, outbuf):
     self.pasteminbleps(len(diffbuf), outbuf.buf, self.naivex2outx, len(outbuf), self.demultiplexed, self.naivex2off, diffbuf.buf, naivex, self.naiverate, self.outrate)
+
+def loadorcreate(config, clockinfo):
+    return MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
