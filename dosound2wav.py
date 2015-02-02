@@ -26,6 +26,7 @@ from pym2149.config import getprocessconfig
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from ymplayer import ChipTimer
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +43,8 @@ def main():
   chip = di(Chip)
   di.start()
   try:
-    timer = Timer(chip.clock)
+    di.add(ChipTimer)
+    timer = di(Timer)
     stream = di(Stream)
     dosound(bytecode, chip, timer, stream)
     log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)

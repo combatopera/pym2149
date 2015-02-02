@@ -24,6 +24,7 @@ from pym2149.config import getprocessconfig
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from ymplayer import ChipTimer
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +42,9 @@ def main():
   chip = di(Chip)
   di.start()
   try:
+    di.add(ChipTimer)
     stream = di(Stream)
-    dosound(bytecode, chip, Timer(chip.clock), stream)
+    dosound(bytecode, chip, di(Timer), stream)
     stream.flush()
   finally:
     di.stop()
