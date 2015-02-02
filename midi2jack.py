@@ -28,6 +28,7 @@ from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
 from pym2149.di import types
+from pym2149.util import awaitinterrupt
 from ymplayer import Background
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class MidiPump(Background):
     def __call__(self):
         naivex = 0
         frame = 0
-        while True:
+        while not self.quit:
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
@@ -74,7 +75,8 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         di.add(MidiPump)
-        di(MidiPump)()
+        di.start()
+        awaitinterrupt()
   finally:
         di.stop()
 
