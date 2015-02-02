@@ -23,6 +23,7 @@ from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream
 from pym2149.ymformat import YMOpen
 from pym2149.di import types
+from pym2149.ym2149 import ClockInfo
 import threading
 
 log = logging.getLogger(__name__)
@@ -37,6 +38,12 @@ class Background:
     def stop(self):
         self.quit = True
         self.thread.join()
+
+class ChipTimer(Timer):
+
+    @types(ClockInfo)
+    def __init__(self, clockinfo):
+        Timer.__init__(self, clockinfo.implclock)
 
 class Player(Background):
 
