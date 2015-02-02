@@ -65,7 +65,6 @@ def main():
   di.start()
   try:
         configure(di)
-        chip = di(Chip)
         di.start()
         stream = di(Stream)
         di.add(Channels)
