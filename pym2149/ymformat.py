@@ -19,7 +19,8 @@ from __future__ import division
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from fractions import Fraction
-from iface import YMFile
+from config import Config
+from di import types
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class LoopInfo:
     self.frame = frame
     self.offset = offset
 
-class YM(YMFile):
+class YM:
 
   checkstr = 'LeOnArD!'
   wordstruct = struct.Struct('>H')
@@ -267,23 +268,33 @@ class YM6(YM56):
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
-def ymopen(config):
-  path = config.inpath
-  once = config.ignoreloop
-  f = open(path, 'rb')
-  try:
-    if 'YM' == f.read(2):
-      return impls['YM' + f.read(2)](f, once)
-  except:
-    f.close()
-    raise
-  f.close()
-  f = UnpackedFile(path)
-  try:
-    return impls[f.read(4)](f, once)
-  except:
-    f.close()
-    raise
+class YMOpen:
+
+    @types(Config)
+    def __init__(self, config):
+        self.path = config.inpath
+        self.once = config.ignoreloop
+
+    def start(self):
+        self.f = open(self.path, 'rb')
+        try:
+            if 'YM' == self.f.read(2):
+                self.ym = impls['YM' + self.f.read(2)](self.f, self.once)
+                return
+        except:
+            self.f.close()
+            raise
+        self.f.close()
+        self.f = UnpackedFile(self.path)
+        try:
+            self.ym = impls[self.f.read(4)](self.f, self.once)
+            # return
+        except:
+            self.f.close()
+            raise
+
+    def stop(self):
+        self.f.close()
 
 class UnpackedFile:
 
