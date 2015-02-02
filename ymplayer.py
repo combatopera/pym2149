@@ -20,7 +20,8 @@
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
 from pym2149.vis import Roll
-from pym2149.iface import Chip, Stream, YMFile
+from pym2149.iface import Chip, Stream
+from pym2149.ymformat import YMOpen
 from pym2149.di import types
 import threading
 
@@ -39,9 +40,9 @@ class Background:
 
 class Player(Background):
 
-    @types(YMFile, Chip, Roll, Timer, Stream)
-    def __init__(self, ymfile, chip, roll, timer, stream):
-        self.ymfile = ymfile
+    @types(YMOpen, Chip, Roll, Timer, Stream)
+    def __init__(self, ymopen, chip, roll, timer, stream):
+        self.ymfile = ymopen.ym
         self.chip = chip
         self.roll = roll
         self.timer = timer

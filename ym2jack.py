@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.timer import Timer
-from pym2149.ymformat import ymopen
+from pym2149.ymformat import YMOpen
 from pym2149.jackclient import JackClient, configure
 from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
@@ -34,25 +34,25 @@ def main():
   config = getprocessconfig()
   config.inpath, = config.positional
   with JackClient(config) as jackclient:
-    f = ymopen(config)
+    di = createdi(config)
+    di.add(YMOpen)
+    di.start()
     try:
+      f = di(YMOpen).ym
       for info in f.info:
         log.info(info)
       config.contextclock = f.clock
-      di = createdi(config)
       configure(di)
       chip = di(Chip)
       timer = Timer(chip.clock) # TODO LATER: Support sync with jack block schedule.
       config.contextpianorollheight = f.framefreq
-      di.add(f)
       di.add(Roll)
       di.add(timer)
       di.add(Player)
       di.start()
       awaitinterrupt()
-      di.stop()
     finally:
-      f.close()
+      di.stop()
 
 if '__main__' == __name__:
   main()
