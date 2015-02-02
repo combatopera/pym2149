@@ -66,7 +66,8 @@ def main():
         chip = di(Chip)
         di.start()
         stream = di(Stream)
-        channels = Channels(config, chip)
+        di.add(Channels)
+        channels = di(Channels)
         log.info(channels)
         blocksizeseconds = stream.size / config.outputrate
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
