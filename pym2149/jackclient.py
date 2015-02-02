@@ -17,14 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from initlogging import logging
 from nod import Node, BufNode
 from const import clientname
 from iface import AmpScale
 from out import FloatStream
 from iface import Stream
 from di import types
-import jack, numpy as np
+import jack, numpy as np, logging
 
 log = logging.getLogger(__name__)
 
