@@ -59,8 +59,8 @@ class MidiPump(Background):
 
 def main():
   config = getprocessconfig()
-  midi = Midi(config)
   di = createdi(config)
+  di.add(Midi)
   di.add(JackClient)
   di.start()
   try:
