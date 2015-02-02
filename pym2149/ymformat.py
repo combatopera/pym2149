@@ -276,6 +276,11 @@ class YMOpen:
         self.once = config.ignoreloop
 
     def start(self):
+        self.startimpl()
+        for info in self.ym.info:
+            log.info(info)
+
+    def startimpl(self):
         self.f = open(self.path, 'rb')
         try:
             if 'YM' == self.f.read(2):
