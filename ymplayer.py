@@ -26,7 +26,18 @@ import threading
 
 log = logging.getLogger(__name__)
 
-class Player:
+class Background:
+
+    def start(self):
+        self.quit = False
+        self.thread = threading.Thread(target = self)
+        self.thread.start()
+
+    def stop(self):
+        self.quit = True
+        self.thread.join()
+
+class Player(Background):
 
     @types(YMFile, Chip, Roll, Timer, Stream)
     def __init__(self, ymfile, chip, roll, timer, stream):
@@ -35,11 +46,6 @@ class Player:
         self.roll = roll
         self.timer = timer
         self.stream = stream
-
-    def start(self):
-        self.quit = False
-        self.thread = threading.Thread(target = self)
-        self.thread.start()
 
     def __call__(self):
         for frame in self.ymfile:
@@ -50,7 +56,3 @@ class Player:
             for b in self.timer.blocksforperiod(self.ymfile.framefreq):
                 self.stream.call(b)
         self.stream.flush()
-
-    def stop(self):
-        self.quit = True
-        self.thread.join()
