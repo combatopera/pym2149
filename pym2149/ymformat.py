@@ -281,7 +281,7 @@ class YMOpen:
         for info in self.ym.info:
             log.info(info)
         self.config.contextclock = self.ym.clock
-        self.config.contextpianorollheight = self.ym.framefreq
+        self.pianorollheight = self.ym.framefreq
 
     def startimpl(self):
         self.f = open(self.path, 'rb')

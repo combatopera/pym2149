@@ -24,6 +24,7 @@ import minblep
 
 def createdi(config):
     di = DI()
+    config.di = di
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)

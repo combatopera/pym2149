@@ -18,6 +18,7 @@
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
+from pym2149.ymformat import YMOpen
 
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
@@ -49,7 +50,7 @@ defaultignoreloop = False
 ignoreloop = config.defaultignoreloop
 '''If True playback will not loop.'''
 
-pianorollheight = config.contextpianorollheight
+pianorollheight = config.di(YMOpen).pianorollheight
 '''You can override the deduced piano roll height here.'''
 
 midichannelbase = 1
