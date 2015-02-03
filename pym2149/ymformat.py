@@ -274,11 +274,14 @@ class YMOpen:
     def __init__(self, config):
         self.path = config.inpath
         self.once = config.ignoreloop
+        self.config = config
 
     def start(self):
         self.startimpl()
         for info in self.ym.info:
             log.info(info)
+        self.config.contextclock = self.ym.clock
+        self.config.contextpianorollheight = self.ym.framefreq
 
     def startimpl(self):
         self.f = open(self.path, 'rb')

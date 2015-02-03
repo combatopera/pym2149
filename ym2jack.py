@@ -37,9 +37,6 @@ def main():
   try:
       di.add(YMOpen)
       di.start()
-      f = di(YMOpen).ym
-      config.contextclock = f.clock
-      config.contextpianorollheight = f.framefreq
       configure(di)
       di.add(Roll)
       di.add(ChipTimer) # TODO LATER: Support sync with jack block schedule.
