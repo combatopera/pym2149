@@ -36,9 +36,6 @@ def main():
   di.add(YMOpen)
   di.start()
   try:
-    f = di(YMOpen).ym
-    config.contextclock = f.clock
-    config.contextpianorollheight = f.framefreq
     configure(di)
     di.add(Roll)
     di.add(ChipTimer)
