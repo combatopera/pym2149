@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+import logging, inspect
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,13 @@ class Creator(Source):
     def __call__(self):
         if self.instance is None:
             log.debug("%s: %s", self.action, self.typelabel)
-            self.instance = self.callable(*(self.di(t) for t in self.getdeptypes(self.callable)))
+            deptypes, defaults = self.getdeptypesanddefaults(self.callable)
+            if defaults:
+                args = [self.di(t) for t in deptypes[:-len(defaults)]]
+                args += [self.di(t, default = d) for t, d in zip(deptypes[-len(defaults):], defaults)]
+            else:
+                args = [self.di(t) for t in deptypes]
+            self.instance = self.callable(*args)
         return self.instance
 
 class Class(Creator):
@@ -98,10 +104,11 @@ class Class(Creator):
     def getowntype(clazz):
         return clazz
 
-    def getdeptypes(self, clazz):
+    def getdeptypesanddefaults(self, clazz):
         ctor = getattr(clazz, '__init__')
+        defaults = inspect.getargspec(ctor).defaults
         try:
-            return ctor.di_deptypes
+            return ctor.di_deptypes, defaults
         except AttributeError:
             raise Exception("Missing types annotation: %s" % self.typelabel)
 
@@ -114,8 +121,8 @@ class Factory(Creator):
         return factory.di_owntype
 
     @staticmethod
-    def getdeptypes(factory):
-        return factory.di_deptypes
+    def getdeptypesanddefaults(factory):
+        return factory.di_deptypes, inspect.getargspec(factory).defaults
 
 class DI:
 
@@ -162,8 +169,10 @@ class DI:
     def all(self, type):
         return [source() for source in self.typetosources.get(type, [])]
 
-    def __call__(self, type):
+    def __call__(self, type, **kwargs):
         objs = self.all(type)
+        if not objs and 'default' in kwargs:
+            return kwargs['default']
         if 1 != len(objs):
             raise Exception("Expected 1 object of type %s but got: %s" % (type, len(objs)))
         return objs[0]
