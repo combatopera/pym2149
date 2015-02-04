@@ -80,6 +80,34 @@ class TestDI(unittest.TestCase):
         self.assertIs(P, i.__class__)
         self.assertEqual(5, i)
 
+    def test_optional(self):
+        class A:
+            @types()
+            def __init__(self): pass
+        class B:
+            @types()
+            def __init__(self): pass
+        class Opt:
+            @types(A, B)
+            def __init__(self, a, b = 123):
+                self.a = a
+                self.b = b
+        di = DI()
+        di.add(A)
+        di.add(Opt)
+        opt = di(Opt)
+        self.assertIs(A, opt.a.__class__)
+        self.assertEqual(123, opt.b)
+        di.add(B)
+        self.assertEqual(123, di(Opt).b) # It's cached.
+        di = DI()
+        di.add(A)
+        di.add(B)
+        di.add(Opt)
+        opt = di(Opt)
+        self.assertIs(A, opt.a.__class__)
+        self.assertIs(B, opt.b.__class__)
+
     class Eventful:
 
         @types(list)
