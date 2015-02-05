@@ -22,7 +22,7 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-from iface import AmpScale, Chip
+from iface import AmpScale, Chip, YMFile
 from config import Config
 from di import types
 import logging
@@ -66,13 +66,13 @@ class Registers:
 
 class ClockInfo:
 
-  @types(Config)
-  def __init__(self, config):
+  @types(Config, YMFile)
+  def __init__(self, config, ymfile = None):
     if config.nominalclock % config.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
     self.implclock = config.nominalclock // config.underclock
-    if 'contextclock' in config.__dict__ and config.nominalclock != config.contextclock:
-      log.info("Context clock %s overridden to: %s", config.contextclock, config.nominalclock)
+    if ymfile is not None and config.nominalclock != ymfile.nominalclock:
+      log.info("Context clock %s overridden to: %s", ymfile.nominalclock, config.nominalclock)
     if self.implclock != config.nominalclock:
       log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
 

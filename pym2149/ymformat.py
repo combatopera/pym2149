@@ -21,6 +21,7 @@ from ym2149 import stclock
 from fractions import Fraction
 from config import Config
 from di import types
+from iface import YMFile
 
 log = logging.getLogger(__name__)
 
@@ -268,19 +269,18 @@ class YM6(YM56):
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
 
-class YMOpen:
+class YMOpen(YMFile):
 
     @types(Config)
     def __init__(self, config):
         self.path = config.inpath
         self.once = config.ignoreloop
-        self.config = config
 
     def start(self):
         self.startimpl()
         for info in self.ym.info:
             log.info(info)
-        self.config.contextclock = self.ym.clock
+        self.nominalclock = self.ym.clock
         self.pianorollheight = self.ym.framefreq
 
     def startimpl(self):
