@@ -85,8 +85,6 @@ class FloatStream(list):
   @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps):
     naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
-    if config.outputrate != config.__getattr__('outputrate'):
-      log.warn("Configured outputrate %s overriden to %s: %s", config.__getattr__('outputrate'), config.outputrateoverridelabel, config.outputrate)
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
 

@@ -24,3 +24,5 @@ class Chip: pass
 class Stream: pass
 
 class YMFile: pass
+
+class JackConnection: pass

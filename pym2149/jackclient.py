@@ -21,14 +21,14 @@ from nod import Node, BufNode
 from const import clientname
 from iface import AmpScale
 from out import FloatStream
-from iface import Stream
+from iface import Stream, JackConnection
 from di import types
 from config import Config
 import jack, numpy as np, logging
 
 log = logging.getLogger(__name__)
 
-class JackClient:
+class JackClient(JackConnection):
 
   @types(Config)
   def __init__(self, config):
@@ -36,8 +36,7 @@ class JackClient:
 
   def start(self):
     jack.attach(clientname)
-    self.config.outputrate = jack.get_sample_rate()
-    self.config.outputrateoverridelabel = 'JACK rate'
+    self.outputrate = jack.get_sample_rate()
 
   def stop(self):
     jack.detach()
