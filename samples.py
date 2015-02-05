@@ -23,6 +23,7 @@ from pym2149.pitch import Freq
 from sampleslib import Orc, Main
 from fractions import Fraction
 from pym2149.config import getprocessconfig
+from pym2149.boot import createdi
 import os, subprocess, time, sys
 
 log = logging.getLogger(__name__)
@@ -157,7 +158,9 @@ class Target:
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  orc.nomclock = getprocessconfig().nominalclock
+  config = getprocessconfig()
+  createdi(config)
+  orc.nomclock = config.nominalclock
   target = Target()
   with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
   with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')
