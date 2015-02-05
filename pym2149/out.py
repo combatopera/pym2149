@@ -82,9 +82,11 @@ class OutChannel:
 
 class FloatStream(list):
 
-  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps):
+  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, JackConnection)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, jackconn = None):
     naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
+    if jackconn is not None and config.outputrate != jackconn.outputrate:
+      log.info("Context outputrate %s overriden to: %s", jackconn.outputrate, config.outputrate)
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
 
