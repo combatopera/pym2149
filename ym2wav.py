@@ -30,7 +30,6 @@ log = logging.getLogger(__name__)
 
 def main():
   config = getprocessconfig()
-  config.defaultignoreloop = True # Even in stdout case, not sure if that's what we want.
   config.inpath, config.outpath = config.positional
   di = createdi(config)
   di.add(YMOpen)
