@@ -41,10 +41,7 @@ panlaw = 3
 
 maxpan = .75
 
-defaultignoreloop = False
-'''Modified to True when writing to a file.'''
-
-ignoreloop = config.defaultignoreloop
+ignoreloop = hasattr(config, 'outpath')
 '''If True playback will not loop.'''
 
 pianorollheight = config.di(YMFile).pianorollheight
