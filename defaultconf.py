@@ -18,7 +18,7 @@
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
-from pym2149.ymformat import YMOpen
+from pym2149.iface import YMFile
 
 outputrate = 44100
 '''May be ignored e.g. when sending data to JACK we must use its own rate.'''
@@ -32,10 +32,7 @@ underclock = 8
 oscpause = False
 '''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
 
-contextclock = stclock
-'''Modified if a file is being played that specifies its own clock.'''
-
-nominalclock = config.contextclock
+nominalclock = config.di(YMFile).nominalclock if config.di.all(YMFile) else stclock
 '''You can specify your own clock here, which overrides any other value.'''
 
 stereo = False
@@ -50,7 +47,7 @@ defaultignoreloop = False
 ignoreloop = config.defaultignoreloop
 '''If True playback will not loop.'''
 
-pianorollheight = config.di(YMOpen).pianorollheight
+pianorollheight = config.di(YMFile).pianorollheight
 '''You can override the deduced piano roll height here.'''
 
 midichannelbase = 1
