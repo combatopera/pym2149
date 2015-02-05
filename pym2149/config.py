@@ -22,15 +22,18 @@ from const import appconfigdir
 
 log = logging.getLogger(__name__)
 
-def getprocessconfig():
-  return Config(sys.argv[1:])
+def getprocessconfig(*argnames):
+  return Config(argnames, sys.argv[1:])
 
 class Config(View):
 
-  def __init__(self, args):
+  def __init__(self, argnames, args):
+    if len(argnames) != len(args):
+      raise Exception("Expected %s but got: %s" % (argnames, args))
     loader = Loader()
     View.__init__(self, loader)
-    self.positional = args
+    for argname, arg in zip(argnames, args):
+      setattr(self, argname, arg)
     loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
     configspath = os.path.join(appconfigdir, 'configs')
     if os.path.exists(configspath):

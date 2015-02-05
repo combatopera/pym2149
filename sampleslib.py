@@ -145,8 +145,7 @@ class Main:
     self.refreshrate = refreshrate
 
   def __call__(self, frames, args = sys.argv[1:]):
-    config = Config(args)
-    config.outpath, = config.positional
+    config = Config(['outpath'], args)
     di = createdi(config)
     configure(di)
     chip = di(Chip)
