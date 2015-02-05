@@ -153,7 +153,7 @@ class Target:
     log.debug(path)
     frames = zip(chan, self.dc0, self.dc0)
     start = time.time()
-    self.main(frames, sys.argv[1:] + [path + '.wav'])
+    self.main(frames, path + '.wav')
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
