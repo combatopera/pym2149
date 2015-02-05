@@ -144,8 +144,8 @@ class Main:
   def __init__(self, refreshrate):
     self.refreshrate = refreshrate
 
-  def __call__(self, frames, args = sys.argv[1:]):
-    config = Config(['outpath'], args)
+  def __call__(self, frames, outpath):
+    config = Config(['outpath'], [outpath])
     di = createdi(config)
     configure(di)
     chip = di(Chip)
