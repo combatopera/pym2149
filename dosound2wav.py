@@ -31,8 +31,7 @@ from ymplayer import ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig()
-  config.inpath, config.srclabel, config.outpath = config.positional
+  config = getprocessconfig('inpath', 'srclabel', 'outpath')
   f = open(config.inpath)
   try:
     bytecode = readbytecode(f, config.srclabel)

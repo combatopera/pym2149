@@ -29,8 +29,7 @@ from ymplayer import ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig()
-  config.inpath, config.outpath = config.positional
+  config = getprocessconfig('inpath', 'outpath')
   f = open(config.inpath, 'rb')
   try:
     log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))

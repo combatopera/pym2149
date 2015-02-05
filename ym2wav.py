@@ -29,8 +29,7 @@ from ymplayer import Player, ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig()
-  config.inpath, config.outpath = config.positional
+  config = getprocessconfig('inpath', 'outpath')
   di = createdi(config)
   di.add(YMOpen)
   di.start()

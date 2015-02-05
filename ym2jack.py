@@ -29,8 +29,7 @@ from ymplayer import Player, ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig()
-  config.inpath, = config.positional
+  config = getprocessconfig('inpath')
   di = createdi(config)
   di.add(JackClient)
   di.start()
