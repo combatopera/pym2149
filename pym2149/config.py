@@ -36,11 +36,16 @@ class Config(View):
       setattr(self, argname, arg)
     loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
     configspath = os.path.join(appconfigdir, 'configs')
+    defaultconfigname = 'defaults'
+    confignames = [defaultconfigname]
     if os.path.exists(configspath):
-      configs = ['defaults'] + sorted(os.listdir(configspath))
-      for i, config in enumerate(configs):
-        print >> sys.stderr, "%s) %s" % (i, config)
+      confignames += sorted(os.listdir(configspath))
+    if 1 == len(confignames):
+      configname, = confignames
+    else:
+      for i, cn in enumerate(confignames):
+        print >> sys.stderr, "%s) %s" % (i, cn)
       sys.stderr.write('#? ')
-      i = int(raw_input())
-      if i:
-        loader.load(os.path.join(configspath, configs[i]))
+      configname = confignames[int(raw_input())]
+    if defaultconfigname != configname:
+      loader.load(os.path.join(configspath, configname))
