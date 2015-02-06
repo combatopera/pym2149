@@ -22,12 +22,14 @@ from const import appconfigdir
 
 log = logging.getLogger(__name__)
 
-def getprocessconfig(*argnames):
-  return Config(argnames, sys.argv[1:])
+def getprocessconfig(*argnames, **kwargs):
+  return Config(argnames, sys.argv[1:], **kwargs)
 
 class Config(View):
 
-  def __init__(self, argnames, args):
+  defaultconfigname = 'defaults'
+
+  def __init__(self, argnames, args, **kwargs):
     if len(argnames) != len(args):
       raise Exception("Expected %s but got: %s" % (argnames, args))
     loader = Loader()
@@ -36,16 +38,18 @@ class Config(View):
       setattr(self, argname, arg)
     loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
     configspath = os.path.join(appconfigdir, 'configs')
-    defaultconfigname = 'defaults'
-    confignames = [defaultconfigname]
-    if os.path.exists(configspath):
-      confignames += sorted(os.listdir(configspath))
-    if 1 == len(confignames):
-      configname, = confignames
+    if 'configname' in kwargs:
+      configname = kwargs['configname']
     else:
-      for i, cn in enumerate(confignames):
-        print >> sys.stderr, "%s) %s" % (i, cn)
-      sys.stderr.write('#? ')
-      configname = confignames[int(raw_input())]
-    if defaultconfigname != configname:
+      confignames = [self.defaultconfigname]
+      if os.path.exists(configspath):
+        confignames += sorted(os.listdir(configspath))
+      if 1 == len(confignames):
+        configname, = confignames
+      else:
+        for i, cn in enumerate(confignames):
+          print >> sys.stderr, "%s) %s" % (i, cn)
+        sys.stderr.write('#? ')
+        configname = confignames[int(raw_input())]
+    if self.defaultconfigname != configname:
       loader.load(os.path.join(configspath, configname))
