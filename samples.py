@@ -24,7 +24,7 @@ from sampleslib import Orc, Main
 from fractions import Fraction
 from pym2149.config import getprocessconfig
 from pym2149.boot import createdi
-import os, subprocess, time, sys
+import os, subprocess, time
 
 log = logging.getLogger(__name__)
 

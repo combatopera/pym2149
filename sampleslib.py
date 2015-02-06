@@ -22,7 +22,7 @@ from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
 from ymplayer import ChipTimer
-import sys, logging
+import logging
 
 log = logging.getLogger(__name__)
 
