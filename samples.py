@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from sampleslib import Orc, Main
 from fractions import Fraction
-from pym2149.config import getprocessconfig
+from pym2149.config import getprocessconfig, Config
 from pym2149.boot import createdi
 import os, subprocess, time
 
@@ -153,7 +153,8 @@ class Target:
     log.debug(path)
     frames = zip(chan, self.dc0, self.dc0)
     start = time.time()
-    self.main(frames, path + '.wav')
+    config = Config(['outpath'], [path + '.wav'], configname = Config.defaultconfigname)
+    self.main(frames, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
