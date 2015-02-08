@@ -17,7 +17,6 @@
 
 from pym2149.timer import Timer
 from pym2149.util import singleton
-from pym2149.config import Config
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
@@ -144,8 +143,7 @@ class Main:
   def __init__(self, refreshrate):
     self.refreshrate = refreshrate
 
-  def __call__(self, frames, outpath):
-    config = Config(['outpath'], [outpath], configname = Config.defaultconfigname)
+  def __call__(self, frames, config):
     di = createdi(config)
     configure(di)
     chip = di(Chip)
