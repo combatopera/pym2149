@@ -23,9 +23,11 @@ from const import appconfigdir
 log = logging.getLogger(__name__)
 
 def getprocessconfig(*argnames, **kwargs):
-  return Config(argnames, sys.argv[1:], **kwargs)
+    return ConfigImpl(argnames, sys.argv[1:], **kwargs)
 
-class Config(View):
+class Config: pass
+
+class ConfigImpl(View, Config):
 
   defaultconfigname = 'defaults'
 
@@ -53,3 +55,14 @@ class Config(View):
         configname = confignames[int(raw_input())]
     if self.defaultconfigname != configname:
       loader.load(os.path.join(configspath, configname))
+
+  def fork(self):
+    return Fork(self)
+
+class Fork(Config):
+
+    def __init__(self, parent):
+        self.parent = parent
+
+    def __getattr__(self, name):
+        return getattr(self.parent, name)
