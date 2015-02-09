@@ -23,7 +23,7 @@ from pym2149.pitch import Freq
 from sampleslib import Orc, Main
 from fractions import Fraction
 from pym2149.config import getprocessconfig
-from pym2149.boot import createdi
+from pym2149.di import DI
 import os, subprocess, time
 
 log = logging.getLogger(__name__)
@@ -162,8 +162,8 @@ class Target:
 
 def main():
   config = getprocessconfig()
-  createdi(config)
-  orc.nomclock = config.nominalclock
+  config.di = DI()
+  orc.nomclock = config.nominalclock # FIXME: Too eager.
   target = Target(config)
   with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
   with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')
