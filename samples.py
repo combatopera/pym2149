@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from sampleslib import Orc, Main
 from fractions import Fraction
-from pym2149.config import getprocessconfig, Config
+from pym2149.config import getprocessconfig
 from pym2149.boot import createdi
 import os, subprocess, time
 
@@ -143,17 +143,19 @@ class Target:
   with orc as play: dc0 = play(1, 's'*10)
   main = Main(refreshrate)
 
-  def __init__(self):
+  def __init__(self, config):
     self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
     if not os.path.exists(self.targetpath):
       os.mkdir(self.targetpath)
+    self.config = config
 
   def dump(self, chan, name):
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     frames = zip(chan, self.dc0, self.dc0)
     start = time.time()
-    config = Config(['outpath'], [path + '.wav'], configname = Config.defaultconfigname)
+    config = self.config.fork()
+    config.outpath = path + '.wav'
     self.main(frames, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
@@ -162,7 +164,7 @@ def main():
   config = getprocessconfig()
   createdi(config)
   orc.nomclock = config.nominalclock
-  target = Target()
+  target = Target(config)
   with orc as play: target.dump(play(2, 'T..', [250]), 'tone250')
   with orc as play: target.dump(play(2, 'T..', [1000]), 'tone1k')
   with orc as play: target.dump(play(2, 'T..', [1500]), 'tone1k5')
