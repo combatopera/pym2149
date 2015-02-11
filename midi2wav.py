@@ -19,7 +19,7 @@
 
 from __future__ import division
 from pym2149.initlogging import logging
-from pym2149.jackclient import JackClient, configure
+from pym2149.out import configure
 from pym2149.nod import Block
 from pym2149.midi import Midi
 from pym2149.config import getprocessconfig
@@ -62,7 +62,6 @@ def main():
   config = getprocessconfig()
   di = createdi(config)
   di.add(Midi)
-  di.add(JackClient)
   di.start()
   try:
         configure(di)
