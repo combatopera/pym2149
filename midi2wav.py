@@ -62,10 +62,9 @@ def main():
   config = getprocessconfig('outpath')
   di = createdi(config)
   di.add(Midi)
+  configure(di)
   di.start()
   try:
-        configure(di)
-        di.start()
         stream = di(Stream)
         di.add(Channels)
         channels = di(Channels)
