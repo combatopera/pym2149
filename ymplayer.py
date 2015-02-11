@@ -19,8 +19,7 @@
 
 from pym2149.timer import Timer
 from pym2149.vis import Roll
-from pym2149.iface import Chip, Stream
-from pym2149.ymformat import YMOpen
+from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 import threading, logging
@@ -46,20 +45,20 @@ class ChipTimer(Timer):
 
 class Player(Background):
 
-    @types(YMOpen, Chip, Roll, Timer, Stream)
-    def __init__(self, ymopen, chip, roll, timer, stream):
-        self.ymfile = ymopen.ym
+    @types(YMFile, Chip, Roll, Timer, Stream)
+    def __init__(self, ymfile, chip, roll, timer, stream):
+        self.ym = ymfile.ym
         self.chip = chip
         self.roll = roll
         self.timer = timer
         self.stream = stream
 
     def __call__(self):
-        for frame in self.ymfile:
+        for frame in self.ym:
             if self.quit:
                 break
             frame(self.chip)
             self.roll.update()
-            for b in self.timer.blocksforperiod(self.ymfile.framefreq):
+            for b in self.timer.blocksforperiod(self.ym.framefreq):
                 self.stream.call(b)
         self.stream.flush()
