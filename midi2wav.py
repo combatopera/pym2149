@@ -59,7 +59,7 @@ class MidiPump(Background):
             frame += 1
 
 def main():
-  config = getprocessconfig()
+  config = getprocessconfig('outpath')
   di = createdi(config)
   di.add(Midi)
   di.start()
