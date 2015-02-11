@@ -69,9 +69,6 @@ def main():
         di.add(Channels)
         channels = di(Channels)
         log.info(channels)
-        blocksizeseconds = stream.size / config.outputrate
-        log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
-        log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
         di.add(MidiPump)
         di.start()
         awaitinterrupt()
