@@ -20,7 +20,6 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.out import configure
-from pym2149.nod import Block
 from pym2149.midi import Midi
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
@@ -29,51 +28,51 @@ from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
-from ymplayer import Background
+from ymplayer import Background, ChipTimer
 
 log = logging.getLogger(__name__)
 
 class MidiPump(Background):
 
-    @types(Midi, Channels, MinBleps, Stream, Chip)
-    def __init__(self, midi, channels, minbleps, stream, chip):
+    framefreq = 50 # TODO: Make configurable.
+
+    @types(Midi, Channels, MinBleps, Stream, Chip, ChipTimer)
+    def __init__(self, midi, channels, minbleps, stream, chip, timer):
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
         self.stream = stream
         self.chip = chip
+        self.timer = timer
 
     def __call__(self):
-        naivex = 0
         frame = 0
         while not self.quit:
-            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
             self.channels.updateall(frame)
-            # Make min amount of chip data to get one JACK block:
-            naiven = self.minbleps.getminnaiven(naivex, self.stream.size)
-            self.stream.call(Block(naiven))
+            for b in self.timer.blocksforperiod(self.framefreq):
+                self.stream.call(b)
             self.channels.applyrates()
-            naivex = (naivex + naiven) % self.chip.clock
             frame += 1
+        self.stream.flush()
 
 def main():
-  config = getprocessconfig('outpath')
-  di = createdi(config)
-  di.add(Midi)
-  configure(di)
-  di.start()
-  try:
-        stream = di(Stream)
+    config = getprocessconfig('outpath')
+    di = createdi(config)
+    di.add(Midi)
+    configure(di)
+    di.start()
+    try:
         di.add(Channels)
         channels = di(Channels)
         log.info(channels)
+        di.add(ChipTimer)
         di.add(MidiPump)
         di.start()
         awaitinterrupt()
-  finally:
+    finally:
         di.stop()
 
 if '__main__' == __name__:
-  main()
+    main()
