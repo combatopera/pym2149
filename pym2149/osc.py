@@ -136,7 +136,7 @@ class TimerSynth(BufNode):
     self.diff = RationalDiff(self.bindiffdtype, clock, freqreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
-    self.chain(self.diff)(self.blockbuf)
+    self.chain(self.diff)(self.blockbuf) # FIXME: Can contain 2.
 
 class ToneOsc(BufNode):
 
