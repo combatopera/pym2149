@@ -122,6 +122,7 @@ class RationalDiff(BinDiff):
       lcd = fraclcd(stepsize, stepindex)
       indices = -((-fracint(stepindex, lcd) - np.arange(stepcount) * fracint(stepsize, lcd)) // lcd)
       dc = self.ringcursor.currentdc()
+      # FIXME: Values can integrate to 2.
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
       self.progress = self.block.framecount - (stepcount - 1) * stepsize - stepindex
@@ -136,7 +137,7 @@ class TimerSynth(BufNode):
     self.diff = RationalDiff(self.bindiffdtype, clock, freqreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
-    self.chain(self.diff)(self.blockbuf) # FIXME: Can contain 2.
+    self.chain(self.diff)(self.blockbuf)
 
 class ToneOsc(BufNode):
 
