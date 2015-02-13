@@ -28,6 +28,7 @@ from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
+from pym2149.timer import Timer
 from ymplayer import Background, ChipTimer
 
 log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class MidiPump(Background):
 
     framefreq = 50 # TODO: Make configurable.
 
-    @types(Midi, Channels, MinBleps, Stream, Chip, ChipTimer)
+    @types(Midi, Channels, MinBleps, Stream, Chip, Timer)
     def __init__(self, midi, channels, minbleps, stream, chip, timer):
         self.midi = midi
         self.channels = channels
