@@ -29,34 +29,49 @@ from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
+from pym2149.timer import Timer
+from pym2149.ym2149 import ClockInfo
 from ymplayer import Background
 
 log = logging.getLogger(__name__)
 
+class JackTimer(Timer):
+
+    @types(Stream, MinBleps, ClockInfo)
+    def __init__(self, stream, minbleps, clockinfo):
+        self.jacksize = stream.size
+        self.naiverate = clockinfo.implclock
+        self.naivex = 0
+        self.minbleps = minbleps
+
+    def blocksforperiod(self, refreshrate):
+        # Make min amount of chip data to get one JACK block:
+        naiven = self.minbleps.getminnaiven(self.naivex, self.jacksize)
+        yield Block(naiven)
+        self.naivex = (self.naivex + naiven) % self.naiverate
+
 class MidiPump(Background):
 
-    @types(Midi, Channels, MinBleps, Stream, Chip)
-    def __init__(self, midi, channels, minbleps, stream, chip):
+    @types(Midi, Channels, MinBleps, Stream, Chip, Timer)
+    def __init__(self, midi, channels, minbleps, stream, chip, timer):
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
         self.stream = stream
         self.chip = chip
+        self.timer = timer
 
     def __call__(self):
-        naivex = 0
         frame = 0
         while not self.quit:
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
             self.channels.updateall(frame)
-            # Make min amount of chip data to get one JACK block:
-            naiven = self.minbleps.getminnaiven(naivex, self.stream.size)
-            self.stream.call(Block(naiven))
-            self.channels.applyrates()
-            naivex = (naivex + naiven) % self.chip.clock
-            frame += 1
+            for block in self.timer.blocksforperiod(None):
+                self.stream.call(block)
+                self.channels.applyrates()
+                frame += 1
 
 def main():
   config = getprocessconfig()
@@ -74,6 +89,7 @@ def main():
         blocksizeseconds = stream.size / config.outputrate
         log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
         log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
+        di.add(JackTimer)
         di.add(MidiPump)
         di.start()
         awaitinterrupt()
