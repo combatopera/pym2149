@@ -19,28 +19,53 @@
 
 from __future__ import division
 import unittest
-from timer import Timer
+from timer import SimpleTimer, MinBlockRateTimer
 
-class TestTimer(unittest.TestCase):
+class TestSimpleTimer(unittest.TestCase):
+
+  def periodframecount(self, rate):
+    block, = self.t.blocksforperiod(rate)
+    return block.framecount
 
   def test_carry(self):
     clock = 2000000
-    t = Timer(clock, None)
-    def nextframecount(rate):
-      blocks = list(t.blocksforperiod(rate))
-      self.assertEqual(1, len(blocks))
-      return blocks[0].framecount
-    self.assertEqual(33333, nextframecount(60))
+    t = self.t = SimpleTimer(clock)
+    self.assertEqual(33333, self.periodframecount(60))
     self.assertEqual(20, t.carryticks)
-    self.assertEqual(33334, nextframecount(60))
+    self.assertEqual(33334, self.periodframecount(60))
     self.assertEqual(-20, t.carryticks)
-    self.assertEqual(33333, nextframecount(60))
+    self.assertEqual(33333, self.periodframecount(60))
     self.assertEqual(0, t.carryticks)
-    self.assertEqual(clock * 10, nextframecount(.1))
+    self.assertEqual(clock * 10, self.periodframecount(.1))
     self.assertEqual(0, t.carryticks)
 
+  def test_fractionalrefreshrates(self):
+    t = self.t = SimpleTimer(100)
+    self.assertEqual(200, self.periodframecount(.5))
+    self.assertEqual(0, t.carryticks)
+    self.assertEqual(300, self.periodframecount(1 / 3))
+    self.assertEqual(0, t.carryticks)
+    self.assertEqual(67, self.periodframecount(1.5))
+    self.assertEqual(-.5, t.carryticks)
+    self.assertEqual(66, self.periodframecount(1.5))
+    self.assertEqual(.5, t.carryticks)
+    self.assertEqual(67, self.periodframecount(1.5))
+    self.assertEqual(0, t.carryticks)
+
+  def test_nonintegerclock(self):
+    t = self.t = SimpleTimer(100.5)
+    self.assertEqual(34, self.periodframecount(3))
+    self.assertEqual(-1.5, t.carryticks)
+    self.assertEqual(33, self.periodframecount(3))
+    self.assertEqual(0, t.carryticks)
+    self.assertEqual(34, self.periodframecount(3))
+    self.assertEqual(-1.5, t.carryticks)
+    t.carryticks = 0
+
+class TestMinBlockRateTimer(unittest.TestCase):
+
   def test_minblockrate(self):
-    t = Timer(1000, 2)
+    t = MinBlockRateTimer(1000, 2)
     self.assertEqual([333], [b.framecount for b in t.blocksforperiod(3)])
     self.assertEqual(1, t.carryticks)
     self.assertEqual([334], [b.framecount for b in t.blocksforperiod(3)])
@@ -57,33 +82,10 @@ class TestTimer(unittest.TestCase):
     t.carryticks = 0
 
   def test_inexactminblockrate(self):
-    t = Timer(1000, 3)
+    t = MinBlockRateTimer(1000, 3)
     # Every block satisfies the given condition:
     self.assertEqual([333, 333, 333, 1], [b.framecount for b in t.blocksforperiod(1)])
     self.assertEqual(0, t.carryticks)
-
-  def test_fractionalrefreshrates(self):
-    t = Timer(100, None)
-    self.assertEqual([200], [b.framecount for b in t.blocksforperiod(.5)])
-    self.assertEqual(0, t.carryticks)
-    self.assertEqual([300], [b.framecount for b in t.blocksforperiod(1 / 3)])
-    self.assertEqual(0, t.carryticks)
-    self.assertEqual([67], [b.framecount for b in t.blocksforperiod(1.5)])
-    self.assertEqual(-.5, t.carryticks)
-    self.assertEqual([66], [b.framecount for b in t.blocksforperiod(1.5)])
-    self.assertEqual(.5, t.carryticks)
-    self.assertEqual([67], [b.framecount for b in t.blocksforperiod(1.5)])
-    self.assertEqual(0, t.carryticks)
-
-  def test_nonintegerclock(self):
-    t = Timer(100.5, None)
-    self.assertEqual([34], [b.framecount for b in t.blocksforperiod(3)])
-    self.assertEqual(-1.5, t.carryticks)
-    self.assertEqual([33], [b.framecount for b in t.blocksforperiod(3)])
-    self.assertEqual(0, t.carryticks)
-    self.assertEqual([34], [b.framecount for b in t.blocksforperiod(3)])
-    self.assertEqual(-1.5, t.carryticks)
-    t.carryticks = 0
 
 if __name__ == '__main__':
   unittest.main()
