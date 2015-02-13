@@ -85,7 +85,7 @@ def fraclcd(f, g): # The LCD is the LCM of the denominators.
   return fd * gd // fractions.gcd(fd, gd)
 
 def fracint(f, denominator):
-  return f.numerator * denominator // f.denominator
+  return np.int64(f.numerator) * denominator // f.denominator
 
 class RationalDiff(BinDiff):
 
