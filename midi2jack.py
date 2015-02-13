@@ -29,7 +29,7 @@ from pym2149.iface import Chip, Stream
 from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
-from pym2149.timer import Timer
+from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
 from ymplayer import Background
 
@@ -49,6 +49,27 @@ class JackTimer(Timer):
         naiven = self.minbleps.getminnaiven(self.naivex, self.jacksize)
         yield Block(naiven)
         self.naivex = (self.naivex + naiven) % self.naiverate
+
+class SyncTimer(SimpleTimer):
+
+    @types(Stream, MinBleps, ClockInfo)
+    def __init__(self, stream, minbleps, clockinfo):
+        self.naiverate = clockinfo.implclock
+        SimpleTimer.__init__(self, self.naiverate)
+        self.jacksize = stream.size
+        self.naivex = 0
+        self.jackx = 0
+        self.minbleps = minbleps
+
+    def blocksforperiod(self, refreshrate):
+        wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
+        naiveN = wholeperiodblock.framecount
+        while naiveN:
+            naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.jacksize - self.jackx))
+            yield Block(naiven)
+            self.jackx = (self.jackx + self.minbleps.getoutcount(self.naivex, naiven)) % self.jacksize
+            self.naivex = (self.naivex + naiven) % self.naiverate
+            naiveN -= naiven
 
 class MidiPump(Background):
 
