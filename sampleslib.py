@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import Timer
+from pym2149.timer import Timer, SimpleTimer
 from pym2149.util import singleton
 from pym2149.out import configure
 from pym2149.boot import createdi
@@ -82,7 +82,7 @@ class Orc(dict):
     return cls
 
   def __enter__(self):
-    self.timers.append(Timer(self.ticksperbar, None))
+    self.timers.append(SimpleTimer(self.ticksperbar))
     return Play(self, self.timers[-1])
 
   def __exit__(self, exc_type, exc_value, traceback):
