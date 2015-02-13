@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import Timer
+from pym2149.timer import Timer, MinBlockRateTimer
 from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
@@ -37,11 +37,11 @@ class Background:
         self.quit = True
         self.thread.join()
 
-class ChipTimer(Timer):
+class ChipTimer(MinBlockRateTimer):
 
     @types(ClockInfo)
     def __init__(self, clockinfo):
-        Timer.__init__(self, clockinfo.implclock)
+        MinBlockRateTimer.__init__(self, clockinfo.implclock, 100)
 
 class Player(Background):
 
