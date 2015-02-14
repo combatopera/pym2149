@@ -121,10 +121,11 @@ class WavBuf(Node):
     diffbuf = self.diffmaster.differentiate(self.dc, naivebuf)
     outcount = self.minbleps.getoutcount(self.naivex, self.block.framecount)
     # Make space for all samples we can output plus overflow:
-    outbuf = self.outmaster.ensureandcrop(outcount + self.overflowsize)
+    outsize = outcount + self.overflowsize
+    outbuf = self.outmaster.ensureandcrop(outsize)
     # Paste in the carry followed by the carried dc level:
     outbuf.buf[:self.overflowsize] = self.carrybuf.buf
-    outbuf.buf[self.overflowsize:] = self.dc
+    outbuf.fillpart(self.overflowsize, outsize, self.dc)
     self.minbleps.paste(self.naivex, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex = (self.naivex + self.block.framecount) % self.naiverate
