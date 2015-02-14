@@ -99,6 +99,8 @@ class NullBuf(AnyBuf):
 
   def fillpart(self, *args): pass
 
+  def partcopyintonp(self, *args): pass
+
   def fill(self, *args): pass
 
   def subbuf(self, *args): pass
@@ -121,6 +123,9 @@ class Buf(AnyBuf):
 
   def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
+
+  def partcopyintonp(self, startframe, endframe, that):
+    that[:] = self.buf[startframe:endframe]
 
   def fill(self, value):
     self.buf[:] = value

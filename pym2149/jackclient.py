@@ -76,7 +76,7 @@ class JackStream(object, Node, Stream):
     while i < n:
       m = min(n - i, self.size - self.cursor)
       for c in xrange(len(self.wavs)):
-        self.jack[c, self.cursor:self.cursor + m] = outbufs[c].buf[i:i + m]
+        outbufs[c].partcopyintonp(i, i + m, self.jack[c, self.cursor:self.cursor + m])
       self.cursor += m
       i += m
       if self.cursor == self.size:
