@@ -127,7 +127,7 @@ class WavBuf(Node):
     outbuf.copyasprefix(self.overflowsize, self.carrybuf)
     outbuf.fillpart(self.overflowsize, outsize, self.dc)
     self.minbleps.paste(self.naivex, diffbuf, outbuf)
-    self.carrybuf.buf[:] = outbuf.buf[outcount:]
+    self.carrybuf.copywindow(outbuf, outcount, outsize)
     self.naivex = (self.naivex + self.block.framecount) % self.naiverate
     self.dc = naivebuf.last()
     return Buf(outbuf.buf[:outcount])

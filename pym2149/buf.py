@@ -101,6 +101,8 @@ class NullBuf(AnyBuf):
 
   def copyasprefix(self, *args): pass
 
+  def copywindow(self, *args): pass
+
   def fillpart(self, *args): pass
 
   def partcopyintonp(self, *args): pass
@@ -130,6 +132,9 @@ class Buf(AnyBuf):
 
   def copyasprefix(self, endframe, that):
     self.buf[:endframe] = that.buf
+
+  def copywindow(self, that, startframe, endframe):
+    self.buf[:] = that.buf[startframe:endframe]
 
   def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
