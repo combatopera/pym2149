@@ -97,7 +97,7 @@ class RingCursor:
 @singleton
 class NullBuf(AnyBuf):
 
-  def copyprefix(self, *args): pass
+  def copyasprefix(self, *args): pass
 
   def fillpart(self, *args): pass
 
@@ -123,14 +123,14 @@ class Buf(AnyBuf):
   def __len__(self):
     return len(self.buf)
 
-  def copyprefix(self, endframe, that):
+  def copyasprefix(self, endframe, that):
     self.buf[:endframe] = that.buf
 
   def fillpart(self, startframe, endframe, value):
     self.buf[startframe:endframe] = value
 
-  def partcopyintonp(self, startframe, endframe, that):
-    that[:] = self.buf[startframe:endframe]
+  def partcopyintonp(self, startframe, endframe, thatnp):
+    thatnp[:] = self.buf[startframe:endframe]
 
   def fill(self, value):
     self.buf[:] = value
