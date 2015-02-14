@@ -129,7 +129,7 @@ class WavBuf(Node):
     self.minbleps.paste(self.naivex, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
     self.naivex = (self.naivex + self.block.framecount) % self.naiverate
-    self.dc = naivebuf.buf[-1]
+    self.dc = naivebuf.last()
     return Buf(outbuf.buf[:outcount])
 
 def configure(di):
