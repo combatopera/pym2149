@@ -97,6 +97,8 @@ class RingCursor:
 @singleton
 class NullBuf(AnyBuf):
 
+  def last(self, *args): pass
+
   def copyasprefix(self, *args): pass
 
   def fillpart(self, *args): pass
@@ -122,6 +124,9 @@ class Buf(AnyBuf):
 
   def __len__(self):
     return len(self.buf)
+
+  def last(self):
+    return self.buf[-1]
 
   def copyasprefix(self, endframe, that):
     self.buf[:endframe] = that.buf
