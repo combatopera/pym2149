@@ -124,7 +124,7 @@ class WavBuf(Node):
     outsize = outcount + self.overflowsize
     outbuf = self.outmaster.ensureandcrop(outsize)
     # Paste in the carry followed by the carried dc level:
-    outbuf.buf[:self.overflowsize] = self.carrybuf.buf
+    outbuf.copyprefix(self.overflowsize, self.carrybuf)
     outbuf.fillpart(self.overflowsize, outsize, self.dc)
     self.minbleps.paste(self.naivex, diffbuf, outbuf)
     self.carrybuf.buf[:] = outbuf.buf[outcount:]
