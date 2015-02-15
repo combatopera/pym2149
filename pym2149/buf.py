@@ -202,7 +202,6 @@ class MasterBuf:
 
   def ensureandcrop(self, framecount):
     if self.size > framecount:
-      print self.size, framecount
       return Buf(self.buf[:framecount])
     if self.size < framecount:
       # Ideally we would resize in-place, but that can fall foul of numpy reference counting:
