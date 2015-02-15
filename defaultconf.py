@@ -44,6 +44,8 @@ maxpan = .75
 ignoreloop = hasattr(config, 'outpath')
 '''If True playback will not loop.'''
 
+updaterate = config.di(YMFile).updaterate if config.di.all(YMFile) else 50
+
 pianorollheight = config.di(YMFile).pianorollheight
 '''You can override the deduced piano roll height here.'''
 
