@@ -107,7 +107,7 @@ class WavBuf(Node):
     self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
     # Need space for a whole mixin in case it is rooted at sample outcount:
     self.overflowsize = minbleps.mixinsize
-    self.carrybuf = Buf(np.empty(self.overflowsize, dtype = BufNode.floatdtype))
+    self.carrybuf = MasterBuf(dtype = BufNode.floatdtype).ensureandcrop(self.overflowsize)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
