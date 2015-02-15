@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.nod import Block
 from pym2149.midi import Midi
-from pym2149.config import getprocessconfig
+from pym2149.config import getprocessconfig, Config
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
@@ -34,21 +34,6 @@ from pym2149.ym2149 import ClockInfo
 from ymplayer import Background
 
 log = logging.getLogger(__name__)
-
-class JackTimer(Timer):
-
-    @types(Stream, MinBleps, ClockInfo)
-    def __init__(self, stream, minbleps, clockinfo):
-        self.jacksize = stream.size
-        self.naiverate = clockinfo.implclock
-        self.naivex = 0
-        self.minbleps = minbleps
-
-    def blocksforperiod(self, refreshrate):
-        # Make min amount of chip data to get one JACK block:
-        naiven = self.minbleps.getminnaiven(self.naivex, self.jacksize)
-        yield Block(naiven)
-        self.naivex = (self.naivex + naiven) % self.naiverate
 
 class SyncTimer(SimpleTimer):
 
@@ -73,8 +58,9 @@ class SyncTimer(SimpleTimer):
 
 class MidiPump(Background):
 
-    @types(Midi, Channels, MinBleps, Stream, Chip, Timer)
-    def __init__(self, midi, channels, minbleps, stream, chip, timer):
+    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
+    def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
+        self.updaterate = config.updaterate
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
@@ -89,7 +75,7 @@ class MidiPump(Background):
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
             self.channels.updateall(frame)
-            for block in self.timer.blocksforperiod(None):
+            for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
                 self.channels.applyrates()
                 frame += 1
@@ -103,14 +89,11 @@ def main():
   try:
         configure(di)
         di.start()
-        stream = di(Stream)
         di.add(Channels)
-        channels = di(Channels)
-        log.info(channels)
-        blocksizeseconds = stream.size / config.outputrate
-        log.debug("JACK block size: %s or %.3f seconds", stream.size, blocksizeseconds)
-        log.info("Chip update rate for arps and slides: %.3f Hz", 1 / blocksizeseconds)
-        di.add(JackTimer)
+        log.info(di(Channels))
+        stream = di(Stream)
+        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
+        di.add(SyncTimer)
         di.add(MidiPump)
         di.start()
         awaitinterrupt()
