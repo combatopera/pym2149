@@ -42,16 +42,10 @@ class Node:
       self.block = block
       self.masked = masked
       self.result = None # Otherwise numpy ref-counting may complain on resize.
-      self.result = self.callimpl2()
+      self.result = self.callimpl()
     elif not masked and self.masked:
       log.warn("This node has already executed masked: %s", self)
     return self.result
-
-  def callimpl2(self):
-    return self.callimpl()
-
-  def callimpl(self):
-    raise Exception('Implement me!')
 
   def chain(self, node):
     return node(self.block, self.masked)
@@ -79,13 +73,15 @@ class BufNode(Node):
     self.masterbuf = MasterBuf(dtype)
     self.dtype = dtype
     self.channels = channels
+    self.realcallimpl = self.callimpl
+    self.callimpl = self.makeresult
 
-  def callimpl2(self):
+  def makeresult(self):
     if self.masked:
       self.blockbuf = NullBuf
     else:
       self.blockbuf = self.masterbuf.ensureandcrop(self.block.framecount * self.channels)
-    resultornone = self.callimpl()
+    resultornone = self.realcallimpl()
     if resultornone is not None:
       return resultornone
     return self.blockbuf
