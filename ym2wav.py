@@ -39,7 +39,7 @@ def main():
     di.add(ChipTimer)
     di.add(Player)
     di.start()
-    awaitinterrupt()
+    awaitinterrupt(config)
   finally:
     di.stop()
 

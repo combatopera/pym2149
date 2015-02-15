@@ -96,7 +96,7 @@ def main():
         di.add(SyncTimer)
         di.add(MidiPump)
         di.start()
-        awaitinterrupt()
+        awaitinterrupt(config)
   finally:
         di.stop()
 
