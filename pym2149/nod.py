@@ -41,7 +41,7 @@ class Node:
     if self.block != block:
       self.block = block
       self.masked = masked
-      self.result = None # Otherwise numpy ref-counting may complain on resize.
+      self.result = None # Otherwise numpy ref-counting may complain on resize. # XXX: Still needed?
       self.result = self.callimpl()
     elif not masked and self.masked:
       log.warn("This node has already executed masked: %s", self)
