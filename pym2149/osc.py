@@ -122,7 +122,7 @@ class RationalDiff(BinDiff):
       lcd = fraclcd(stepsize, stepindex)
       indices = -((-fracint(stepindex, lcd) - np.arange(stepcount) * fracint(stepsize, lcd)) // lcd)
       dc = self.ringcursor.currentdc()
-      # FIXME: Values can integrate to 2.
+      # Note values can integrate to 2 if there was an overflow earlier.
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
       self.progress = self.block.framecount - (stepcount - 1) * stepsize - stepindex
