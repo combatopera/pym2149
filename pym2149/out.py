@@ -118,7 +118,8 @@ class WavBuf(Node):
   def callimpl(self):
     # TODO: Unit-test that results do not depend on block size.
     naivebuf = self.chain(self.naive)
-    diffbuf = self.diffmaster.differentiate(self.dc, naivebuf)
+    diffbuf = self.diffmaster.ensureandcrop(len(naivebuf))
+    diffbuf.differentiate(self.dc, naivebuf)
     outcount = self.minbleps.getoutcount(self.naivex, self.block.framecount)
     # Make space for all samples we can output plus overflow:
     outsize = outcount + self.overflowsize

@@ -182,11 +182,9 @@ class Buf(AnyBuf):
     self.buf.tofile(fileobj)
 
   def differentiate(self, lastofprev, that):
-    diff = self.ensureandcrop(len(that))
-    diff.copybuf(that)
-    diff.buf[0] -= lastofprev
-    diff.buf[1:] -= that.buf[:-1]
-    return diff
+    self.copybuf(that)
+    self.buf[0] -= lastofprev
+    self.buf[1:] -= that.buf[:-1]
 
   def ensureandcrop(self, framecount):
     thisframecount = self.buf.shape[0]
