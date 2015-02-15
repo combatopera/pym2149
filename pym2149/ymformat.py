@@ -281,7 +281,7 @@ class YMOpen(YMFile):
         for info in self.ym.info:
             log.info(info)
         self.nominalclock = self.ym.clock
-        self.pianorollheight = self.ym.framefreq
+        self.pianorollheight = self.updaterate = self.ym.framefreq
 
     def startimpl(self):
         self.f = open(self.path, 'rb')

@@ -21,7 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.out import configure
 from pym2149.midi import Midi
-from pym2149.config import getprocessconfig
+from pym2149.config import getprocessconfig, Config
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
@@ -35,10 +35,9 @@ log = logging.getLogger(__name__)
 
 class MidiPump(Background):
 
-    framefreq = 50 # TODO: Make configurable.
-
-    @types(Midi, Channels, MinBleps, Stream, Chip, Timer)
-    def __init__(self, midi, channels, minbleps, stream, chip, timer):
+    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
+    def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
+        self.updaterate = config.updaterate
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
@@ -52,7 +51,7 @@ class MidiPump(Background):
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
             self.channels.updateall(frame)
-            for b in self.timer.blocksforperiod(self.framefreq):
+            for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
             self.channels.applyrates()
             frame += 1

@@ -22,6 +22,7 @@ from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
+from pym2149.config import Config
 import threading, logging
 
 log = logging.getLogger(__name__)
@@ -45,8 +46,9 @@ class ChipTimer(MinBlockRateTimer):
 
 class Player(Background):
 
-    @types(YMFile, Chip, Roll, Timer, Stream)
-    def __init__(self, ymfile, chip, roll, timer, stream):
+    @types(Config, YMFile, Chip, Roll, Timer, Stream)
+    def __init__(self, config, ymfile, chip, roll, timer, stream):
+        self.updaterate = config.updaterate
         self.ym = ymfile.ym
         self.chip = chip
         self.roll = roll
@@ -59,6 +61,6 @@ class Player(Background):
                 break
             frame(self.chip)
             self.roll.update()
-            for b in self.timer.blocksforperiod(self.ym.framefreq):
+            for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
         self.stream.flush()
