@@ -37,14 +37,14 @@ class Background:
             self.bg = self.__call__
 
     def profile(self, *args, **kwargs):
-        timestr = time.strftime('%Y-%m-%dT%H-%M-%S')
+        profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')
         tmpdir = tempfile.mkdtemp()
         try:
             binpath = os.path.join(tmpdir, 'stats')
             import cProfile
             cProfile.runctx('self.__call__(*args, **kwargs)', globals(), locals(), binpath)
             import pstats
-            f = open("%s.%s" % (self.profilepath, timestr), 'w')
+            f = open(profilepath, 'w')
             try:
                 stats = pstats.Stats(binpath, stream = f)
                 stats.sort_stats(self.profilesort)
