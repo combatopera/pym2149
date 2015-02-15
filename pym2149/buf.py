@@ -186,6 +186,14 @@ class Buf(AnyBuf):
     self.buf[0] -= lastofprev
     self.buf[1:] -= that.buf[:-1]
 
+  def tolist(self): # For tests.
+    return list(self.buf)
+
+class MasterBuf(Buf):
+
+  def __init__(self, dtype):
+    Buf.__init__(self, np.empty(0, dtype))
+
   def ensureandcrop(self, framecount):
     thisframecount = self.buf.shape[0]
     if thisframecount == framecount:
@@ -194,11 +202,3 @@ class Buf(AnyBuf):
       self.buf.resize(framecount)
       return self
     return Buf(self.buf[:framecount])
-
-  def tolist(self): # For tests.
-    return list(self.buf)
-
-class MasterBuf(Buf):
-
-  def __init__(self, dtype):
-    Buf.__init__(self, np.empty(0, dtype))
