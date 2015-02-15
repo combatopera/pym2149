@@ -130,7 +130,7 @@ class WavBuf(Node):
     self.carrybuf.copywindow(outbuf, outcount, outsize)
     self.naivex = (self.naivex + self.block.framecount) % self.naiverate
     self.dc = naivebuf.last()
-    return outbuf.ensureandcrop(outcount)
+    return self.outmaster.ensureandcrop(outcount)
 
 def configure(di):
     di.add(WavWriter)
