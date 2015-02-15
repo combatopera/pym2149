@@ -23,7 +23,7 @@ from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.config import Config
-import threading, logging, tempfile, shutil, os
+import threading, logging, tempfile, shutil, os, time
 
 log = logging.getLogger(__name__)
 
@@ -37,13 +37,14 @@ class Background:
             self.bg = self.__call__
 
     def profile(self, *args, **kwargs):
+        timestr = time.strftime('%Y-%m-%dT%H-%M-%S')
         tmpdir = tempfile.mkdtemp()
         try:
             binpath = os.path.join(tmpdir, 'stats')
             import cProfile
             cProfile.runctx('self.__call__(*args, **kwargs)', globals(), locals(), binpath)
             import pstats
-            f = open(self.profilepath, 'w')
+            f = open("%s.%s" % (self.profilepath, timestr), 'w')
             try:
                 stats = pstats.Stats(binpath, stream = f)
                 stats.sort_stats(self.profilesort)
