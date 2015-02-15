@@ -189,16 +189,22 @@ class Buf(AnyBuf):
   def tolist(self): # For tests.
     return list(self.buf)
 
-class MasterBuf(Buf):
+class MasterBuf:
 
   def __init__(self, dtype):
-    Buf.__init__(self, np.empty(0, dtype))
+    self.dtype = dtype
+    self.setsize(0)
+
+  def setsize(self, size):
+    self.buf = np.empty(size, self.dtype)
+    self.bufobj = Buf(self.buf)
+    self.size = size
 
   def ensureandcrop(self, framecount):
-    thisframecount = self.buf.shape[0]
-    if thisframecount == framecount:
-      return self
-    if thisframecount < framecount:
-      self.buf.resize(framecount)
-      return self
-    return Buf(self.buf[:framecount])
+    if self.size > framecount:
+      print self.size, framecount
+      return Buf(self.buf[:framecount])
+    if self.size < framecount:
+      # Ideally we would resize in-place, but that can fall foul of numpy reference counting:
+      self.setsize(framecount)
+    return self.bufobj
