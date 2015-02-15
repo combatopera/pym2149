@@ -74,3 +74,5 @@ dosoundextraseconds = 3
 
 chipchannels = 3
 '''Eventually you will be able to choose as many channels as you like, doesn't quite work yet.'''
+
+profile = None

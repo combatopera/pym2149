@@ -23,11 +23,35 @@ from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.config import Config
-import threading, logging
+import threading, logging, tempfile, shutil, os
 
 log = logging.getLogger(__name__)
 
 class Background:
+
+    def __init__(self, config):
+        if config.profile:
+            self.realcall = self.__call__
+            self.__dict__['__call__'] = self.profile
+            _, self.profilesort, self.profilepath = config.profile
+
+    def profile(self, *args, **kwargs):
+        tmpdir = tempfile.mkdtemp()
+        try:
+            binpath = os.path.join(tmpdir, 'stats')
+            import cProfile
+            cProfile.runctx('self.realcall(*args, **kwargs)', globals(), locals(), binpath)
+            import pstats
+            f = open(self.profilepath, 'w')
+            try:
+                stats = pstats.Stats(binpath, stream = f)
+                stats.sort_stats(self.profilesort)
+                stats.print_stats()
+                f.flush()
+            finally:
+                f.close()
+        finally:
+            shutil.rmtree(tmpdir)
 
     def start(self):
         self.quit = False
@@ -48,6 +72,7 @@ class Player(Background):
 
     @types(Config, YMFile, Chip, Roll, Timer, Stream)
     def __init__(self, config, ymfile, chip, roll, timer, stream):
+        Background.__init__(self, config)
         self.updaterate = config.updaterate
         self.ym = ymfile.ym
         self.chip = chip

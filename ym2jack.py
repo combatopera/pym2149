@@ -42,7 +42,7 @@ def main():
       di.add(SyncTimer)
       di.add(Player)
       di.start()
-      awaitinterrupt()
+      awaitinterrupt(config)
   finally:
       di.stop()
 

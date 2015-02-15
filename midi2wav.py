@@ -70,7 +70,7 @@ def main():
         di.add(ChipTimer)
         di.add(MidiPump)
         di.start()
-        awaitinterrupt()
+        awaitinterrupt(config)
     finally:
         di.stop()
 

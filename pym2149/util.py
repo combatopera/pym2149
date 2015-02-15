@@ -22,9 +22,13 @@ log = logging.getLogger(__name__)
 def singleton(f):
     return f()
 
-def awaitinterrupt():
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        log.debug('Caught interrupt, shutting down.')
+def awaitinterrupt(config):
+    if config.profile:
+        time.sleep(config.profile[0])
+        log.debug('End of profile, shutting down.')
+    else:
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            log.debug('Caught interrupt, shutting down.')
