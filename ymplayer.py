@@ -31,16 +31,17 @@ class Background:
 
     def __init__(self, config):
         if config.profile:
-            self.realcall = self.__call__
-            self.__dict__['__call__'] = self.profile
             _, self.profilesort, self.profilepath = config.profile
+            self.bg = self.profile
+        else:
+            self.bg = self.__call__
 
     def profile(self, *args, **kwargs):
         tmpdir = tempfile.mkdtemp()
         try:
             binpath = os.path.join(tmpdir, 'stats')
             import cProfile
-            cProfile.runctx('self.realcall(*args, **kwargs)', globals(), locals(), binpath)
+            cProfile.runctx('self.__call__(*args, **kwargs)', globals(), locals(), binpath)
             import pstats
             f = open(self.profilepath, 'w')
             try:
@@ -55,7 +56,7 @@ class Background:
 
     def start(self):
         self.quit = False
-        self.thread = threading.Thread(target = self)
+        self.thread = threading.Thread(target = self.bg)
         self.thread.start()
 
     def stop(self):
