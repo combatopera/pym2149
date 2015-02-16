@@ -31,8 +31,12 @@ class Background:
 
     def __init__(self, config):
         if config.profile:
+            if config.trace:
+                raise Exception
             _, self.profilesort, self.profilepath = config.profile
             self.bg = self.profile
+        elif config.trace:
+            self.bg = self.trace
         else:
             self.bg = self.__call__
 
@@ -54,6 +58,12 @@ class Background:
                 f.close()
         finally:
             shutil.rmtree(tmpdir)
+
+    def trace(self, *args, **kwargs):
+        from trace import Trace
+        t = Trace()
+        t.runctx('self.__call__(*args, **kwargs)', globals(), locals())
+        t.results().write_results()
 
     def start(self):
         self.quit = False
