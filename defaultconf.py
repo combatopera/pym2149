@@ -77,4 +77,4 @@ chipchannels = 3
 
 profile = None
 
-trace = False
+trace = None
