@@ -85,12 +85,18 @@ def fraclcd(f, g): # The LCD is the LCM of the denominators.
   return fd * gd // fractions.gcd(fd, gd)
 
 def fracint(f, denominator):
-  d = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
-  return f.numerator * (denominator//d) // (f.denominator//d)
+  com = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
+  return f.numerator * (denominator//com) // (f.denominator//com)
 
 def fracfloor2(f, g):
-  d = fractions.gcd(f.denominator, g.denominator)
-  return f.numerator * (g.denominator//d) // ((f.denominator//d) * g.numerator)
+  com = fractions.gcd(f.denominator, g.denominator)
+  return f.numerator * (g.denominator//com) // ((f.denominator//com) * g.numerator)
+
+def fracsub(f, g):
+  com = fractions.gcd(f.denominator, g.denominator)
+  fd = f.denominator // com
+  gd = g.denominator // com
+  return Fraction(f.numerator * gd - g.numerator * fd, fd * gd)
 
 class RationalDiff(BinDiff):
 
@@ -130,7 +136,8 @@ class RationalDiff(BinDiff):
       # Note values can integrate to 2 if there was an overflow earlier.
       self.ringcursor.put2(self.blockbuf, indices)
       self.blockbuf.addtofirst(dc)
-      self.progress = self.block.framecount - (stepcount - 1) * stepsize - stepindex
+      self.progress = self.block.framecount - (stepcount - 1) * stepsize
+      self.progress = fracsub(self.progress, stepindex)
       if self.progress == stepsize:
         self.progress = 0
       return self.integral
