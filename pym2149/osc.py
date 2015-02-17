@@ -85,8 +85,12 @@ def fraclcd(f, g): # The LCD is the LCM of the denominators.
   return fd * gd // fractions.gcd(fd, gd)
 
 def fracint(f, denominator):
-  d = fractions.gcd(denominator, f.denominator) # To prevent overflow, not as slow as it looks.
+  d = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
   return f.numerator * (denominator//d) // (f.denominator//d)
+
+def fracfloor2(f, g):
+  d = fractions.gcd(f.denominator, g.denominator)
+  return f.numerator * (g.denominator//d) // ((f.denominator//d) * g.numerator)
 
 class RationalDiff(BinDiff):
 
@@ -119,7 +123,7 @@ class RationalDiff(BinDiff):
       return self.hold
     else:
       self.blockbuf.fill(0)
-      stepcount = fracfloor(np.int64(self.block.framecount - 1 - stepindex) / stepsize) + 1
+      stepcount = fracfloor2(self.block.framecount - 1 - stepindex, stepsize) + 1
       lcd = fraclcd(stepsize, stepindex)
       indices = -((-fracint(stepindex, lcd) - np.arange(stepcount) * fracint(stepsize, lcd)) // lcd)
       dc = self.ringcursor.currentdc()
