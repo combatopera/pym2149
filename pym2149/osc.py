@@ -121,7 +121,7 @@ class RationalDiff(BinDiff):
     if 0 == self.progress:
       stepindex = 0
     else:
-      stepindex = stepsize - self.progress
+      stepindex = fracsub(stepsize, self.progress)
       if fracceil(stepindex) < 0:
         stepindex = 0
     if fracceil(stepindex) >= self.block.framecount:
