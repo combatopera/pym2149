@@ -96,7 +96,7 @@ def fracsub(f, g):
   com = fractions.gcd(f.denominator, g.denominator)
   fd = f.denominator // com
   gd = g.denominator // com
-  return Fraction(f.numerator * gd - g.numerator * fd, fd * gd)
+  return Fraction(f.numerator * gd - g.numerator * fd, fd * gd * com)
 
 class RationalDiff(BinDiff):
 
