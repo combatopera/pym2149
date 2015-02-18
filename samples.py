@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from sampleslib import Orc, Updater, voidupdater, Play
+from sampleslib import Orc, Updater, voidupdater
 from fractions import Fraction
 from pym2149.config import getprocessconfig
 from pym2149.di import DI
@@ -28,6 +28,7 @@ from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
+from pym2149.util import singleton
 from ymplayer import ChipTimer
 import os, subprocess, time
 
@@ -76,7 +77,7 @@ class Boring:
 @orc.add
 class tone(Boring):
 
-  def __init__(self, orc, period):
+  def __init__(self, period):
     self.period = period
 
   def noteon(self, chip, chan):
@@ -88,13 +89,13 @@ class tone(Boring):
 @orc.add
 class Tone(tone):
 
-  def __init__(self, orc, freq):
-    tone.__init__(self, orc, Freq(freq).toneperiod(orc.nomclock))
+  def __init__(self, freq):
+    tone.__init__(self, Freq(freq).toneperiod(orc.nomclock))
 
 @orc.add
 class Noise(Boring):
 
-  def __init__(self, orc, freq):
+  def __init__(self, freq):
     self.period = Freq(freq).noiseperiod(orc.nomclock)
 
   def noteon(self, chip, chan):
@@ -106,7 +107,7 @@ class Noise(Boring):
 @orc.add
 class Both(Boring):
 
-  def __init__(self, orc, tfreq, nfreq):
+  def __init__(self, tfreq, nfreq):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
 
@@ -120,7 +121,7 @@ class Both(Boring):
 @orc.add
 class Env(Boring):
 
-  def __init__(self, orc, freq, shape):
+  def __init__(self, freq, shape):
     self.period = Freq(freq).envperiod(orc.nomclock, shape)
     self.shape = shape
 
@@ -134,7 +135,7 @@ class Env(Boring):
 @orc.add
 class All(Boring):
 
-  def __init__(self, orc, tfreq, nfreq, efreq, shape):
+  def __init__(self, tfreq, nfreq, efreq, shape):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
     self.eperiod = Freq(efreq).envperiod(orc.nomclock, shape)
@@ -152,7 +153,7 @@ class All(Boring):
 @orc.add
 class PWM(Boring):
 
-  def __init__(self, orc, tfreq, tsfreq):
+  def __init__(self, tfreq, tsfreq):
     self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
     self.tsfreq = Fraction(tsfreq)
 
@@ -182,8 +183,49 @@ class Target:
     log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
-def play(*args):
-  return lambda chip: Play(orc, SimpleTimer(refreshrate))(*args)
+class NoteAction:
+
+  def __init__(self, note):
+    self.note = note
+
+  def onnoteornone(self, chip, chan):
+    # The note needn't know all the chip's features, so turn them off first:
+    chip.flagsoff(chan)
+    self.note.noteon(chip, chan)
+    return self.note
+
+@singleton
+class sustainaction:
+
+  def onnoteornone(self, chip, chan):
+    pass
+
+def getorlast(v, i):
+  try:
+    return v[i]
+  except IndexError:
+    return v[-1]
+
+def play(beatsperbar, beats, *args):
+  def framesfactory(chip):
+    timer = SimpleTimer(refreshrate)
+    frames = []
+    paramindex = 0
+    for char in beats:
+      if '.' == char:
+        action = sustainaction
+      else:
+        nargs = [getorlast(v, paramindex) for v in args]
+        program = orc[char]
+        note = program(*nargs)
+        action = NoteAction(note)
+        paramindex += 1
+      frames.append(action)
+      b, = timer.blocksforperiod(beatsperbar)
+      for _ in xrange(b.framecount - 1):
+        frames.append(sustainaction)
+    return frames
+  return framesfactory
 
 def main():
   config = getprocessconfig()
