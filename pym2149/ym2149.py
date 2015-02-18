@@ -60,7 +60,7 @@ class Registers:
     self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
     self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
-    # TODO: Let's support just one timer effect and get that right.
+    # TODO: Rename to rtone and make configurable.
     self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(channels))
     self.tsflags = tuple(Reg(0) for _ in xrange(channels))
 
