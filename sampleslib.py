@@ -15,12 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import Timer, SimpleTimer
+from pym2149.timer import SimpleTimer
 from pym2149.util import singleton
-from pym2149.out import configure
-from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
-from ymplayer import ChipTimer
 import logging
 
 log = logging.getLogger(__name__)
@@ -137,32 +133,3 @@ class voidupdater:
 
   def update(self, frameindex):
     pass
-
-class Main:
-
-  def __init__(self, refreshrate):
-    self.refreshrate = refreshrate
-
-  def __call__(self, frames, config):
-    di = createdi(config)
-    configure(di)
-    chip = di(Chip)
-    di.start()
-    try:
-      di.add(ChipTimer)
-      timer = di(Timer)
-      stream = di(Stream)
-      chanupdaters = [voidupdater] * config.chipchannels
-      for frameindex, frame in enumerate(frames):
-        for patternindex, action in enumerate(frame):
-          chan = patternindex # TODO LATER: Utilise voids in channels.
-          onnoteornone = action.onnoteornone(chip, chan)
-          if onnoteornone is not None:
-            chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
-        for updater in chanupdaters:
-          updater.update(frameindex)
-        for b in timer.blocksforperiod(self.refreshrate):
-          stream.call(b)
-      stream.flush()
-    finally:
-      di.stop()

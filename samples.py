@@ -20,16 +20,45 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from sampleslib import Orc, Main
+from sampleslib import Orc, Updater, voidupdater
 from fractions import Fraction
 from pym2149.config import getprocessconfig
 from pym2149.di import DI
+from pym2149.timer import Timer
+from pym2149.out import configure
+from pym2149.boot import createdi
+from pym2149.iface import Chip, Stream
+from ymplayer import ChipTimer
 import os, subprocess, time
 
 log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
 orc = Orc(refreshrate) # A bar is exactly 1 second long.
+
+def main2(frames, config):
+    di = createdi(config)
+    configure(di)
+    chip = di(Chip)
+    di.start()
+    try:
+      di.add(ChipTimer)
+      timer = di(Timer)
+      stream = di(Stream)
+      chanupdaters = [voidupdater] * config.chipchannels
+      for frameindex, frame in enumerate(frames):
+        for patternindex, action in enumerate(frame):
+          chan = patternindex
+          onnoteornone = action.onnoteornone(chip, chan)
+          if onnoteornone is not None:
+            chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
+        for updater in chanupdaters:
+          updater.update(frameindex)
+        for b in timer.blocksforperiod(refreshrate):
+          stream.call(b)
+      stream.flush()
+    finally:
+      di.stop()
 
 class Boring:
 
@@ -141,7 +170,6 @@ class PWM(Boring):
 class Target:
 
   with orc as play: dc0 = play(1, 's'*10)
-  main = Main(refreshrate)
 
   def __init__(self, config):
     self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
@@ -156,7 +184,7 @@ class Target:
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    self.main(frames, config)
+    main2(frames, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
