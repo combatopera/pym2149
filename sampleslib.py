@@ -20,16 +20,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def voidzip(*chans):
-  n = max(len(c) for c in chans)
-  return zip(*(c + [Play.voidaction] * (n - len(c)) for c in chans))
-
-def strictzip(*chans):
-  n = [len(c) for c in chans]
-  if 1 != len(set(n)):
-    raise Exception(n)
-  return zip(*chans)
-
 @singleton
 class nullnote:
 
