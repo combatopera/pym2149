@@ -180,7 +180,7 @@ class Target:
     log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
-def play(orc, *args):
+def play(*args):
   return Play(orc, SimpleTimer(refreshrate))(*args)
 
 def main():
@@ -188,21 +188,21 @@ def main():
   config.di = DI()
   orc.nomclock = config.nominalclock # FIXME: Too eager.
   target = Target(config)
-  target.dump(play(orc, 2, 'T..', [250]), 'tone250')
-  target.dump(play(orc, 2, 'T..', [1000]), 'tone1k')
-  target.dump(play(orc, 2, 'T..', [1500]), 'tone1k5')
-  target.dump(play(orc, 2, 'N..', [5000]), 'noise5k')
-  target.dump(play(orc, 2, 'N..', [125000]), 'noise125k')
-  target.dump(play(orc, 2, 'B..', [1000], [5000]), 'tone1k+noise5k')
-  target.dump(play(orc, 2, 'B..', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
-  target.dump(play(orc, 2, 'E..', [600], [0x08]), 'saw600')
-  target.dump(play(orc, 2, 'E..', [600], [0x10]), 'sin600')
-  target.dump(play(orc, 2, 'E..', [650], [0x0a]), 'tri650')
-  target.dump(play(orc, 2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
-  target.dump(play(orc, 4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
-  target.dump(play(orc, 2, 'P..', [501], [501]), 'pwm501')
-  target.dump(play(orc, 2, 'P..', [250], [251]), 'pwm250') # Observe timer detune.
-  target.dump(play(orc, 8, 't'*8, range(1, 9)), 'tone1-8')
+  target.dump(play(2, 'T..', [250]), 'tone250')
+  target.dump(play(2, 'T..', [1000]), 'tone1k')
+  target.dump(play(2, 'T..', [1500]), 'tone1k5')
+  target.dump(play(2, 'N..', [5000]), 'noise5k')
+  target.dump(play(2, 'N..', [125000]), 'noise125k')
+  target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
+  target.dump(play(2, 'B..', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
+  target.dump(play(2, 'E..', [600], [0x08]), 'saw600')
+  target.dump(play(2, 'E..', [600], [0x10]), 'sin600')
+  target.dump(play(2, 'E..', [650], [0x0a]), 'tri650')
+  target.dump(play(2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
+  target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
+  target.dump(play(2, 'P..', [501], [501]), 'pwm501')
+  target.dump(play(2, 'P..', [250], [251]), 'pwm250') # Observe timer detune.
+  target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
 
 if '__main__' == __name__:
   main()
