@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import SimpleTimer
 from pym2149.util import singleton
 import logging
 
@@ -65,10 +64,6 @@ def getorlast(v, i):
 
 class Orc(dict):
 
-  def __init__(self, ticksperbar):
-    self.timers = []
-    self.ticksperbar = ticksperbar
-
   def add(self, cls, key = None):
     if key is None:
       key = cls.__name__[0]
@@ -76,13 +71,6 @@ class Orc(dict):
       raise Exception("Key already in use: %s" % key)
     self[key] = cls
     return cls
-
-  def __enter__(self):
-    self.timers.append(SimpleTimer(self.ticksperbar))
-    return Play(self, self.timers[-1])
-
-  def __exit__(self, exc_type, exc_value, traceback):
-    self.timers.pop() # It will log non-zero carry.
 
 class Play:
 
