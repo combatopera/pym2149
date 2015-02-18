@@ -50,7 +50,8 @@ def main2(framesfactory, config):
         chip.toneflags[chan].value = False
         chip.noiseflags[chan].value = False
         chip.fixedlevels[chan].value = 13 # Neutral DC.
-      for frameindex, action in enumerate(framesfactory()):
+      frames = framesfactory(chip)
+      for frameindex, action in enumerate(frames):
         chan = 0
         onnoteornone = action.onnoteornone(chip, chan)
         if onnoteornone is not None:
@@ -60,6 +61,7 @@ def main2(framesfactory, config):
         for b in timer.blocksforperiod(refreshrate):
           stream.call(b)
       stream.flush()
+      return frames
     finally:
       di.stop()
 
@@ -170,18 +172,18 @@ class Target:
       os.mkdir(self.targetpath)
     self.config = config
 
-  def dump(self, chan, name):
+  def dump(self, chanfactory, name):
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    main2(lambda: chan, config)
+    chan = main2(chanfactory, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def play(*args):
-  return Play(orc, SimpleTimer(refreshrate))(*args)
+  return lambda chip: Play(orc, SimpleTimer(refreshrate))(*args)
 
 def main():
   config = getprocessconfig()
