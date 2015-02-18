@@ -36,15 +36,6 @@ log = logging.getLogger(__name__)
 refreshrate = 60 # Deliberately not a divisor of the clock.
 
 @singleton
-class nullnote:
-
-  def noteon(self, chip, chan):
-    pass # Flags are turned off by NoteAction.
-
-  def update(self, chip, chan, frameindex):
-    pass
-
-@singleton
 class orc(dict):
 
   def add(self, cls, key = None):
