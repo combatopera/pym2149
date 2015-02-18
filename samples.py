@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 refreshrate = 60 # Deliberately not a divisor of the clock.
 orc = Orc()
 
-def main2(frames, config):
+def main2(framesfactory, config):
     di = createdi(config)
     configure(di)
     chip = di(Chip)
@@ -50,7 +50,7 @@ def main2(frames, config):
         chip.toneflags[chan].value = False
         chip.noiseflags[chan].value = False
         chip.fixedlevels[chan].value = 13 # Neutral DC.
-      for frameindex, action in enumerate(frames):
+      for frameindex, action in enumerate(framesfactory()):
         chan = 0
         onnoteornone = action.onnoteornone(chip, chan)
         if onnoteornone is not None:
@@ -176,7 +176,7 @@ class Target:
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    main2(chan, config)
+    main2(lambda: chan, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
