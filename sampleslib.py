@@ -29,29 +29,6 @@ class nullnote:
   def update(self, chip, chan, frameindex):
     pass
 
-class NoteAction:
-
-  def __init__(self, note):
-    self.note = note
-
-  def onnoteornone(self, chip, chan):
-    # The note needn't know all the chip's features, so turn them off first:
-    chip.flagsoff(chan)
-    self.note.noteon(chip, chan)
-    return self.note
-
-@singleton
-class sustainaction:
-
-  def onnoteornone(self, chip, chan):
-    pass
-
-def getorlast(v, i):
-  try:
-    return v[i]
-  except IndexError:
-    return v[-1]
-
 class Orc(dict):
 
   def add(self, cls, key = None):
@@ -61,39 +38,6 @@ class Orc(dict):
       raise Exception("Key already in use: %s" % key)
     self[key] = cls
     return cls
-
-class Play:
-
-  voidaction = NoteAction(nullnote)
-
-  def __init__(self, orc, timer):
-    self.orc = orc
-    self.timer = timer
-
-  def __call__(self, beatsperbar, beats, *args, **kwargs):
-    frames = []
-    paramindex = 0
-    for char in beats:
-      if '.' == char:
-        action = sustainaction
-      elif '-' == char:
-        action = self.voidaction
-      else:
-        nargs = [getorlast(v, paramindex) for v in args]
-        nkwargs = dict([k, getorlast(v, paramindex)] for k, v in kwargs.iteritems())
-        noteclass = self.orc[char]
-        try:
-          note = noteclass(self.orc, *nargs, **nkwargs)
-        except:
-          log.info("Note class that errored: %s", noteclass)
-          raise
-        action = NoteAction(note)
-        paramindex += 1
-      frames.append(action)
-      b, = self.timer.blocksforperiod(beatsperbar)
-      for _ in xrange(b.framecount - 1):
-        frames.append(sustainaction)
-    return frames
 
 class Updater:
 
