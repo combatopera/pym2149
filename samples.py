@@ -46,12 +46,15 @@ def main2(frames, config):
       timer = di(Timer)
       stream = di(Stream)
       chanupdaters = [voidupdater] * config.chipchannels
-      for frameindex, frame in enumerate(frames):
-        for patternindex, action in enumerate(frame):
-          chan = patternindex
-          onnoteornone = action.onnoteornone(chip, chan)
-          if onnoteornone is not None:
-            chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
+      for chan in xrange(1, config.chipchannels):
+        chip.toneflags[chan].value = False
+        chip.noiseflags[chan].value = False
+        chip.fixedlevels[chan].value = 13 # Neutral DC.
+      for frameindex, action in enumerate(frames):
+        chan = 0
+        onnoteornone = action.onnoteornone(chip, chan)
+        if onnoteornone is not None:
+          chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
         for b in timer.blocksforperiod(refreshrate):
@@ -67,14 +70,6 @@ class Boring:
 
   def update(self, chip, chan, frame):
     pass
-
-@orc.add
-class silence(Boring):
-
-  def noteon(self, chip, chan):
-    chip.toneflags[chan].value = False
-    chip.noiseflags[chan].value = False
-    chip.fixedlevels[chan].value = 13
 
 @orc.add
 class tone(Boring):
@@ -169,8 +164,6 @@ class PWM(Boring):
 
 class Target:
 
-  with orc as play: dc0 = play(1, 's'*10)
-
   def __init__(self, config):
     self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
     if not os.path.exists(self.targetpath):
@@ -180,12 +173,11 @@ class Target:
   def dump(self, chan, name):
     path = os.path.join(self.targetpath, name)
     log.debug(path)
-    frames = zip(chan, self.dc0, self.dc0)
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    main2(frames, config)
-    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
+    main2(chan, config)
+    log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
