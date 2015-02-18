@@ -55,19 +55,18 @@ class JackStream(object, Node, Stream):
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
-    jack.activate()
-    # Connect all system channels, cycling over our streams if necessary:
-    for i, systemchannel in enumerate(self.systemchannels):
-      clientchannelindex = i % len(wavs)
-      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
-    self.size = jack.get_buffer_size()
-    self.jack = np.empty((len(wavs), self.size), dtype = BufNode.floatdtype)
-    self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
     self.cursor = 0
     self.wavs = wavs
 
   def start(self):
-    pass # TODO: Move some constructor code here.
+    jack.activate()
+    # Connect all system channels, cycling over our streams if necessary:
+    for i, systemchannel in enumerate(self.systemchannels):
+      clientchannelindex = i % len(self.wavs)
+      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
+    self.size = jack.get_buffer_size()
+    self.jack = np.empty((len(self.wavs), self.size), dtype = BufNode.floatdtype)
+    self.empty = np.empty((1, self.size), dtype = BufNode.floatdtype)
 
   def callimpl(self):
     outbufs = [self.chain(wav) for wav in self.wavs]
