@@ -20,7 +20,6 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from sampleslib import Orc, Updater, voidupdater
 from fractions import Fraction
 from pym2149.config import getprocessconfig
 from pym2149.di import DI
@@ -35,7 +34,43 @@ import os, subprocess, time
 log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
-orc = Orc()
+
+@singleton
+class nullnote:
+
+  def noteon(self, chip, chan):
+    pass # Flags are turned off by NoteAction.
+
+  def update(self, chip, chan, frameindex):
+    pass
+
+@singleton
+class orc(dict):
+
+  def add(self, cls, key = None):
+    if key is None:
+      key = cls.__name__[0]
+    if key in self:
+      raise Exception("Key already in use: %s" % key)
+    self[key] = cls
+    return cls
+
+class Updater:
+
+  def __init__(self, onnote, chip, chan, frameindex):
+    self.onnote = onnote
+    self.chip = chip
+    self.chan = chan
+    self.frameindex = frameindex
+
+  def update(self, frameindex):
+    self.onnote.update(self.chip, self.chan, frameindex - self.frameindex)
+
+@singleton
+class voidupdater:
+
+  def update(self, frameindex):
+    pass
 
 def main2(framesfactory, config):
     di = createdi(config)
