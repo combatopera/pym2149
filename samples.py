@@ -110,18 +110,14 @@ class Noise(Note):
     self.setfixedlevel(15)
     self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
-class Both(Boring):
+class Both(Note):
 
-  def __init__(self, nomclock):
-    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
-    self.nperiod = Freq(self.nfreq).noiseperiod(nomclock)
-
-  def noteon(self, chip, chan):
-    chip.toneflags[chan].value = True
-    chip.noiseflags[chan].value = True
-    chip.fixedlevels[chan].value = 15
-    chip.toneperiods[chan].value = self.tperiod
-    chip.noiseperiod.value = self.nperiod
+  def noteon(self, voladj):
+    self.toneflag.value = True
+    self.noiseflag.value = True
+    self.setfixedlevel(15)
+    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+    self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
 
 class Env(Boring):
 
@@ -244,8 +240,8 @@ def main():
   #target.dump(2, [T1k5, 0, 0], 'tone1k5')
   target.dump(2, [N5k, 0, 0], 'noise5k')
   target.dump(2, [N125k, 0, 0], 'noise125k')
-  #target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
-  #target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
+  target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
+  target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
   #target.dump(2, [Saw600, 0, 0], 'saw600')
   #target.dump(2, [Sin600, 0, 0], 'sin600')
   #target.dump(2, [Tri650, 0, 0], 'tri650')
