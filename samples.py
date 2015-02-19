@@ -153,14 +153,14 @@ class Env(Boring):
     chip.envperiod.value = self.period
     chip.envshape.value = self.shape
 
-@orc.add
 class All(Boring):
 
-  def __init__(self, tfreq, nfreq, efreq, shape):
-    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
-    self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
-    self.eperiod = Freq(efreq).envperiod(orc.nomclock, shape)
-    self.shape = shape
+  tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
+
+  def __init__(self, nomclock):
+    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
+    self.nperiod = Freq(self.nfreq).noiseperiod(nomclock)
+    self.eperiod = Freq(self.efreq).envperiod(nomclock, self.shape)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = True
@@ -175,7 +175,7 @@ class PWM(Boring):
 
   def __init__(self, nomclock):
     self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
-    self.tsfreq = Fraction(self.tsfreq)
+    self.tsfreq = Fraction(self.tsfreq) # Hide the class var.
 
   def noteon(self, chip, chan):
     chip.noiseflags[chan].value = False
@@ -295,7 +295,7 @@ def main():
   target.dump(play2(2, [Sin600, 0, 0]), 'sin600')
   class Tri650(Env): freq, shape = 650, 0x0a
   target.dump(play2(2, [Tri650, 0, 0]), 'tri650')
-  target.dump(play(2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
+  target.dump(play2(2, [All, 0, 0]), 'tone1k+noise5k+tri1')
   class T2k(Tone): freq = 2000
   class T3k(Tone): freq = 3000
   class T4k(Tone): freq = 4000
