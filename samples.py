@@ -112,11 +112,10 @@ class tone(Boring):
     chip.fixedlevels[chan].value = 15
     chip.toneperiods[chan].value = self.period
 
-@orc.add
 class Tone(tone):
 
-  def __init__(self, freq):
-    tone.__init__(self, Freq(freq).toneperiod(orc.nomclock))
+  def __init__(self):
+    tone.__init__(self, Freq(self.freq).toneperiod(orc.nomclock))
 
 @orc.add
 class Noise(Boring):
@@ -253,19 +252,16 @@ def play(beatsperbar, beats, *args):
     return frames
   return framesfactory
 
-def play2(beatsperbar, beats, *args):
+def play2(beatsperbar, beats):
   def framesfactory(chip):
     timer = SimpleTimer(refreshrate)
     frames = []
-    paramindex = 0
     for program in beats:
       if not program:
         action = sustainaction
       else:
-        nargs = [getorlast(v, paramindex) for v in args]
-        note = program(*nargs)
+        note = program()
         action = NoteAction(note)
-        paramindex += 1
       frames.append(action)
       b, = timer.blocksforperiod(beatsperbar)
       for _ in xrange(b.framecount - 1):
@@ -278,12 +274,12 @@ def main():
   config.di = DI()
   orc.nomclock = config.nominalclock # FIXME: Too eager.
   target = Target(config)
-  class T(Tone): pass
-  target.dump(play2(2, [T, 0, 0], [250]), 'tone250')
-  class T(Tone): pass
-  target.dump(play2(2, [T, 0, 0], [1000]), 'tone1k')
-  class T(Tone): pass
-  target.dump(play2(2, [T, 0, 0], [1500]), 'tone1k5')
+  class T250(Tone): freq = 250
+  target.dump(play2(2, [T250, 0, 0]), 'tone250')
+  class T1k(Tone): freq = 1000
+  target.dump(play2(2, [T1k, 0, 0]), 'tone1k')
+  class T1k5(Tone): freq = 1500
+  target.dump(play2(2, [T1k5, 0, 0]), 'tone1k5')
   target.dump(play(2, 'N..', [5000]), 'noise5k')
   target.dump(play(2, 'N..', [125000]), 'noise125k')
   target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
@@ -292,7 +288,10 @@ def main():
   target.dump(play(2, 'E..', [600], [0x10]), 'sin600')
   target.dump(play(2, 'E..', [650], [0x0a]), 'tri650')
   target.dump(play(2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
-  target.dump(play(4, 'TTTT', [1000,2000,3000,4000]), 'tone1k,2k,3k,4k')
+  class T2k(Tone): freq = 2000
+  class T3k(Tone): freq = 3000
+  class T4k(Tone): freq = 4000
+  target.dump(play2(4, [T1k, T2k, T3k, T4k]), 'tone1k,2k,3k,4k')
   target.dump(play(2, 'P..', [501], [501]), 'pwm501')
   target.dump(play(2, 'P..', [250], [251]), 'pwm250') # Observe timer detune.
   target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
