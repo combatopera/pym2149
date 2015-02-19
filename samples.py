@@ -89,7 +89,7 @@ class Boring:
   def update(self, chip, chan, frame):
     pass
 
-class tone(Note):
+class BaseTone(Note):
 
   def noteon(self, voladj):
     self.toneflag.value = True
@@ -97,11 +97,11 @@ class tone(Note):
     self.setfixedlevel(15)
     self.toneperiod.value = self.period
 
-class Tone(tone):
+class Tone(BaseTone):
 
   def noteon(self, voladj):
     self.period = Freq(self.freq).toneperiod(self.nomclock)
-    tone.noteon(self, voladj)
+    BaseTone.noteon(self, voladj)
 
 class Noise(Note):
 
@@ -226,7 +226,7 @@ def main():
   class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
   tones = []
   for p in xrange(1, 9):
-    class t(tone): period = p
+    class t(BaseTone): period = p
     tones.append(t)
   target.dump(2, [T250, 0, 0], 'tone250')
   target.dump(2, [T1k, 0, 0], 'tone1k')
