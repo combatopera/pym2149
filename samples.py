@@ -35,17 +35,6 @@ log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
 
-@singleton
-class orc(dict):
-
-  def add(self, cls, key = None):
-    if key is None:
-      key = cls.__name__[0]
-    if key in self:
-      raise Exception("Key already in use: %s" % key)
-    self[key] = cls
-    return cls
-
 class Updater:
 
   def __init__(self, onnote, chip, chan, frameindex):
@@ -94,17 +83,13 @@ def main2(framesfactory, config):
 
 class Boring:
 
-  def __init__(self, orc):
+  def __init__(self, nomclock):
     pass
 
   def update(self, chip, chan, frame):
     pass
 
-@orc.add
 class tone(Boring):
-
-  def __init__(self, period):
-    self.period = period
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = True
@@ -115,7 +100,7 @@ class tone(Boring):
 class Tone(tone):
 
   def __init__(self, nomclock):
-    tone.__init__(self, Freq(self.freq).toneperiod(nomclock))
+    self.period = Freq(self.freq).toneperiod(nomclock)
 
 class Noise(Boring):
 
@@ -226,27 +211,6 @@ def getorlast(v, i):
   except IndexError:
     return v[-1]
 
-def play(beatsperbar, beats, *args):
-  def framesfactory(chip):
-    timer = SimpleTimer(refreshrate)
-    frames = []
-    paramindex = 0
-    for char in beats:
-      if '.' == char:
-        action = sustainaction
-      else:
-        nargs = [getorlast(v, paramindex) for v in args]
-        program = orc[char]
-        note = program(*nargs)
-        action = NoteAction(note)
-        paramindex += 1
-      frames.append(action)
-      b, = timer.blocksforperiod(beatsperbar)
-      for _ in xrange(b.framecount - 1):
-        frames.append(sustainaction)
-    return frames
-  return framesfactory
-
 class Play:
 
   def __init__(self, config):
@@ -272,7 +236,6 @@ class Play:
 def main():
   config = getprocessconfig()
   config.di = DI()
-  orc.nomclock = config.nominalclock # FIXME: Too eager.
   play2 = Play(config)
   target = Target(config)
   class T250(Tone): freq = 250
@@ -304,7 +267,11 @@ def main():
   target.dump(play2(2, [PWM501, 0, 0]), 'pwm501')
   class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
   target.dump(play2(2, [PWM250, 0, 0]), 'pwm250')
-  target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
+  tones = []
+  for p in xrange(1, 9):
+    class t(tone): period = p
+    tones.append(t)
+  target.dump(play2(8, tones), 'tone1-8')
 
 if '__main__' == __name__:
   main()
