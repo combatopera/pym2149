@@ -52,7 +52,7 @@ class voidupdater:
   def update(self, frameindex):
     pass
 
-def main2(framesfactory, config):
+def main2(frames, config):
     di = createdi(config)
     configure(di)
     chip = di(Chip)
@@ -67,7 +67,6 @@ def main2(framesfactory, config):
           chip.toneflags[chan].value = False
           chip.noiseflags[chan].value = False
           chip.fixedlevels[chan].value = 13 # Neutral DC.
-      frames = framesfactory(chip)
       for frameindex, program in enumerate(frames):
         if program:
           onnote = program(config.nominalclock, chip, activechan, None, None)
@@ -79,7 +78,6 @@ def main2(framesfactory, config):
         for b in timer.blocksforperiod(refreshrate):
           stream.call(b)
       stream.flush()
-      return frames
     finally:
       di.stop()
 
@@ -155,21 +153,19 @@ class Target:
     self.config = config
 
   def dump(self, beatsperbar, beats, name):
-    def framesfactory(chip):
-      timer = SimpleTimer(refreshrate)
-      frames = []
-      for program in beats:
+    timer = SimpleTimer(refreshrate)
+    frames = []
+    for program in beats:
         frames.append(program)
         b, = timer.blocksforperiod(beatsperbar)
         for _ in xrange(b.framecount - 1):
           frames.append(0)
-      return frames
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    frames = main2(framesfactory, config)
+    main2(frames, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
