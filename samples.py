@@ -141,12 +141,10 @@ class Both(Boring):
     chip.toneperiods[chan].value = self.tperiod
     chip.noiseperiod.value = self.nperiod
 
-@orc.add
 class Env(Boring):
 
-  def __init__(self, freq, shape):
-    self.period = Freq(freq).envperiod(orc.nomclock, shape)
-    self.shape = shape
+  def __init__(self, nomclock):
+    self.period = Freq(self.freq).envperiod(nomclock, self.shape)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = False
@@ -292,9 +290,12 @@ def main():
   target.dump(play2(2, [T1kN5k, 0, 0]), 'tone1k+noise5k')
   class T1N5k(Both): tfreq, nfreq = config.nominalclock // 16, 5000
   target.dump(play2(2, [T1N5k, 0, 0]), 'noise5k+tone1')
-  target.dump(play(2, 'E..', [600], [0x08]), 'saw600')
-  target.dump(play(2, 'E..', [600], [0x10]), 'sin600')
-  target.dump(play(2, 'E..', [650], [0x0a]), 'tri650')
+  class Saw600(Env): freq, shape = 600, 0x08
+  target.dump(play2(2, [Saw600, 0, 0]), 'saw600')
+  class Sin600(Env): freq, shape = 600, 0x10
+  target.dump(play2(2, [Sin600, 0, 0]), 'sin600')
+  class Tri650(Env): freq, shape = 650, 0x0a
+  target.dump(play2(2, [Tri650, 0, 0]), 'tri650')
   target.dump(play(2, 'A..', [1000], [5000], [1], [0x0e]), 'tone1k+noise5k+tri1')
   class T2k(Tone): freq = 2000
   class T3k(Tone): freq = 3000
