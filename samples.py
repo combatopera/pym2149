@@ -253,14 +253,37 @@ def play(beatsperbar, beats, *args):
     return frames
   return framesfactory
 
+def play2(beatsperbar, beats, *args):
+  def framesfactory(chip):
+    timer = SimpleTimer(refreshrate)
+    frames = []
+    paramindex = 0
+    for program in beats:
+      if not program:
+        action = sustainaction
+      else:
+        nargs = [getorlast(v, paramindex) for v in args]
+        note = program(*nargs)
+        action = NoteAction(note)
+        paramindex += 1
+      frames.append(action)
+      b, = timer.blocksforperiod(beatsperbar)
+      for _ in xrange(b.framecount - 1):
+        frames.append(sustainaction)
+    return frames
+  return framesfactory
+
 def main():
   config = getprocessconfig()
   config.di = DI()
   orc.nomclock = config.nominalclock # FIXME: Too eager.
   target = Target(config)
-  target.dump(play(2, 'T..', [250]), 'tone250')
-  target.dump(play(2, 'T..', [1000]), 'tone1k')
-  target.dump(play(2, 'T..', [1500]), 'tone1k5')
+  class T(Tone): pass
+  target.dump(play2(2, [T, 0, 0], [250]), 'tone250')
+  class T(Tone): pass
+  target.dump(play2(2, [T, 0, 0], [1000]), 'tone1k')
+  class T(Tone): pass
+  target.dump(play2(2, [T, 0, 0], [1500]), 'tone1k5')
   target.dump(play(2, 'N..', [5000]), 'noise5k')
   target.dump(play(2, 'N..', [125000]), 'noise125k')
   target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
