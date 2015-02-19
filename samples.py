@@ -39,10 +39,9 @@ activechan = 0
 
 class Updater:
 
-  def __init__(self, onnote, chip, chan, frameindex):
+  def __init__(self, onnote, chip, frameindex):
     self.onnote = onnote
     self.chip = chip
-    self.chan = chan
     self.frameindex = frameindex
 
   def update(self, frameindex):
@@ -71,9 +70,9 @@ def main2(framesfactory, config):
           chip.fixedlevels[chan].value = 13 # Neutral DC.
       frames = framesfactory(chip)
       for frameindex, action in enumerate(frames):
-        onnoteornone = action.onnoteornone(chip, activechan)
+        onnoteornone = action.onnoteornone()
         if onnoteornone is not None:
-          chanupdaters[activechan] = Updater(onnoteornone, chip, activechan, frameindex)
+          chanupdaters[activechan] = Updater(onnoteornone, chip, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
         for b in timer.blocksforperiod(refreshrate):
@@ -206,16 +205,16 @@ class NoteAction:
   def __init__(self, note):
     self.note = note
 
-  def onnoteornone(self, chip, chan):
+  def onnoteornone(self):
     # The note needn't know all the chip's features, so turn them off first:
-    chip.flagsoff(chan)
+    self.note.chip.flagsoff(self.note.chipchan)
     self.note.noteon(0)
     return self.note
 
 @singleton
 class sustainaction:
 
-  def onnoteornone(self, chip, chan):
+  def onnoteornone(self):
     pass
 
 def main():
