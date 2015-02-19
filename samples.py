@@ -81,14 +81,6 @@ def main2(framesfactory, config):
     finally:
       di.stop()
 
-class Boring:
-
-  def __init__(self, nomclock):
-    pass
-
-  def update(self, chip, chan, frame):
-    pass
-
 class BaseTone(Note):
 
   def noteon(self, voladj):
@@ -142,19 +134,15 @@ class All(Note):
     self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
     self.chip.envshape.value = self.shape
 
-class PWM(Boring):
+class PWM(Note):
 
-  def __init__(self, nomclock):
-    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
-    self.tsfreq = Fraction(self.tsfreq) # Hide the class var.
-
-  def noteon(self, chip, chan):
-    chip.noiseflags[chan].value = False
-    chip.toneflags[chan].value = True
-    chip.tsflags[chan].value = True
-    chip.fixedlevels[chan].value = 15
-    chip.toneperiods[chan].value = self.tperiod
-    chip.tsfreqs[chan].value = self.tsfreq
+  def noteon(self, voladj):
+    self.noiseflag.value = False
+    self.toneflag.value = True
+    self.chip.tsflags[self.chipchan].value = True
+    self.setfixedlevel(15)
+    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+    self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
 
 class Target:
 
@@ -240,8 +228,8 @@ def main():
   target.dump(2, [Tri650, 0, 0], 'tri650')
   target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
   target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
-  #target.dump(2, [PWM501, 0, 0], 'pwm501')
-  #target.dump(2, [PWM250, 0, 0], 'pwm250')
+  target.dump(2, [PWM501, 0, 0], 'pwm501')
+  target.dump(2, [PWM250, 0, 0], 'pwm250')
   target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
