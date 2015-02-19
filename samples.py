@@ -39,9 +39,8 @@ activechan = 0
 
 class Updater:
 
-  def __init__(self, onnote, chip, frameindex):
+  def __init__(self, onnote, frameindex):
     self.onnote = onnote
-    self.chip = chip
     self.frameindex = frameindex
 
   def update(self, frameindex):
@@ -72,7 +71,7 @@ def main2(framesfactory, config):
       for frameindex, action in enumerate(frames):
         onnoteornone = action.onnoteornone()
         if onnoteornone is not None:
-          chanupdaters[activechan] = Updater(onnoteornone, chip, frameindex)
+          chanupdaters[activechan] = Updater(onnoteornone, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
         for b in timer.blocksforperiod(refreshrate):
