@@ -117,11 +117,10 @@ class Tone(tone):
   def __init__(self):
     tone.__init__(self, Freq(self.freq).toneperiod(orc.nomclock))
 
-@orc.add
 class Noise(Boring):
 
-  def __init__(self, freq):
-    self.period = Freq(freq).noiseperiod(orc.nomclock)
+  def __init__(self):
+    self.period = Freq(self.freq).noiseperiod(orc.nomclock)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = False
@@ -280,8 +279,10 @@ def main():
   target.dump(play2(2, [T1k, 0, 0]), 'tone1k')
   class T1k5(Tone): freq = 1500
   target.dump(play2(2, [T1k5, 0, 0]), 'tone1k5')
-  target.dump(play(2, 'N..', [5000]), 'noise5k')
-  target.dump(play(2, 'N..', [125000]), 'noise125k')
+  class N5k(Noise): freq = 5000
+  target.dump(play2(2, [N5k, 0, 0]), 'noise5k')
+  class N125k(Noise): freq = 125000
+  target.dump(play2(2, [N125k, 0, 0]), 'noise125k')
   target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
   target.dump(play(2, 'B..', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
   target.dump(play(2, 'E..', [600], [0x08]), 'saw600')
