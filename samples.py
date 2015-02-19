@@ -128,23 +128,18 @@ class Env(Note):
     self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
     self.chip.envshape.value = self.shape
 
-class All(Boring):
+class All(Note):
 
   tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
 
-  def __init__(self, nomclock):
-    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
-    self.nperiod = Freq(self.nfreq).noiseperiod(nomclock)
-    self.eperiod = Freq(self.efreq).envperiod(nomclock, self.shape)
-
-  def noteon(self, chip, chan):
-    chip.toneflags[chan].value = True
-    chip.noiseflags[chan].value = True
-    chip.levelmodes[chan].value = 1
-    chip.toneperiods[chan].value = self.tperiod
-    chip.noiseperiod.value = self.nperiod
-    chip.envperiod.value = self.eperiod
-    chip.envshape.value = self.shape
+  def noteon(self, voladj):
+    self.toneflag.value = True
+    self.noiseflag.value = True
+    self.levelmode.value = 1
+    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+    self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
+    self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
+    self.chip.envshape.value = self.shape
 
 class PWM(Boring):
 
@@ -242,7 +237,7 @@ def main():
   target.dump(2, [Saw600, 0, 0], 'saw600')
   target.dump(2, [Sin600, 0, 0], 'sin600')
   target.dump(2, [Tri650, 0, 0], 'tri650')
-  #target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
+  target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
   #target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
   #target.dump(2, [PWM501, 0, 0], 'pwm501')
   #target.dump(2, [PWM250, 0, 0], 'pwm250')
