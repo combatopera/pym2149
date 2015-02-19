@@ -28,12 +28,14 @@ from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
 from pym2149.util import singleton
+from pym2149.program import Note
 from ymplayer import ChipTimer
 import os, subprocess, time
 
 log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
+activechan = 0
 
 class Updater:
 
@@ -44,7 +46,7 @@ class Updater:
     self.frameindex = frameindex
 
   def update(self, frameindex):
-    self.onnote.update(self.chip, self.chan, frameindex - self.frameindex)
+    self.onnote.noteonframe(frameindex - self.frameindex)
 
 @singleton
 class voidupdater:
@@ -62,16 +64,16 @@ def main2(framesfactory, config):
       timer = di(Timer)
       stream = di(Stream)
       chanupdaters = [voidupdater] * config.chipchannels
-      for chan in xrange(1, config.chipchannels):
-        chip.toneflags[chan].value = False
-        chip.noiseflags[chan].value = False
-        chip.fixedlevels[chan].value = 13 # Neutral DC.
+      for chan in xrange(config.chipchannels):
+        if chan != activechan:
+          chip.toneflags[chan].value = False
+          chip.noiseflags[chan].value = False
+          chip.fixedlevels[chan].value = 13 # Neutral DC.
       frames = framesfactory(chip)
       for frameindex, action in enumerate(frames):
-        chan = 0
-        onnoteornone = action.onnoteornone(chip, chan)
+        onnoteornone = action.onnoteornone(chip, activechan)
         if onnoteornone is not None:
-          chanupdaters[chan] = Updater(onnoteornone, chip, chan, frameindex)
+          chanupdaters[activechan] = Updater(onnoteornone, chip, activechan, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
         for b in timer.blocksforperiod(refreshrate):
@@ -102,16 +104,13 @@ class Tone(tone):
   def __init__(self, nomclock):
     self.period = Freq(self.freq).toneperiod(nomclock)
 
-class Noise(Boring):
+class Noise(Note):
 
-  def __init__(self, nomclock):
-    self.period = Freq(self.freq).noiseperiod(nomclock)
-
-  def noteon(self, chip, chan):
-    chip.toneflags[chan].value = False
-    chip.noiseflags[chan].value = True
-    chip.fixedlevels[chan].value = 15
-    chip.noiseperiod.value = self.period
+  def noteon(self, voladj):
+    self.toneflag.value = False
+    self.noiseflag.value = True
+    self.setfixedlevel(15)
+    self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Boring):
 
@@ -186,7 +185,7 @@ class Target:
         if not program:
           action = sustainaction
         else:
-          note = program(self.config.nominalclock)
+          note = program(self.config.nominalclock, chip, activechan, None, None)
           action = NoteAction(note)
         frames.append(action)
         b, = timer.blocksforperiod(beatsperbar)
@@ -198,8 +197,8 @@ class Target:
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    chan = main2(framesfactory, config)
-    log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
+    frames = main2(framesfactory, config)
+    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 class NoteAction:
@@ -210,7 +209,7 @@ class NoteAction:
   def onnoteornone(self, chip, chan):
     # The note needn't know all the chip's features, so turn them off first:
     chip.flagsoff(chan)
-    self.note.noteon(chip, chan)
+    self.note.noteon(0)
     return self.note
 
 @singleton
@@ -242,21 +241,21 @@ def main():
   for p in xrange(1, 9):
     class t(tone): period = p
     tones.append(t)
-  target.dump(2, [T250, 0, 0], 'tone250')
-  target.dump(2, [T1k, 0, 0], 'tone1k')
-  target.dump(2, [T1k5, 0, 0], 'tone1k5')
+  #target.dump(2, [T250, 0, 0], 'tone250')
+  #target.dump(2, [T1k, 0, 0], 'tone1k')
+  #target.dump(2, [T1k5, 0, 0], 'tone1k5')
   target.dump(2, [N5k, 0, 0], 'noise5k')
   target.dump(2, [N125k, 0, 0], 'noise125k')
-  target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
-  target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
-  target.dump(2, [Saw600, 0, 0], 'saw600')
-  target.dump(2, [Sin600, 0, 0], 'sin600')
-  target.dump(2, [Tri650, 0, 0], 'tri650')
-  target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
-  target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
-  target.dump(2, [PWM501, 0, 0], 'pwm501')
-  target.dump(2, [PWM250, 0, 0], 'pwm250')
-  target.dump(8, tones, 'tone1-8')
+  #target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
+  #target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
+  #target.dump(2, [Saw600, 0, 0], 'saw600')
+  #target.dump(2, [Sin600, 0, 0], 'sin600')
+  #target.dump(2, [Tri650, 0, 0], 'tri650')
+  #target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
+  #target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
+  #target.dump(2, [PWM501, 0, 0], 'pwm501')
+  #target.dump(2, [PWM250, 0, 0], 'pwm250')
+  #target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
   main()
