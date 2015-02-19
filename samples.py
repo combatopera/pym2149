@@ -205,12 +205,6 @@ class sustainaction:
   def onnoteornone(self, chip, chan):
     pass
 
-def getorlast(v, i):
-  try:
-    return v[i]
-  except IndexError:
-    return v[-1]
-
 class Play:
 
   def __init__(self, config):
