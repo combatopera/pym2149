@@ -99,8 +99,9 @@ class tone(Note):
 
 class Tone(tone):
 
-  def __init__(self, nomclock):
-    self.period = Freq(self.freq).toneperiod(nomclock)
+  def noteon(self, voladj):
+    self.period = Freq(self.freq).toneperiod(self.nomclock)
+    tone.noteon(self, voladj)
 
 class Noise(Note):
 
@@ -227,9 +228,9 @@ def main():
   for p in xrange(1, 9):
     class t(tone): period = p
     tones.append(t)
-  #target.dump(2, [T250, 0, 0], 'tone250')
-  #target.dump(2, [T1k, 0, 0], 'tone1k')
-  #target.dump(2, [T1k5, 0, 0], 'tone1k5')
+  target.dump(2, [T250, 0, 0], 'tone250')
+  target.dump(2, [T1k, 0, 0], 'tone1k')
+  target.dump(2, [T1k5, 0, 0], 'tone1k5')
   target.dump(2, [N5k, 0, 0], 'noise5k')
   target.dump(2, [N125k, 0, 0], 'noise125k')
   target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
@@ -238,7 +239,7 @@ def main():
   target.dump(2, [Sin600, 0, 0], 'sin600')
   target.dump(2, [Tri650, 0, 0], 'tri650')
   target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
-  #target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
+  target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
   #target.dump(2, [PWM501, 0, 0], 'pwm501')
   #target.dump(2, [PWM250, 0, 0], 'pwm250')
   target.dump(8, tones, 'tone1-8')
