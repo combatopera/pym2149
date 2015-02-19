@@ -128,12 +128,11 @@ class Noise(Boring):
     chip.fixedlevels[chan].value = 15
     chip.noiseperiod.value = self.period
 
-@orc.add
 class Both(Boring):
 
-  def __init__(self, tfreq, nfreq):
-    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
-    self.nperiod = Freq(nfreq).noiseperiod(orc.nomclock)
+  def __init__(self, nomclock):
+    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
+    self.nperiod = Freq(self.nfreq).noiseperiod(nomclock)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = True
@@ -289,8 +288,10 @@ def main():
   target.dump(play2(2, [N5k, 0, 0]), 'noise5k')
   class N125k(Noise): freq = 125000
   target.dump(play2(2, [N125k, 0, 0]), 'noise125k')
-  target.dump(play(2, 'B..', [1000], [5000]), 'tone1k+noise5k')
-  target.dump(play(2, 'B..', [orc.nomclock // 16], [5000]), 'noise5k+tone1')
+  class T1kN5k(Both): tfreq, nfreq = 1000, 5000
+  target.dump(play2(2, [T1kN5k, 0, 0]), 'tone1k+noise5k')
+  class T1N5k(Both): tfreq, nfreq = config.nominalclock // 16, 5000
+  target.dump(play2(2, [T1N5k, 0, 0]), 'noise5k+tone1')
   target.dump(play(2, 'E..', [600], [0x08]), 'saw600')
   target.dump(play(2, 'E..', [600], [0x10]), 'sin600')
   target.dump(play(2, 'E..', [650], [0x0a]), 'tri650')
