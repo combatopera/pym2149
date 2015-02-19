@@ -68,10 +68,12 @@ def main2(framesfactory, config):
           chip.noiseflags[chan].value = False
           chip.fixedlevels[chan].value = 13 # Neutral DC.
       frames = framesfactory(chip)
-      for frameindex, action in enumerate(frames):
-        onnoteornone = action.onnoteornone()
-        if onnoteornone is not None:
-          chanupdaters[activechan] = Updater(onnoteornone, frameindex)
+      for frameindex, program in enumerate(frames):
+        if program:
+          onnote = program(config.nominalclock, chip, activechan, None, None)
+          chip.flagsoff(onnote.chipchan)
+          onnote.noteon(0)
+          chanupdaters[activechan] = Updater(onnote, frameindex)
         for updater in chanupdaters:
           updater.update(frameindex)
         for b in timer.blocksforperiod(refreshrate):
@@ -157,15 +159,10 @@ class Target:
       timer = SimpleTimer(refreshrate)
       frames = []
       for program in beats:
-        if not program:
-          action = sustainaction
-        else:
-          note = program(self.config.nominalclock, chip, activechan, None, None)
-          action = NoteAction(note)
-        frames.append(action)
+        frames.append(program)
         b, = timer.blocksforperiod(beatsperbar)
         for _ in xrange(b.framecount - 1):
-          frames.append(sustainaction)
+          frames.append(0)
       return frames
     path = os.path.join(self.targetpath, name)
     log.debug(path)
@@ -175,23 +172,6 @@ class Target:
     frames = main2(framesfactory, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
-
-class NoteAction:
-
-  def __init__(self, note):
-    self.note = note
-
-  def onnoteornone(self):
-    # The note needn't know all the chip's features, so turn them off first:
-    self.note.chip.flagsoff(self.note.chipchan)
-    self.note.noteon(0)
-    return self.note
-
-@singleton
-class sustainaction:
-
-  def onnoteornone(self):
-    pass
 
 def main():
   config = getprocessconfig()
