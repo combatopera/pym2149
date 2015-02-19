@@ -114,13 +114,13 @@ class tone(Boring):
 
 class Tone(tone):
 
-  def __init__(self):
-    tone.__init__(self, Freq(self.freq).toneperiod(orc.nomclock))
+  def __init__(self, nomclock):
+    tone.__init__(self, Freq(self.freq).toneperiod(nomclock))
 
 class Noise(Boring):
 
-  def __init__(self):
-    self.period = Freq(self.freq).noiseperiod(orc.nomclock)
+  def __init__(self, nomclock):
+    self.period = Freq(self.freq).noiseperiod(nomclock)
 
   def noteon(self, chip, chan):
     chip.toneflags[chan].value = False
@@ -251,27 +251,33 @@ def play(beatsperbar, beats, *args):
     return frames
   return framesfactory
 
-def play2(beatsperbar, beats):
-  def framesfactory(chip):
-    timer = SimpleTimer(refreshrate)
-    frames = []
-    for program in beats:
-      if not program:
-        action = sustainaction
-      else:
-        note = program()
-        action = NoteAction(note)
-      frames.append(action)
-      b, = timer.blocksforperiod(beatsperbar)
-      for _ in xrange(b.framecount - 1):
-        frames.append(sustainaction)
-    return frames
-  return framesfactory
+class Play:
+
+  def __init__(self, config):
+    self.nomclock = config.nominalclock
+
+  def __call__(self, beatsperbar, beats):
+    def framesfactory(chip):
+      timer = SimpleTimer(refreshrate)
+      frames = []
+      for program in beats:
+        if not program:
+          action = sustainaction
+        else:
+          note = program(self.nomclock)
+          action = NoteAction(note)
+        frames.append(action)
+        b, = timer.blocksforperiod(beatsperbar)
+        for _ in xrange(b.framecount - 1):
+          frames.append(sustainaction)
+      return frames
+    return framesfactory
 
 def main():
   config = getprocessconfig()
   config.di = DI()
   orc.nomclock = config.nominalclock # FIXME: Too eager.
+  play2 = Play(config)
   target = Target(config)
   class T250(Tone): freq = 250
   target.dump(play2(2, [T250, 0, 0]), 'tone250')
