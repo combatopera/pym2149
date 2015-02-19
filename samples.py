@@ -89,13 +89,13 @@ class Boring:
   def update(self, chip, chan, frame):
     pass
 
-class tone(Boring):
+class tone(Note):
 
-  def noteon(self, chip, chan):
-    chip.toneflags[chan].value = True
-    chip.noiseflags[chan].value = False
-    chip.fixedlevels[chan].value = 15
-    chip.toneperiods[chan].value = self.period
+  def noteon(self, voladj):
+    self.toneflag.value = True
+    self.noiseflag.value = False
+    self.setfixedlevel(15)
+    self.toneperiod.value = self.period
 
 class Tone(tone):
 
@@ -241,7 +241,7 @@ def main():
   #target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
   #target.dump(2, [PWM501, 0, 0], 'pwm501')
   #target.dump(2, [PWM250, 0, 0], 'pwm250')
-  #target.dump(8, tones, 'tone1-8')
+  target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
   main()
