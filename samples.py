@@ -171,12 +171,11 @@ class All(Boring):
     chip.envperiod.value = self.eperiod
     chip.envshape.value = self.shape
 
-@orc.add
 class PWM(Boring):
 
-  def __init__(self, tfreq, tsfreq):
-    self.tperiod = Freq(tfreq).toneperiod(orc.nomclock)
-    self.tsfreq = Fraction(tsfreq)
+  def __init__(self, nomclock):
+    self.tperiod = Freq(self.tfreq).toneperiod(nomclock)
+    self.tsfreq = Fraction(self.tsfreq)
 
   def noteon(self, chip, chan):
     chip.noiseflags[chan].value = False
@@ -301,8 +300,10 @@ def main():
   class T3k(Tone): freq = 3000
   class T4k(Tone): freq = 4000
   target.dump(play2(4, [T1k, T2k, T3k, T4k]), 'tone1k,2k,3k,4k')
-  target.dump(play(2, 'P..', [501], [501]), 'pwm501')
-  target.dump(play(2, 'P..', [250], [251]), 'pwm250') # Observe timer detune.
+  class PWM501(PWM): tfreq, tsfreq = 501, 501
+  target.dump(play2(2, [PWM501, 0, 0]), 'pwm501')
+  class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
+  target.dump(play2(2, [PWM250, 0, 0]), 'pwm250')
   target.dump(play(8, 't'*8, range(1, 9)), 'tone1-8')
 
 if '__main__' == __name__:
