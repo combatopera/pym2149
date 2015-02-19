@@ -178,13 +178,27 @@ class Target:
       os.mkdir(self.targetpath)
     self.config = config
 
-  def dump(self, chanfactory, name):
+  def dump(self, beatsperbar, beats, name):
+    def framesfactory(chip):
+      timer = SimpleTimer(refreshrate)
+      frames = []
+      for program in beats:
+        if not program:
+          action = sustainaction
+        else:
+          note = program(self.config.nominalclock)
+          action = NoteAction(note)
+        frames.append(action)
+        b, = timer.blocksforperiod(beatsperbar)
+        for _ in xrange(b.framecount - 1):
+          frames.append(sustainaction)
+      return frames
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
     config = self.config.fork()
     config.outpath = path + '.wav'
-    chan = main2(chanfactory, config)
+    chan = main2(framesfactory, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(chan) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
@@ -205,32 +219,9 @@ class sustainaction:
   def onnoteornone(self, chip, chan):
     pass
 
-class Play:
-
-  def __init__(self, config):
-    self.nomclock = config.nominalclock
-
-  def __call__(self, beatsperbar, beats):
-    def framesfactory(chip):
-      timer = SimpleTimer(refreshrate)
-      frames = []
-      for program in beats:
-        if not program:
-          action = sustainaction
-        else:
-          note = program(self.nomclock)
-          action = NoteAction(note)
-        frames.append(action)
-        b, = timer.blocksforperiod(beatsperbar)
-        for _ in xrange(b.framecount - 1):
-          frames.append(sustainaction)
-      return frames
-    return framesfactory
-
 def main():
   config = getprocessconfig()
   config.di = DI()
-  play2 = Play(config)
   target = Target(config)
   class T250(Tone): freq = 250
   class T1k(Tone): freq = 1000
@@ -251,21 +242,21 @@ def main():
   for p in xrange(1, 9):
     class t(tone): period = p
     tones.append(t)
-  target.dump(play2(2, [T250, 0, 0]), 'tone250')
-  target.dump(play2(2, [T1k, 0, 0]), 'tone1k')
-  target.dump(play2(2, [T1k5, 0, 0]), 'tone1k5')
-  target.dump(play2(2, [N5k, 0, 0]), 'noise5k')
-  target.dump(play2(2, [N125k, 0, 0]), 'noise125k')
-  target.dump(play2(2, [T1kN5k, 0, 0]), 'tone1k+noise5k')
-  target.dump(play2(2, [T1N5k, 0, 0]), 'noise5k+tone1')
-  target.dump(play2(2, [Saw600, 0, 0]), 'saw600')
-  target.dump(play2(2, [Sin600, 0, 0]), 'sin600')
-  target.dump(play2(2, [Tri650, 0, 0]), 'tri650')
-  target.dump(play2(2, [All, 0, 0]), 'tone1k+noise5k+tri1')
-  target.dump(play2(4, [T1k, T2k, T3k, T4k]), 'tone1k,2k,3k,4k')
-  target.dump(play2(2, [PWM501, 0, 0]), 'pwm501')
-  target.dump(play2(2, [PWM250, 0, 0]), 'pwm250')
-  target.dump(play2(8, tones), 'tone1-8')
+  target.dump(2, [T250, 0, 0], 'tone250')
+  target.dump(2, [T1k, 0, 0], 'tone1k')
+  target.dump(2, [T1k5, 0, 0], 'tone1k5')
+  target.dump(2, [N5k, 0, 0], 'noise5k')
+  target.dump(2, [N125k, 0, 0], 'noise125k')
+  target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
+  target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
+  target.dump(2, [Saw600, 0, 0], 'saw600')
+  target.dump(2, [Sin600, 0, 0], 'sin600')
+  target.dump(2, [Tri650, 0, 0], 'tri650')
+  target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
+  target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
+  target.dump(2, [PWM501, 0, 0], 'pwm501')
+  target.dump(2, [PWM250, 0, 0], 'pwm250')
+  target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
   main()
