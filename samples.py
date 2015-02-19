@@ -233,38 +233,38 @@ def main():
   play2 = Play(config)
   target = Target(config)
   class T250(Tone): freq = 250
-  target.dump(play2(2, [T250, 0, 0]), 'tone250')
   class T1k(Tone): freq = 1000
-  target.dump(play2(2, [T1k, 0, 0]), 'tone1k')
   class T1k5(Tone): freq = 1500
-  target.dump(play2(2, [T1k5, 0, 0]), 'tone1k5')
   class N5k(Noise): freq = 5000
-  target.dump(play2(2, [N5k, 0, 0]), 'noise5k')
   class N125k(Noise): freq = 125000
-  target.dump(play2(2, [N125k, 0, 0]), 'noise125k')
   class T1kN5k(Both): tfreq, nfreq = 1000, 5000
-  target.dump(play2(2, [T1kN5k, 0, 0]), 'tone1k+noise5k')
   class T1N5k(Both): tfreq, nfreq = config.nominalclock // 16, 5000
-  target.dump(play2(2, [T1N5k, 0, 0]), 'noise5k+tone1')
   class Saw600(Env): freq, shape = 600, 0x08
-  target.dump(play2(2, [Saw600, 0, 0]), 'saw600')
   class Sin600(Env): freq, shape = 600, 0x10
-  target.dump(play2(2, [Sin600, 0, 0]), 'sin600')
   class Tri650(Env): freq, shape = 650, 0x0a
-  target.dump(play2(2, [Tri650, 0, 0]), 'tri650')
-  target.dump(play2(2, [All, 0, 0]), 'tone1k+noise5k+tri1')
   class T2k(Tone): freq = 2000
   class T3k(Tone): freq = 3000
   class T4k(Tone): freq = 4000
-  target.dump(play2(4, [T1k, T2k, T3k, T4k]), 'tone1k,2k,3k,4k')
   class PWM501(PWM): tfreq, tsfreq = 501, 501
-  target.dump(play2(2, [PWM501, 0, 0]), 'pwm501')
   class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
-  target.dump(play2(2, [PWM250, 0, 0]), 'pwm250')
   tones = []
   for p in xrange(1, 9):
     class t(tone): period = p
     tones.append(t)
+  target.dump(play2(2, [T250, 0, 0]), 'tone250')
+  target.dump(play2(2, [T1k, 0, 0]), 'tone1k')
+  target.dump(play2(2, [T1k5, 0, 0]), 'tone1k5')
+  target.dump(play2(2, [N5k, 0, 0]), 'noise5k')
+  target.dump(play2(2, [N125k, 0, 0]), 'noise125k')
+  target.dump(play2(2, [T1kN5k, 0, 0]), 'tone1k+noise5k')
+  target.dump(play2(2, [T1N5k, 0, 0]), 'noise5k+tone1')
+  target.dump(play2(2, [Saw600, 0, 0]), 'saw600')
+  target.dump(play2(2, [Sin600, 0, 0]), 'sin600')
+  target.dump(play2(2, [Tri650, 0, 0]), 'tri650')
+  target.dump(play2(2, [All, 0, 0]), 'tone1k+noise5k+tri1')
+  target.dump(play2(4, [T1k, T2k, T3k, T4k]), 'tone1k,2k,3k,4k')
+  target.dump(play2(2, [PWM501, 0, 0]), 'pwm501')
+  target.dump(play2(2, [PWM250, 0, 0]), 'pwm250')
   target.dump(play2(8, tones), 'tone1-8')
 
 if '__main__' == __name__:
