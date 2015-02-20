@@ -155,9 +155,15 @@ class Target:
     self.config = config
 
   def dump(self, beatsperbar, beats, name):
+    config = self.config.fork()
+    allprograms = set()
+    config.midiprograms = {}
     timer = SimpleTimer(refreshrate)
     frames = []
     for program in beats:
+        if program and program not in allprograms:
+          config.midiprograms[config.midiprogrambase + len(allprograms)] = program
+          allprograms.add(program)
         frames.append(program)
         b, = timer.blocksforperiod(beatsperbar)
         for _ in xrange(b.framecount - 1):
@@ -165,7 +171,6 @@ class Target:
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
-    config = self.config.fork()
     config.outpath = path + '.wav'
     main2(frames, config)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
