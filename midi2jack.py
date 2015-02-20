@@ -31,7 +31,7 @@ from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
-from ymplayer import Background
+from pym2149.bg import Background
 
 log = logging.getLogger(__name__)
 

@@ -23,56 +23,7 @@ from pym2149.iface import Chip, Stream, YMFile
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.config import Config
-import threading, logging, tempfile, shutil, os, time
-
-log = logging.getLogger(__name__)
-
-class Background:
-
-    def __init__(self, config):
-        if config.profile:
-            if config.trace:
-                raise Exception
-            _, self.profilesort, self.profilepath = config.profile
-            self.bg = self.profile
-        elif config.trace:
-            self.bg = self.trace
-        else:
-            self.bg = self.__call__
-
-    def profile(self, *args, **kwargs):
-        profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')
-        tmpdir = tempfile.mkdtemp()
-        try:
-            binpath = os.path.join(tmpdir, 'stats')
-            import cProfile
-            cProfile.runctx('self.__call__(*args, **kwargs)', globals(), locals(), binpath)
-            import pstats
-            f = open(profilepath, 'w')
-            try:
-                stats = pstats.Stats(binpath, stream = f)
-                stats.sort_stats(self.profilesort)
-                stats.print_stats()
-                f.flush()
-            finally:
-                f.close()
-        finally:
-            shutil.rmtree(tmpdir)
-
-    def trace(self, *args, **kwargs):
-        from trace import Trace
-        t = Trace()
-        t.runctx('self.__call__(*args, **kwargs)', globals(), locals())
-        t.results().write_results()
-
-    def start(self):
-        self.quit = False
-        self.thread = threading.Thread(target = self.bg)
-        self.thread.start()
-
-    def stop(self):
-        self.quit = True
-        self.thread.join()
+from pym2149.bg import Background
 
 class ChipTimer(MinBlockRateTimer):
 
