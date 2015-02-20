@@ -26,8 +26,7 @@ from pym2149.di import DI
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
-from pym2149.util import singleton
+from pym2149.iface import Stream
 from pym2149.program import Note
 from pym2149.channels import Channels
 from ymplayer import ChipTimer
@@ -36,47 +35,29 @@ import os, subprocess, time
 log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
-activechan = 0
-
-class Updater:
-
-  def __init__(self, onnote, frameindex):
-    self.onnote = onnote
-    self.frameindex = frameindex
-
-  def update(self, frameindex):
-    self.onnote.noteonframe(frameindex - self.frameindex)
-
-@singleton
-class voidupdater:
-
-  def update(self, frameindex):
-    pass
 
 def main2(frames, config, programids):
+    midichan = config.midichannelbase
     di = createdi(config)
     configure(di)
-    di.add(Channels) # TODO: Use this.
-    chip = di(Chip)
+    di.add(Channels)
     di.start()
     try:
       di.add(ChipTimer)
       timer = di(Timer)
       stream = di(Stream)
-      chanupdaters = [voidupdater] * config.chipchannels
+      channels = di(Channels)
+      channels.programchange(0, midichan, programids[Silence])
+      # Play silence on all chip channels:
       for chan in xrange(config.chipchannels):
-        if chan != activechan:
-          onnote = Silence(config.nominalclock, chip, chan, None, None)
-          chip.flagsoff(onnote.chipchan)
-          onnote.noteon(0)
+        channels.noteon(0, midichan, 60 + chan, config.neutralvelocity)
+      for chan in xrange(config.chipchannels):
+        channels.noteoff(0, midichan, 60 + chan, config.neutralvelocity)
       for frameindex, program in enumerate(frames):
         if program:
-          onnote = program(config.nominalclock, chip, activechan, None, None)
-          chip.flagsoff(onnote.chipchan)
-          onnote.noteon(0)
-          chanupdaters[activechan] = Updater(onnote, frameindex)
-        for updater in chanupdaters:
-          updater.update(frameindex)
+          channels.programchange(frameindex, midichan, programids[program])
+          channels.noteon(frameindex, midichan, 60, config.neutralvelocity)
+        channels.updateall(frameindex)
         for b in timer.blocksforperiod(refreshrate):
           stream.call(b)
       stream.flush()
@@ -158,6 +139,7 @@ class Target:
     config = self.config.fork()
     programids = {}
     config.midiprograms = {}
+    config.midichanneltoprogram = {} # We'll use programchange as necessary.
     def register(program):
       programid = config.midiprogrambase + len(programids)
       config.midiprograms[programid] = program
