@@ -34,8 +34,6 @@ import os, subprocess, time
 
 log = logging.getLogger(__name__)
 
-refreshrate = 60 # Deliberately not a divisor of the clock.
-
 class Silence(Note):
 
   def noteon(self, voladj):
@@ -117,7 +115,7 @@ class Target:
       config.midiprograms[programid] = program
       programids[program] = programid
     register(Silence)
-    timer = SimpleTimer(refreshrate)
+    timer = SimpleTimer(config.updaterate)
     frames = []
     for program in beats:
       if program and program not in programids:
@@ -151,12 +149,12 @@ class Target:
           channels.programchange(frameindex, midichan, programids[program])
           channels.noteon(frameindex, midichan, 60, config.neutralvelocity)
         channels.updateall(frameindex)
-        for b in timer.blocksforperiod(refreshrate):
+        for b in timer.blocksforperiod(config.updaterate):
           stream.call(b)
       stream.flush()
     finally:
       di.stop()
-    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
+    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
