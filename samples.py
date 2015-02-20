@@ -161,7 +161,7 @@ class Target:
 
 def main():
   config = getprocessconfig()
-  config.di = DI()
+  config.di = DI() # Enough to get nominalclock working.
   target = Target(config)
   class T250(Tone): freq = 250
   class T1k(Tone): freq = 1000
