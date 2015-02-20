@@ -29,7 +29,8 @@ from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
-from ymplayer import Background, ChipTimer
+from pym2149.bg import Background
+from ymplayer import ChipTimer
 
 log = logging.getLogger(__name__)
 
