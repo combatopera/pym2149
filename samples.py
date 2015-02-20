@@ -53,7 +53,7 @@ class voidupdater:
   def update(self, frameindex):
     pass
 
-def main2(frames, config):
+def main2(frames, config, programids):
     di = createdi(config)
     configure(di)
     di.add(Channels) # TODO: Use this.
@@ -158,22 +158,25 @@ class Target:
     config = self.config.fork()
     programids = {}
     config.midiprograms = {}
+    def register(program):
+      programid = config.midiprogrambase + len(programids)
+      config.midiprograms[programid] = program
+      programids[program] = programid
+    register(Silence)
     timer = SimpleTimer(refreshrate)
     frames = []
     for program in beats:
-        if program and program not in programids:
-          programid = config.midiprogrambase + len(programids)
-          config.midiprograms[programid] = program
-          programids[program] = programid
-        frames.append(program)
-        b, = timer.blocksforperiod(beatsperbar)
-        for _ in xrange(b.framecount - 1):
-          frames.append(0)
+      if program and program not in programids:
+        register(program)
+      frames.append(program)
+      b, = timer.blocksforperiod(beatsperbar)
+      for _ in xrange(b.framecount - 1):
+        frames.append(0)
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
     config.outpath = path + '.wav'
-    main2(frames, config)
+    main2(frames, config, programids)
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
