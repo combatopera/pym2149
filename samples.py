@@ -36,34 +36,6 @@ log = logging.getLogger(__name__)
 
 refreshrate = 60 # Deliberately not a divisor of the clock.
 
-def main2(frames, config, programids):
-    midichan = config.midichannelbase
-    di = createdi(config)
-    configure(di)
-    di.add(Channels)
-    di.start()
-    try:
-      di.add(ChipTimer)
-      timer = di(Timer)
-      stream = di(Stream)
-      channels = di(Channels)
-      channels.programchange(0, midichan, programids[Silence])
-      # Play silence on all chip channels:
-      for chan in xrange(config.chipchannels):
-        channels.noteon(0, midichan, 60 + chan, config.neutralvelocity)
-      for chan in xrange(config.chipchannels):
-        channels.noteoff(0, midichan, 60 + chan, config.neutralvelocity)
-      for frameindex, program in enumerate(frames):
-        if program:
-          channels.programchange(frameindex, midichan, programids[program])
-          channels.noteon(frameindex, midichan, 60, config.neutralvelocity)
-        channels.updateall(frameindex)
-        for b in timer.blocksforperiod(refreshrate):
-          stream.call(b)
-      stream.flush()
-    finally:
-      di.stop()
-
 class Silence(Note):
 
   def noteon(self, voladj):
@@ -158,7 +130,32 @@ class Target:
     log.debug(path)
     start = time.time()
     config.outpath = path + '.wav'
-    main2(frames, config, programids)
+    midichan = config.midichannelbase
+    di = createdi(config)
+    configure(di)
+    di.add(Channels)
+    di.start()
+    try:
+      di.add(ChipTimer)
+      timer = di(Timer)
+      stream = di(Stream)
+      channels = di(Channels)
+      channels.programchange(0, midichan, programids[Silence])
+      # Play silence on all chip channels:
+      for chan in xrange(config.chipchannels):
+        channels.noteon(0, midichan, 60 + chan, config.neutralvelocity)
+      for chan in xrange(config.chipchannels):
+        channels.noteoff(0, midichan, 60 + chan, config.neutralvelocity)
+      for frameindex, program in enumerate(frames):
+        if program:
+          channels.programchange(frameindex, midichan, programids[program])
+          channels.noteon(frameindex, midichan, 60, config.neutralvelocity)
+        channels.updateall(frameindex)
+        for b in timer.blocksforperiod(refreshrate):
+          stream.call(b)
+      stream.flush()
+    finally:
+      di.stop()
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / refreshrate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
