@@ -29,6 +29,7 @@ from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
 from pym2149.util import singleton
 from pym2149.program import Note
+from pym2149.channels import Channels
 from ymplayer import ChipTimer
 import os, subprocess, time
 
@@ -55,6 +56,7 @@ class voidupdater:
 def main2(frames, config):
     di = createdi(config)
     configure(di)
+    di.add(Channels) # TODO: Use this.
     chip = di(Chip)
     di.start()
     try:
@@ -64,9 +66,9 @@ def main2(frames, config):
       chanupdaters = [voidupdater] * config.chipchannels
       for chan in xrange(config.chipchannels):
         if chan != activechan:
-          chip.toneflags[chan].value = False
-          chip.noiseflags[chan].value = False
-          chip.fixedlevels[chan].value = 13 # Neutral DC.
+          onnote = Silence(config.nominalclock, chip, chan, None, None)
+          chip.flagsoff(onnote.chipchan)
+          onnote.noteon(0)
       for frameindex, program in enumerate(frames):
         if program:
           onnote = program(config.nominalclock, chip, activechan, None, None)
@@ -81,11 +83,15 @@ def main2(frames, config):
     finally:
       di.stop()
 
+class Silence(Note):
+
+  def noteon(self, voladj):
+    self.setfixedlevel(13) # Neutral DC.
+
 class BaseTone(Note):
 
   def noteon(self, voladj):
     self.toneflag.value = True
-    self.noiseflag.value = False
     self.setfixedlevel(15)
     self.toneperiod.value = self.period
 
@@ -98,7 +104,6 @@ class Tone(BaseTone):
 class Noise(Note):
 
   def noteon(self, voladj):
-    self.toneflag.value = False
     self.noiseflag.value = True
     self.setfixedlevel(15)
     self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
@@ -115,8 +120,6 @@ class Both(Note):
 class Env(Note):
 
   def noteon(self, voladj):
-    self.toneflag.value = False
-    self.noiseflag.value = False
     self.levelmode.value = 1
     self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
     self.chip.envshape.value = self.shape
@@ -137,7 +140,6 @@ class All(Note):
 class PWM(Note):
 
   def noteon(self, voladj):
-    self.noiseflag.value = False
     self.toneflag.value = True
     self.chip.tsflags[self.chipchan].value = True
     self.setfixedlevel(15)
