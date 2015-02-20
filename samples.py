@@ -156,14 +156,15 @@ class Target:
 
   def dump(self, beatsperbar, beats, name):
     config = self.config.fork()
-    allprograms = set()
+    programids = {}
     config.midiprograms = {}
     timer = SimpleTimer(refreshrate)
     frames = []
     for program in beats:
-        if program and program not in allprograms:
-          config.midiprograms[config.midiprogrambase + len(allprograms)] = program
-          allprograms.add(program)
+        if program and program not in programids:
+          programid = config.midiprogrambase + len(programids)
+          config.midiprograms[programid] = program
+          programids[program] = programid
         frames.append(program)
         b, = timer.blocksforperiod(beatsperbar)
         for _ in xrange(b.framecount - 1):
