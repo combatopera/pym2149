@@ -50,8 +50,10 @@ pianorollheight = config.di(YMFile).pianorollheight
 '''You can override the deduced piano roll height here.'''
 
 midichannelbase = 1
+'''In case you wanted 0-based channel numbering.'''
 
 midiprogrambase = 0
+'''Some synths use 1 for the first program.'''
 
 neutralvelocity = 0x60
 
@@ -71,10 +73,13 @@ pitchbendratemultiplier = 4
 '''In finepitchbendisrate mode, the rate is the fine bend multiplied by this.'''
 
 dosoundextraseconds = 3
+'''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
 chipchannels = 3
 '''Eventually you will be able to choose as many channels as you like, doesn't quite work yet.'''
 
 profile = None
+'''If not None, a tuple of (profiling time, sort column, output path).'''
 
 trace = None
+'''If not None, the number of seconds worth of trace data to collect.'''
