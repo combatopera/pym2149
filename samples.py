@@ -21,8 +21,8 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from fractions import Fraction
-from pym2149.config import getprocessconfig
-from pym2149.di import DI
+from pym2149.config import getprocessconfig, Config
+from pym2149.di import DI, types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
@@ -107,7 +107,7 @@ class Target:
 
   def dump(self, beatsperbar, beats, name):
     config = self.config.fork()
-    programids = {}
+    programids = ProgramIds()
     config.midiprograms = {}
     config.midichanneltoprogram = {} # We'll use programchange as necessary.
     def register(program):
@@ -115,47 +115,67 @@ class Target:
       config.midiprograms[programid] = program
       programids[program] = programid
     register(Silence)
-    timer = SimpleTimer(config.updaterate)
-    frames = []
+    lftimer = SimpleTimer(config.updaterate)
+    frames = Frames()
     for program in beats:
       if program and program not in programids:
         register(program)
       frames.append(program)
-      b, = timer.blocksforperiod(beatsperbar)
+      b, = lftimer.blocksforperiod(beatsperbar)
       for _ in xrange(b.framecount - 1):
         frames.append(0)
     path = os.path.join(self.targetpath, name)
     log.debug(path)
     start = time.time()
     config.outpath = path + '.wav'
-    midichan = config.midichannelbase
     di = createdi(config)
     configure(di)
     di.add(Channels)
+    di.add(ChipTimer)
+    di.add(frames)
+    di.add(programids)
     di.start()
     try:
-      di.add(ChipTimer)
-      timer = di(Timer)
-      stream = di(Stream)
-      channels = di(Channels)
-      channels.programchange(0, midichan, programids[Silence])
-      # Play silence on all chip channels:
-      for chan in xrange(config.chipchannels):
-        channels.noteon(0, midichan, 60 + chan, config.neutralvelocity)
-      for chan in xrange(config.chipchannels):
-        channels.noteoff(0, midichan, 60 + chan, config.neutralvelocity)
-      for frameindex, program in enumerate(frames):
-        if program:
-          channels.programchange(frameindex, midichan, programids[program])
-          channels.noteon(frameindex, midichan, 60, config.neutralvelocity)
-        channels.updateall(frameindex)
-        for b in timer.blocksforperiod(config.updaterate):
-          stream.call(b)
-      stream.flush()
+      di.add(Player)
+      di(Player)()
     finally:
       di.stop()
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
+
+class Frames(list): pass
+
+class ProgramIds(dict): pass
+
+class Player:
+
+    @types(Config, Timer, Stream, Channels, Frames, ProgramIds)
+    def __init__(self, config, timer, stream, channels, frames, programids):
+        self.updaterate = config.updaterate
+        self.neutralvel = config.neutralvelocity
+        self.chipchannels = config.chipchannels
+        self.midichan = config.midichannelbase
+        self.timer = timer
+        self.stream = stream
+        self.channels = channels
+        self.frames = frames
+        self.programids = programids
+
+    def __call__(self):
+        self.channels.programchange(0, self.midichan, self.programids[Silence])
+        # Play silence on all chip channels:
+        for chan in xrange(self.chipchannels):
+            self.channels.noteon(0, self.midichan, 60 + chan, self.neutralvel)
+        for chan in xrange(self.chipchannels):
+            self.channels.noteoff(0, self.midichan, 60 + chan, self.neutralvel)
+        for frameindex, program in enumerate(self.frames):
+            if program:
+                self.channels.programchange(frameindex, self.midichan, self.programids[program])
+                self.channels.noteon(frameindex, self.midichan, 60, self.neutralvel)
+            self.channels.updateall(frameindex)
+            for b in self.timer.blocksforperiod(self.updaterate):
+                self.stream.call(b)
+        self.stream.flush()
 
 def main():
   config = getprocessconfig()
