@@ -18,23 +18,15 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lazyconf import Expressions, View
+from lazyconf import Expressions, View, Fork
 
-class Fork:
-
-    def __init__(self, parent):
-        self.parent = parent
-
-    def __getattr__(self, name):
-        return getattr(self.parent, name)
-
-class TestView(unittest.TestCase):
+class TestFork(unittest.TestCase):
 
     def test_inheritedexpressionusescorrectcontext(self):
         expressions = Expressions()
         lines = ['woo = config.yay\n', '']
         readline = lambda: lines.pop(0)
-        expressions.loadfile(None, readline)
+        expressions.loadfile('whatever', readline)
         view = View(expressions)
         fork = Fork(view)
         view.yay = 'viewyay'
