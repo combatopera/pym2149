@@ -16,8 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import sys, logging, os, anchor
-from lazyconf import Expressions, View
+import sys, logging, os, anchor, lazyconf
 from const import appconfigdir
 
 log = logging.getLogger(__name__)
@@ -27,15 +26,15 @@ def getprocessconfig(*argnames, **kwargs):
 
 class Config: pass
 
-class ConfigImpl(View, Config):
+class ConfigImpl(lazyconf.View, Config):
 
   defaultconfigname = 'defaults'
 
   def __init__(self, argnames, args, **kwargs):
     if len(argnames) != len(args):
       raise Exception("Expected %s but got: %s" % (argnames, args))
-    expressions = Expressions()
-    View.__init__(self, expressions)
+    expressions = lazyconf.Expressions()
+    lazyconf.View.__init__(self, expressions)
     for argname, arg in zip(argnames, args):
       setattr(self, argname, arg)
     expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
@@ -59,10 +58,4 @@ class ConfigImpl(View, Config):
   def fork(self):
     return Fork(self)
 
-class Fork(Config):
-
-    def __init__(self, parent):
-        self.parent = parent
-
-    def __getattr__(self, name):
-        return getattr(self.parent, name)
+class Fork(lazyconf.Fork, Config): pass
