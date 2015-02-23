@@ -45,9 +45,10 @@ class View:
         self.expressions = expressions
 
     def __getattr__(self, name):
-        obj = self.expressions.expression(name)(context.view)
+        view = context.view if hasattr(context, 'view') and context.view is not None else self
+        obj = self.expressions.expression(name)(view)
         for mod in self.expressions.modifiers(name):
-            mod.modify(context.view, name, obj)
+            mod.modify(view, name, obj)
         return obj
 
 class Fork:
