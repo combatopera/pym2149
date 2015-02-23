@@ -44,7 +44,7 @@ class View:
 
     def __getattr__(self, name):
         context = self
-        obj = self.expressions.expressions[name](context)
+        obj = self.expressions.expression(name)(context)
         for mod in self.expressions.modifiers(name):
             mod.modify(context, name, obj)
         return obj
@@ -94,6 +94,9 @@ class Expressions:
                 name = m.group(1)
                 self.expressions[name] = Expression(head, tocode(line), name)
             line = readline()
+
+    def expression(self, name):
+        return self.expressions[name]
 
     def modifiers(self, name):
         for modname, e in self.expressions.iteritems():
