@@ -83,20 +83,20 @@ class Loader:
         self.paths.append(self.canonicalize(path))
 
     def loadfile(self, logtag, readline):
-            head = []
+        head = []
+        line = readline()
+        while line and self.toplevelassignment.search(line) is None:
+            head.append(line)
             line = readline()
-            while line and self.toplevelassignment.search(line) is None:
-                head.append(line)
-                line = readline()
-            tocode = lambda block: compile(block, '<string>', 'exec')
-            log.debug("[%s] Header is first %s lines.", logtag, len(head))
-            head = tocode(''.join(head))
-            while line:
-                m = self.toplevelassignment.search(line)
-                if m is not None:
-                    name = m.group(1)
-                    self.expressions[name] = Expression(head, tocode(line), name)
-                line = readline()
+        tocode = lambda block: compile(block, '<string>', 'exec')
+        log.debug("[%s] Header is first %s lines.", logtag, len(head))
+        head = tocode(''.join(head))
+        while line:
+            m = self.toplevelassignment.search(line)
+            if m is not None:
+                name = m.group(1)
+                self.expressions[name] = Expression(head, tocode(line), name)
+            line = readline()
 
     def modifiers(self, name):
         for modname, e in self.expressions.iteritems():
