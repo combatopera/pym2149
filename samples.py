@@ -187,7 +187,11 @@ def main():
   class N5k(Noise): freq = 5000
   class N125k(Noise): freq = 125000
   class T1kN5k(Both): tfreq, nfreq = 1000, 5000
-  class T1N5k(Both): tfreq, nfreq = config.nominalclock // 16, 5000
+  class T1N5k(Both):
+    nfreq = 5000
+    def __init__(self, nomclock, *args):
+      self.tfreq = nomclock // 16
+      Both.__init__(self, nomclock, *args)
   class Saw600(Env): freq, shape = 600, 0x08
   class Sin600(Env): freq, shape = 600, 0x10
   class Tri650(Env): freq, shape = 650, 0x0a
