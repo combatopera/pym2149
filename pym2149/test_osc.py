@@ -113,7 +113,7 @@ class TestToneOsc(unittest.TestCase):
 
 def cmptime(self, taken, strictlimit):
   expression = "%.3f < %s" % (taken, strictlimit)
-  print >> sys.stderr, expression
+  sys.stderr.write("%s ... " % expression)
   self.assertTrue(eval(expression))
 
 class TestTimerSynth(TestToneOsc):
