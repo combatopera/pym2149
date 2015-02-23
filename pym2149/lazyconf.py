@@ -43,9 +43,6 @@ class View:
         self.expressions = expressions
 
     def __getattr__(self, name):
-        if 'configpath' == name:
-            path, = self.expressions.paths
-            return path
         context = self
         obj = self.expressions.expressions[name](context)
         for mod in self.expressions.modifiers(name):
@@ -72,7 +69,6 @@ class Expressions:
 
     def __init__(self):
         self.expressions = {}
-        self.paths = []
 
     def load(self, path):
         f = open(path)
@@ -80,16 +76,15 @@ class Expressions:
             self.loadfile(path, f.readline)
         finally:
             f.close()
-        self.paths.append(self.canonicalize(path))
 
-    def loadfile(self, logtag, readline):
-        head = []
+    def loadfile(self, path, readline):
+        head = ["__file__ = %r\n" % self.canonicalize(path)]
         line = readline()
         while line and self.toplevelassignment.search(line) is None:
             head.append(line)
             line = readline()
         tocode = lambda block: compile(block, '<string>', 'exec')
-        log.debug("[%s] Header is first %s lines.", logtag, len(head))
+        log.debug("[%s] Header is first %s lines.", path, len(head))
         head = tocode(''.join(head))
         while line:
             m = self.toplevelassignment.search(line)
