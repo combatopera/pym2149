@@ -107,6 +107,7 @@ class Target:
 
   def dump(self, beatsperbar, beats, name):
     config = self.config.fork()
+    di = createdi(config)
     programids = ProgramIds()
     config.midiprograms = {}
     config.midichanneltoprogram = {} # We'll use programchange as necessary.
@@ -128,7 +129,6 @@ class Target:
     log.debug(path)
     start = time.time()
     config.outpath = path + '.wav'
-    di = createdi(config)
     configure(di)
     di.add(Channels)
     di.add(ChipTimer)
@@ -178,9 +178,7 @@ class Player:
         self.stream.flush()
 
 def main():
-  config = getprocessconfig()
-  config.di = DI() # Enough to get nominalclock working.
-  target = Target(config)
+  target = Target(getprocessconfig())
   class T250(Tone): freq = 250
   class T1k(Tone): freq = 1000
   class T1k5(Tone): freq = 1500
