@@ -43,9 +43,10 @@ class View:
     def __getattr__(self, name):
         if 'configpath' == name:
             return self.loader.paths[-1]
-        obj = self.loader.expressions[name](self)
+        context = self
+        obj = self.loader.expressions[name](context)
         for mod in self.loader.modifiers(name):
-            mod(self, (name, obj))
+            mod(context, (name, obj))
         return obj
 
     def addpath(self, path):
@@ -73,23 +74,26 @@ class Loader:
     def load(self, path):
         f = open(path)
         try:
+            self.loadfile(path, f.readline)
+        finally:
+            f.close()
+        self.paths.append(self.canonicalize(path))
+
+    def loadfile(self, logtag, readline):
             head = []
-            line = f.readline()
+            line = readline()
             while line and self.toplevelassignment.search(line) is None:
                 head.append(line)
-                line = f.readline()
+                line = readline()
             tocode = lambda block: compile(block, '<string>', 'exec')
-            log.debug("[%s] Header is first %s lines.", path, len(head))
+            log.debug("[%s] Header is first %s lines.", logtag, len(head))
             head = tocode(''.join(head))
             while line:
                 m = self.toplevelassignment.search(line)
                 if m is not None:
                     name = m.group(1)
                     self.expressions[name] = Expression(head, tocode(line), name)
-                line = f.readline()
-        finally:
-            f.close()
-        self.paths.append(self.canonicalize(path))
+                line = readline()
 
     def modifiers(self, name):
         for modname, e in self.expressions.iteritems():
