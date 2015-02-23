@@ -41,8 +41,6 @@ class View:
         self.loader = loader
 
     def __getattr__(self, name):
-        if 'configpath' == name:
-            return self.loader.paths[-1]
         context = self
         obj = self.loader.expressions[name](context)
         for mod in self.loader.modifiers(name):
