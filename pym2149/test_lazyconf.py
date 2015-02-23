@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lazyconf import Loader, View
+from lazyconf import Expressions, View
 
 class Fork:
 
@@ -31,11 +31,11 @@ class Fork:
 class TestView(unittest.TestCase):
 
     def test_inheritedexpressionusescorrectcontext(self):
-        loader = Loader()
+        expressions = Expressions()
         lines = ['woo = config.yay\n', '']
         readline = lambda: lines.pop(0)
-        loader.loadfile(None, readline)
-        view = View(loader)
+        expressions.loadfile(None, readline)
+        view = View(expressions)
         fork = Fork(view)
         view.yay = 'viewyay'
         self.assertEqual('viewyay', fork.woo)

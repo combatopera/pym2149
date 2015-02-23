@@ -17,7 +17,7 @@
 
 from __future__ import division
 import sys, logging, os, anchor
-from lazyconf import Loader, View
+from lazyconf import Expressions, View
 from const import appconfigdir
 
 log = logging.getLogger(__name__)
@@ -34,11 +34,11 @@ class ConfigImpl(View, Config):
   def __init__(self, argnames, args, **kwargs):
     if len(argnames) != len(args):
       raise Exception("Expected %s but got: %s" % (argnames, args))
-    loader = Loader()
-    View.__init__(self, loader)
+    expressions = Expressions()
+    View.__init__(self, expressions)
     for argname, arg in zip(argnames, args):
       setattr(self, argname, arg)
-    loader.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
+    expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
     configspath = os.path.join(appconfigdir, 'configs')
     if 'configname' in kwargs:
       configname = kwargs['configname']
@@ -54,7 +54,7 @@ class ConfigImpl(View, Config):
         sys.stderr.write('#? ')
         configname = confignames[int(raw_input())]
     if self.defaultconfigname != configname:
-      loader.load(os.path.join(configspath, configname))
+      expressions.load(os.path.join(configspath, configname))
 
   def fork(self):
     return Fork(self)
