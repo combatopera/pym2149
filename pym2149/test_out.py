@@ -57,7 +57,7 @@ class TestWavWriter(unittest.TestCase):
       tone.cursor += block.framecount
     w.stop()
     expression = "%.3f < %s" % (time.time() - start, strictlimit)
-    print >> sys.stderr, expression
+    sys.stderr.write("%s ... " % expression)
     self.assertTrue(eval(expression))
 
   def test_minperiodperformancesmallblocks(self):
