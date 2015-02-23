@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, sys, os
+import re, logging, os
 
 log = logging.getLogger(__name__)
 
@@ -49,10 +49,6 @@ class View:
             mod.modify(context, name, obj)
         return obj
 
-    def addpath(self, path):
-        if path not in sys.path:
-            sys.path.append(path)
-
 class Expressions:
 
     # TODO LATER: Ideally inspect the AST as this can give false positives.
@@ -78,7 +74,13 @@ class Expressions:
             f.close()
 
     def loadfile(self, path, readline):
-        head = ["__file__ = %r\n" % self.canonicalize(path)]
+        head = [
+            "__file__ = %r\n" % self.canonicalize(path),
+            'def sys_path_add(path):\n',
+            '    import sys\n',
+            '    if path not in sys.path:\n',
+            '        sys.path.append(path)\n',
+        ]
         line = readline()
         while line and self.toplevelassignment.search(line) is None:
             head.append(line)
