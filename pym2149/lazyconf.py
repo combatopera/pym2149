@@ -39,16 +39,16 @@ class Expression:
 
 class View:
 
-    def __init__(self, loader):
-        self.loader = loader
+    def __init__(self, expressions):
+        self.expressions = expressions
 
     def __getattr__(self, name):
         if 'configpath' == name:
-            path, = self.loader.paths
+            path, = self.expressions.paths
             return path
         context = self
-        obj = self.loader.expressions[name](context)
-        for mod in self.loader.modifiers(name):
+        obj = self.expressions.expressions[name](context)
+        for mod in self.expressions.modifiers(name):
             mod.modify(context, name, obj)
         return obj
 
@@ -56,7 +56,7 @@ class View:
         if path not in sys.path:
             sys.path.append(path)
 
-class Loader:
+class Expressions:
 
     # TODO LATER: Ideally inspect the AST as this can give false positives.
     toplevelassignment = re.compile(r'^([^\s]+)\s*=')
