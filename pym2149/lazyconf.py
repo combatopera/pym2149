@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, os
+import re, logging, os, threading
 
 log = logging.getLogger(__name__)
 
@@ -37,17 +37,30 @@ class Expression:
     def modify(self, view, objname, obj):
         self.run({'config': view, objname: obj})
 
+context = threading.local()
+
 class View:
 
     def __init__(self, expressions):
         self.expressions = expressions
 
     def __getattr__(self, name):
-        context = self
-        obj = self.expressions.expression(name)(context)
+        obj = self.expressions.expression(name)(context.view)
         for mod in self.expressions.modifiers(name):
-            mod.modify(context, name, obj)
+            mod.modify(context.view, name, obj)
         return obj
+
+class Fork:
+
+    def __init__(self, parent):
+        self.parent = parent
+
+    def __getattr__(self, name):
+        context.view = self
+        try:
+            return getattr(self.parent, name)
+        finally:
+            context.view = None
 
 class Expressions:
 
@@ -99,6 +112,6 @@ class Expressions:
         return self.expressions[name]
 
     def modifiers(self, name):
-        for modname, e in self.expressions.iteritems():
-            if modname.startswith(name + '['):
+        for e in self.expressions.itervalues():
+            if e.name.startswith(name + '['):
                 yield e
