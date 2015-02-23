@@ -26,14 +26,16 @@ class Expression:
         self.code = code
         self.name = name
 
-    def __call__(self, view, itemornone = None):
-        g = dict(config = view)
-        if itemornone is not None:
-            g[itemornone[0]] = itemornone[1]
+    def run(self, g):
         exec (self.head, g)
         exec (self.code, g)
-        if itemornone is None:
-            return g[self.name]
+        return g
+
+    def __call__(self, view):
+        return self.run({'config': view})[self.name]
+
+    def modify(self, view, objname, obj):
+        self.run({'config': view, objname: obj})
 
 class View:
 
@@ -47,7 +49,7 @@ class View:
         context = self
         obj = self.loader.expressions[name](context)
         for mod in self.loader.modifiers(name):
-            mod(context, (name, obj))
+            mod.modify(context, name, obj)
         return obj
 
     def addpath(self, path):
