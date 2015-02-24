@@ -140,11 +140,18 @@ class Target:
     self.config = config
 
   def dump(self, beatsperbar, beats, name):
+    path = os.path.join(self.targetpath, name)
+    log.info(path)
     config = self.config.fork()
-    di = createdi(config)
-    programids = ProgramIds()
     config.midiprograms = {}
     config.midichanneltoprogram = {} # We'll use programchange as necessary.
+    config.outpath = path + '.wav'
+    di = createdi(config)
+    configure(di)
+    di.add(Channels)
+    di.add(ChipTimer)
+    di.add(Player)
+    programids = ProgramIds()
     def register(program):
       programid = config.midiprogrambase + len(programids)
       config.midiprograms[programid] = program
@@ -159,18 +166,11 @@ class Target:
       b, = lftimer.blocksforperiod(beatsperbar)
       for _ in xrange(b.framecount - 1):
         frames.append(0)
-    path = os.path.join(self.targetpath, name)
-    log.debug(path)
     start = time.time()
-    config.outpath = path + '.wav'
-    configure(di)
-    di.add(Channels)
-    di.add(ChipTimer)
     di.add(frames)
     di.add(programids)
     di.start()
     try:
-      di.add(Player)
       di(Player)()
     finally:
       di.stop()
