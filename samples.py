@@ -97,6 +97,40 @@ class PWM(Note):
     self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
     self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
 
+class Frames(list): pass
+
+class ProgramIds(dict): pass
+
+class Player:
+
+    @types(Config, Timer, Stream, Channels, Frames, ProgramIds)
+    def __init__(self, config, timer, stream, channels, frames, programids):
+        self.updaterate = config.updaterate
+        self.neutralvel = config.neutralvelocity
+        self.chipchannels = config.chipchannels
+        self.midichan = config.midichannelbase
+        self.timer = timer
+        self.stream = stream
+        self.channels = channels
+        self.frames = frames
+        self.programids = programids
+
+    def __call__(self):
+        self.channels.programchange(0, self.midichan, self.programids[Silence])
+        # Play silence on all chip channels:
+        for chan in xrange(self.chipchannels):
+            self.channels.noteon(0, self.midichan, 60 + chan, self.neutralvel)
+        for chan in xrange(self.chipchannels):
+            self.channels.noteoff(0, self.midichan, 60 + chan, self.neutralvel)
+        for frameindex, program in enumerate(self.frames):
+            if program:
+                self.channels.programchange(frameindex, self.midichan, self.programids[program])
+                self.channels.noteon(frameindex, self.midichan, 60, self.neutralvel)
+            self.channels.updateall(frameindex)
+            for b in self.timer.blocksforperiod(self.updaterate):
+                self.stream.call(b)
+        self.stream.flush()
+
 class Target:
 
   def __init__(self, config):
@@ -143,42 +177,7 @@ class Target:
     log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
     subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
-class Frames(list): pass
-
-class ProgramIds(dict): pass
-
-class Player:
-
-    @types(Config, Timer, Stream, Channels, Frames, ProgramIds)
-    def __init__(self, config, timer, stream, channels, frames, programids):
-        self.updaterate = config.updaterate
-        self.neutralvel = config.neutralvelocity
-        self.chipchannels = config.chipchannels
-        self.midichan = config.midichannelbase
-        self.timer = timer
-        self.stream = stream
-        self.channels = channels
-        self.frames = frames
-        self.programids = programids
-
-    def __call__(self):
-        self.channels.programchange(0, self.midichan, self.programids[Silence])
-        # Play silence on all chip channels:
-        for chan in xrange(self.chipchannels):
-            self.channels.noteon(0, self.midichan, 60 + chan, self.neutralvel)
-        for chan in xrange(self.chipchannels):
-            self.channels.noteoff(0, self.midichan, 60 + chan, self.neutralvel)
-        for frameindex, program in enumerate(self.frames):
-            if program:
-                self.channels.programchange(frameindex, self.midichan, self.programids[program])
-                self.channels.noteon(frameindex, self.midichan, 60, self.neutralvel)
-            self.channels.updateall(frameindex)
-            for b in self.timer.blocksforperiod(self.updaterate):
-                self.stream.call(b)
-        self.stream.flush()
-
 def main():
-  target = Target(getprocessconfig())
   class T250(Tone): freq = 250
   class T1k(Tone): freq = 1000
   class T1k5(Tone): freq = 1500
@@ -202,6 +201,7 @@ def main():
   for p in xrange(1, 9):
     class t(BaseTone): period = p
     tones.append(t)
+  target = Target(getprocessconfig())
   target.dump(2, [T250, 0, 0], 'tone250')
   target.dump(2, [T1k, 0, 0], 'tone1k')
   target.dump(2, [T1k5, 0, 0], 'tone1k5')
