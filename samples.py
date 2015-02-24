@@ -36,66 +36,66 @@ log = logging.getLogger(__name__)
 
 class Silence(Note):
 
-  def noteon(self, voladj):
-    self.setfixedlevel(13) # Neutral DC.
+    def noteon(self, voladj):
+        self.setfixedlevel(13) # Neutral DC.
 
 class BaseTone(Note):
 
-  def noteon(self, voladj):
-    self.toneflag.value = True
-    self.setfixedlevel(15)
-    self.toneperiod.value = self.period
+    def noteon(self, voladj):
+        self.toneflag.value = True
+        self.setfixedlevel(15)
+        self.toneperiod.value = self.period
 
 class Tone(BaseTone):
 
-  def noteon(self, voladj):
-    self.period = Freq(self.freq).toneperiod(self.nomclock)
-    BaseTone.noteon(self, voladj)
+    def noteon(self, voladj):
+        self.period = Freq(self.freq).toneperiod(self.nomclock)
+        BaseTone.noteon(self, voladj)
 
 class Noise(Note):
 
-  def noteon(self, voladj):
-    self.noiseflag.value = True
-    self.setfixedlevel(15)
-    self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
+    def noteon(self, voladj):
+        self.noiseflag.value = True
+        self.setfixedlevel(15)
+        self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Note):
 
-  def noteon(self, voladj):
-    self.toneflag.value = True
-    self.noiseflag.value = True
-    self.setfixedlevel(15)
-    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
-    self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
+    def noteon(self, voladj):
+        self.toneflag.value = True
+        self.noiseflag.value = True
+        self.setfixedlevel(15)
+        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
 
 class Env(Note):
 
-  def noteon(self, voladj):
-    self.levelmode.value = 1
-    self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
-    self.chip.envshape.value = self.shape
+    def noteon(self, voladj):
+        self.levelmode.value = 1
+        self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
+        self.chip.envshape.value = self.shape
 
 class All(Note):
 
-  tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
+    tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
 
-  def noteon(self, voladj):
-    self.toneflag.value = True
-    self.noiseflag.value = True
-    self.levelmode.value = 1
-    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
-    self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
-    self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
-    self.chip.envshape.value = self.shape
+    def noteon(self, voladj):
+        self.toneflag.value = True
+        self.noiseflag.value = True
+        self.levelmode.value = 1
+        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
+        self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
+        self.chip.envshape.value = self.shape
 
 class PWM(Note):
 
-  def noteon(self, voladj):
-    self.toneflag.value = True
-    self.chip.tsflags[self.chipchan].value = True
-    self.setfixedlevel(15)
-    self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
-    self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
+    def noteon(self, voladj):
+        self.toneflag.value = True
+        self.chip.tsflags[self.chipchan].value = True
+        self.setfixedlevel(15)
+        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
 
 class Frames(list): pass
 
@@ -133,90 +133,90 @@ class Player:
 
 class Target:
 
-  def __init__(self, config):
-    self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
-    if not os.path.exists(self.targetpath):
-      os.mkdir(self.targetpath)
-    self.config = config
+    def __init__(self, config):
+        self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
+        if not os.path.exists(self.targetpath):
+            os.mkdir(self.targetpath)
+        self.config = config
 
-  def dump(self, beatsperbar, beats, name):
-    path = os.path.join(self.targetpath, name)
-    log.info(path)
-    config = self.config.fork()
-    config.midiprograms = {}
-    config.midichanneltoprogram = {} # We'll use programchange as necessary.
-    config.outpath = path + '.wav'
-    di = createdi(config)
-    configure(di)
-    di.add(Channels)
-    di.add(ChipTimer)
-    di.add(Player)
-    programids = ProgramIds()
-    def register(program):
-      programid = config.midiprogrambase + len(programids)
-      config.midiprograms[programid] = program
-      programids[program] = programid
-    register(Silence)
-    lftimer = SimpleTimer(config.updaterate)
-    frames = Frames()
-    for program in beats:
-      if program and program not in programids:
-        register(program)
-      frames.append(program)
-      b, = lftimer.blocksforperiod(beatsperbar)
-      for _ in xrange(b.framecount - 1):
-        frames.append(0)
-    start = time.time()
-    di.add(frames)
-    di.add(programids)
-    di.start()
-    try:
-      di(Player)()
-    finally:
-      di.stop()
-    log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
-    subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
+    def dump(self, beatsperbar, beats, name):
+        path = os.path.join(self.targetpath, name)
+        log.info(path)
+        config = self.config.fork()
+        config.midiprograms = {}
+        config.midichanneltoprogram = {} # We'll use programchange as necessary.
+        config.outpath = path + '.wav'
+        di = createdi(config)
+        configure(di)
+        di.add(Channels)
+        di.add(ChipTimer)
+        di.add(Player)
+        programids = ProgramIds()
+        def register(program):
+            programid = config.midiprogrambase + len(programids)
+            config.midiprograms[programid] = program
+            programids[program] = programid
+        register(Silence)
+        lftimer = SimpleTimer(config.updaterate)
+        frames = Frames()
+        for program in beats:
+            if program and program not in programids:
+                register(program)
+            frames.append(program)
+            b, = lftimer.blocksforperiod(beatsperbar)
+            for _ in xrange(b.framecount - 1):
+                frames.append(0)
+        start = time.time()
+        di.add(frames)
+        di.add(programids)
+        di.start()
+        try:
+            di(Player)()
+        finally:
+            di.stop()
+        log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
+        subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-  class T250(Tone): freq = 250
-  class T1k(Tone): freq = 1000
-  class T1k5(Tone): freq = 1500
-  class N5k(Noise): freq = 5000
-  class N125k(Noise): freq = 125000
-  class T1kN5k(Both): tfreq, nfreq = 1000, 5000
-  class T1N5k(Both):
-    nfreq = 5000
-    def __init__(self, nomclock, *args):
-      self.tfreq = nomclock // 16
-      Both.__init__(self, nomclock, *args)
-  class Saw600(Env): freq, shape = 600, 0x08
-  class Sin600(Env): freq, shape = 600, 0x10
-  class Tri650(Env): freq, shape = 650, 0x0a
-  class T2k(Tone): freq = 2000
-  class T3k(Tone): freq = 3000
-  class T4k(Tone): freq = 4000
-  class PWM501(PWM): tfreq, tsfreq = 501, 501
-  class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
-  tones = []
-  for p in xrange(1, 9):
-    class t(BaseTone): period = p
-    tones.append(t)
-  target = Target(getprocessconfig())
-  target.dump(2, [T250, 0, 0], 'tone250')
-  target.dump(2, [T1k, 0, 0], 'tone1k')
-  target.dump(2, [T1k5, 0, 0], 'tone1k5')
-  target.dump(2, [N5k, 0, 0], 'noise5k')
-  target.dump(2, [N125k, 0, 0], 'noise125k')
-  target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
-  target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
-  target.dump(2, [Saw600, 0, 0], 'saw600')
-  target.dump(2, [Sin600, 0, 0], 'sin600')
-  target.dump(2, [Tri650, 0, 0], 'tri650')
-  target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
-  target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
-  target.dump(2, [PWM501, 0, 0], 'pwm501')
-  target.dump(2, [PWM250, 0, 0], 'pwm250')
-  target.dump(8, tones, 'tone1-8')
+    class T250(Tone): freq = 250
+    class T1k(Tone): freq = 1000
+    class T1k5(Tone): freq = 1500
+    class N5k(Noise): freq = 5000
+    class N125k(Noise): freq = 125000
+    class T1kN5k(Both): tfreq, nfreq = 1000, 5000
+    class T1N5k(Both):
+        nfreq = 5000
+        def __init__(self, nomclock, *args):
+            self.tfreq = nomclock // 16
+            Both.__init__(self, nomclock, *args)
+    class Saw600(Env): freq, shape = 600, 0x08
+    class Sin600(Env): freq, shape = 600, 0x10
+    class Tri650(Env): freq, shape = 650, 0x0a
+    class T2k(Tone): freq = 2000
+    class T3k(Tone): freq = 3000
+    class T4k(Tone): freq = 4000
+    class PWM501(PWM): tfreq, tsfreq = 501, 501
+    class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
+    tones = []
+    for p in xrange(1, 9):
+        class t(BaseTone): period = p
+        tones.append(t)
+    target = Target(getprocessconfig())
+    target.dump(2, [T250, 0, 0], 'tone250')
+    target.dump(2, [T1k, 0, 0], 'tone1k')
+    target.dump(2, [T1k5, 0, 0], 'tone1k5')
+    target.dump(2, [N5k, 0, 0], 'noise5k')
+    target.dump(2, [N125k, 0, 0], 'noise125k')
+    target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
+    target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
+    target.dump(2, [Saw600, 0, 0], 'saw600')
+    target.dump(2, [Sin600, 0, 0], 'sin600')
+    target.dump(2, [Tri650, 0, 0], 'tri650')
+    target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
+    target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
+    target.dump(2, [PWM501, 0, 0], 'pwm501')
+    target.dump(2, [PWM250, 0, 0], 'pwm250')
+    target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
-  main()
+    main()
