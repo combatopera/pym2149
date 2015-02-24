@@ -152,13 +152,13 @@ class Target:
         di.add(ChipTimer)
         di.add(Player)
         programids = ProgramIds()
+        frames = Frames()
         def register(program):
             programid = config.midiprogrambase + len(programids)
             config.midiprograms[programid] = program
             programids[program] = programid
         register(Silence)
         lftimer = SimpleTimer(config.updaterate)
-        frames = Frames()
         for program in beats:
             if program and program not in programids:
                 register(program)
@@ -166,9 +166,9 @@ class Target:
             b, = lftimer.blocksforperiod(beatsperbar)
             for _ in xrange(b.framecount - 1):
                 frames.append(0)
-        start = time.time()
-        di.add(frames)
         di.add(programids)
+        di.add(frames)
+        start = time.time()
         di.start()
         try:
             di(Player)()
