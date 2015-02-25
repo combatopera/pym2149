@@ -41,18 +41,18 @@ class SyncTimer(SimpleTimer):
     def __init__(self, stream, minbleps, clockinfo):
         self.naiverate = clockinfo.implclock
         SimpleTimer.__init__(self, self.naiverate)
-        self.jacksize = stream.size
+        self.buffersize = stream.buffersize
         self.naivex = 0
-        self.jackx = 0
+        self.bufferx = 0
         self.minbleps = minbleps
 
     def blocksforperiod(self, refreshrate):
         wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
         naiveN = wholeperiodblock.framecount
         while naiveN:
-            naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.jacksize - self.jackx))
+            naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.buffersize - self.bufferx))
             yield Block(naiven)
-            self.jackx = (self.jackx + self.minbleps.getoutcount(self.naivex, naiven)) % self.jacksize
+            self.bufferx = (self.bufferx + self.minbleps.getoutcount(self.naivex, naiven)) % self.buffersize
             self.naivex = (self.naivex + naiven) % self.naiverate
             naiveN -= naiven
 
@@ -93,7 +93,7 @@ def main():
         di.add(Channels)
         log.info(di(Channels))
         stream = di(Stream)
-        log.debug("JACK block size: %s or %.3f seconds", stream.size, stream.size / config.outputrate)
+        log.debug("JACK block size: %s or %.3f seconds", stream.buffersize, stream.buffersize / config.outputrate)
         di.add(SyncTimer)
         di.add(MidiPump)
         di.start()
