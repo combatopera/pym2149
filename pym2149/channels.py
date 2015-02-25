@@ -115,7 +115,7 @@ class Channels:
     for channel in self.channels:
       channel.update(frame)
 
-  def applyrates(self):
+  def closeframe(self):
     for fx in self.midichantofx.itervalues():
       fx.applyrates()
 
