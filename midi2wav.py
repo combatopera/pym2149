@@ -54,7 +54,7 @@ class MidiPump(Background):
             self.channels.updateall(frame)
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
-            self.channels.applyrates()
+            self.channels.closeframe()
             frame += 1
         self.stream.flush()
 
