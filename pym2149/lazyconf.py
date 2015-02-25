@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, os, threading
+import re, logging, os
 
 log = logging.getLogger(__name__)
 
@@ -37,18 +37,32 @@ class Expression:
     def modify(self, view, objname, obj):
         self.run({'config': view, objname: obj})
 
-context = threading.local()
+class Private:
+
+    def __init__(self, expressions):
+        self.expressions = expressions
+        self.contextstack = []
+
+    def withcontext(self, context, f):
+        self.contextstack.append(context)
+        try:
+            return f()
+        finally:
+            self.contextstack.pop()
+
+    def currentcontext(self):
+        return self.contextstack[-1]
 
 class View:
 
     def __init__(self, expressions):
-        self.expressions = expressions
+        self.pRiVaTe = Private(expressions)
 
     def __getattr__(self, name):
-        view = context.view if hasattr(context, 'view') and context.view is not None else self
-        obj = self.expressions.expression(name)(view)
-        for mod in self.expressions.modifiers(name):
-            mod.modify(view, name, obj)
+        context = self.pRiVaTe.currentcontext()
+        obj = self.pRiVaTe.expressions.expression(name)(context)
+        for mod in self.pRiVaTe.expressions.modifiers(name):
+            mod.modify(context, name, obj)
         return obj
 
 class Fork:
@@ -57,11 +71,7 @@ class Fork:
         self.parent = parent
 
     def __getattr__(self, name):
-        context.view = self
-        try:
-            return getattr(self.parent, name)
-        finally:
-            context.view = None
+        return self.parent.pRiVaTe.withcontext(self, lambda: getattr(self.parent, name))
 
 class Expressions:
 
