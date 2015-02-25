@@ -65,13 +65,13 @@ class Channel:
         self.noteonimpl()
       f = frame - self.offframe
       if not f:
-        self.note.noteoff()
-      self.note.noteoffframe(self.offframe - self.onframe, f)
+        self.note.callnoteoff(self.offframe - self.onframe)
+      self.note.noteoffframe(f)
 
   def noteonimpl(self):
     # Make it so that the note only has to switch things on:
     self.chip.flagsoff(self.chipindex)
-    self.note.noteon(self.voladj)
+    self.note.callnoteon(self.voladj)
 
   def __str__(self):
     return chr(ord('A') + self.chipindex)

@@ -64,42 +64,49 @@ class Note:
   def setfixedlevel(self, unclamped):
     self.fixedlevel.value = max(0, min(15, unclamped))
 
-  def noteon(self, voladj): pass
+  def callnoteon(self, voladj):
+    self.voladj = voladj
+    self.noteon()
+
+  def noteon(self): pass
 
   def noteonframe(self, frame):
     """Note this may never be called, so should not make changes that noteoff or a custom impl of noteoffframe later relies on."""
 
+  def callnoteoff(self, onframes):
+    self.onframes = onframes
+    self.noteoff()
+
   def noteoff(self): pass
 
-  def noteoffframe(self, onframes, frame):
-    self.noteonframe(onframes + frame)
+  def noteoffframe(self, frame):
+    self.noteonframe(self.onframes + frame)
 
 class NullNote(Note): pass
 
 class DefaultNote(Note):
 
-  def noteon(self, voladj):
+  def noteon(self):
     self.toneflag.value = True
-    self.setfixedlevel(voladj + 13)
-    self.voladj = voladj
+    self.setfixedlevel(self.voladj + 13)
 
   def noteonframe(self, frame):
     self.applypitch()
 
-  def noteoffframe(self, onframes, frame):
+  def noteoffframe(self, frame):
     self.setfixedlevel(self.voladj + 12 - frame // 2)
 
 class Unpitched(Note):
 
-  def noteon(self, voladj):
+  def noteon(self):
     self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.fx)
-    self.note.noteon(voladj)
+    self.note.callnoteon(self.voladj)
 
   def noteonframe(self, frame):
     self.note.noteonframe(frame)
 
   def noteoff(self):
-    self.note.noteoff()
+    self.note.callnoteoff(self.onframes)
 
-  def noteoffframe(self, onframes, frame):
-    self.note.noteoffframe(onframes, frame)
+  def noteoffframe(self, frame):
+    self.note.noteoffframe(frame)
