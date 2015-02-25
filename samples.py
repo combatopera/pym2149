@@ -36,32 +36,32 @@ log = logging.getLogger(__name__)
 
 class Silence(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.setfixedlevel(13) # Neutral DC.
 
 class BaseTone(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.toneflag.value = True
         self.setfixedlevel(15)
         self.toneperiod.value = self.period
 
 class Tone(BaseTone):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.period = Freq(self.freq).toneperiod(self.nomclock)
-        BaseTone.noteon(self, voladj)
+        BaseTone.noteon(self)
 
 class Noise(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.noiseflag.value = True
         self.setfixedlevel(15)
         self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.toneflag.value = True
         self.noiseflag.value = True
         self.setfixedlevel(15)
@@ -70,7 +70,7 @@ class Both(Note):
 
 class Env(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.levelmode.value = 1
         self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
         self.chip.envshape.value = self.shape
@@ -79,7 +79,7 @@ class All(Note):
 
     tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.toneflag.value = True
         self.noiseflag.value = True
         self.levelmode.value = 1
@@ -90,7 +90,7 @@ class All(Note):
 
 class PWM(Note):
 
-    def noteon(self, voladj):
+    def noteon(self):
         self.toneflag.value = True
         self.chip.tsflags[self.chipchan].value = True
         self.setfixedlevel(15)
@@ -186,9 +186,9 @@ def main():
     class T1kN5k(Both): tfreq, nfreq = 1000, 5000
     class T1N5k(Both):
         nfreq = 5000
-        def __init__(self, nomclock, *args):
-            self.tfreq = nomclock // 16
-            Both.__init__(self, nomclock, *args)
+        def __init__(self, *args):
+            Both.__init__(self, *args)
+            self.tfreq = self.nomclock // 16
     class Saw600(Env): freq, shape = 600, 0x08
     class Sin600(Env): freq, shape = 600, 0x10
     class Tri650(Env): freq, shape = 650, 0x0a
