@@ -70,16 +70,14 @@ class MidiPump(Background):
         self.timer = timer
 
     def __call__(self):
-        frame = 0
         while not self.quit:
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for event in self.midi.iterevents():
-                log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
-            self.channels.updateall(frame)
+                log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
+            self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
                 self.channels.closeframe()
-                frame += 1
 
 def main():
   config = getprocessconfig()

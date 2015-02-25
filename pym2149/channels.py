@@ -86,38 +86,40 @@ class Channels:
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, config.chipchannels)
     self.prevtext = None
+    self.frameindex = 0
 
-  def noteon(self, frame, midichan, midinote, vel):
+  def noteon(self, midichan, midinote, vel):
     program = self.midichantoprogram[midichan]
     fx = self.midichantofx[midichan]
-    channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, frame)]
-    channel.newnote(frame, program, midinote, vel, fx)
+    channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, self.frameindex)]
+    channel.newnote(self.frameindex, program, midinote, vel, fx)
     return channel
 
-  def noteoff(self, frame, midichan, midinote, vel):
+  def noteoff(self, midichan, midinote, vel):
     chipchan = self.mediation.releasechipchan(midichan, midinote)
     if chipchan is not None:
       channel = self.channels[chipchan]
-      channel.noteoff(frame)
+      channel.noteoff(self.frameindex)
       return channel
 
-  def pitchbend(self, frame, midichan, bend):
+  def pitchbend(self, midichan, bend):
     self.midichantofx[midichan].setbend(bend)
 
-  def programchange(self, frame, midichan, program):
+  def programchange(self, midichan, program):
     self.midichantoprogram[midichan] = self.midiprograms[program]
 
-  def updateall(self, frame):
+  def updateall(self):
     text = ' | '.join("%s@%s" % (c.programornone(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
     if text != self.prevtext:
       log.debug(text)
       self.prevtext = text
     for channel in self.channels:
-      channel.update(frame)
+      channel.update(self.frameindex)
 
   def closeframe(self):
     for fx in self.midichantofx.itervalues():
       fx.applyrates()
+    self.frameindex += 1
 
   def __str__(self):
     return ', '.join("%s -> %s" % entry for entry in sorted(self.midichantoprogram.iteritems()))

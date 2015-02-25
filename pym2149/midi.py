@@ -40,15 +40,15 @@ class NoteOn(NoteOnOff):
 
   char = 'I'
 
-  def __call__(self, channels, frame):
-    return channels.noteon(frame, self.midichan, self.midinote, self.vel)
+  def __call__(self, channels):
+    return channels.noteon(self.midichan, self.midinote, self.vel)
 
 class NoteOff(NoteOnOff):
 
   char = 'O'
 
-  def __call__(self, channels, frame):
-    return channels.noteoff(frame, self.midichan, self.midinote, self.vel)
+  def __call__(self, channels):
+    return channels.noteoff(self.midichan, self.midinote, self.vel)
 
 class PitchBend(ChannelMessage):
 
@@ -56,8 +56,8 @@ class PitchBend(ChannelMessage):
     ChannelMessage.__init__(self, midi, event)
     self.bend = event[5] # In [-0x2000, 0x2000).
 
-  def __call__(self, channels, frame):
-    return channels.pitchbend(frame, self.midichan, self.bend)
+  def __call__(self, channels):
+    return channels.pitchbend(self.midichan, self.bend)
 
   def __str__(self):
     return "B %2d %5d" % (self.midichan, self.bend)
@@ -68,8 +68,8 @@ class ProgramChange(ChannelMessage):
     ChannelMessage.__init__(self, midi, event)
     self.program = midi.programbase + event[5]
 
-  def __call__(self, channels, frame):
-    return channels.programchange(frame, self.midichan, self.program)
+  def __call__(self, channels):
+    return channels.programchange(self.midichan, self.program)
 
   def __str__(self):
     return "P %2d %3d" % (self.midichan, self.program)

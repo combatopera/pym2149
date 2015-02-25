@@ -47,15 +47,13 @@ class MidiPump(Background):
         self.timer = timer
 
     def __call__(self):
-        frame = 0
         while not self.quit:
             for event in self.midi.iterevents():
-                log.debug("%s @ %s -> %s", event, frame, event(self.channels, frame))
-            self.channels.updateall(frame)
+                log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
+            self.channels.updateall()
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
             self.channels.closeframe()
-            frame += 1
         self.stream.flush()
 
 def main():
