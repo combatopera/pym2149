@@ -55,7 +55,7 @@ class JackStream(object, Node, Stream):
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
-    self.cursor = 0
+    self.bufferx = 0
     self.wavs = wavs
 
   def start(self):
@@ -73,17 +73,17 @@ class JackStream(object, Node, Stream):
     n = len(outbufs[0])
     i = 0
     while i < n:
-      m = min(n - i, self.buffersize - self.cursor)
+      m = min(n - i, self.buffersize - self.bufferx)
       for c in xrange(len(self.wavs)):
-        outbufs[c].partcopyintonp(i, i + m, self.jack[c, self.cursor:self.cursor + m])
-      self.cursor += m
+        outbufs[c].partcopyintonp(i, i + m, self.jack[c, self.bufferx:self.bufferx + m])
+      self.bufferx += m
       i += m
-      if self.cursor == self.buffersize:
+      if self.bufferx == self.buffersize:
         try:
           jack.process(self.jack, self.empty)
         except (jack.InputSyncError, jack.OutputSyncError):
           log.warn('JACK error:', exc_info = True)
-        self.cursor = 0
+        self.bufferx = 0
 
   def flush(self):
     pass # Nothing to be done.
