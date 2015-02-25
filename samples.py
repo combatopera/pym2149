@@ -116,19 +116,20 @@ class Player:
         self.programids = programids
 
     def __call__(self):
-        self.channels.programchange(0, self.midichan, self.programids[Silence])
+        self.channels.programchange(self.midichan, self.programids[Silence])
         # Play silence on all chip channels:
         for chan in xrange(self.chipchannels):
-            self.channels.noteon(0, self.midichan, 60 + chan, self.neutralvel)
+            self.channels.noteon(self.midichan, 60 + chan, self.neutralvel)
         for chan in xrange(self.chipchannels):
-            self.channels.noteoff(0, self.midichan, 60 + chan, self.neutralvel)
-        for frameindex, program in enumerate(self.frames):
+            self.channels.noteoff(self.midichan, 60 + chan, self.neutralvel)
+        for program in self.frames:
             if program:
-                self.channels.programchange(frameindex, self.midichan, self.programids[program])
-                self.channels.noteon(frameindex, self.midichan, 60, self.neutralvel)
-            self.channels.updateall(frameindex)
+                self.channels.programchange(self.midichan, self.programids[program])
+                self.channels.noteon(self.midichan, 60, self.neutralvel)
+            self.channels.updateall()
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
+            self.channels.closeframe()
         self.stream.flush()
 
 class Target:
