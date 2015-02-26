@@ -48,9 +48,9 @@ class BaseTone(Note):
 
 class Tone(BaseTone):
 
-    def noteon(self):
+    def __init__(self, *args):
+        BaseTone.__init__(self, *args)
         self.period = Freq(self.freq).toneperiod(self.nomclock)
-        BaseTone.noteon(self)
 
 class Noise(Note):
 
