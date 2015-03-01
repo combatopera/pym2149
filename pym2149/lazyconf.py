@@ -39,9 +39,9 @@ class Expression:
 
 class Private:
 
-    def __init__(self, expressions):
+    def __init__(self, expressions, rootcontext):
         self.expressions = expressions
-        self.contextstack = []
+        self.contextstack = [rootcontext]
 
     def withcontext(self, context, f):
         self.contextstack.append(context)
@@ -56,7 +56,7 @@ class Private:
 class View:
 
     def __init__(self, expressions):
-        self.pRiVaTe = Private(expressions)
+        self.pRiVaTe = Private(expressions, self)
 
     def __getattr__(self, name):
         context = self.pRiVaTe.currentcontext()
