@@ -77,7 +77,7 @@ class MidiPump(Background):
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
-                self.channels.closeframe()
+            self.channels.closeframe()
 
 def main():
   config = getprocessconfig()
