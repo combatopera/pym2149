@@ -38,6 +38,7 @@ class MidiPump(Background):
 
     @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
+        Background.__init__(self, config)
         self.updaterate = config.updaterate
         self.midi = midi
         self.channels = channels
