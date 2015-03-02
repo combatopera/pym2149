@@ -31,6 +31,7 @@ from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
 from pym2149.bg import Background
 from ymplayer import ChipTimer
+import time
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +49,7 @@ class MidiPump(Background):
         self.timer = timer
 
     def __call__(self):
+        t = time.time()
         while not self.quit:
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
@@ -55,6 +57,10 @@ class MidiPump(Background):
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
             self.channels.closeframe()
+            t += 1 / self.updaterate
+            now = time.time()
+            if now < t:
+                time.sleep(t - now)
         self.stream.flush()
 
 def main():
