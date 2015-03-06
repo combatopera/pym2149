@@ -22,8 +22,7 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from fractions import Fraction
-from iface import AmpScale, Chip, YMFile
-from config import Config
+from iface import AmpScale, Chip, YMFile, Config
 from di import types
 import logging
 

@@ -18,13 +18,12 @@
 from __future__ import division
 import sys, logging, os, anchor, lazyconf
 from const import appconfigdir
+from iface import Config
 
 log = logging.getLogger(__name__)
 
 def getprocessconfig(*argnames, **kwargs):
     return ConfigImpl(argnames, sys.argv[1:], **kwargs)
-
-class Config: pass
 
 class ConfigImpl(lazyconf.View, Config):
 

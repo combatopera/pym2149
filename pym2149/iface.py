@@ -26,3 +26,5 @@ class Stream: pass
 class YMFile: pass
 
 class JackConnection: pass
+
+class Config: pass

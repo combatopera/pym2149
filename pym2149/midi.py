@@ -18,7 +18,7 @@
 from __future__ import division
 from const import clientname
 from di import types
-from config import Config
+from iface import Config
 import alsaseq
 
 class ChannelMessage:

@@ -24,8 +24,7 @@ from pym2149.program import FX
 from pym2149.const import midichannelcount
 from pym2149.mediation import Mediation
 from pym2149.di import types
-from pym2149.config import Config
-from pym2149.iface import Chip
+from pym2149.iface import Chip, Config
 
 log = logging.getLogger(__name__)
 

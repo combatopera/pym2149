@@ -19,10 +19,9 @@
 
 from pym2149.timer import Timer, MinBlockRateTimer
 from pym2149.vis import Roll
-from pym2149.iface import Chip, Stream, YMFile
+from pym2149.iface import Chip, Stream, YMFile, Config
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
-from pym2149.config import Config
 from pym2149.bg import Background
 
 class ChipTimer(MinBlockRateTimer):
