@@ -37,6 +37,11 @@ class TestYM2149(unittest.TestCase):
       self.assertEqual(9, toneperiodclampor0(Chip(clock, scale), 25000))
       self.assertEqual(10, toneperiodclampor0(Chip(clock, scale), 25000-1))
       self.assertEqual(10, toneperiodclampor0(Chip(clock+1, scale), 25000))
+      # Chip can sing higher than half these outrates:
+      self.assertEqual(1, toneperiodclampor0(Chip(clock, scale), 250000-1))
+      self.assertEqual(1, toneperiodclampor0(Chip(clock+1, scale), 250000))
+      # But not half of this one:
+      self.assertEqual(0, toneperiodclampor0(Chip(clock, scale), 250000))
 
 if __name__ == '__main__':
   unittest.main()
