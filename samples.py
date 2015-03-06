@@ -21,12 +21,12 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from fractions import Fraction
-from pym2149.config import getprocessconfig, Config
+from pym2149.config import getprocessconfig
 from pym2149.di import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Stream
+from pym2149.iface import Stream, Config
 from pym2149.program import Note
 from pym2149.channels import Channels
 from ymplayer import ChipTimer

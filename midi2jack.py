@@ -22,10 +22,10 @@ from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.nod import Block
 from pym2149.midi import Midi
-from pym2149.config import getprocessconfig, Config
+from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
+from pym2149.iface import Chip, Stream, Config
 from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt

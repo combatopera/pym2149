@@ -17,8 +17,7 @@
 
 from pitch import Period, Freq
 from di import types
-from config import Config
-from iface import Chip
+from iface import Chip, Config
 import sys
 
 class Roll:

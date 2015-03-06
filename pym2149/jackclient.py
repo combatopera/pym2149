@@ -21,9 +21,8 @@ from nod import Node, BufNode
 from const import clientname
 from iface import AmpScale
 from out import FloatStream
-from iface import Stream, JackConnection
+from iface import Stream, JackConnection, Config
 from di import types
-from config import Config
 import jack, numpy as np, logging
 
 log = logging.getLogger(__name__)

@@ -19,9 +19,8 @@ from __future__ import division
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from fractions import Fraction
-from config import Config
 from di import types
-from iface import YMFile
+from iface import YMFile, Config
 
 log = logging.getLogger(__name__)
 
