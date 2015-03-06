@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from ym2149 import toneperiodclamp
+from ym2149 import toneperiodclampor0
 from collections import namedtuple
 
 class TestYM2149(unittest.TestCase):
@@ -27,16 +27,16 @@ class TestYM2149(unittest.TestCase):
     Chip = namedtuple('Chip', 'clock scale')
     for scale in 8, 1:
       clock = 2000000 // 8 * scale
-      self.assertEqual(5, toneperiodclamp(Chip(clock, scale), 44100))
+      self.assertEqual(5, toneperiodclampor0(Chip(clock, scale), 44100))
       # We shouldn't make Nyquist itself the clamp:
-      self.assertEqual(4, toneperiodclamp(Chip(clock, scale), 50000))
+      self.assertEqual(4, toneperiodclampor0(Chip(clock, scale), 50000))
       # But higher frequencies are acceptable:
-      self.assertEqual(5, toneperiodclamp(Chip(clock, scale), 50000-1))
-      self.assertEqual(5, toneperiodclamp(Chip(clock+1, scale), 50000))
+      self.assertEqual(5, toneperiodclampor0(Chip(clock, scale), 50000-1))
+      self.assertEqual(5, toneperiodclampor0(Chip(clock+1, scale), 50000))
       # Same again:
-      self.assertEqual(9, toneperiodclamp(Chip(clock, scale), 25000))
-      self.assertEqual(10, toneperiodclamp(Chip(clock, scale), 25000-1))
-      self.assertEqual(10, toneperiodclamp(Chip(clock+1, scale), 25000))
+      self.assertEqual(9, toneperiodclampor0(Chip(clock, scale), 25000))
+      self.assertEqual(10, toneperiodclampor0(Chip(clock, scale), 25000-1))
+      self.assertEqual(10, toneperiodclampor0(Chip(clock+1, scale), 25000))
 
 if __name__ == '__main__':
   unittest.main()
