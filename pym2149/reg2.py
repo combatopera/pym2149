@@ -34,6 +34,7 @@ class Reg:
 
     def __init__(self):
         self.links = []
+        self.done = set() # In the hope that clearing is cheaper than creating.
 
     def link(self, xform, *upstream):
         link = Link(self, xform, upstream)
@@ -45,7 +46,10 @@ class Reg:
         self.link(lambda *args: (negmask & self.value) | (mask & xform(*args)), *upstream)
 
     def set(self, value):
-        self.setimpl(value, set())
+        try:
+            self.setimpl(value, self.done)
+        finally:
+            self.done.clear()
 
     def setimpl(self, value, done):
         self.value = value
