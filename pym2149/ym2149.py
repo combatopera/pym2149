@@ -32,7 +32,7 @@ stclock = 2000000
 defaultscale = 8
 ym2149nzdegrees = 17, 14
 
-def toneperiodclamp(chip, outrate):
+def toneperiodclampor0(chip, outrate):
   # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
   return (chip.clock - 1) // (chip.scale * outrate)
 
@@ -43,7 +43,7 @@ class Registers:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    mintoneperiod = max(toneperiodclamp(self, clampoutrate), 1) if (clampoutrate is not None) else 1
+    mintoneperiod = max(toneperiodclampor0(self, clampoutrate), 1) if (clampoutrate is not None) else 1
     log.debug("Minimum tone period: %s", mintoneperiod)
     TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
