@@ -39,9 +39,9 @@ class Registers:
     self.R = tuple(Reg(0) for _ in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    TP = lambda f, r: max(clockinfo.mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
+    TP = lambda f, r: max(clockinfo.mintoneperiod, (f & 0xff) | ((r & 0x0f) << 8))
     NP = lambda p: max(1, p & 0x1f)
-    EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
+    EP = lambda f, r: max(1, (f & 0xff) | ((r & 0xff) << 8))
     self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(channels))
     self.noiseperiod = DerivedReg(NP, self.R[0x6])
     masks = [0x01 << b for b in xrange(8)]
@@ -72,6 +72,7 @@ class ClockInfo:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
     if config.freqclamp:
+      # The 0 case just means that 1 is audible:
       self.mintoneperiod = max(1, self.toneperiodclampor0(config.outputrate))
       log.debug("Minimum tone period: %s", self.mintoneperiod)
     else:
