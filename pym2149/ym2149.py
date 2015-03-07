@@ -43,16 +43,18 @@ class Registers:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    mintoneperiod = 1 if clampoutrate is None else max(1, toneperiodclampor0(self, clampoutrate))
+    mintoneperiod = max(toneperiodclampor0(self, clampoutrate), 1) if (clampoutrate is not None) else 1
     log.debug("Minimum tone period: %s", mintoneperiod)
-    TP = lambda f, r: max(mintoneperiod, (f & 0xff) | ((r & 0x0f) << 8))
+    TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
-    EP = lambda f, r: max(1, (f & 0xff) | ((r & 0xff) << 8))
+    EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
     self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(channels))
     self.noiseperiod = DerivedReg(NP, self.R[0x6])
-    masks = [0x01 << b for b in xrange(8)]
-    self.toneflags = tuple(DerivedReg(lambda m: not (m & masks[c]), self.R[0x7]) for c in xrange(channels))
-    self.noiseflags = tuple(DerivedReg(lambda m: not (m & masks[b]), self.R[0x7]) for b in xrange(channels, channels * 2))
+    def flagxform(b):
+      mask = 0x01 << b
+      return lambda x: not (x & mask)
+    self.toneflags = tuple(DerivedReg(flagxform(c), self.R[0x7]) for c in xrange(channels))
+    self.noiseflags = tuple(DerivedReg(flagxform(channels + c), self.R[0x7]) for c in xrange(channels))
     self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(channels))
     self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(channels))
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
