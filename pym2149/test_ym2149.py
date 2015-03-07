@@ -18,30 +18,35 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from ym2149 import toneperiodclampor0
+from ym2149 import ClockInfo
 from collections import namedtuple
 
 class TestYM2149(unittest.TestCase):
 
   def test_toneperiodclamp(self):
-    Chip = namedtuple('Chip', 'clock scale')
-    for scale in 8, 1:
-      clock = 2000000 // 8 * scale
-      self.assertEqual(5, toneperiodclampor0(Chip(clock, scale), 44100))
+    Config = namedtuple('Config', 'nominalclock underclock')
+    for underclock in 1, 8:
+      nomclock = 2000000
+      clock = nomclock // underclock
+      def toneperiodclampor0(implclock, outrate):
+        ci = ClockInfo(Config(nomclock, underclock))
+        ci.implclock = implclock
+        return ci.toneperiodclampor0(outrate)
+      self.assertEqual(5, toneperiodclampor0(clock, 44100))
       # We shouldn't make Nyquist itself the clamp:
-      self.assertEqual(4, toneperiodclampor0(Chip(clock, scale), 50000))
+      self.assertEqual(4, toneperiodclampor0(clock, 50000))
       # But higher frequencies are acceptable:
-      self.assertEqual(5, toneperiodclampor0(Chip(clock, scale), 50000-1))
-      self.assertEqual(5, toneperiodclampor0(Chip(clock+1, scale), 50000))
+      self.assertEqual(5, toneperiodclampor0(clock, 50000-1))
+      self.assertEqual(5, toneperiodclampor0(clock+1, 50000))
       # Same again:
-      self.assertEqual(9, toneperiodclampor0(Chip(clock, scale), 25000))
-      self.assertEqual(10, toneperiodclampor0(Chip(clock, scale), 25000-1))
-      self.assertEqual(10, toneperiodclampor0(Chip(clock+1, scale), 25000))
+      self.assertEqual(9, toneperiodclampor0(clock, 25000))
+      self.assertEqual(10, toneperiodclampor0(clock, 25000-1))
+      self.assertEqual(10, toneperiodclampor0(clock+1, 25000))
       # Chip can sing higher than half these outrates:
-      self.assertEqual(1, toneperiodclampor0(Chip(clock, scale), 250000-1))
-      self.assertEqual(1, toneperiodclampor0(Chip(clock+1, scale), 250000))
+      self.assertEqual(1, toneperiodclampor0(clock, 250000-1))
+      self.assertEqual(1, toneperiodclampor0(clock+1, 250000))
       # But not half of this one:
-      self.assertEqual(0, toneperiodclampor0(Chip(clock, scale), 250000))
+      self.assertEqual(0, toneperiodclampor0(clock, 250000))
 
 if __name__ == '__main__':
   unittest.main()
