@@ -27,26 +27,24 @@ class TestYM2149(unittest.TestCase):
     Config = namedtuple('Config', 'nominalclock underclock freqclamp outputrate')
     for underclock in 1, 2, 4, 8:
       nomclock = 2000000
-      clock = nomclock // underclock
-      def toneperiodclampor0(implclock, outrate):
+      def toneperiodclampor0(nomclock, outrate):
         ci = ClockInfo(Config(nomclock, underclock, True, outrate))
-        ci.implclock = implclock
         return ci.toneperiodclampor0(outrate)
-      self.assertEqual(5, toneperiodclampor0(clock, 44100))
+      self.assertEqual(5, toneperiodclampor0(nomclock, 44100))
       # We shouldn't make Nyquist itself the clamp:
-      self.assertEqual(4, toneperiodclampor0(clock, 50000))
+      self.assertEqual(4, toneperiodclampor0(nomclock, 50000))
       # But higher frequencies are acceptable:
-      self.assertEqual(5, toneperiodclampor0(clock, 50000-1))
-      self.assertEqual(5, toneperiodclampor0(clock+1, 50000))
+      self.assertEqual(5, toneperiodclampor0(nomclock, 50000-1))
+      self.assertEqual(5, toneperiodclampor0(nomclock+underclock, 50000))
       # Same again:
-      self.assertEqual(9, toneperiodclampor0(clock, 25000))
-      self.assertEqual(10, toneperiodclampor0(clock, 25000-1))
-      self.assertEqual(10, toneperiodclampor0(clock+1, 25000))
+      self.assertEqual(9, toneperiodclampor0(nomclock, 25000))
+      self.assertEqual(10, toneperiodclampor0(nomclock, 25000-1))
+      self.assertEqual(10, toneperiodclampor0(nomclock+underclock, 25000))
       # Chip can sing higher than half these outrates:
-      self.assertEqual(1, toneperiodclampor0(clock, 250000-1))
-      self.assertEqual(1, toneperiodclampor0(clock+1, 250000))
+      self.assertEqual(1, toneperiodclampor0(nomclock, 250000-1))
+      self.assertEqual(1, toneperiodclampor0(nomclock+underclock, 250000))
       # But not half of this one:
-      self.assertEqual(0, toneperiodclampor0(clock, 250000))
+      self.assertEqual(0, toneperiodclampor0(nomclock, 250000))
 
 if __name__ == '__main__':
   unittest.main()
