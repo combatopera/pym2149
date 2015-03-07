@@ -73,7 +73,7 @@ def main():
         di.add(Channels)
         channels = di(Channels)
         log.info(channels)
-        di.add(ChipTimer)
+        di.add(ChipTimer) # XXX: Why not a SimpleTimer?
         di.add(MidiPump)
         di.start()
         awaitinterrupt(config)
