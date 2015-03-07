@@ -32,6 +32,14 @@ stclock = 2000000
 defaultscale = 8
 ym2149nzdegrees = 17, 14
 
+class MixerFlag:
+
+  def __init__(self, bit):
+    self.mask = 0x01 << bit
+
+  def __call__(self, m):
+    return not (m & self.mask)
+
 class Registers:
 
   def __init__(self, clockinfo, channels):
@@ -42,17 +50,21 @@ class Registers:
     TP = lambda f, r: max(clockinfo.mintoneperiod, (f & 0xff) | ((r & 0x0f) << 8))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, (f & 0xff) | ((r & 0xff) << 8))
-    self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(channels))
+    self.toneperiods = [None for _ in xrange(channels)]
+    for c in xrange(channels):
+      self.toneperiods[c] = DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1])
     self.noiseperiod = DerivedReg(NP, self.R[0x6])
-    masks = [0x01 << b for b in xrange(8)]
-    def flagxform(b):
-      return lambda x: not (x & masks[b])
-    self.toneflags = tuple(DerivedReg(flagxform(c), self.R[0x7]) for c in xrange(channels))
-    self.noiseflags = tuple(DerivedReg(flagxform(channels + c), self.R[0x7]) for c in xrange(channels))
-    self.fixedlevels = tuple(DerivedReg(lambda x: x & 0x0f, self.R[0x8 + c]) for c in xrange(channels))
-    self.levelmodes = tuple(DerivedReg(lambda x: bool(x & 0x10), self.R[0x8 + c]) for c in xrange(channels))
+    self.toneflags = [None for _ in xrange(channels)]
+    self.noiseflags = [None for _ in xrange(channels)]
+    self.fixedlevels = [None for _ in xrange(channels)]
+    self.levelmodes = [None for _ in xrange(channels)]
+    for c in xrange(channels):
+      self.toneflags[c] = DerivedReg(MixerFlag(c), self.R[0x7])
+      self.noiseflags[c] = DerivedReg(MixerFlag(channels + c), self.R[0x7])
+      self.fixedlevels[c] = DerivedReg(lambda l: l & 0x0f, self.R[0x8 + c])
+      self.levelmodes[c] = DerivedReg(lambda l: bool(l & 0x10), self.R[0x8 + c])
     self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
-    self.envshape = DerivedReg(lambda x: x & 0x0f, self.R[0xD])
+    self.envshape = DerivedReg(lambda s: s & 0x0f, self.R[0xD])
     # TODO: Rename to rtone and make configurable.
     self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(channels))
     self.tsflags = tuple(Reg(0) for _ in xrange(channels))
