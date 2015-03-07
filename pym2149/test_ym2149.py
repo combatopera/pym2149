@@ -21,9 +21,9 @@ import unittest
 from ym2149 import ClockInfo
 from collections import namedtuple
 
-class TestYM2149(unittest.TestCase):
+class TestClockInfo(unittest.TestCase):
 
-  def test_toneperiodclamp(self):
+  def test_toneperiodclampor0(self):
     Config = namedtuple('Config', 'nominalclock underclock freqclamp outputrate')
     for underclock in 1, 2, 4, 8:
       nomclock = 2000000
