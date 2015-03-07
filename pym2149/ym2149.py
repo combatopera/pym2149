@@ -34,12 +34,12 @@ ym2149nzdegrees = 17, 14
 
 class Registers:
 
-  def __init__(self, clockinfo, channels, clampoutrate):
+  def __init__(self, clockinfo, channels):
     # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    mintoneperiod = max(clockinfo.toneperiodclampor0(clampoutrate), 1) if (clampoutrate is not None) else 1
+    mintoneperiod = clockinfo.mintoneperiod()
     log.debug("Minimum tone period: %s", mintoneperiod)
     TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
@@ -73,10 +73,14 @@ class ClockInfo:
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
+    self.clampoutrate = config.outputrate if config.freqclamp else None
 
   def toneperiodclampor0(self, outrate):
     # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
     return (self.implclock - 1) // (self.scale * outrate)
+
+  def mintoneperiod(self):
+    return max(self.toneperiodclampor0(self.clampoutrate), 1) if (self.clampoutrate is not None) else 1
 
 class YM2149(Registers, Container, Chip):
 
@@ -84,10 +88,9 @@ class YM2149(Registers, Container, Chip):
   def __init__(self, config, clockinfo, ampscale):
     self.scale = clockinfo.scale
     channels = config.chipchannels
-    clampoutrate = config.outputrate if config.freqclamp else None
     self.oscpause = config.oscpause
     self.clock = clockinfo.implclock
-    Registers.__init__(self, clockinfo, channels, clampoutrate)
+    Registers.__init__(self, clockinfo, channels)
     # Chip-wide signals:
     noise = NoiseOsc(self.scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
