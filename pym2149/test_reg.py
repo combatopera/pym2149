@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from reg2 import Reg, VersionReg
+from reg import Reg, VersionReg
 
 class TestReg(unittest.TestCase):
 
