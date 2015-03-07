@@ -46,6 +46,8 @@ ignoreloop = hasattr(config, 'outpath')
 
 updaterate = config.di(YMFile).updaterate if config.di.all(YMFile) else 50
 
+linesperbeat = 4
+
 pianorollheight = config.di(YMFile).pianorollheight
 '''You can override the deduced piano roll height here.'''
 
