@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from reg2 import Reg, VersionReg
+from reg import Reg, VersionReg
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
