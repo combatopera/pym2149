@@ -58,9 +58,9 @@ class MidiPump(Background):
                 self.stream.call(b)
             self.channels.closeframe()
             t += 1 / self.updaterate
-            now = time.time()
-            if now < t:
-                time.sleep(t - now)
+            sleeptime = t - time.time()
+            if sleeptime > 0:
+                time.sleep(sleeptime)
         self.stream.flush()
 
 def main():
