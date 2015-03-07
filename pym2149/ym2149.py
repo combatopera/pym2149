@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from reg import Reg, DerivedReg
+from reg2 import Reg, VersionReg
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, TimerSynth
 from dac import Level, Dac
 from mix import BinMix
@@ -44,30 +44,39 @@ class Registers:
 
   def __init__(self, clockinfo, channels):
     # Like the real thing we have 16 registers, this impl ignores the last 2:
-    self.R = tuple(Reg(0) for _ in xrange(16))
+    self.R = tuple(Reg() for _ in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
     TP = lambda f, r: max(clockinfo.mintoneperiod, (f & 0xff) | ((r & 0x0f) << 8))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, (f & 0xff) | ((r & 0xff) << 8))
-    self.toneperiods = [None for _ in xrange(channels)]
+    self.toneperiods = [Reg() for _ in xrange(channels)]
     for c in xrange(channels):
-      self.toneperiods[c] = DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1])
-    self.noiseperiod = DerivedReg(NP, self.R[0x6])
-    self.toneflags = [None for _ in xrange(channels)]
-    self.noiseflags = [None for _ in xrange(channels)]
-    self.fixedlevels = [None for _ in xrange(channels)]
-    self.levelmodes = [None for _ in xrange(channels)]
+      self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
+    self.noiseperiod = Reg()
+    self.noiseperiod.link(NP, self.R[0x6])
+    self.toneflags = [Reg() for _ in xrange(channels)]
+    self.noiseflags = [Reg() for _ in xrange(channels)]
+    self.fixedlevels = [Reg() for _ in xrange(channels)]
+    self.levelmodes = [Reg() for _ in xrange(channels)]
     for c in xrange(channels):
-      self.toneflags[c] = DerivedReg(MixerFlag(c), self.R[0x7])
-      self.noiseflags[c] = DerivedReg(MixerFlag(channels + c), self.R[0x7])
-      self.fixedlevels[c] = DerivedReg(lambda l: l & 0x0f, self.R[0x8 + c])
-      self.levelmodes[c] = DerivedReg(lambda l: bool(l & 0x10), self.R[0x8 + c])
-    self.envperiod = DerivedReg(EP, self.R[0xB], self.R[0xC])
-    self.envshape = DerivedReg(lambda s: s & 0x0f, self.R[0xD])
+      self.toneflags[c].link(MixerFlag(c), self.R[0x7])
+      self.noiseflags[c].link(MixerFlag(channels + c), self.R[0x7])
+      self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
+      self.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
+    self.envperiod = Reg()
+    self.envperiod.link(EP, self.R[0xB], self.R[0xC])
+    self.envshape = VersionReg()
+    self.envshape.link(lambda s: s & 0x0f, self.R[0xD])
+    for r in self.R:
+      r.value = 0
     # TODO: Rename to rtone and make configurable.
-    self.tsfreqs = tuple(Reg(Fraction(0)) for _ in xrange(channels))
-    self.tsflags = tuple(Reg(0) for _ in xrange(channels))
+    self.tsfreqs = tuple(Reg() for _ in xrange(channels))
+    for r in self.tsfreqs:
+      r.value = Fraction(0)
+    self.tsflags = tuple(Reg() for _ in xrange(channels))
+    for r in self.tsflags:
+      r.value = 0
 
 class ClockInfo:
 
