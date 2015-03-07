@@ -71,9 +71,11 @@ class ClockInfo:
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
-    clampoutrate = config.outputrate if config.freqclamp else None
-    self.mintoneperiod = max(self.toneperiodclampor0(clampoutrate), 1) if (clampoutrate is not None) else 1
-    log.debug("Minimum tone period: %s", self.mintoneperiod)
+    if config.freqclamp:
+      self.mintoneperiod = max(1, self.toneperiodclampor0(config.outputrate))
+      log.debug("Minimum tone period: %s", self.mintoneperiod)
+    else:
+      self.mintoneperiod = 1
 
   def toneperiodclampor0(self, outrate):
     # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
