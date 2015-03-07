@@ -39,9 +39,7 @@ class Registers:
     self.R = tuple(Reg(0) for i in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    mintoneperiod = clockinfo.mintoneperiod()
-    log.debug("Minimum tone period: %s", mintoneperiod)
-    TP = lambda f, r: max(mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
+    TP = lambda f, r: max(clockinfo.mintoneperiod, ((r & 0x0f) << 8) | (f & 0xff))
     NP = lambda p: max(1, p & 0x1f)
     EP = lambda f, r: max(1, ((r & 0xff) << 8) | (f & 0xff))
     self.toneperiods = tuple(DerivedReg(TP, self.R[c * 2], self.R[c * 2 + 1]) for c in xrange(channels))
@@ -73,14 +71,13 @@ class ClockInfo:
     if config.underclock < 1 or defaultscale % config.underclock:
       raise Exception("underclock must be a factor of %s." % defaultscale)
     self.scale = defaultscale // config.underclock
-    self.clampoutrate = config.outputrate if config.freqclamp else None
+    clampoutrate = config.outputrate if config.freqclamp else None
+    self.mintoneperiod = max(self.toneperiodclampor0(clampoutrate), 1) if (clampoutrate is not None) else 1
+    log.debug("Minimum tone period: %s", self.mintoneperiod)
 
   def toneperiodclampor0(self, outrate):
     # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
     return (self.implclock - 1) // (self.scale * outrate)
-
-  def mintoneperiod(self):
-    return max(self.toneperiodclampor0(self.clampoutrate), 1) if (self.clampoutrate is not None) else 1
 
 class YM2149(Registers, Container, Chip):
 
