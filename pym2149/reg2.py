@@ -30,7 +30,7 @@ class Link:
                 return
             self.reg.setimpl(self.xform(*upstreamvals), done)
 
-class Reg:
+class Reg(object):
 
     def __init__(self):
         self.links = []
@@ -45,6 +45,12 @@ class Reg:
         negmask = ~mask
         self.link(lambda *args: (negmask & self.value) | (mask & xform(*args)), *upstream)
 
+    def __setattr__(self, name, value):
+        if 'value' == name:
+            self.set(value)
+        else:
+            object.__setattr__(self, name, value)
+
     def set(self, value):
         try:
             self.setimpl(value, self.done)
@@ -52,7 +58,7 @@ class Reg:
             self.done.clear()
 
     def setimpl(self, value, done):
-        self.value = value
+        object.__setattr__(self, 'value', value)
         done.add(self)
         for link in self.links:
             link.update(done)
