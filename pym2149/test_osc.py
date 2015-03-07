@@ -21,11 +21,22 @@ from __future__ import division
 import unittest, time, sys, numpy as np
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
 from nod import Block, BufNode
-from reg import Reg, DerivedReg
+from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
 from fractions import Fraction
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
+
+def Reg(value):
+  r = VersionReg()
+  r.value = value
+  return r
+
+def DerivedReg(xform, that):
+  r = VersionReg()
+  r.link(xform, that)
+  that.value = that.value # Send it through the xform.
+  return r
 
 class TestToneOsc(unittest.TestCase):
 
