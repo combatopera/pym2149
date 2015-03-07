@@ -24,12 +24,12 @@ from collections import namedtuple
 class TestYM2149(unittest.TestCase):
 
   def test_toneperiodclamp(self):
-    Config = namedtuple('Config', 'nominalclock underclock')
-    for underclock in 1, 8:
+    Config = namedtuple('Config', 'nominalclock underclock freqclamp outputrate')
+    for underclock in 1, 2, 4, 8:
       nomclock = 2000000
       clock = nomclock // underclock
       def toneperiodclampor0(implclock, outrate):
-        ci = ClockInfo(Config(nomclock, underclock))
+        ci = ClockInfo(Config(nomclock, underclock, True, outrate))
         ci.implclock = implclock
         return ci.toneperiodclampor0(outrate)
       self.assertEqual(5, toneperiodclampor0(clock, 44100))
