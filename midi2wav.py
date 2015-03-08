@@ -47,6 +47,28 @@ class StreamReady:
             time.sleep(sleeptime)
         self.readytime += self.period
 
+class SpeedDetector:
+
+    def __init__(self):
+        self.update = 0
+        self.lastevent = None
+        self.speed = None
+
+    def __call__(self, event):
+        if event:
+            if self.lastevent is not None:
+                speed = self.update - self.lastevent
+                if self.speed is None:
+                    log.info("Speed detected: %s", speed)
+                    self.speed = speed
+                elif speed % self.speed:
+                    log.warn("Speed was %s but is now: %s", self.speed, speed)
+                    self.speed = speed
+                else:
+                    pass # Do nothing, multiples of current speed are fine.
+            self.lastevent = self.update
+        self.update += 1
+
 class MidiPump(Background):
 
     @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
@@ -62,11 +84,15 @@ class MidiPump(Background):
 
     def __call__(self):
         streamready = StreamReady(self.updaterate)
+        speeddetector = SpeedDetector()
         while not self.quit:
-            for event in self.midi.iterevents():
+            # Simulate blocking behaviour of a real output device, but we do it here for best MIDI timing:
+            streamready.await()
+            events = list(self.midi.iterevents())
+            speeddetector(bool(events))
+            for event in events:
                 log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
-            streamready.await() # Simulate blocking behaviour of a real device.
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
             self.channels.closeframe()
