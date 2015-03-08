@@ -30,10 +30,22 @@ from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
 from pym2149.bg import Background
-from ymplayer import ChipTimer
+from ymplayer import SimpleChipTimer
 import time
 
 log = logging.getLogger(__name__)
+
+class StreamReady:
+
+    def __init__(self, updaterate):
+        self.period = 1 / updaterate
+        self.readytime = time.time()
+
+    def await(self):
+        sleeptime = self.readytime - time.time()
+        if sleeptime > 0:
+            time.sleep(sleeptime)
+        self.readytime += self.period
 
 class MidiPump(Background):
 
@@ -49,18 +61,15 @@ class MidiPump(Background):
         self.timer = timer
 
     def __call__(self):
-        t = time.time()
+        streamready = StreamReady(self.updaterate)
         while not self.quit:
             for event in self.midi.iterevents():
                 log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
+            streamready.await() # Simulate blocking behaviour of a real device.
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
             self.channels.closeframe()
-            t += 1 / self.updaterate
-            sleeptime = t - time.time()
-            if sleeptime > 0:
-                time.sleep(sleeptime)
         self.stream.flush()
 
 def main():
@@ -73,7 +82,7 @@ def main():
         di.add(Channels)
         channels = di(Channels)
         log.info(channels)
-        di.add(ChipTimer) # XXX: Why not a SimpleTimer?
+        di.add(SimpleChipTimer) # One block per update.
         di.add(MidiPump)
         di.start()
         awaitinterrupt(config)
