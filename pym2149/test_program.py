@@ -18,21 +18,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from program import FX
 
 class TestFX(unittest.TestCase):
 
-  def test_setbend(self):
-    class config:
-      finepitchbendisrate = True
-      pitchbendratemultiplier = 3
-      pitchbendpersemitone = 1 # Don't care.
-    fx = FX(config)
-    for coarse in xrange(0x80):
-      for fine in xrange(0x80):
-        fx.setbend(((coarse << 7) | fine) - 0x2000)
-        self.assertEqual((coarse << 7) - 0x2000, fx.bend)
-        self.assertEqual((fine - 0x40) * 3, fx.bendrate)
+    pass # Nothing at the moment.
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()
