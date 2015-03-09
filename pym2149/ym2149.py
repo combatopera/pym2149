@@ -43,6 +43,7 @@ class MixerFlag:
 class Registers:
 
   def __init__(self, clockinfo, channels):
+    # TODO: Add reverse wiring.
     # Like the real thing we have 16 registers, this impl ignores the last 2:
     self.R = tuple(Reg() for _ in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
