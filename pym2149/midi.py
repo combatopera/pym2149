@@ -74,6 +74,19 @@ class ProgramChange(ChannelMessage):
   def __str__(self):
     return "P %2d %3d" % (self.midichan, self.program)
 
+class ControlChange(ChannelMessage):
+
+  def __init__(self, midi, event):
+    ChannelMessage.__init__(self, midi, event)
+    self.controller = event[4]
+    self.value = event[5]
+
+  def __call__(self, channels):
+    return channels.controlchange(self.midichan, self.controller, self.value)
+
+  def __str__(self):
+    return "C %2d %3d %3d" % (self.midichan, self.controller, self.value)
+
 class Midi:
 
   classes = {
@@ -81,6 +94,7 @@ class Midi:
     alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
     alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
     alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
+    alsaseq.SND_SEQ_EVENT_CONTROLLER: ControlChange,
   }
 
   @types(Config)
