@@ -19,24 +19,24 @@ from __future__ import division
 
 class FX:
 
-  bendlimit = 0x2000
+  bendlowerbound = -0x2000
+  bendupperbound = -bendlowerbound - 1
+
+  @staticmethod
+  def signum(n):
+    return 1 if n > 0 else (-1 if n < 0 else 0)
 
   def __init__(self, config):
-    self.finebendisrate = config.finepitchbendisrate
-    self.bendratemultiplier = config.pitchbendratemultiplier
     self.bendpersemitone = config.pitchbendpersemitone
     self.bend = 0
     self.bendrate = 0
-
-  def setbend(self, bend):
-    if self.finebendisrate:
-      self.bend = bend & ~0x7f
-      self.bendrate = ((bend & 0x7f) - 0x40) * self.bendratemultiplier
-    else:
-      self.bend = bend # We never change bendrate from 0.
+    self.bendlimit = self.bendlowerbound # Or 0 absolute.
 
   def applyrates(self):
-    self.bend = max(-self.bendlimit, min(self.bendlimit - 1, self.bend + self.bendrate))
+    side = self.signum(self.bend - self.bendlimit)
+    self.bend = max(self.bendlowerbound, min(self.bendupperbound, self.bend + self.bendrate))
+    if side != self.signum(self.bend - self.bendlimit):
+      self.bend = self.bendlimit
 
   def bendsemitones(self):
     return self.bend / self.bendpersemitone
