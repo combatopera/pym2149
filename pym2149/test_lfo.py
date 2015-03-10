@@ -18,27 +18,27 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lfo import Env
+from lfo import LFO
 
-class TestEnv(unittest.TestCase):
+class TestLFO(unittest.TestCase):
 
   def test_works(self):
-    self.assertEqual([5], Env(5))
-    self.assertEqual([8], Env(5).jump(8))
-    self.assertEqual([5, 8], Env(5).lin(1, 8))
-    self.assertEqual([5, 6, 7, 8], Env(5).lin(3, 8))
-    self.assertEqual([5, 7, 8], Env(5).lin(2, 8))
-    self.assertEqual([5, 6, 7, 7, 8], Env(5).lin(4, 8))
+    self.assertEqual([5], LFO(5))
+    self.assertEqual([8], LFO(5).jump(8))
+    self.assertEqual([5, 8], LFO(5).lin(1, 8))
+    self.assertEqual([5, 6, 7, 8], LFO(5).lin(3, 8))
+    self.assertEqual([5, 7, 8], LFO(5).lin(2, 8))
+    self.assertEqual([5, 6, 7, 7, 8], LFO(5).lin(4, 8))
     # Negative values:
-    self.assertEqual([-5, -8], Env(-5).lin(1, -8))
-    self.assertEqual([-5, -6, -7, -8], Env(-5).lin(3, -8))
-    self.assertEqual([-5, -7, -8], Env(-5).lin(2, -8))
-    self.assertEqual([-5, -6, -7, -7, -8], Env(-5).lin(4, -8))
+    self.assertEqual([-5, -8], LFO(-5).lin(1, -8))
+    self.assertEqual([-5, -6, -7, -8], LFO(-5).lin(3, -8))
+    self.assertEqual([-5, -7, -8], LFO(-5).lin(2, -8))
+    self.assertEqual([-5, -6, -7, -7, -8], LFO(-5).lin(4, -8))
     # Holds:
-    self.assertEqual([5, 5, 5, 5, 6, 7, 8], Env(5).hold(3).lin(3, 8))
-    self.assertEqual([5, 5, 5, 8], Env(5).hold(3).jump(8))
+    self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8))
+    self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8))
     # Triangular:
-    self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], Env(5).tri(2, 7, 1))
+    self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], LFO(5).tri(2, 7, 1))
 
 if __name__ == '__main__':
   unittest.main()
