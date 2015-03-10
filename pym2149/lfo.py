@@ -17,7 +17,7 @@
 
 from __future__ import division
 
-class Env(list):
+class LFO(list):
 
   def __init__(self, initial):
     self.append(initial)
