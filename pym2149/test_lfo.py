@@ -27,13 +27,13 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([8], LFO(5).jump(8))
     self.assertEqual([5, 8], LFO(5).lin(1, 8))
     self.assertEqual([5, 6, 7, 8], LFO(5).lin(3, 8))
-    self.assertEqual([5, 7, 8], LFO(5).lin(2, 8))
-    self.assertEqual([5, 6, 7, 7, 8], LFO(5).lin(4, 8))
+    self.assertEqual([5, 7, 8], list(LFO(5).lin(2, 8).round()))
+    self.assertEqual([5, 6, 7, 7, 8], list(LFO(5).lin(4, 8).round()))
     # Negative values:
     self.assertEqual([-5, -8], LFO(-5).lin(1, -8))
     self.assertEqual([-5, -6, -7, -8], LFO(-5).lin(3, -8))
-    self.assertEqual([-5, -7, -8], LFO(-5).lin(2, -8))
-    self.assertEqual([-5, -6, -7, -7, -8], LFO(-5).lin(4, -8))
+    self.assertEqual([-5, -7, -8], list(LFO(-5).lin(2, -8).round()))
+    self.assertEqual([-5, -6, -7, -7, -8], list(LFO(-5).lin(4, -8).round()))
     # Holds:
     self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8))
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8))
