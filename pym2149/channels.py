@@ -75,6 +75,24 @@ class Channel:
   def __str__(self):
     return chr(ord('A') + self.chipindex)
 
+class ControlPair:
+
+  def __init__(self, binaryzero, flush):
+    self.binary = self.binaryzero = binaryzero
+    self.flush = flush
+
+  def install(self, d, msbindex):
+    d[msbindex] = self.setmsb
+    d[msbindex + 0x20] = self.setlsb
+
+  def setmsb(self, midichan, msb):
+    self.binary = (msb << 7) | (self.binary & 0x7f)
+    self.flush(midichan, self.binary - self.binaryzero)
+
+  def setlsb(self, midichan, lsb):
+    self.binary = (self.binary & (0x7f << 7)) | lsb
+    self.flush(midichan, self.binary - self.binaryzero)
+
 class Channels:
 
   @types(Config, Chip)
@@ -84,6 +102,15 @@ class Channels:
     self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, config.chipchannels)
+    self.controllers = {}
+    if config.pitchbendratecontroller is not None:
+      def flush(midichan, value):
+        self.midichantofx[midichan].bendrate = value
+      ControlPair(0x2000, flush).install(self.controllers, config.pitchbendratecontroller)
+    if config.pitchbendlimitcontroller is not None:
+      def flush(midichan, value):
+        self.midichantofx[midichan].bendlimit = value
+      ControlPair(0x2000, flush).install(self.controllers, config.pitchbendlimitcontroller)
     self.prevtext = None
     self.frameindex = 0
 
@@ -102,7 +129,11 @@ class Channels:
       return channel
 
   def pitchbend(self, midichan, bend):
-    self.midichantofx[midichan].setbend(bend)
+    self.midichantofx[midichan].bend = bend
+
+  def controlchange(self, midichan, controller, value):
+    if controller in self.controllers:
+      self.controllers[controller](midichan, value)
 
   def programchange(self, midichan, program):
     self.midichantoprogram[midichan] = self.midiprograms[program]
