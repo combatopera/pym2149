@@ -25,7 +25,7 @@ class LFO(list):
   def lin(self, n, target):
     source = self[-1]
     for i in xrange(1, n + 1):
-      self.append(int(round(source + (target - source) * i / n)))
+      self.append(source + (target - source) * i / n)
     return self
 
   def jump(self, target):
@@ -45,3 +45,18 @@ class LFO(list):
 
   def __call__(self, frame):
     return self[min(frame, len(self) - 1)]
+
+  def round(self):
+    return RoundLFO(self)
+
+class RoundLFO:
+
+  def __init__(self, lfo):
+    self.lfo = lfo
+
+  def __call__(self, frame):
+    return int(round(self.lfo(frame)))
+
+  def __iter__(self):
+    for frame in xrange(len(self.lfo)):
+      yield self(frame)
