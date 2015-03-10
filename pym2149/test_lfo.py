@@ -39,6 +39,7 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8))
     # Triangular:
     self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], LFO(5).tri(2, 7, 1))
+    self.assertEqual([5] + [6, 7, 6, 5, 4, 3, 4, 5] * 2, LFO(5).tri(2, 7, 2))
 
 if __name__ == '__main__':
   unittest.main()
