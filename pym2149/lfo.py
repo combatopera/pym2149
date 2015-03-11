@@ -71,15 +71,17 @@ class LFO(list, AbstractLFO):
   def hold(self, n):
     return self.lin(n, self[-1])
 
-  def tri(self, m, target, n):
-    unit = m * 4
-    if 0 != n % unit:
-      raise Exception("Expected a multiple of %s but got: %s" % (unit, n))
+  def tri(self, trin, linn, target):
+    if 0 != trin % 4:
+      raise Exception("Expected a multiple of 4 but got: %s" % trin)
+    normn = trin // 4
+    if 0 != normn % linn:
+      raise Exception("Expected a factor of %s but got: %s" % (normn, linn))
     source = self[-1]
-    for _ in xrange(n // unit):
-      self.lin(m, target)
-      self.lin(m * 2, source * 2 - target)
-      self.lin(m, source)
+    for _ in xrange(normn // linn):
+      self.lin(linn, target)
+      self.lin(linn * 2, source * 2 - target)
+      self.lin(linn, source)
     return self
 
   def __call__(self, frame):
