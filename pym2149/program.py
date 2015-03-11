@@ -99,10 +99,10 @@ class DefaultNote(Note):
     self.setfixedlevel(13 + self.voladj)
 
   def noteonframe(self, frame):
-    self.applypitch(self.pitch + self.vib(frame))
+    self.applypitch(self.pitch + self.fx.relmodulation() * self.vib(frame))
 
   def noteoffframe(self, frame):
-    self.applypitch(self.pitch + self.vib(self.onframes + frame))
+    self.applypitch(self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame))
     self.setfixedlevel(13 + self.voladj + self.fadeout(frame))
 
 class Unpitched(Note):
