@@ -17,11 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from program import DefaultNote
 import unittest
 
 class TestFX(unittest.TestCase):
 
     pass # Nothing at the moment.
+
+class TestDefaultNote(unittest.TestCase):
+
+    def test_fadeout(self):
+        self.assertEqual(sum([[i, i] for i in xrange(-1, -16, -1)], []), DefaultNote.fadeout.render())
 
 if __name__ == '__main__':
     unittest.main()
