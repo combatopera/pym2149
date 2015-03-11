@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+from lfo import LFO
 
 class FX:
 
@@ -86,15 +87,19 @@ class NullNote(Note): pass
 
 class DefaultNote(Note):
 
+  vib = LFO(0).hold(10).tri(8, 2, .2).loop(8)
+  fadeout = LFO(-1).hold(1).lin(28, -15).round()
+
   def noteon(self):
     self.toneflag.value = True
-    self.setfixedlevel(self.voladj + 13)
+    self.setfixedlevel(13 + self.voladj)
 
   def noteonframe(self, frame):
-    self.applypitch()
+    self.applypitch(self.pitch + self.vib(frame))
 
   def noteoffframe(self, frame):
-    self.setfixedlevel(self.voladj + 12 - frame // 2)
+    self.applypitch(self.pitch + self.vib(self.onframes + frame))
+    self.setfixedlevel(13 + self.voladj + self.fadeout(frame))
 
 class Unpitched(Note):
 
