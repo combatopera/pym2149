@@ -17,10 +17,46 @@
 
 from __future__ import division
 
-class LFO(list):
+class AbstractLFO:
+
+  def loop(self, n):
+    return Loop(self, n)
+
+  def round(self):
+    return Round(self)
+
+  def render(self, n = None):
+    if n is None:
+      n = len(self)
+    return [self(i) for i in xrange(n)]
+
+class Loop(AbstractLFO):
+
+  def __init__(self, lfo, n):
+    self.loop = len(lfo) - n
+    self.lfo = lfo
+
+  def __call__(self, frame):
+    n = len(self.lfo)
+    if frame >= n:
+      frame = self.loop + ((frame - self.loop) % (n - self.loop))
+    return self.lfo(frame)
+
+class Round(AbstractLFO):
+
+  def __init__(self, lfo):
+    self.lfo = lfo
+
+  def __call__(self, frame):
+    return int(round(self.lfo(frame)))
+
+  def __len__(self):
+    return len(self.lfo)
+
+class LFO(list, AbstractLFO):
 
   def __init__(self, initial):
-    self.append(initial)
+    list.__init__(self, [initial])
 
   def lin(self, n, target):
     source = self[-1]
@@ -35,28 +71,16 @@ class LFO(list):
   def hold(self, n):
     return self.lin(n, self[-1])
 
-  def tri(self, n, target, waves):
+  def tri(self, m, target, n):
+    unit = m * 4
+    if 0 != n % unit:
+      raise Exception("Expected a multiple of %s but got: %s" % (unit, n))
     source = self[-1]
-    for _ in xrange(waves):
-      self.lin(n, target)
-      self.lin(n * 2, source * 2 - target)
-      self.lin(n, source)
+    for _ in xrange(n // unit):
+      self.lin(m, target)
+      self.lin(m * 2, source * 2 - target)
+      self.lin(m, source)
     return self
 
   def __call__(self, frame):
     return self[min(frame, len(self) - 1)]
-
-  def round(self):
-    return RoundLFO(self)
-
-class RoundLFO:
-
-  def __init__(self, lfo):
-    self.lfo = lfo
-
-  def __call__(self, frame):
-    return int(round(self.lfo(frame)))
-
-  def __iter__(self):
-    for frame in xrange(len(self.lfo)):
-      yield self(frame)
