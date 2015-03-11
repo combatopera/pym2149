@@ -49,5 +49,13 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 5, 5] + [6, 7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(8).render(83))
     self.assertEqual([5, 5, 5, 6, 7, 6, 5, 4, 3, 4, 5] + [7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(7).render(81))
 
+  def test_bias(self):
+    self.assertEqual([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], LFO(1).lin(10, 6).round().render())
+    self.assertEqual([-1, -2, -2, -3, -3, -4, -4, -5, -5, -6, -6], LFO(-1).lin(10, -6).round().render())
+    self.assertEqual([6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1], LFO(6).lin(10, 1).round().render())
+    self.assertEqual([-6, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1], LFO(-6).lin(10, -1).round().render())
+    self.assertEqual([2, 1, 1, 0, 0, -1, -1, -2, -2], LFO(2).lin(8, -2).round().render())
+    self.assertEqual([-2, -1, -1, 0, 0, 1, 1, 2, 2], LFO(-2).lin(8, 2).round().render())
+
 if __name__ == '__main__':
   unittest.main()

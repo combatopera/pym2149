@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+from decimal import Decimal, ROUND_HALF_DOWN, ROUND_HALF_UP
 
 class AbstractLFO:
 
@@ -48,7 +49,13 @@ class Round(AbstractLFO):
     self.lfo = lfo
 
   def __call__(self, frame):
-    return int(round(self.lfo(frame)))
+    current, next = self.lfo(frame), self.lfo(frame + 1)
+    if current < 0:
+      towards0 = (current < next) if (next < 0) else True
+    else:
+      towards0 = True if (next < 0) else (next < current)
+    rounding = ROUND_HALF_DOWN if towards0 else ROUND_HALF_UP
+    return int(Decimal(current).to_integral_value(rounding))
 
   def __len__(self):
     return len(self.lfo)
