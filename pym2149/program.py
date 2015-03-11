@@ -32,6 +32,7 @@ class FX:
     self.bend = 0
     self.bendrate = 0
     self.bendlimit = self.bendlowerbound # Or 0 absolute.
+    self.modulation = 0x2000
 
   def applyrates(self):
     side = self.signum(self.bend - self.bendlimit)
@@ -41,6 +42,9 @@ class FX:
 
   def bendsemitones(self):
     return self.bend / self.bendpersemitone
+
+  def relmodulation(self):
+    return self.modulation / 0x4000 # This way the default is exactly a half.
 
 class Note:
 
