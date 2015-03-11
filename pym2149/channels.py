@@ -103,6 +103,9 @@ class Channels:
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, config.chipchannels)
     self.controllers = {}
+    def flush(midichan, value):
+      self.midichantofx[midichan].modulation = value
+    ControlPair(0, flush).install(self.controllers, 0x01)
     if config.pitchbendratecontroller is not None:
       def flush(midichan, value):
         self.midichantofx[midichan].bendrate = value
