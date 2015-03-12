@@ -106,6 +106,9 @@ class Channels:
     def flush(midichan, value):
       self.midichantofx[midichan].modulation = value
     ControlPair(0, flush).install(self.controllers, 0x01)
+    def flush(midichan, value):
+      self.midichantofx[midichan].pan = value
+    ControlPair(0x2000, flush).install(self.controllers, 0x0a)
     if config.pitchbendratecontroller is not None:
       def flush(midichan, value):
         self.midichantofx[midichan].bendrate = value
