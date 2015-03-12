@@ -20,7 +20,9 @@ from lfo import LFO
 
 class FX:
 
-  bendlowerbound = -0x2000
+  range = 1 << 14
+  halfrange = range // 2
+  bendlowerbound = -halfrange
   bendupperbound = -bendlowerbound - 1
 
   @staticmethod
@@ -32,7 +34,8 @@ class FX:
     self.bend = 0
     self.bendrate = 0
     self.bendlimit = self.bendlowerbound # Or 0 absolute.
-    self.modulation = 0x2000
+    self.modulation = self.halfrange
+    self.pan = 0
 
   def applyrates(self):
     side = self.signum(self.bend - self.bendlimit)
@@ -44,7 +47,10 @@ class FX:
     return self.bend / self.bendpersemitone
 
   def relmodulation(self):
-    return self.modulation / 0x4000 # This way the default is exactly a half.
+    return self.modulation / self.range # This way the default is exactly a half.
+
+  def normpan(self):
+    return self.pan / self.halfrange
 
 class Note:
 
