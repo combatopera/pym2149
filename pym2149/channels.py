@@ -72,6 +72,9 @@ class Channel:
     self.chip.flagsoff(self.chipindex)
     self.note.callnoteon(self.voladj)
 
+  def getpan(self):
+    return 0 if self.note is None else self.note.fx.normpan()
+
   def __str__(self):
     return chr(ord('A') + self.chipindex)
 
@@ -156,6 +159,10 @@ class Channels:
     for fx in self.midichantofx.itervalues():
       fx.applyrates()
     self.frameindex += 1
+
+  def getpans(self):
+    for c in self.channels:
+      yield c.getpan()
 
   def __str__(self):
     return ', '.join("%s -> %s" % entry for entry in sorted(self.midichantoprogram.iteritems()))

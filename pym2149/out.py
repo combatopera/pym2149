@@ -34,14 +34,34 @@ class StereoInfo:
 
     @types(Config)
     def __init__(self, config):
-        chipnum = config.chipchannels
+        self.n = config.chipchannels
         if config.stereo:
-            def getamp(outchan, chipchan):
-                pan = (chipchan * 2 - (chipnum - 1)) / (chipnum - 1) * config.maxpan
-                return ((1 + (outchan * 2 - 1) * pan) / 2) ** (config.panlaw / 6)
-            self.getoutchans = lambda *args: [StaticOutChannel([getamp(outchan, chipchan) for chipchan in xrange(chipnum)]) for outchan in xrange(2)]
+            self.panlaw = config.panlaw
+            if config.midipan:
+                self.getoutchans = self.getmidioutchans
+            else:
+                self.maxpan = config.maxpan
+                self.getoutchans = self.getstaticoutchans
         else:
-            self.getoutchans = lambda *args: [TrivialOutChannel(chipnum)]
+            self.getoutchans = self.gettrivialoutchans
+
+    def pantoamp(self, outchan, pan):
+        return ((1 + (outchan * 2 - 1) * pan) / 2) ** (self.panlaw / 6)
+
+    def staticamp(self, outchan, chipchan):
+        return self.pantoamp(outchan, (chipchan * 2 - (self.n - 1)) / (self.n - 1) * self.maxpan)
+
+    def gettrivialoutchans(self, *args):
+        return [TrivialOutChannel(self.n)]
+
+    def getstaticoutchans(self, *args):
+        return [StaticOutChannel([self.staticamp(oc, cc) for cc in xrange(self.n)]) for oc in xrange(2)]
+
+    def getmidioutchans(self, channels):
+        class PanToAmp:
+            def __init__(this, outchan): this.outchan = outchan
+            def __call__(this, pan): return self.pantoamp(this.outchan, pan)
+        return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in xrange(2)]
 
 class WavWriter(object, Node, Stream):
 
@@ -91,6 +111,21 @@ class TrivialOutChannel(StaticOutChannel):
 
     def __init__(self, n):
         StaticOutChannel.__init__(self, [1] * n)
+
+class MidiOutChannel(Node):
+
+    nontrivial = True
+
+    def __init__(self, channels, pantoamp):
+        Node.__init__(self)
+        self.channels = channels
+        self.pantoamp = pantoamp
+
+    def size(self):
+        return len(list(self.channels.getpans())) # Only called once.
+
+    def callimpl(self):
+        return [self.pantoamp(pan) for pan in self.channels.getpans()]
 
 class FloatStream(list):
 
