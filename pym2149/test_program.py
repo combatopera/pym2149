@@ -17,12 +17,35 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from program import DefaultNote
+from program import DefaultNote, FX
+from collections import namedtuple
 import unittest
 
 class TestFX(unittest.TestCase):
 
-    pass # Nothing at the moment.
+    def test_modulation(self):
+        fx = FX(namedtuple('Config', 'pitchbendpersemitone')(None))
+        self.assertEqual(.5, fx.relmodulation())
+        fx.modulation = 0
+        self.assertEqual(0, fx.relmodulation())
+        fx.modulation = 1
+        self.assertEqual(0, fx.relmodulation())
+        fx.modulation = 0x2000
+        self.assertEqual(.5, fx.relmodulation())
+        fx.modulation = 0x3fff
+        self.assertEqual(1, fx.relmodulation())
+
+    def test_pan(self):
+        fx = FX(namedtuple('Config', 'pitchbendpersemitone')(None))
+        self.assertEqual(0, fx.normpan())
+        fx.pan = 0
+        self.assertEqual(-1, fx.normpan())
+        fx.pan = 1
+        self.assertEqual(-1, fx.normpan())
+        fx.pan = 0x2000
+        self.assertEqual(0, fx.normpan())
+        fx.pan = 0x3fff
+        self.assertEqual(1, fx.normpan())
 
 class TestDefaultNote(unittest.TestCase):
 
