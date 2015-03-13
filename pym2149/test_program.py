@@ -38,13 +38,13 @@ class TestFX(unittest.TestCase):
     def test_pan(self):
         fx = FX(namedtuple('Config', 'pitchbendpersemitone maxpan')(None, .75))
         self.assertEqual(0, fx.normpan())
+        fx.pan = -0x2000
+        self.assertEqual(-.75, fx.normpan())
+        fx.pan = -0x1fff
+        self.assertEqual(-.75, fx.normpan())
         fx.pan = 0
-        self.assertEqual(-.75, fx.normpan())
-        fx.pan = 1
-        self.assertEqual(-.75, fx.normpan())
-        fx.pan = 0x2000
         self.assertEqual(0, fx.normpan())
-        fx.pan = 0x3fff
+        fx.pan = 0x1fff
         self.assertEqual(.75, fx.normpan())
 
 class TestDefaultNote(unittest.TestCase):
