@@ -103,9 +103,9 @@ def main():
     di = createdi(config)
     di.add(Midi)
     configure(di)
+    di.add(Channels)
     di.start()
     try:
-        di.add(Channels)
         channels = di(Channels)
         log.info(channels)
         di.add(SimpleChipTimer) # One block per update.

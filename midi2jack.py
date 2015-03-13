@@ -87,8 +87,8 @@ def main():
   di.start()
   try:
         configure(di)
-        di.start()
         di.add(Channels)
+        di.start()
         log.info(di(Channels))
         stream = di(Stream)
         log.debug("JACK block size: %s or %.3f seconds", stream.buffersize, stream.buffersize / config.outputrate)
