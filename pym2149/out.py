@@ -26,6 +26,7 @@ from iface import AmpScale, Multiplexed, Stream, JackConnection, Config
 from di import types
 from mix import IdealMixer
 from minblep import MinBleps
+from channels import Channels
 
 log = logging.getLogger(__name__)
 
@@ -42,8 +43,10 @@ class StereoInfo:
         else:
             outnum = 1
             def getamp(outchan, chipchan): return 1
-        outchan2chipamps = [[getamp(outchan, chipchan) for chipchan in xrange(chipnum)] for outchan in xrange(outnum)]
-        self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
+        self.outchan2chipamps = [[getamp(outchan, chipchan) for chipchan in xrange(chipnum)] for outchan in xrange(outnum)]
+
+    def getoutchans(self, channelsornone):
+        return [OutChannel(amps) for amps in self.outchan2chipamps]
 
 class WavWriter(object, Node, Stream):
 
@@ -92,9 +95,9 @@ class OutChannel(Node):
 
 class FloatStream(list):
 
-  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, JackConnection)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, jackconn = None):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.outchans]
+  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, JackConnection, Channels)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, jackconn = None, channels = None):
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]
     if jackconn is not None and config.outputrate != jackconn.outputrate:
       log.info("Context outputrate %s overriden to: %s", jackconn.outputrate, config.outputrate)
     for naive in naives:
