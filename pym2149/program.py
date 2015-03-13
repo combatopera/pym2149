@@ -20,10 +20,9 @@ from lfo import LFO
 
 class FX:
 
-  range = 1 << 14
-  halfrange = range // 2
-  bendlowerbound = -halfrange
-  bendupperbound = -bendlowerbound - 1
+  halfrange = 1 << 13 # Full range is 14 bits.
+  minsigned = -halfrange
+  maxsigned = halfrange - 1
 
   @staticmethod
   def signum(n):
@@ -34,13 +33,13 @@ class FX:
     self.maxpan = config.maxpan
     self.bend = 0
     self.bendrate = 0
-    self.bendlimit = self.bendlowerbound # Or 0 absolute.
+    self.bendlimit = self.minsigned # Or 0 absolute.
     self.modulation = self.halfrange
     self.pan = 0
 
   def applyrates(self):
     side = self.signum(self.bend - self.bendlimit)
-    self.bend = max(self.bendlowerbound, min(self.bendupperbound, self.bend + self.bendrate))
+    self.bend = max(self.minsigned, min(self.maxsigned, self.bend + self.bendrate))
     if side != self.signum(self.bend - self.bendlimit):
       self.bend = self.bendlimit
 
@@ -51,7 +50,7 @@ class FX:
     return (max(1, self.modulation) - self.halfrange) / (self.halfrange - 1) / 2 + .5
 
   def normpan(self):
-    return max(-(self.halfrange - 1), self.pan) / (self.halfrange - 1) * self.maxpan
+    return max(self.minsigned + 1, self.pan) / (self.halfrange - 1) * self.maxpan
 
 class Note:
 
