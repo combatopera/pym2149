@@ -73,16 +73,28 @@ class WavWriter(object, Node, Stream):
   def stop(self):
     self.f.close()
 
-class OutChannel:
+class OutChannel(Node):
 
     def __init__(self, chipamps):
+        Node.__init__(self)
         self.chipamps = chipamps
+
+    def size(self):
+        return len(self.chipamps)
+
+    def isnontrivial(self):
+        for amp in self.chipamps:
+            if 1 != amp:
+                return True
+
+    def callimpl(self):
+        return self.chipamps
 
 class FloatStream(list):
 
   @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, JackConnection)
   def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, jackconn = None):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan.chipamps) for outchan in stereoinfo.outchans]
+    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.outchans]
     if jackconn is not None and config.outputrate != jackconn.outputrate:
       log.info("Context outputrate %s overriden to: %s", jackconn.outputrate, config.outputrate)
     for naive in naives:
