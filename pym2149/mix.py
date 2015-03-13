@@ -70,14 +70,9 @@ class IdealMixer(BufNode):
   def __init__(self, container, log2maxpeaktopeak, chipamps):
     BufNode.__init__(self, self.floatdtype)
     self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
-    if len(container) != len(chipamps):
-      raise Exception("Expected %s chipamps but got: %s" % (len(container), len(chipamps)))
-    for amp in chipamps:
-      if 1 != amp:
-        self.nontrivial = True
-        break
-    else:
-      self.nontrivial = False
+    if len(container) != chipamps.size():
+      raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
+    self.nontrivial = chipamps.isnontrivial()
     log.debug("Mix is trivial: %s", not self.nontrivial)
     if self.nontrivial:
       self.contrib = MasterBuf(self.dtype)
@@ -88,7 +83,7 @@ class IdealMixer(BufNode):
     self.blockbuf.fill(self.datum)
     if self.nontrivial:
       contrib = self.contrib.ensureandcrop(self.block.framecount)
-      for buf, amp in zip(self.chain(self.container), self.chipamps):
+      for buf, amp in zip(self.chain(self.container), self.chain(self.chipamps)):
         if amp:
           contrib.copybuf(buf)
           contrib.mul(amp)
