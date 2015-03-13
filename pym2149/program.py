@@ -30,7 +30,6 @@ class FX:
 
   def __init__(self, config):
     self.bendpersemitone = config.pitchbendpersemitone
-    self.maxpan = config.maxpan
     self.bend = 0
     self.bendrate = 0
     self.bendlimit = self.minsigned # Or 0 absolute.
@@ -50,7 +49,7 @@ class FX:
     return (max(1, self.modulation) - self.halfrange) / (self.halfrange - 1) / 2 + .5
 
   def normpan(self):
-    return max(self.minsigned + 1, self.pan) / (self.halfrange - 1) * self.maxpan
+    return max(self.minsigned + 1, self.pan) / (self.halfrange - 1)
 
 class Note:
 
