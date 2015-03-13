@@ -33,16 +33,16 @@ class StereoInfo:
 
     @types(Config)
     def __init__(self, config):
-        n = config.chipchannels
+        chipnum = config.chipchannels
         if config.stereo:
+            outnum = 2
             def getamp(outchan, chipchan):
-                pan = (chipchan * 2 - (n - 1)) / (n - 1) * config.maxpan
+                pan = (chipchan * 2 - (chipnum - 1)) / (chipnum - 1) * config.maxpan
                 return ((1 + (outchan * 2 - 1) * pan) / 2) ** (config.panlaw / 6)
-            def getamps(outchan):
-                return [getamp(outchan, chipchan) for chipchan in xrange(n)]
-            outchan2chipamps = [getamps(outchan) for outchan in xrange(2)]
         else:
-            outchan2chipamps = [[1] * n]
+            outnum = 1
+            def getamp(outchan, chipchan): return 1
+        outchan2chipamps = [[getamp(outchan, chipchan) for chipchan in xrange(chipnum)] for outchan in xrange(outnum)]
         self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
 
 class WavWriter(object, Node, Stream):
