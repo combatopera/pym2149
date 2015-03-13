@@ -35,11 +35,13 @@ class StereoInfo:
     def __init__(self, config):
         n = config.chipchannels
         if config.stereo:
-            locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
             left, right = -1, 1
-            def getamp(side, loc):
+            def getamp(side, chipchan):
+                loc = (chipchan * 2 - (n - 1)) / (n - 1) * config.maxpan
                 return ((1 + side * loc) / 2) ** (config.panlaw / 6)
-            outchan2chipamps = [[getamp(side, loc) for loc in locs] for side in (left, right)]
+            def getamps(side):
+                return [getamp(side, chipchan) for chipchan in xrange(n)]
+            outchan2chipamps = [getamps(side) for side in (left, right)]
         else:
             outchan2chipamps = [[1] * n]
         self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
