@@ -36,17 +36,12 @@ class StereoInfo:
     def __init__(self, config):
         chipnum = config.chipchannels
         if config.stereo:
-            outnum = 2
             def getamp(outchan, chipchan):
                 pan = (chipchan * 2 - (chipnum - 1)) / (chipnum - 1) * config.maxpan
                 return ((1 + (outchan * 2 - 1) * pan) / 2) ** (config.panlaw / 6)
+            self.getoutchans = lambda *args: [StaticOutChannel([getamp(outchan, chipchan) for chipchan in xrange(chipnum)]) for outchan in xrange(2)]
         else:
-            outnum = 1
-            def getamp(outchan, chipchan): return 1
-        self.outchan2chipamps = [[getamp(outchan, chipchan) for chipchan in xrange(chipnum)] for outchan in xrange(outnum)]
-
-    def getoutchans(self, channelsornone):
-        return [OutChannel(amps) for amps in self.outchan2chipamps]
+            self.getoutchans = lambda *args: [TrivialOutChannel(chipnum)]
 
 class WavWriter(object, Node, Stream):
 
@@ -76,7 +71,9 @@ class WavWriter(object, Node, Stream):
   def stop(self):
     self.f.close()
 
-class OutChannel(Node):
+class StaticOutChannel(Node):
+
+    nontrivial = True
 
     def __init__(self, chipamps):
         Node.__init__(self)
@@ -85,13 +82,15 @@ class OutChannel(Node):
     def size(self):
         return len(self.chipamps)
 
-    def isnontrivial(self):
-        for amp in self.chipamps:
-            if 1 != amp:
-                return True
-
     def callimpl(self):
         return self.chipamps
+
+class TrivialOutChannel(StaticOutChannel):
+
+    nontrivial = False
+
+    def __init__(self, n):
+        StaticOutChannel.__init__(self, [1] * n)
 
 class FloatStream(list):
 
