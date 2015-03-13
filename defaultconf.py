@@ -35,7 +35,9 @@ oscpause = False
 nominalclock = config.di(YMFile).nominalclock if config.di.all(YMFile) else stclock
 '''You can specify your own clock here, which overrides any other value.'''
 
-stereo = False
+midipan = False
+
+stereo = config.midipan
 
 panlaw = 3
 

@@ -24,7 +24,7 @@ import unittest
 class TestFX(unittest.TestCase):
 
     def test_modulation(self):
-        fx = FX(namedtuple('Config', 'pitchbendpersemitone')(None))
+        fx = FX(namedtuple('Config', 'pitchbendpersemitone maxpan')(None, None))
         self.assertEqual(.5, fx.relmodulation())
         fx.modulation = 0
         self.assertEqual(0, fx.relmodulation())
@@ -36,16 +36,16 @@ class TestFX(unittest.TestCase):
         self.assertEqual(1, fx.relmodulation())
 
     def test_pan(self):
-        fx = FX(namedtuple('Config', 'pitchbendpersemitone')(None))
+        fx = FX(namedtuple('Config', 'pitchbendpersemitone maxpan')(None, .75))
         self.assertEqual(0, fx.normpan())
         fx.pan = 0
-        self.assertEqual(-1, fx.normpan())
+        self.assertEqual(-.75, fx.normpan())
         fx.pan = 1
-        self.assertEqual(-1, fx.normpan())
+        self.assertEqual(-.75, fx.normpan())
         fx.pan = 0x2000
         self.assertEqual(0, fx.normpan())
         fx.pan = 0x3fff
-        self.assertEqual(1, fx.normpan())
+        self.assertEqual(.75, fx.normpan())
 
 class TestDefaultNote(unittest.TestCase):
 
