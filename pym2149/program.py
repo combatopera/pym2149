@@ -49,6 +49,7 @@ class FX:
     return (max(1, self.modulation) - self.halfrange) / (self.halfrange - 1) / 2 + .5
 
   def normpan(self):
+    # Observe we don't apply maxpan, which is only for the auto-stereo:
     return max(self.minsigned + 1, self.pan) / (self.halfrange - 1)
 
 class Note:
