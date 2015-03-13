@@ -36,12 +36,10 @@ class StereoInfo:
         n = config.chipchannels
         if config.stereo:
             locs = (np.arange(n) * 2 - (n - 1)) / (n - 1) * config.maxpan
-            def getamppair(loc):
-                l = ((1 - loc) / 2) ** (config.panlaw / 6)
-                r = ((1 + loc) / 2) ** (config.panlaw / 6)
-                return l, r
-            amppairs = [getamppair(loc) for loc in locs]
-            outchan2chipamps = zip(*amppairs)
+            left, right = -1, 1
+            def getamp(side, loc):
+                return ((1 + side * loc) / 2) ** (config.panlaw / 6)
+            outchan2chipamps = [[getamp(side, loc) for loc in locs] for side in (left, right)]
         else:
             outchan2chipamps = [[1] * n]
         self.outchans = [OutChannel(amps) for amps in outchan2chipamps]
