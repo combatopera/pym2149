@@ -53,15 +53,18 @@ class StereoInfo:
 
     def gettrivialoutchans(self, *args):
         return [TrivialOutChannel(self.n)]
+    gettrivialoutchans.size = 1
 
     def getstaticoutchans(self, *args):
         return [StaticOutChannel([self.staticamp(oc, cc) for cc in xrange(self.n)]) for oc in xrange(2)]
+    getstaticoutchans.size = 2
 
     def getmidioutchans(self, channels):
         class PanToAmp:
             def __init__(this, outchan): this.outchan = outchan
             def __call__(this, pan): return self.pantoamp(this.outchan, pan)
         return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in xrange(2)]
+    getmidioutchans.size = 2
 
 class WavWriter(object, Node, Stream):
 
@@ -72,7 +75,7 @@ class WavWriter(object, Node, Stream):
   def __init__(self, config, wav, stereoinfo):
     Node.__init__(self)
     fclass = Wave16
-    self.open = lambda: fclass(config.outpath, config.outputrate, len(stereoinfo.outchans))
+    self.open = lambda: fclass(config.outpath, config.outputrate, stereoinfo.getoutchans.size)
     self.wavmaster = MasterBuf(dtype = fclass.dtype)
     self.wav = wav
 
