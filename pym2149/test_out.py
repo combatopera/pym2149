@@ -47,7 +47,7 @@ class TestWavWriter(unittest.TestCase):
     outrate = 44100
     w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
     config = namedtuple('Config', 'outputrate outpath')(outrate, '/dev/null')
-    w = WavWriter(config, w, namedtuple('StereoInfo', 'outchans')('M'))
+    w = WavWriter(config, w, namedtuple('StereoInfo', 'getoutchans')(namedtuple('getoutchansimpl', 'size')(1)))
     w.start()
     tone.cursor = 0
     start = time.time()
