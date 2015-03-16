@@ -76,7 +76,9 @@ class LFO(list, AbstractLFO):
     return self
 
   def hold(self, n):
-    return self.lin(n, self[-1])
+    for _ in xrange(n):
+      self.append(self[-1])
+    return self
 
   def tri(self, trin, linn, target):
     if 0 != trin % 4:
