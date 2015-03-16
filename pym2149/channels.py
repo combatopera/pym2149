@@ -19,12 +19,12 @@
 
 from __future__ import division
 import logging
-from pym2149.pitch import Pitch
-from pym2149.program import FX
-from pym2149.const import midichannelcount
-from pym2149.mediation import Mediation
-from pym2149.di import types
-from pym2149.iface import Chip, Config
+from pitch import Pitch
+from program import FX
+from const import midichannelcount
+from mediation import Mediation
+from di import types
+from iface import Chip, Config
 
 log = logging.getLogger(__name__)
 
