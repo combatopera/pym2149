@@ -37,6 +37,7 @@ class TestLFO(unittest.TestCase):
     # Holds:
     self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8))
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8))
+    self.assertEqual([True, True, True, False], LFO(True).hold(3).jump(False))
     # Triangular:
     self.assertEqual([5, 7, 5, 3, 5], LFO(5).tri(4, 1, 7)) # Simplest possible.
     self.assertEqual([5, 7, 5, 3, 5, 7, 5, 3, 5], LFO(5).tri(8, 1, 7))
