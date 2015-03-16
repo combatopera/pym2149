@@ -45,7 +45,7 @@ class TestIdealMixer(unittest.TestCase):
 
   def test_works(self):
     c = Container([Counter(10), Counter()])
-    m = IdealMixer(c, 16, TrivialOutChannel(2))
+    m = IdealMixer(c, 16, TrivialOutChannel)
     self.expect(m, [10, 12, 14, 16, 18], m.call(Block(5)))
     # Check the buffer is actually cleared first:
     self.expect(m, [20, 22, 24, 26, 28], m.call(Block(5)))
@@ -53,7 +53,7 @@ class TestIdealMixer(unittest.TestCase):
   def test_masked(self):
     upstream = Counter(10), Counter()
     c = Container(upstream)
-    m = IdealMixer(c, 16, TrivialOutChannel(2))
+    m = IdealMixer(c, 16, TrivialOutChannel)
     self.assertEqual(NullBuf, m(Block(5), True))
     for n in upstream:
       self.assertEqual(NullBuf, n.result)
