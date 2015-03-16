@@ -68,25 +68,29 @@ class Multiplexer(Node):
 class IdealMixer(BufNode):
 
   def __init__(self, container, log2maxpeaktopeak, chipamps):
-    BufNode.__init__(self, self.floatdtype)
-    self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
-    if len(container) != chipamps.size():
-      raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
     log.debug("Mix is trivial: %s", not chipamps.nontrivial)
     if chipamps.nontrivial:
+      if len(container) != chipamps.size():
+        raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
       self.contrib = MasterBuf(self.dtype)
+      self.callimpl = self.nontrivialcallimpl
+    else:
+      self.callimpl = self.trivialcallimpl
+    BufNode.__init__(self, self.floatdtype)
+    self.datum = self.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
     self.container = container
     self.chipamps = chipamps
 
-  def callimpl(self):
+  def nontrivialcallimpl(self):
     self.blockbuf.fill(self.datum)
-    if self.chipamps.nontrivial:
-      contrib = self.contrib.ensureandcrop(self.block.framecount)
-      for buf, amp in zip(self.chain(self.container), self.chain(self.chipamps)):
-        if amp:
-          contrib.copybuf(buf)
-          contrib.mul(amp)
-          self.blockbuf.subbuf(contrib)
-    else:
-      for buf in self.chain(self.container):
-        self.blockbuf.subbuf(buf)
+    contrib = self.contrib.ensureandcrop(self.block.framecount)
+    for buf, amp in zip(self.chain(self.container), self.chain(self.chipamps)):
+      if amp:
+        contrib.copybuf(buf)
+        contrib.mul(amp)
+        self.blockbuf.subbuf(contrib)
+
+  def trivialcallimpl(self):
+    self.blockbuf.fill(self.datum)
+    for buf in self.chain(self.container):
+      self.blockbuf.subbuf(buf)

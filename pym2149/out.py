@@ -27,6 +27,7 @@ from di import types
 from mix import IdealMixer
 from minblep import MinBleps
 from channels import Channels
+from util import singleton
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class StereoInfo:
         return self.pantoamp(outchan, (chipchan * 2 - (self.n - 1)) / (self.n - 1) * self.maxpan)
 
     def gettrivialoutchans(self, *args):
-        return [TrivialOutChannel(self.n)]
+        return [TrivialOutChannel]
     gettrivialoutchans.size = 1
 
     def getstaticoutchans(self, *args):
@@ -108,12 +109,10 @@ class StaticOutChannel(Node):
     def callimpl(self):
         return self.chipamps
 
-class TrivialOutChannel(StaticOutChannel):
+@singleton
+class TrivialOutChannel:
 
     nontrivial = False
-
-    def __init__(self, n):
-        StaticOutChannel.__init__(self, [1] * n)
 
 class MidiOutChannel(Node):
 
