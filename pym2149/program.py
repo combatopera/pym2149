@@ -60,6 +60,7 @@ class Note:
     self.toneflag = chip.toneflags[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = Reg()
+    # No reverse link, we don't want to pollute the chip with references:
     chip.fixedlevels[chipchan].link(lambda unclamped: max(0, min(15, unclamped)), self.fixedlevel)
     self.levelmode = chip.levelmodes[chipchan]
     self.nomclock = nomclock
