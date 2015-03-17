@@ -17,6 +17,7 @@
 
 from __future__ import division
 from lfo import LFO
+from reg import Reg
 
 class FX:
 
@@ -58,7 +59,8 @@ class Note:
     self.toneperiod = chip.toneperiods[chipchan]
     self.toneflag = chip.toneflags[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
-    self.fixedlevel = chip.fixedlevels[chipchan]
+    self.fixedlevel = Reg()
+    chip.fixedlevels[chipchan].link(lambda unclamped: max(0, min(15, unclamped)), self.fixedlevel)
     self.levelmode = chip.levelmodes[chipchan]
     self.nomclock = nomclock
     self.chip = chip
@@ -71,9 +73,6 @@ class Note:
 
   def applyfreq(self, freq):
     self.toneperiod.value = freq.toneperiod(self.nomclock)
-
-  def setfixedlevel(self, unclamped):
-    self.fixedlevel.value = max(0, min(15, unclamped))
 
   def callnoteon(self, voladj):
     self.voladj = voladj
