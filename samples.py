@@ -37,13 +37,13 @@ log = logging.getLogger(__name__)
 class Silence(Note):
 
     def noteon(self):
-        self.setfixedlevel(13) # Neutral DC.
+        self.fixedlevel.value = 13 # Neutral DC.
 
 class BaseTone(Note):
 
     def noteon(self):
         self.toneflag.value = True
-        self.setfixedlevel(15)
+        self.fixedlevel.value = 15
         self.toneperiod.value = self.period
 
 class Tone(BaseTone):
@@ -56,7 +56,7 @@ class Noise(Note):
 
     def noteon(self):
         self.noiseflag.value = True
-        self.setfixedlevel(15)
+        self.fixedlevel.value = 15
         self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Note):
@@ -64,7 +64,7 @@ class Both(Note):
     def noteon(self):
         self.toneflag.value = True
         self.noiseflag.value = True
-        self.setfixedlevel(15)
+        self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
 
@@ -93,7 +93,7 @@ class PWM(Note):
     def noteon(self):
         self.toneflag.value = True
         self.chip.tsflags[self.chipchan].value = True
-        self.setfixedlevel(15)
+        self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
 
