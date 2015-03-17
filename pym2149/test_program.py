@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from program import DefaultNote, FX
+from program import DefaultNote, FX, Note
 from collections import namedtuple
+from reg import Reg
 import unittest
 
 class TestFX(unittest.TestCase):
@@ -51,6 +52,30 @@ class TestDefaultNote(unittest.TestCase):
 
     def test_fadeout(self):
         self.assertEqual(sum([[i, i] for i in xrange(-1, -16, -1)], []), DefaultNote.fadeout.render())
+
+class TestNote(unittest.TestCase):
+
+    def test_fixedlevel(self):
+        toneperiods = [None]
+        toneflags = [None]
+        noiseflags = [None]
+        fixedlevels = [Reg()]
+        levelmodes = [None]
+        chip = namedtuple('Chip', 'toneperiods toneflags noiseflags fixedlevels levelmodes')(toneperiods, toneflags, noiseflags, fixedlevels, levelmodes)
+        note = Note(None, chip, 0, None, None)
+        self.assertFalse(hasattr(fixedlevels[0], 'value'))
+        note.fixedlevel.value = 7
+        self.assertEqual(7, fixedlevels[0].value)
+        note.fixedlevel.value = 0
+        self.assertEqual(0, fixedlevels[0].value)
+        note.fixedlevel.value = -1
+        self.assertEqual(0, fixedlevels[0].value)
+        note.fixedlevel.value = 15
+        self.assertEqual(15, fixedlevels[0].value)
+        note.fixedlevel.value = 16
+        self.assertEqual(15, fixedlevels[0].value)
+        # The chip never gains a reference:
+        self.assertEqual([], fixedlevels[0].links)
 
 if __name__ == '__main__':
     unittest.main()
