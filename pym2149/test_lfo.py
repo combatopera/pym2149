@@ -23,28 +23,28 @@ from lfo import LFO
 class TestLFO(unittest.TestCase):
 
   def test_works(self):
-    self.assertEqual([5], LFO(5))
-    self.assertEqual([8], LFO(5).jump(8))
-    self.assertEqual([5, 8], LFO(5).lin(1, 8))
-    self.assertEqual([5, 6, 7, 8], LFO(5).lin(3, 8))
+    self.assertEqual([5], LFO(5).render())
+    self.assertEqual([8], LFO(5).jump(8).render())
+    self.assertEqual([5, 8], LFO(5).lin(1, 8).render())
+    self.assertEqual([5, 6, 7, 8], LFO(5).lin(3, 8).render())
     self.assertEqual([5, 7, 8], LFO(5).lin(2, 8).round().render())
     self.assertEqual([5, 6, 7, 7, 8], LFO(5).lin(4, 8).round().render())
     # Negative values:
-    self.assertEqual([-5, -8], LFO(-5).lin(1, -8))
-    self.assertEqual([-5, -6, -7, -8], LFO(-5).lin(3, -8))
+    self.assertEqual([-5, -8], LFO(-5).lin(1, -8).render())
+    self.assertEqual([-5, -6, -7, -8], LFO(-5).lin(3, -8).render())
     self.assertEqual([-5, -7, -8], LFO(-5).lin(2, -8).round().render())
     self.assertEqual([-5, -6, -7, -7, -8], LFO(-5).lin(4, -8).round().render())
     # Holds:
-    self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8))
-    self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8))
-    self.assertEqual([True, True, True, False], LFO(True).hold(3).jump(False))
+    self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8).render())
+    self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8).render())
+    self.assertEqual([True, True, True, False], LFO(True).hold(3).jump(False).render())
     # Triangular:
-    self.assertEqual([5, 7, 5, 3, 5], LFO(5).tri(4, 1, 7)) # Simplest possible.
-    self.assertEqual([5, 7, 5, 3, 5, 7, 5, 3, 5], LFO(5).tri(8, 1, 7))
-    self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], LFO(5).tri(8, 2, 7))
-    self.assertEqual([5] + [6, 7, 6, 5, 4, 3, 4, 5] * 2, LFO(5).tri(16, 2, 7))
-    self.assertEqual([5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5], LFO(5).tri(16, 4, 9))
-    self.assertEqual([5, 7, 9, 7, 5, 3, 1, 3, 5, 7, 9, 7, 5, 3, 1, 3, 5], LFO(5).tri(16, 2, 9))
+    self.assertEqual([5, 7, 5, 3, 5], LFO(5).tri(4, 1, 7).render()) # Simplest possible.
+    self.assertEqual([5, 7, 5, 3, 5, 7, 5, 3, 5], LFO(5).tri(8, 1, 7).render())
+    self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], LFO(5).tri(8, 2, 7).render())
+    self.assertEqual([5] + [6, 7, 6, 5, 4, 3, 4, 5] * 2, LFO(5).tri(16, 2, 7).render())
+    self.assertEqual([5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5], LFO(5).tri(16, 4, 9).render())
+    self.assertEqual([5, 7, 9, 7, 5, 3, 1, 3, 5, 7, 9, 7, 5, 3, 1, 3, 5], LFO(5).tri(16, 2, 9).render())
     # Infinite:
     lfo = LFO(5).hold(2).tri(8, 2, 7)
     self.assertEqual([5, 5, 5] + [6, 7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(8).render(83))

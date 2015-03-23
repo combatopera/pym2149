@@ -60,24 +60,24 @@ class Round(AbstractLFO):
   def __len__(self):
     return len(self.lfo)
 
-class LFO(list, AbstractLFO):
+class LFO(AbstractLFO):
 
   def __init__(self, initial):
-    list.__init__(self, [initial])
+    self.v = [initial]
 
   def lin(self, n, target):
-    source = self[-1]
+    source = self.v[-1]
     for i in xrange(1, n + 1):
-      self.append(source + (target - source) * i / n)
+      self.v.append(source + (target - source) * i / n)
     return self
 
   def jump(self, target):
-    self[-1] = target
+    self.v[-1] = target
     return self
 
   def hold(self, n):
     for _ in xrange(n):
-      self.append(self[-1])
+      self.v.append(self.v[-1])
     return self
 
   def tri(self, trin, linn, target):
@@ -86,12 +86,15 @@ class LFO(list, AbstractLFO):
     normn = trin // 4
     if 0 != normn % linn:
       raise Exception("Expected a factor of %s but got: %s" % (normn, linn))
-    source = self[-1]
+    source = self.v[-1]
     for _ in xrange(normn // linn):
       self.lin(linn, target)
       self.lin(linn * 2, source * 2 - target)
       self.lin(linn, source)
     return self
 
+  def __len__(self):
+    return len(self.v)
+
   def __call__(self, frame):
-    return self[min(frame, len(self) - 1)]
+    return self.v[min(frame, len(self) - 1)] # TODO: This is a loop of length 1.
