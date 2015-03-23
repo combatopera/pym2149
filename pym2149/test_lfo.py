@@ -38,6 +38,9 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8).render())
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8).render())
     self.assertEqual([True, True, True, False], LFO(True).hold(3).jump(False).render())
+    # Literal:
+    self.assertEqual([1, 2, 3, 4, 5], LFO(1).then(2, 3, 4, 5).render())
+    self.assertEqual([1, 2, 3, 4, 6], LFO(1).then(2, 3, 4, 5).jump(6).render())
     # Triangular:
     # TODO: Should support rational period.
     self.assertEqual([5, 7, 5, 3, 5], LFO(5).tri(4, 1, 7).render()) # Simplest possible.
