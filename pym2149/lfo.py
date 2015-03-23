@@ -20,51 +20,9 @@ from decimal import Decimal, ROUND_HALF_DOWN, ROUND_HALF_UP
 
 class AbstractLFO:
 
-  def loop(self, n):
-    return Loop(self, n)
-
-  def round(self):
-    return Round(self)
-
-  def render(self, n = None):
-    if n is None:
-      n = len(self)
-    return [self(i) for i in xrange(n)]
-
-class Loop(AbstractLFO):
-
-  def __init__(self, lfo, n):
-    self.loop = len(lfo) - n
-    self.lfo = lfo
-
-  def __call__(self, frame):
-    n = len(self.lfo)
-    if frame >= n:
-      frame = self.loop + ((frame - self.loop) % (n - self.loop))
-    return self.lfo.get(frame)
-
-class Round(AbstractLFO):
-
-  def __init__(self, lfo):
-    self.lfo = lfo
-
-  def get(self, frame):
-    current, next = self.lfo.get(frame), self.lfo.get(frame + 1)
-    if current < 0:
-      towards0 = (current < next) if (next < 0) else True
-    else:
-      towards0 = True if (next < 0) else (next < current)
-    rounding = ROUND_HALF_DOWN if towards0 else ROUND_HALF_UP
-    return int(Decimal(current).to_integral_value(rounding))
-
-  def __len__(self):
-    return len(self.lfo)
-
-class LFO(AbstractLFO):
-
   def __init__(self, initial):
     self.v = [initial]
-    self.out = Round(self)
+    self.looplen = 1
 
   def lin(self, n, target):
     source = self.v[-1]
@@ -94,17 +52,34 @@ class LFO(AbstractLFO):
       self.lin(linn, source)
     return self
 
-  def __len__(self):
-    return len(self.v)
+  def loop(self, n):
+    self.looplen = n
+    return self
 
   def get(self, frame):
-    return self.v[min(frame, len(self) - 1)] # TODO: This is a loop of length 1.
+    n = len(self.v)
+    if frame >= n:
+      start = n - self.looplen
+      frame = start + ((frame - start) % self.looplen)
+    return self.v[frame]
+
+  def render(self, n = None):
+    if n is None:
+      n = len(self.v)
+    return [self(i) for i in xrange(n)] # Observe via the xform.
+
+class LFO(AbstractLFO):
 
   def __call__(self, frame):
-    return self.out.get(frame)
+    current, next = self.get(frame), self.get(frame + 1)
+    if current < 0:
+      towards0 = (current < next) if (next < 0) else True
+    else:
+      towards0 = True if (next < 0) else (next < current)
+    rounding = ROUND_HALF_DOWN if towards0 else ROUND_HALF_UP
+    return int(Decimal(current).to_integral_value(rounding))
 
-class FloatLFO(LFO):
+class FloatLFO(AbstractLFO):
 
-  def __init__(self, *args):
-    LFO.__init__(self, *args)
-    self.out = self
+  def __call__(self, frame):
+    return self.get(frame)
