@@ -41,15 +41,15 @@ class Loop(AbstractLFO):
     n = len(self.lfo)
     if frame >= n:
       frame = self.loop + ((frame - self.loop) % (n - self.loop))
-    return self.lfo(frame)
+    return self.lfo.get(frame)
 
 class Round(AbstractLFO):
 
   def __init__(self, lfo):
     self.lfo = lfo
 
-  def __call__(self, frame):
-    current, next = self.lfo(frame), self.lfo(frame + 1)
+  def get(self, frame):
+    current, next = self.lfo.get(frame), self.lfo.get(frame + 1)
     if current < 0:
       towards0 = (current < next) if (next < 0) else True
     else:
@@ -64,6 +64,7 @@ class LFO(AbstractLFO):
 
   def __init__(self, initial):
     self.v = [initial]
+    self.out = Round(self)
 
   def lin(self, n, target):
     source = self.v[-1]
@@ -96,5 +97,14 @@ class LFO(AbstractLFO):
   def __len__(self):
     return len(self.v)
 
-  def __call__(self, frame):
+  def get(self, frame):
     return self.v[min(frame, len(self) - 1)] # TODO: This is a loop of length 1.
+
+  def __call__(self, frame):
+    return self.out.get(frame)
+
+class FloatLFO(LFO):
+
+  def __init__(self, *args):
+    LFO.__init__(self, *args)
+    self.out = self

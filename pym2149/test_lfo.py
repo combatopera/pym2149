@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lfo import LFO
+from lfo import LFO, FloatLFO
 
 class TestLFO(unittest.TestCase):
 
@@ -27,13 +27,13 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([8], LFO(5).jump(8).render())
     self.assertEqual([5, 8], LFO(5).lin(1, 8).render())
     self.assertEqual([5, 6, 7, 8], LFO(5).lin(3, 8).render())
-    self.assertEqual([5, 7, 8], LFO(5).lin(2, 8).round().render())
-    self.assertEqual([5, 6, 7, 7, 8], LFO(5).lin(4, 8).round().render())
+    self.assertEqual([5, 7, 8], LFO(5).lin(2, 8).render())
+    self.assertEqual([5, 6, 7, 7, 8], LFO(5).lin(4, 8).render())
     # Negative values:
     self.assertEqual([-5, -8], LFO(-5).lin(1, -8).render())
     self.assertEqual([-5, -6, -7, -8], LFO(-5).lin(3, -8).render())
-    self.assertEqual([-5, -7, -8], LFO(-5).lin(2, -8).round().render())
-    self.assertEqual([-5, -6, -7, -7, -8], LFO(-5).lin(4, -8).round().render())
+    self.assertEqual([-5, -7, -8], LFO(-5).lin(2, -8).render())
+    self.assertEqual([-5, -6, -7, -7, -8], LFO(-5).lin(4, -8).render())
     # Holds:
     self.assertEqual([5, 5, 5, 5, 6, 7, 8], LFO(5).hold(3).lin(3, 8).render())
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8).render())
@@ -51,12 +51,15 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 5, 5, 6, 7, 6, 5, 4, 3, 4, 5] + [7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(7).render(81))
 
   def test_bias(self):
-    self.assertEqual([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], LFO(1).lin(10, 6).round().render())
-    self.assertEqual([-1, -2, -2, -3, -3, -4, -4, -5, -5, -6, -6], LFO(-1).lin(10, -6).round().render())
-    self.assertEqual([6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1], LFO(6).lin(10, 1).round().render())
-    self.assertEqual([-6, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1], LFO(-6).lin(10, -1).round().render())
-    self.assertEqual([2, 1, 1, 0, 0, -1, -1, -2, -2], LFO(2).lin(8, -2).round().render())
-    self.assertEqual([-2, -1, -1, 0, 0, 1, 1, 2, 2], LFO(-2).lin(8, 2).round().render())
+    self.assertEqual([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], LFO(1).lin(10, 6).render())
+    self.assertEqual([-1, -2, -2, -3, -3, -4, -4, -5, -5, -6, -6], LFO(-1).lin(10, -6).render())
+    self.assertEqual([6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1], LFO(6).lin(10, 1).render())
+    self.assertEqual([-6, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1], LFO(-6).lin(10, -1).render())
+    self.assertEqual([2, 1, 1, 0, 0, -1, -1, -2, -2], LFO(2).lin(8, -2).render())
+    self.assertEqual([-2, -1, -1, 0, 0, 1, 1, 2, 2], LFO(-2).lin(8, 2).render())
+
+  def test_float(self):
+    self.assertEqual([5, 5.5, 6, 6.5], FloatLFO(5).lin(3, 6.5).render())
 
 if __name__ == '__main__':
   unittest.main()
