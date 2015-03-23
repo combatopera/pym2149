@@ -39,6 +39,7 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 5, 5, 8], LFO(5).hold(3).jump(8).render())
     self.assertEqual([True, True, True, False], LFO(True).hold(3).jump(False).render())
     # Triangular:
+    # TODO: Should support rational period.
     self.assertEqual([5, 7, 5, 3, 5], LFO(5).tri(4, 1, 7).render()) # Simplest possible.
     self.assertEqual([5, 7, 5, 3, 5, 7, 5, 3, 5], LFO(5).tri(8, 1, 7).render())
     self.assertEqual([5, 6, 7, 6, 5, 4, 3, 4, 5], LFO(5).tri(8, 2, 7).render())
@@ -49,6 +50,11 @@ class TestLFO(unittest.TestCase):
     lfo = LFO(5).hold(2).tri(8, 2, 7)
     self.assertEqual([5, 5, 5] + [6, 7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(8).render(83))
     self.assertEqual([5, 5, 5, 6, 7, 6, 5, 4, 3, 4, 5] + [7, 6, 5, 4, 3, 4, 5] * 10, lfo.loop(7).render(81))
+    # Calling loop again overrides existing loop:
+    lfo = LFO(5).lin(2, 7)
+    self.assertEqual([5, 6, 7], lfo.render())
+    self.assertEqual([5, 6, 7, 6, 7, 6, 7], lfo.loop(2).render(7))
+    self.assertEqual([5, 6, 7, 5, 6, 7, 5], lfo.loop(2).loop(3).render(7))
 
   def test_bias(self):
     self.assertEqual([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], LFO(1).lin(10, 6).render())
