@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from lfo import LFO
+from lfo import LFO, FloatLFO
 from reg import Reg
 
 class FX:
@@ -97,8 +97,8 @@ class NullNote(Note): pass
 
 class DefaultNote(Note):
 
-  vib = LFO(0).hold(10).tri(8, 2, .2).loop(8)
-  fadeout = LFO(-1).hold(1).lin(28, -15).round()
+  vib = FloatLFO(0).hold(10).tri(8, 2, .2).loop(8)
+  fadeout = LFO(-1).hold(1).lin(28, -15)
 
   def noteon(self):
     self.toneflag.value = True
