@@ -22,7 +22,7 @@ class AbstractLFO:
 
   def __init__(self, initial):
     self.v = [initial]
-    self.looplen = 1
+    self.looplenornone = 1
 
   def lin(self, n, target):
     source = self.v[-1]
@@ -56,15 +56,16 @@ class AbstractLFO:
       self.lin(linn, source)
     return self
 
-  def loop(self, n):
-    self.looplen = n
+  def loop(self, n = None):
+    self.looplenornone = n
     return self
 
   def get(self, frame):
     n = len(self.v)
     if frame >= n:
-      start = n - self.looplen
-      frame = start + ((frame - start) % self.looplen)
+      looplen = n if self.looplenornone is None else self.looplenornone
+      start = n - looplen
+      frame = start + ((frame - start) % looplen)
     return self.v[frame]
 
   def render(self, n = None):

@@ -58,6 +58,11 @@ class TestLFO(unittest.TestCase):
     self.assertEqual([5, 6, 7], lfo.render())
     self.assertEqual([5, 6, 7, 6, 7, 6, 7], lfo.loop(2).render(7))
     self.assertEqual([5, 6, 7, 5, 6, 7, 5], lfo.loop(2).loop(3).render(7))
+    # Loop all:
+    lfo = LFO(5).lin(2, 7).loop()
+    self.assertEqual([5, 6, 7, 5, 6, 7, 5], lfo.render(7))
+    lfo.then(8)
+    self.assertEqual([5, 6, 7, 8, 5, 6, 7, 8, 5], lfo.render(9))
 
   def test_bias(self):
     self.assertEqual([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6], LFO(1).lin(10, 6).render())
