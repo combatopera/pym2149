@@ -34,6 +34,10 @@ class AbstractLFO:
     self.v[-1] = target
     return self
 
+  def then(self, *vals):
+    self.v.extend(vals)
+    return self
+
   def hold(self, n):
     for _ in xrange(n):
       self.v.append(self.v[-1])
