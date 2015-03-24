@@ -21,6 +21,15 @@ import numpy as np, math
 
 class Level(BufNode):
 
+  def to5bit(level4bit):
+    return level4bit * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
+
+  pwmzero4bit = 0 # TODO: Make this a register.
+  pwmzero5bit = to5bit(pwmzero4bit)
+  lookup = np.fromiter([pwmzero5bit] + range(32), BufNode.zto255dtype)
+
+  to5bit = staticmethod(to5bit)
+
   def __init__(self, modereg, fixedreg, env, signal, rtone, rtoneflagreg):
     BufNode.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
     self.modereg = modereg
@@ -31,17 +40,26 @@ class Level(BufNode):
     self.rtoneflagreg = rtoneflagreg
 
   def callimpl(self):
-    if self.modereg.value:
-      self.blockbuf.copybuf(self.chain(self.env))
-    else:
-      # Convert to equivalent 5-bit level, observe 4-bit 0 is 5-bit 1:
-      self.blockbuf.fill(self.fixedreg.value * 2 + 1)
-    self.blockbuf.mulbuf(self.chain(self.signal))
     if self.rtoneflagreg.value:
-      # Use rtone to switch between normal level (either mode) and fixed 4-bit 0 level:
-      # FIXME: The other level should be 4-bit 0, or 1 here.
-      # TODO LATER: Add a register to make the fixed level configurable.
-      self.blockbuf.mulbuf(self.chain(self.rtone))
+      if self.modereg.value:
+        # TODO: Test this branch.
+        self.blockbuf.copybuf(self.chain(self.env)) # Values in [0, 31].
+        self.blockbuf.add(1) # Shift env values to [1, 32].
+        self.blockbuf.mulbuf(self.chain(self.signal)) # Introduce 0.
+        self.blockbuf.mulbuf(self.chain(self.rtone)) # Introduce more 0.
+        self.blockbuf.mapbuf(self.blockbuf, self.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+      else:
+        self.blockbuf.copybuf(self.chain(self.signal))
+        self.blockbuf.mulbuf(self.chain(self.rtone))
+        # Map 0 to pwmzero and 1 to fixed level:
+        self.blockbuf.mul(self.to5bit(self.fixedreg.value) - self.pwmzero5bit)
+        self.blockbuf.add(self.pwmzero5bit)
+    elif self.modereg.value:
+      self.blockbuf.copybuf(self.chain(self.signal))
+      self.blockbuf.mulbuf(self.chain(self.env))
+    else:
+      self.blockbuf.copybuf(self.chain(self.signal))
+      self.blockbuf.mul(self.to5bit(self.fixedreg.value))
 
 log2 = math.log(2)
 
