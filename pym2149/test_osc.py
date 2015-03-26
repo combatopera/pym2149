@@ -19,7 +19,7 @@
 
 from __future__ import division
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, TimerSynth
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc
 from nod import Block, BufNode
 from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
@@ -127,7 +127,7 @@ def cmptime(self, taken, strictlimit):
   sys.stderr.write("%s ... " % expression)
   self.assertTrue(eval(expression))
 
-class TestTimerSynth(TestToneOsc):
+class TestRToneOsc(TestToneOsc):
 
   performancelimit = .1
 
@@ -135,7 +135,7 @@ class TestTimerSynth(TestToneOsc):
   def createosc(scale, periodreg):
     clock = 2000000
     xform = lambda period: Fraction(clock, scale * 2 * period)
-    return TimerSynth(clock, DerivedReg(xform, periodreg))
+    return RToneOsc(clock, DerivedReg(xform, periodreg))
 
 def diffblock(d, n):
   v = Buf(np.empty(n, dtype = int))

@@ -141,7 +141,7 @@ class RationalDiff(BinDiff):
         self.progress = 0
       return self.integral
 
-class TimerSynth(BufNode):
+class RToneOsc(BufNode):
 
   def __init__(self, clock, freqreg):
     BufNode.__init__(self, self.binarydtype)

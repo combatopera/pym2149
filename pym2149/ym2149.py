@@ -17,7 +17,7 @@
 
 from __future__ import division
 from reg import Reg, VersionReg
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, TimerSynth
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RToneOsc
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
@@ -118,7 +118,7 @@ class YM2149(Registers, Container, Chip):
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
-    timersynths = [TimerSynth(self.clock, self.tsfreqs[c]) for c in xrange(channels)]
+    timersynths = [RToneOsc(self.clock, self.tsfreqs[c]) for c in xrange(channels)]
     # We don't add timersynths to maskables as it makes sense to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
