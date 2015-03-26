@@ -92,7 +92,7 @@ class PWM(Note):
 
     def noteon(self):
         self.toneflag.value = True
-        self.chip.tsflags[self.chipchan].value = True
+        self.rtoneflag.value = True
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)

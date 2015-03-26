@@ -214,7 +214,7 @@ class Frame56(PlainFrame):
     if denom:
       # Note freq is half of the step freq, so divide by 2:
       chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom * 2)
-      chip.tsflags[chan].value = True
+      chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):
 
@@ -232,7 +232,7 @@ class Frame6(Frame56):
 
   def __call__(self, chip):
     PlainFrame.__call__(self, chip)
-    for flag in chip.tsflags:
+    for flag in chip.rtoneflags:
       flag.value = False
     for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
       if self.data[r] & 0x30:

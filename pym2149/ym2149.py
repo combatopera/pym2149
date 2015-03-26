@@ -75,8 +75,8 @@ class Registers:
     self.tsfreqs = tuple(Reg() for _ in xrange(channels))
     for r in self.tsfreqs:
       r.value = Fraction(0)
-    self.tsflags = tuple(Reg() for _ in xrange(channels))
-    for r in self.tsflags:
+    self.rtoneflags = tuple(Reg() for _ in xrange(channels))
+    for r in self.rtoneflags:
       r.value = 0
 
 class ClockInfo:
@@ -122,7 +122,7 @@ class YM2149(Registers, Container, Chip):
     # We don't add rtones to maskables as it is probably authentic to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.tsflags[c]) for c in xrange(channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.rtoneflags[c]) for c in xrange(channels)]
     Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
@@ -137,4 +137,4 @@ class YM2149(Registers, Container, Chip):
     self.levelmodes[chan].value = 0 # Effectively the envelope flag.
     self.toneflags[chan].value = False
     self.noiseflags[chan].value = False
-    self.tsflags[chan].value = False
+    self.rtoneflags[chan].value = False
