@@ -72,8 +72,8 @@ class Registers:
     for r in self.R:
       r.value = 0
     # TODO: Rename to rtone and make configurable.
-    self.tsfreqs = tuple(Reg() for _ in xrange(channels))
-    for r in self.tsfreqs:
+    self.rtonefreqs = tuple(Reg() for _ in xrange(channels))
+    for r in self.rtonefreqs:
       r.value = Fraction(0)
     self.rtoneflags = tuple(Reg() for _ in xrange(channels))
     for r in self.rtoneflags:
@@ -118,7 +118,7 @@ class YM2149(Registers, Container, Chip):
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
-    rtones = [RToneOsc(self.clock, self.tsfreqs[c]) for c in xrange(channels)]
+    rtones = [RToneOsc(self.clock, self.rtonefreqs[c]) for c in xrange(channels)]
     # We don't add rtones to maskables as it is probably authentic to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]

@@ -213,7 +213,7 @@ class Frame56(PlainFrame):
   def timersynthdenom(self, chip, chan, denom):
     if denom:
       # Note freq is half of the step freq, so divide by 2:
-      chip.tsfreqs[chan].value = Fraction(self.mfpclock, denom * 2)
+      chip.rtonefreqs[chan].value = Fraction(self.mfpclock, denom * 2)
       chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):

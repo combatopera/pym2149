@@ -71,7 +71,7 @@ class Roll:
         else:
           vals.append(level)
         vals.append('')
-        vals.append(Freq(self.chip.tsfreqs[c].value).pitch())
+        vals.append(Freq(self.chip.rtonefreqs[c].value).pitch())
       elif env:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])

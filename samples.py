@@ -95,7 +95,7 @@ class PWM(Note):
         self.rtoneflag.value = True
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.chip.tsfreqs[self.chipchan].value = Fraction(self.tsfreq)
+        self.chip.rtonefreqs[self.chipchan].value = Fraction(self.rtfreq)
 
 class Frames(list): pass
 
@@ -196,8 +196,8 @@ def main():
     class T2k(Tone): freq = 2000
     class T3k(Tone): freq = 3000
     class T4k(Tone): freq = 4000
-    class PWM501(PWM): tfreq, tsfreq = 501, 501
-    class PWM250(PWM): tfreq, tsfreq = 250, 251 # Observe timer detune.
+    class PWM501(PWM): tfreq, rtfreq = 501, 501
+    class PWM250(PWM): tfreq, rtfreq = 250, 251 # Observe timer detune.
     tones = []
     for p in xrange(1, 9):
         class t(BaseTone): period = p
