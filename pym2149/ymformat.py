@@ -210,10 +210,10 @@ class Frame56(PlainFrame):
     self.index = ym.frameindex
     self.flags = ym
 
-  def timersynthdenom(self, chip, chan, denom):
-    if denom:
-      # Note freq is half of the step freq, so divide by 2:
-      chip.rtonefreqs[chan].value = Fraction(self.mfpclock, denom * 2)
+  def mfpinterruptperiod(self, chip, chan, mfpinterruptperiod):
+    if mfpinterruptperiod:
+      # Signal period is double the interrupt period, so mul by 2:
+      chip.rtonefreqs[chan].value = 1 / Fraction(2 * mfpinterruptperiod, self.mfpclock)
       chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):
@@ -222,8 +222,8 @@ class Frame5(Frame56):
     PlainFrame.__call__(self, chip)
     if self.data[0x1] & 0x30:
       chan = ((self.data[0x1] & 0x30) >> 4) - 1
-      denom = self.prescalers[(self.data[0x6] & 0xe0) >> 5] * self.data[0xE]
-      self.timersynthdenom(chip, chan, denom)
+      mfpinterruptperiod = self.prescalers[(self.data[0x6] & 0xe0) >> 5] * self.data[0xE]
+      self.mfpinterruptperiod(chip, chan, mfpinterruptperiod)
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
@@ -239,8 +239,8 @@ class Frame6(Frame56):
         chan = ((self.data[r] & 0x30) >> 4) - 1
         fx = self.data[r] & 0xc0
         if 0x00 == fx:
-          denom = self.prescalers[(self.data[rr] & 0xe0) >> 5] * self.data[rrr]
-          self.timersynthdenom(chip, chan, denom)
+          mfpinterruptperiod = self.prescalers[(self.data[rr] & 0xe0) >> 5] * self.data[rrr]
+          self.mfpinterruptperiod(chip, chan, mfpinterruptperiod)
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
