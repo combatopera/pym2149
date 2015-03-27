@@ -134,7 +134,7 @@ class TestRToneOsc(TestToneOsc):
   @staticmethod
   def createosc(scale, periodreg):
     clock = 2000000
-    xform = lambda period: Fraction(clock, scale * 2 * period)
+    xform = lambda period: Fraction(scale * 2 * period, clock)
     return RToneOsc(clock, DerivedReg(xform, periodreg))
 
 def diffblock(d, n):
@@ -145,8 +145,8 @@ def diffblock(d, n):
 class TestRationalDiff(unittest.TestCase):
 
   def test_works(self):
-    f = Reg(Fraction(15))
-    d = RationalDiff(RationalDiff.bindiffdtype, 100, f).reset(ToneOsc.diffs)
+    p = Reg(Fraction(1, 15))
+    d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
     expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
     for _ in xrange(13):
       self.assertEqual(expected, diffblock(d, 80))
@@ -159,16 +159,16 @@ class TestRationalDiff(unittest.TestCase):
     block(1)
     self.assertEqual(expected, actual)
 
-  def test_zerofreq(self):
-    f = Reg(Fraction(0))
-    d = RationalDiff(RationalDiff.bindiffdtype, 1000, f).reset(ToneOsc.diffs)
+  def test_zeroperiod(self):
+    p = Reg(Fraction(0))
+    d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(ToneOsc.diffs)
     for _ in xrange(50):
       self.assertEqual([1] * 100, diffblock(d, 100))
     self.assertEqual(5000, d.progress)
-    f.value = Fraction(50)
+    p.value = Fraction(1, 50)
     self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
     self.assertEqual(5, d.progress)
-    f.value = Fraction(0)
+    p.value = Fraction(0)
     self.assertEqual([0] * 25, diffblock(d, 25))
     self.assertEqual(30, d.progress)
 
