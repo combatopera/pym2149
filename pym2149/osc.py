@@ -101,9 +101,9 @@ def fracsub(f, g):
 
 class RationalDiff(BinDiff):
 
-  def __init__(self, dtype, clock, periodreg):
+  def __init__(self, dtype, chipimplclock, periodreg):
     BinDiff.__init__(self, dtype)
-    self.halfclock = Fraction(clock, 2)
+    self.chipimplclock = chipimplclock
     self.periodreg = periodreg
 
   def callimpl(self):
@@ -119,7 +119,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = self.halfclock * self.periodreg.value
+    stepsize = Fraction(self.periodreg.value * self.chipimplclock, 2)
     if 0 == self.progress:
       stepindex = 0
     else:
@@ -145,9 +145,9 @@ class RationalDiff(BinDiff):
 
 class RToneOsc(BufNode):
 
-  def __init__(self, clock, periodreg):
+  def __init__(self, chipimplclock, periodreg):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = RationalDiff(self.bindiffdtype, clock, periodreg).reset(ToneOsc.diffs)
+    self.diff = RationalDiff(self.bindiffdtype, chipimplclock, periodreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
