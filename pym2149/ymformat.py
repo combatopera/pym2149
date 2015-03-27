@@ -213,7 +213,7 @@ class Frame56(PlainFrame):
   def mfpinterruptperiod(self, chip, chan, mfpinterruptperiod):
     if mfpinterruptperiod:
       # Signal period is double the interrupt period, so mul by 2:
-      chip.rtonefreqs[chan].value = 1 / Fraction(2 * mfpinterruptperiod, self.mfpclock)
+      chip.rtoneperiods[chan].value = Fraction(2 * mfpinterruptperiod, self.mfpclock)
       chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):
