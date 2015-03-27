@@ -118,8 +118,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    # XXX: Why does this break when I simplify it?
-    stepsize = self.halfclock / (1 / self.periodreg.value)
+    stepsize = self.halfclock * self.periodreg.value
     if 0 == self.progress:
       stepindex = 0
     else:
