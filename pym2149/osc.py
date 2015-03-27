@@ -100,13 +100,14 @@ def fracsub(f, g):
 
 class RationalDiff(BinDiff):
 
-  def __init__(self, dtype, clock, freqreg):
+  def __init__(self, dtype, clock, periodreg):
     BinDiff.__init__(self, dtype)
     self.halfclock = Fraction(clock, 2)
-    self.freqreg = freqreg
+    self.periodreg = periodreg
 
   def callimpl(self):
-    if not self.freqreg.value:
+    if not self.periodreg.value:
+      # Halt interrupts. XXX: Is this authentic?
       if not self.progress:
         self.blockbuf.fill(0)
         dc = self.ringcursor.currentdc()
@@ -117,7 +118,8 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = self.halfclock / self.freqreg.value
+    # XXX: Why does this break when I simplify it?
+    stepsize = self.halfclock / (1 / self.periodreg.value)
     if 0 == self.progress:
       stepindex = 0
     else:
@@ -143,9 +145,9 @@ class RationalDiff(BinDiff):
 
 class RToneOsc(BufNode):
 
-  def __init__(self, clock, freqreg):
+  def __init__(self, clock, periodreg):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = RationalDiff(self.bindiffdtype, clock, freqreg).reset(ToneOsc.diffs)
+    self.diff = RationalDiff(self.bindiffdtype, clock, periodreg).reset(ToneOsc.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
