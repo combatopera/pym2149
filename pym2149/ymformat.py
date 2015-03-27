@@ -21,6 +21,7 @@ from ym2149 import stclock
 from fractions import Fraction
 from di import types
 from iface import YMFile, Config
+from osc import mfpclock
 
 log = logging.getLogger(__name__)
 
@@ -202,7 +203,6 @@ class YM56(YM):
 
 class Frame56(PlainFrame):
 
-  mfpclock = 2457600
   prescalers = (0, 4, 10, 16, 50, 64, 100, 200)
 
   def __init__(self, ym):
@@ -213,7 +213,7 @@ class Frame56(PlainFrame):
   def mfpinterruptperiod(self, chip, chan, mfpinterruptperiod):
     if mfpinterruptperiod:
       # Signal period is double the interrupt period, so mul by 2:
-      chip.rtoneperiods[chan].value = Fraction(2 * mfpinterruptperiod, self.mfpclock)
+      chip.rtoneperiods[chan].value = Fraction(2 * mfpinterruptperiod, mfpclock)
       chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):
