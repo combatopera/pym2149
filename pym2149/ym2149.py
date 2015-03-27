@@ -72,11 +72,8 @@ class Registers:
     for r in self.R:
       r.value = 0
     # TODO: Rename to rtone and make configurable.
-    self.rtonefreqs = tuple(Reg() for _ in xrange(channels))
     self.rtoneperiods = tuple(Reg() for _ in xrange(channels))
-    for c in xrange(channels):
-      self.rtoneperiods[c].link(lambda f: 1 / f, self.rtonefreqs[c])
-    for r in self.rtonefreqs:
+    for r in self.rtoneperiods:
       r.value = Fraction(0)
     self.rtoneflags = tuple(Reg() for _ in xrange(channels))
     for r in self.rtoneflags:
