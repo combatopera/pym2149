@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from pitch import Period, Freq
 from di import types
 from iface import Chip, Config
