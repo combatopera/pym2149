@@ -37,7 +37,8 @@ class TestPitch(unittest.TestCase):
 class TestFreq(unittest.TestCase):
 
     def test_rtoneperiod(self):
-        self.assertEqual(2460, Freq(1000).rtoneperiod())
+        self.assertEqual(2460, Freq(1000).rtoneperiod()) # Close.
+        self.assertEqual(24576, Freq(100).rtoneperiod()) # Exact.
 
 if '__main__' == __name__:
     unittest.main()
