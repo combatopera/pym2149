@@ -80,12 +80,12 @@ class MidiPump(Background):
             self.channels.closeframe()
 
 def main():
-  config = getprocessconfig()
-  di = createdi(config)
-  di.add(Midi)
-  di.add(JackClient)
-  di.start()
-  try:
+    config = getprocessconfig()
+    di = createdi(config)
+    di.add(Midi)
+    di.add(JackClient)
+    di.start()
+    try:
         configure(di)
         di.add(Channels)
         di.start()
@@ -96,8 +96,8 @@ def main():
         di.add(MidiPump)
         di.start()
         awaitinterrupt(config)
-  finally:
+    finally:
         di.stop()
 
 if '__main__' == __name__:
-  main()
+    main()

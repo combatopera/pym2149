@@ -29,19 +29,19 @@ from ymplayer import Player, ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig('inpath', 'outpath')
-  di = createdi(config)
-  di.add(YMOpen)
-  di.start()
-  try:
-    configure(di)
-    di.add(Roll)
-    di.add(ChipTimer)
-    di.add(Player)
+    config = getprocessconfig('inpath', 'outpath')
+    di = createdi(config)
+    di.add(YMOpen)
     di.start()
-    awaitinterrupt(config)
-  finally:
-    di.stop()
+    try:
+        configure(di)
+        di.add(Roll)
+        di.add(ChipTimer)
+        di.add(Player)
+        di.start()
+        awaitinterrupt(config)
+    finally:
+        di.stop()
 
 if '__main__' == __name__:
-  main()
+    main()

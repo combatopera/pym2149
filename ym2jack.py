@@ -30,21 +30,21 @@ from ymplayer import Player
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig('inpath')
-  di = createdi(config)
-  di.add(JackClient)
-  di.start()
-  try:
-      di.add(YMOpen)
-      di.start()
-      configure(di)
-      di.add(Roll)
-      di.add(SyncTimer)
-      di.add(Player)
-      di.start()
-      awaitinterrupt(config)
-  finally:
-      di.stop()
+    config = getprocessconfig('inpath')
+    di = createdi(config)
+    di.add(JackClient)
+    di.start()
+    try:
+        di.add(YMOpen)
+        di.start()
+        configure(di)
+        di.add(Roll)
+        di.add(SyncTimer)
+        di.add(Player)
+        di.start()
+        awaitinterrupt(config)
+    finally:
+        di.stop()
 
 if '__main__' == __name__:
-  main()
+    main()

@@ -29,24 +29,24 @@ from ymplayer import ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-  config = getprocessconfig('inpath', 'outpath')
-  f = open(config.inpath, 'rb')
-  try:
-    log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-    bytecode = [ord(c) for c in f.read()]
-  finally:
-    f.close()
-  di = createdi(config)
-  configure(di)
-  chip = di(Chip)
-  di.start()
-  try:
-    di.add(ChipTimer)
-    stream = di(Stream)
-    dosound(bytecode, chip, di(Timer), stream)
-    stream.flush()
-  finally:
-    di.stop()
+    config = getprocessconfig('inpath', 'outpath')
+    f = open(config.inpath, 'rb')
+    try:
+        log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
+        bytecode = [ord(c) for c in f.read()]
+    finally:
+        f.close()
+    di = createdi(config)
+    configure(di)
+    chip = di(Chip)
+    di.start()
+    try:
+        di.add(ChipTimer)
+        stream = di(Stream)
+        dosound(bytecode, chip, di(Timer), stream)
+        stream.flush()
+    finally:
+        di.stop()
 
 if '__main__' == __name__:
-  main()
+    main()
