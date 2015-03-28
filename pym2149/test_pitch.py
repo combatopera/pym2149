@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pitch import Pitch
+from pitch import Pitch, Freq
 
 class TestPitch(unittest.TestCase):
 
@@ -33,6 +33,11 @@ class TestPitch(unittest.TestCase):
         self.assertEqual('B.-1   ', str(Pitch(11)))
         self.assertEqual('B..9   ', str(Pitch(131)))
         self.assertEqual('C.10   ', str(Pitch(132)))
+
+class TestFreq(unittest.TestCase):
+
+    def test_rtoneperiod(self):
+        self.assertEqual(2460, Freq(1000).rtoneperiod())
 
 if '__main__' == __name__:
     unittest.main()
