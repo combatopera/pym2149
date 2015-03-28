@@ -17,6 +17,7 @@
 
 from __future__ import division
 from util import singleton
+from fractions import Fraction
 import math
 
 class Pitch(float):
