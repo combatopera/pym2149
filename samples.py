@@ -20,7 +20,6 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from fractions import Fraction
 from pym2149.config import getprocessconfig
 from pym2149.di import types
 from pym2149.timer import Timer, SimpleTimer
