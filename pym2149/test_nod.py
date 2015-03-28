@@ -44,5 +44,5 @@ class TestNode(unittest.TestCase):
         for _ in xrange(2):
             self.assertEqual(12, n.call(b1))
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

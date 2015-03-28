@@ -31,5 +31,5 @@ class TestReg(unittest.TestCase):
         # We did a whole cycle to decide it never stops:
         self.assertEqual(128, d.totalticks)
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

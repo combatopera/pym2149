@@ -66,5 +66,5 @@ class TestWavWriter(unittest.TestCase):
     def test_minperiodperformancebigblocks(self):
         self.minperiodperformance(True, .1) # Wow!
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

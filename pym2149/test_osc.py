@@ -339,5 +339,5 @@ class TestEnvOsc(unittest.TestCase):
                 self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
             self.assertEqual([0] * (8 * 3 * 34), o.call(Block(8 * 3 * 34)).tolist())
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

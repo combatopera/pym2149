@@ -79,5 +79,5 @@ class TestNote(unittest.TestCase):
         # The chip never gains a reference:
         self.assertEqual([], fixedlevels[0].links)
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

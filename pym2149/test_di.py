@@ -204,5 +204,5 @@ class TestDI(unittest.TestCase):
         di.stop()
         self.assertEqual(['OK.start', 'BadStop.start', "%s.%s" % (self.BadStop.__module__, self.BadStop.__name__), 'OK.stop'], events)
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

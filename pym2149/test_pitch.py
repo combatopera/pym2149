@@ -34,5 +34,5 @@ class TestPitch(unittest.TestCase):
         self.assertEqual('B..9   ', str(Pitch(131)))
         self.assertEqual('C.10   ', str(Pitch(132)))
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

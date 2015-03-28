@@ -31,5 +31,5 @@ class TestLfsr(unittest.TestCase):
         actual = tuple(Lfsr(ym2149nzdegrees))
         self.assertTrue(''.join(map(str, expected)) in ''.join(map(str, actual)))
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

@@ -46,5 +46,5 @@ class TestClockInfo(unittest.TestCase):
             # But not half of this one:
             self.assertEqual(0, toneperiodclampor0(nomclock, 250000))
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()
