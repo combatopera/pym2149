@@ -26,45 +26,45 @@ from collections import namedtuple
 
 class MinPeriodTone(Node):
 
-  size = 250000 # One second at adjusted rate.
+    size = 250000 # One second at adjusted rate.
 
-  def __init__(self):
-    Node.__init__(self)
-    toneamp = .5 * 2 ** 15 # Half of full scale.
-    self.buf = np.empty(self.size)
-    self.buf[::2] = toneamp
-    self.buf[1::2] = -toneamp
+    def __init__(self):
+        Node.__init__(self)
+        toneamp = .5 * 2 ** 15 # Half of full scale.
+        self.buf = np.empty(self.size)
+        self.buf[::2] = toneamp
+        self.buf[1::2] = -toneamp
 
-  def callimpl(self):
-    return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
+    def callimpl(self):
+        return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
 
 class TestWavWriter(unittest.TestCase):
 
-  def minperiodperformance(self, bigblocks, strictlimit):
-    clock = 250000
-    blocksize = clock // (1000, 10)[bigblocks]
-    tone = MinPeriodTone()
-    outrate = 44100
-    w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
-    config = namedtuple('Config', 'outputrate outpath')(outrate, '/dev/null')
-    w = WavWriter(config, w, namedtuple('StereoInfo', 'getoutchans')(namedtuple('getoutchansimpl', 'size')(1)))
-    w.start()
-    tone.cursor = 0
-    start = time.time()
-    while tone.cursor < tone.size:
-      block = Block(blocksize)
-      w.call(block)
-      tone.cursor += block.framecount
-    w.stop()
-    expression = "%.3f < %s" % (time.time() - start, strictlimit)
-    sys.stderr.write("%s ... " % expression)
-    self.assertTrue(eval(expression))
+    def minperiodperformance(self, bigblocks, strictlimit):
+        clock = 250000
+        blocksize = clock // (1000, 10)[bigblocks]
+        tone = MinPeriodTone()
+        outrate = 44100
+        w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
+        config = namedtuple('Config', 'outputrate outpath')(outrate, '/dev/null')
+        w = WavWriter(config, w, namedtuple('StereoInfo', 'getoutchans')(namedtuple('getoutchansimpl', 'size')(1)))
+        w.start()
+        tone.cursor = 0
+        start = time.time()
+        while tone.cursor < tone.size:
+            block = Block(blocksize)
+            w.call(block)
+            tone.cursor += block.framecount
+        w.stop()
+        expression = "%.3f < %s" % (time.time() - start, strictlimit)
+        sys.stderr.write("%s ... " % expression)
+        self.assertTrue(eval(expression))
 
-  def test_minperiodperformancesmallblocks(self):
-    self.minperiodperformance(False, 1)
+    def test_minperiodperformancesmallblocks(self):
+        self.minperiodperformance(False, 1)
 
-  def test_minperiodperformancebigblocks(self):
-    self.minperiodperformance(True, .1) # Wow!
+    def test_minperiodperformancebigblocks(self):
+        self.minperiodperformance(True, .1) # Wow!
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()
