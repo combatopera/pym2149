@@ -36,5 +36,5 @@ class TestDac(unittest.TestCase):
         d = Dac(Ramps(), 16, 1)
         self.assertEqual([d.leveltopeaktopeak[v] for v in xrange(32)], d.call(Block(32)).tolist())
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

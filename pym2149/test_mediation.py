@@ -117,5 +117,5 @@ class TestMediation(unittest.TestCase):
         # Note-off for interrupted note is now spurious:
         self.assertIs(None, m.releasechipchan(4, 61))
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

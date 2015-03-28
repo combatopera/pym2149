@@ -143,5 +143,5 @@ def integrateringthrice(r, last):
         index = r.loopstart
     return v
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

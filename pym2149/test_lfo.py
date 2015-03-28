@@ -75,5 +75,5 @@ class TestLFO(unittest.TestCase):
     def test_float(self):
         self.assertEqual([5, 5.5, 6, 6.5], FloatLFO(5).lin(3, 6.5).render())
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

@@ -67,5 +67,5 @@ class TestReg(unittest.TestCase):
         self.assertEqual(0xad, reg.value)
         self.assertEqual(0xcd, value.value)
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()

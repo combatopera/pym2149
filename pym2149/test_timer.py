@@ -87,5 +87,5 @@ class TestMinBlockRateTimer(unittest.TestCase):
         self.assertEqual([333, 333, 333, 1], [b.framecount for b in t.blocksforperiod(1)])
         self.assertEqual(0, t.carryticks)
 
-if __name__ == '__main__':
+if '__main__' == __name__:
     unittest.main()
