@@ -107,8 +107,7 @@ class RationalDiff(BinDiff):
     self.periodreg = periodreg
 
   def callimpl(self):
-    if not self.periodreg.value:
-      # Halt interrupts. XXX: Is this authentic?
+    if not self.periodreg.value: # Timer should stop, according to the spec.
       if not self.progress:
         self.blockbuf.fill(0)
         dc = self.ringcursor.currentdc()
