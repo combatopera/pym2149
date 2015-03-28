@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 from reg import Reg, VersionReg
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RToneOsc
 from dac import Level, Dac
