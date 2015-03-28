@@ -75,6 +75,9 @@ class Freq(float):
   def envperiod(self, clock, shape):
     return self.periodimpl(clock, shapescale(shape))
 
+  def rtoneperiod(self):
+    return Fraction(1, self) # FIXME: Find the nearest authentic value.
+
   def pitch(self):
     return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
 
