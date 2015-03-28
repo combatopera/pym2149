@@ -17,7 +17,7 @@
 
 from __future__ import division
 from util import singleton
-from fractions import Fraction
+from osc import mfpclock
 import math
 
 class Pitch(float):
@@ -77,7 +77,7 @@ class Freq(float):
     return self.periodimpl(clock, shapescale(shape))
 
   def rtoneperiod(self):
-    return Fraction(1, int(round(self))) # FIXME: Find the nearest authentic value.
+    return int(round(mfpclock / self)) # FIXME: Find the nearest authentic value.
 
   def pitch(self):
     return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))

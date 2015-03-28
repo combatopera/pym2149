@@ -20,7 +20,6 @@ from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RToneOsc
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
-from fractions import Fraction
 from iface import AmpScale, Chip, YMFile, Config
 from di import types
 import logging
@@ -73,7 +72,7 @@ class Registers:
     # TODO: Rename to rtone and make configurable.
     self.rtoneperiods = tuple(Reg() for _ in xrange(channels))
     for r in self.rtoneperiods:
-      r.value = Fraction(0)
+      r.value = 0
     self.rtoneflags = tuple(Reg() for _ in xrange(channels))
     for r in self.rtoneflags:
       r.value = 0

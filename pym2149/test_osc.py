@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc, mfpclock
 from nod import Block, BufNode
 from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
@@ -133,7 +133,7 @@ class TestRToneOsc(TestToneOsc):
     @staticmethod
     def createosc(scale, periodreg):
         clock = 2000000
-        xform = lambda period: Fraction(scale * 2 * period, clock)
+        xform = lambda period: Fraction(scale * 2 * period * mfpclock, clock)
         return RToneOsc(clock, DerivedReg(xform, periodreg))
 
 def diffblock(d, n):
@@ -144,7 +144,7 @@ def diffblock(d, n):
 class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
-        p = Reg(Fraction(1, 15))
+        p = Reg(Fraction(mfpclock, 15))
         d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -164,7 +164,7 @@ class TestRationalDiff(unittest.TestCase):
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000, d.progress)
-        p.value = Fraction(1, 50)
+        p.value = Fraction(mfpclock, 50)
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
         self.assertEqual(5, d.progress)
         p.value = Fraction(0)
