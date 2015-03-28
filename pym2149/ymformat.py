@@ -17,10 +17,8 @@
 
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
-from fractions import Fraction
 from di import types
 from iface import YMFile, Config
-from osc import mfpclock
 
 log = logging.getLogger(__name__)
 
@@ -212,7 +210,7 @@ class Frame56(PlainFrame):
   def mfpinterruptperiod(self, chip, chan, mfpinterruptperiod):
     if mfpinterruptperiod:
       # Signal period is double the interrupt period, so mul by 2:
-      chip.rtoneperiods[chan].value = Fraction(2 * mfpinterruptperiod, mfpclock)
+      chip.rtoneperiods[chan].value = 2 * mfpinterruptperiod
       chip.rtoneflags[chan].value = True
 
 class Frame5(Frame56):

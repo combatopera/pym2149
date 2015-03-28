@@ -19,6 +19,7 @@ from __future__ import division
 from pitch import Period, Freq
 from di import types
 from iface import Chip, Config
+from osc import mfpclock
 import sys
 
 class Roll:
@@ -72,7 +73,7 @@ class Roll:
         else:
           vals.append(level)
         vals.append('')
-        vals.append(Freq(1 / self.chip.rtoneperiods[c].value).pitch())
+        vals.append(Freq(mfpclock / self.chip.rtoneperiods[c].value).pitch())
       elif env:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])

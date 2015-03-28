@@ -107,7 +107,8 @@ class RationalDiff(BinDiff):
     self.periodreg = periodreg
 
   def callimpl(self):
-    if not self.periodreg.value: # Timer should stop, according to the spec.
+    period = self.periodreg.value
+    if not period: # Timer should stop, according to the spec.
       if not self.progress:
         self.blockbuf.fill(0)
         dc = self.ringcursor.currentdc()
@@ -118,7 +119,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = Fraction(self.periodreg.value * self.chipimplclock, 2)
+    stepsize = Fraction(period * self.chipimplclock, 2 * mfpclock)
     if 0 == self.progress:
       stepindex = 0
     else:
