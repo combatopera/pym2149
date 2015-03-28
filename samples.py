@@ -195,8 +195,8 @@ def main():
     class T2k(Tone): freq = 2000
     class T3k(Tone): freq = 3000
     class T4k(Tone): freq = 4000
-    class PWM501(PWM): tfreq, rtfreq = 501, 501
-    class PWM250(PWM): tfreq, rtfreq = 250, 251 # Observe timer detune.
+    class PWM500(PWM): tfreq, rtfreq = 500, 500
+    class PWM250(PWM): tfreq, rtfreq = 250, 250
     tones = []
     for p in xrange(1, 9):
         class t(BaseTone): period = p
@@ -214,7 +214,7 @@ def main():
     target.dump(2, [Tri650, 0, 0], 'tri650')
     target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
     target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
-    target.dump(2, [PWM501, 0, 0], 'pwm501')
+    target.dump(2, [PWM500, 0, 0], 'pwm500')
     target.dump(2, [PWM250, 0, 0], 'pwm250')
     target.dump(8, tones, 'tone1-8')
 
