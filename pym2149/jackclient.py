@@ -62,7 +62,7 @@ class JackStream(object, Node, Stream):
       clientchannelindex = i % len(self.wavs)
       jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.buffersize = jack.get_buffer_size()
-    self.jack = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
+    self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.buffersize), dtype = BufNode.floatdtype)
 
   def callimpl(self):
@@ -72,12 +72,12 @@ class JackStream(object, Node, Stream):
     while i < n:
       m = min(n - i, self.buffersize - self.bufferx)
       for c in xrange(len(self.wavs)):
-        outbufs[c].partcopyintonp(i, i + m, self.jack[c, self.bufferx:self.bufferx + m])
+        outbufs[c].partcopyintonp(i, i + m, self.data[c, self.bufferx:self.bufferx + m])
       self.bufferx += m
       i += m
       if self.bufferx == self.buffersize:
         try:
-          jack.process(self.jack, self.empty)
+          jack.process(self.data, self.empty)
         except (jack.InputSyncError, jack.OutputSyncError):
           log.warn('JACK error:', exc_info = True)
         self.bufferx = 0
