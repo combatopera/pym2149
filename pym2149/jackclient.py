@@ -40,6 +40,9 @@ class JackClient(JackConnection):
   def activate(self):
     jack.activate()
 
+  def deactivate(self):
+    jack.deactivate()
+
   def stop(self):
     jack.detach()
 
@@ -92,7 +95,7 @@ class JackStream(object, Node, Stream):
     pass # Nothing to be done.
 
   def stop(self):
-    jack.deactivate()
+    self.client.deactivate()
 
 def configure(di):
     di.add(JackStream)
