@@ -27,6 +27,9 @@ log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
+  PortIsInput = jack.IsInput
+  PortIsOutput = jack.IsOutput
+
   @types()
   def __init__(self): pass
 
@@ -60,9 +63,9 @@ class JackStream(object, Node, Stream):
   @types(FloatStream, JackClient)
   def __init__(self, wavs, client):
     Node.__init__(self)
-    client.port_register('in_1', jack.IsInput) # Apparently necessary.
+    client.port_register('in_1', client.PortIsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
-      client.port_register("out_%s" % (1 + i), jack.IsOutput)
+      client.port_register("out_%s" % (1 + i), client.PortIsOutput)
     self.bufferx = 0
     self.wavs = wavs
     self.client = client
