@@ -19,7 +19,7 @@ from nod import Node, BufNode
 from const import clientname
 from iface import AmpScale
 from out import FloatStream
-from iface import Stream, JackConnection, Config
+from iface import Stream, JackConnection
 from di import types
 import jack, numpy as np, logging
 
@@ -27,9 +27,8 @@ log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
-  @types(Config)
-  def __init__(self, config):
-    self.config = config
+  @types()
+  def __init__(self): pass
 
   def start(self):
     jack.attach(clientname)
