@@ -37,6 +37,9 @@ class JackClient(JackConnection):
   def get_buffer_size(self):
     return jack.get_buffer_size()
 
+  def port_register(self, port_name, flags):
+    jack.register_port(port_name, flags)
+
   def activate(self):
     jack.activate()
 
@@ -57,9 +60,9 @@ class JackStream(object, Node, Stream):
   @types(FloatStream, JackClient)
   def __init__(self, wavs, client):
     Node.__init__(self)
-    jack.register_port('in_1', jack.IsInput) # Apparently necessary.
+    client.port_register('in_1', jack.IsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
-      jack.register_port("out_%s" % (1 + i), jack.IsOutput)
+      client.port_register("out_%s" % (1 + i), jack.IsOutput)
     self.bufferx = 0
     self.wavs = wavs
     self.client = client
