@@ -55,12 +55,12 @@ class JackStream(object, Node, Stream):
     self.wavs = wavs
 
   def start(self):
+    self.buffersize = jack.get_buffer_size()
     jack.activate()
     # Connect all system channels, cycling over our streams if necessary:
     for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(self.wavs)
       jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
-    self.buffersize = jack.get_buffer_size()
     self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.buffersize), dtype = BufNode.floatdtype)
 
