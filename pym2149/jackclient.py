@@ -46,6 +46,9 @@ class JackClient(JackConnection):
   def activate(self):
     jack.activate()
 
+  def connect(self, source_port, destination_port):
+    jack.connect(source_port, destination_port)
+
   def deactivate(self):
     jack.deactivate()
 
@@ -76,7 +79,7 @@ class JackStream(object, Node, Stream):
     # Connect all system channels, cycling over our streams if necessary:
     for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(self.wavs)
-      jack.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
+      self.client.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
     self.empty = np.empty((1, self.buffersize), dtype = BufNode.floatdtype)
 
