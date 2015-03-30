@@ -34,6 +34,12 @@ class JackClient(JackConnection):
     jack.attach(clientname)
     self.outputrate = jack.get_sample_rate()
 
+  def get_buffer_size(self):
+    return jack.get_buffer_size()
+
+  def activate(self):
+    jack.activate()
+
   def stop(self):
     jack.detach()
 
@@ -45,18 +51,19 @@ class JackStream(object, Node, Stream):
   # XXX: Can we detect how many system channels there are?
   systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
 
-  @types(FloatStream)
-  def __init__(self, wavs):
+  @types(FloatStream, JackClient)
+  def __init__(self, wavs, client):
     Node.__init__(self)
     jack.register_port('in_1', jack.IsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
       jack.register_port("out_%s" % (1 + i), jack.IsOutput)
     self.bufferx = 0
     self.wavs = wavs
+    self.client = client
 
   def start(self):
-    self.buffersize = jack.get_buffer_size()
-    jack.activate()
+    self.buffersize = self.client.get_buffer_size()
+    self.client.activate()
     # Connect all system channels, cycling over our streams if necessary:
     for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(self.wavs)
