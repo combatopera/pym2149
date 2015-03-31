@@ -38,6 +38,8 @@ cdef extern from "jack/jack.h":
     cdef enum JackPortFlags:
         JackPortIsOutput = 0x2
 
+    ctypedef int (*JackProcessCallback)(jack_nframes_t, void*)
+
     jack_client_t* jack_client_open(const char*, jack_options_t, jack_status_t*, ...)
     jack_nframes_t jack_get_sample_rate(jack_client_t*)
     jack_port_t* jack_port_register(jack_client_t*, const char*, const char*, unsigned long, unsigned long)
@@ -46,17 +48,27 @@ cdef extern from "jack/jack.h":
     int jack_connect(jack_client_t*, const char*, const char*)
     int jack_deactivate(jack_client_t*)
     int jack_client_close(jack_client_t*)
+    int jack_set_process_callback(jack_client_t*, JackProcessCallback, void*)
+
+cdef int callback(jack_nframes_t nframes, void* arg):
+    cdef Payload* payload = <Payload*> arg
+    return 0 # Success.
+
+cdef struct Payload:
+
+    jack_port_t* ports[10]
+    int ports_length
 
 cdef class Client:
 
     cdef jack_status_t status
     cdef jack_client_t* client
-    cdef jack_port_t* ports[10]
-    cdef int ports_length
+    cdef Payload payload
 
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
-        self.ports_length = 0
+        self.payload.ports_length = 0
+        jack_set_process_callback(self.client, &callback, &(self.payload))
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -66,8 +78,8 @@ cdef class Client:
 
     def port_register_output(self, const char* port_name):
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
-        self.ports[self.ports_length] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.ports_length += 1
+        self.payload.ports[self.payload.ports_length] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
+        self.payload.ports_length += 1
 
     def activate(self):
         return jack_activate(self.client)
