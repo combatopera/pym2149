@@ -17,5 +17,6 @@
 
 import pyximport, numpy as np
 
+# FIXME LATER: Only link against jack when necessary.
 # Note -O3 is apparently the default:
-pyximport.install(setup_args = {'include_dirs': np.get_include()}, inplace = True)
+pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': [('jack', {})]}, inplace = True)
