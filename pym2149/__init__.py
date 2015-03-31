@@ -15,8 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyximport, numpy as np
+import pyximport, numpy as np, subprocess, re
 
-# FIXME LATER: Only link against jack when necessary.
+def libraries():
+    installed = set(re.search(r'[^\s]+', line).group() for line in subprocess.check_output(['/sbin/ldconfig', '-p']).splitlines() if line.startswith('\t'))
+    for name in 'jack',:
+        if "lib%s.so" % name in installed:
+            yield name, {}
+
 # Note -O3 is apparently the default:
-pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': [('jack', {})]}, inplace = True)
+pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': list(libraries())}, inplace = True)
