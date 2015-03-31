@@ -51,9 +51,12 @@ cdef class Client:
 
     cdef jack_status_t status
     cdef jack_client_t* client
+    cdef jack_port_t* ports[10]
+    cdef int ports_length
 
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
+        self.ports_length = 0
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -63,7 +66,8 @@ cdef class Client:
 
     def port_register_output(self, const char* port_name):
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
-        jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
+        self.ports[self.ports_length] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
+        self.ports_length += 1
 
     def activate(self):
         return jack_activate(self.client)
