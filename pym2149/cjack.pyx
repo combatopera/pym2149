@@ -18,6 +18,7 @@
 cimport numpy as np
 from libc.stdio cimport printf
 from libc.stdlib cimport malloc
+from libc.string cimport memcpy
 
 cdef extern from "pthread.h":
 
@@ -126,7 +127,10 @@ cdef class Client:
         pthread_mutex_lock(&(self.payload.mutex))
         while self.payload.full:
             pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
-        # TODO: Copy data.
+        cdef jack_default_audio_sample_t* p
+        for i in xrange(self.payload.ports_length):
+            p = &output_buffer[i, 0]
+            memcpy(p, self.payload.blocks[i], len(output_buffer[i]) * sizeof(jack_default_audio_sample_t))
         self.payload.full = True
         pthread_mutex_unlock(&(self.payload.mutex))
 
