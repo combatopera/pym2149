@@ -31,6 +31,7 @@ cdef extern from "pthread.h":
     int pthread_mutex_unlock(pthread_mutex_t*)
     int pthread_cond_init(pthread_cond_t*, void*)
     int pthread_cond_signal(pthread_cond_t*)
+    int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*)
 
 cdef extern from "jack/jack.h":
 
@@ -117,7 +118,12 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
-        pass # TODO: Implement me!
+        pthread_mutex_lock(&(self.payload.mutex))
+        while self.payload.full:
+            pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
+        # TODO: Copy data.
+        self.payload.full = True
+        pthread_mutex_unlock(&(self.payload.mutex))
 
     def deactivate(self):
         jack_deactivate(self.client)
