@@ -21,45 +21,39 @@ from iface import AmpScale
 from out import FloatStream
 from iface import Stream, JackConnection
 from di import types
-import jack, numpy as np, logging
+import cjack, numpy as np, logging
 
 log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
-  PortIsInput = jack.IsInput
-  PortIsOutput = jack.IsOutput
-
   @types()
   def __init__(self): pass
 
   def start(self):
-    jack.attach(clientname)
-    self.outputrate = jack.get_sample_rate()
+    self.jack = cjack.Client(clientname)
+    self.outputrate = self.jack.get_sample_rate()
 
   def get_buffer_size(self):
-    return jack.get_buffer_size()
+    return self.jack.get_buffer_size()
 
-  def port_register(self, port_name, flags):
-    jack.register_port(port_name, flags)
+  def port_register_output(self, port_name):
+    self.jack.port_register_output(port_name)
 
   def activate(self):
-    jack.activate()
+    self.jack.activate()
 
-  def connect(self, source_port, destination_port):
-    jack.connect(source_port, destination_port)
+  def connect(self, source_port_name, destination_port_name):
+    self.jack.connect(source_port_name, destination_port_name)
 
-  def send(self, output_buffer, input_buffer):
-    try:
-      jack.process(output_buffer, input_buffer)
-    except (jack.InputSyncError, jack.OutputSyncError):
-      log.warn('JACK error:', exc_info = True)
+  def send(self, output_buffer):
+    self.jack.send(output_buffer)
 
   def deactivate(self):
-    jack.deactivate()
+    self.jack.deactivate()
 
   def stop(self):
-    jack.detach()
+    self.jack.dispose()
 
 class JackStream(object, Node, Stream):
 
@@ -72,9 +66,8 @@ class JackStream(object, Node, Stream):
   @types(FloatStream, JackClient)
   def __init__(self, wavs, client):
     Node.__init__(self)
-    client.port_register('in_1', client.PortIsInput) # Apparently necessary.
     for i in xrange(len(wavs)):
-      client.port_register("out_%s" % (1 + i), client.PortIsOutput)
+      client.port_register_output("out_%s" % (1 + i))
     self.bufferx = 0
     self.wavs = wavs
     self.client = client
@@ -87,7 +80,6 @@ class JackStream(object, Node, Stream):
       clientchannelindex = i % len(self.wavs)
       self.client.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
-    self.empty = np.empty((1, self.buffersize), dtype = BufNode.floatdtype)
 
   def callimpl(self):
     outbufs = [self.chain(wav) for wav in self.wavs]
@@ -100,7 +92,7 @@ class JackStream(object, Node, Stream):
       self.bufferx += m
       i += m
       if self.bufferx == self.buffersize:
-        self.client.send(self.data, self.empty)
+        self.client.send(self.data)
         self.bufferx = 0
 
   def flush(self):
