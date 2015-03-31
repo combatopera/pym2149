@@ -49,6 +49,12 @@ class JackClient(JackConnection):
   def connect(self, source_port, destination_port):
     jack.connect(source_port, destination_port)
 
+  def send(self, output_buffer, input_buffer):
+    try:
+      jack.process(output_buffer, input_buffer)
+    except (jack.InputSyncError, jack.OutputSyncError):
+      log.warn('JACK error:', exc_info = True)
+
   def deactivate(self):
     jack.deactivate()
 
@@ -94,10 +100,7 @@ class JackStream(object, Node, Stream):
       self.bufferx += m
       i += m
       if self.bufferx == self.buffersize:
-        try:
-          jack.process(self.data, self.empty)
-        except (jack.InputSyncError, jack.OutputSyncError):
-          log.warn('JACK error:', exc_info = True)
+        self.client.send(self.data, self.empty)
         self.bufferx = 0
 
   def flush(self):
