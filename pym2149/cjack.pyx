@@ -16,6 +16,21 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport numpy as np
+from libc.stdio cimport printf
+
+cdef extern from "pthread.h":
+
+    ctypedef struct pthread_mutex_t:
+        pass
+
+    ctypedef struct pthread_cond_t:
+        pass
+
+    int pthread_mutex_init(pthread_mutex_t*, void*)
+    int pthread_mutex_lock(pthread_mutex_t*)
+    int pthread_mutex_unlock(pthread_mutex_t*)
+    int pthread_cond_init(pthread_cond_t*, void*)
+    int pthread_cond_signal(pthread_cond_t*)
 
 cdef extern from "jack/jack.h":
 
@@ -52,12 +67,23 @@ cdef extern from "jack/jack.h":
 
 cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload* payload = <Payload*> arg
+    pthread_mutex_lock(&(payload.mutex))
+    if payload.full:
+        # TODO: Send data to jack.
+        payload.full = False
+        pthread_cond_signal(&(payload.cond))
+    else:
+        printf('Underrun!\n') # TODO: On stderr.
+    pthread_mutex_unlock(&(payload.mutex))
     return 0 # Success.
 
 cdef struct Payload:
 
     jack_port_t* ports[10]
     int ports_length
+    pthread_mutex_t mutex
+    pthread_cond_t cond
+    int full
 
 cdef class Client:
 
@@ -68,6 +94,9 @@ cdef class Client:
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
         self.payload.ports_length = 0
+        pthread_mutex_init(&(self.payload.mutex), NULL)
+        pthread_cond_init(&(self.payload.cond), NULL)
+        self.payload.full = False
         jack_set_process_callback(self.client, &callback, &(self.payload))
 
     def get_sample_rate(self):
