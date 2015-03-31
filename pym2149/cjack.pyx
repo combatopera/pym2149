@@ -69,12 +69,14 @@ cdef extern from "jack/jack.h":
     int jack_deactivate(jack_client_t*)
     int jack_client_close(jack_client_t*)
     int jack_set_process_callback(jack_client_t*, JackProcessCallback, void*)
+    void* jack_port_get_buffer(jack_port_t*, jack_nframes_t)
 
 cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload* payload = <Payload*> arg
     pthread_mutex_lock(&(payload.mutex))
     if payload.full:
-        # TODO: Send data to jack.
+        for i in xrange(payload.ports_length):
+            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], nframes * sizeof(jack_default_audio_sample_t))
         payload.full = False
         pthread_cond_signal(&(payload.cond))
     else:
@@ -130,7 +132,7 @@ cdef class Client:
         cdef jack_default_audio_sample_t* p
         for i in xrange(self.payload.ports_length):
             p = &output_buffer[i, 0]
-            memcpy(p, self.payload.blocks[i], len(output_buffer[i]) * sizeof(jack_default_audio_sample_t))
+            memcpy(self.payload.blocks[i], p, len(output_buffer[i]) * sizeof(jack_default_audio_sample_t))
         self.payload.full = True
         pthread_mutex_unlock(&(self.payload.mutex))
 
