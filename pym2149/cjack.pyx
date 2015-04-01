@@ -51,7 +51,7 @@ cdef extern from "jack/jack.h":
     ctypedef struct jack_port_t:
         pass # Opaque.
 
-    const char* JACK_DEFAULT_AUDIO_TYPE = '32 bit float mono audio'
+    DEF JACK_DEFAULT_AUDIO_TYPE = '32 bit float mono audio'
 
     cdef enum JackPortFlags:
         JackPortIsOutput = 0x2
@@ -71,27 +71,33 @@ cdef extern from "jack/jack.h":
     int jack_set_process_callback(jack_client_t*, JackProcessCallback, void*)
     void* jack_port_get_buffer(jack_port_t*, jack_nframes_t)
 
+cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
+DEF maxports = 10
+
 cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload* payload = <Payload*> arg
-    pthread_mutex_lock(&(payload.mutex))
+    cdef size_t bytecount
+    pthread_mutex_lock(&(payload.mutex)) # Worst case is a tiny delay while we wait for send to finish.
     if payload.full:
+        bytecount = nframes * samplesize
         for i in xrange(payload.ports_length):
-            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], nframes * sizeof(jack_default_audio_sample_t))
+            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], bytecount)
         payload.full = False
         pthread_cond_signal(&(payload.cond))
     else:
+        # Unknown when send will run, so give up:
         printf('Underrun!\n') # TODO: On stderr.
     pthread_mutex_unlock(&(payload.mutex))
     return 0 # Success.
 
 cdef struct Payload:
 
-    jack_port_t* ports[10]
+    jack_port_t* ports[maxports]
     int ports_length
     pthread_mutex_t mutex
     pthread_cond_t cond
     int full
-    jack_default_audio_sample_t* blocks[10]
+    jack_default_audio_sample_t* blocks[maxports]
 
 cdef class Client:
 
@@ -116,9 +122,12 @@ cdef class Client:
         return jack_get_buffer_size(self.client)
 
     def port_register_output(self, const char* port_name):
+        i = self.payload.ports_length
+        if i == maxports:
+            raise Exception('Please increase maxports.')
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
-        self.payload.ports[self.payload.ports_length] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.payload.blocks[self.payload.ports_length] = <jack_default_audio_sample_t*> malloc(self.get_buffer_size() * sizeof(jack_default_audio_sample_t))
+        self.payload.ports[i] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
+        self.payload.blocks[i] = <jack_default_audio_sample_t*> malloc(self.get_buffer_size() * samplesize)
         self.payload.ports_length += 1
 
     def activate(self):
