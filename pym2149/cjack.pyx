@@ -76,12 +76,10 @@ DEF maxports = 10
 
 cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload* payload = <Payload*> arg
-    cdef size_t bytecount
     pthread_mutex_lock(&(payload.mutex)) # Worst case is a tiny delay while we wait for send to finish.
     if payload.occupied:
-        bytecount = nframes * samplesize
         for i in xrange(payload.ports_length):
-            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], bytecount)
+            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], payload.bufferbytes)
         payload.occupied = False
         pthread_cond_signal(&(payload.cond))
     else:
@@ -98,12 +96,14 @@ cdef struct Payload:
     pthread_cond_t cond
     bint occupied
     jack_default_audio_sample_t* blocks[maxports]
+    size_t bufferbytes
 
 cdef class Client:
 
     cdef jack_status_t status
     cdef jack_client_t* client
     cdef Payload payload
+    cdef size_t buffersize
 
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
@@ -113,13 +113,15 @@ cdef class Client:
         pthread_mutex_init(&(self.payload.mutex), NULL)
         pthread_cond_init(&(self.payload.cond), NULL)
         self.payload.occupied = False
+        self.buffersize = jack_get_buffer_size(self.client)
+        self.payload.bufferbytes = self.buffersize * samplesize
         jack_set_process_callback(self.client, &callback, &(self.payload))
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
 
     def get_buffer_size(self):
-        return jack_get_buffer_size(self.client)
+        return self.buffersize
 
     def port_register_output(self, const char* port_name):
         i = self.payload.ports_length
@@ -127,7 +129,7 @@ cdef class Client:
             raise Exception('Please increase maxports.')
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
         self.payload.ports[i] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.payload.blocks[i] = <jack_default_audio_sample_t*> malloc(self.get_buffer_size() * samplesize)
+        self.payload.blocks[i] = <jack_default_audio_sample_t*> malloc(self.payload.bufferbytes)
         self.payload.ports_length += 1
 
     def activate(self):
@@ -142,7 +144,7 @@ cdef class Client:
             pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
         # XXX: Can we avoid these copies?
         for i in xrange(self.payload.ports_length):
-            memcpy(self.payload.blocks[i], &output_buffer[i, 0], len(output_buffer[i]) * samplesize)
+            memcpy(self.payload.blocks[i], &output_buffer[i, 0], self.payload.bufferbytes)
         self.payload.occupied = True
         pthread_mutex_unlock(&(self.payload.mutex))
 
