@@ -101,6 +101,8 @@ cdef class Client:
 
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
+        if NULL == self.client:
+            raise Exception('Failed to create a JACK client.')
         self.payload.ports_length = 0
         pthread_mutex_init(&(self.payload.mutex), NULL)
         pthread_cond_init(&(self.payload.cond), NULL)
