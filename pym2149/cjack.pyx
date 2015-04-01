@@ -53,7 +53,7 @@ cdef extern from "jack/jack.h":
 
     DEF JACK_DEFAULT_AUDIO_TYPE = '32 bit float mono audio'
 
-    cdef enum JackPortFlags:
+    cdef enum JackPortFlags: # XXX: How is this different from ctypedef?
         JackPortIsOutput = 0x2
 
     ctypedef int (*JackProcessCallback)(jack_nframes_t, void*)
@@ -78,11 +78,11 @@ cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload* payload = <Payload*> arg
     cdef size_t bytecount
     pthread_mutex_lock(&(payload.mutex)) # Worst case is a tiny delay while we wait for send to finish.
-    if payload.full:
+    if payload.occupied:
         bytecount = nframes * samplesize
         for i in xrange(payload.ports_length):
             memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], bytecount)
-        payload.full = False
+        payload.occupied = False
         pthread_cond_signal(&(payload.cond))
     else:
         # Unknown when send will run, so give up:
@@ -96,7 +96,7 @@ cdef struct Payload:
     int ports_length
     pthread_mutex_t mutex
     pthread_cond_t cond
-    int full
+    int occupied
     jack_default_audio_sample_t* blocks[maxports]
 
 cdef class Client:
@@ -112,7 +112,7 @@ cdef class Client:
         self.payload.ports_length = 0
         pthread_mutex_init(&(self.payload.mutex), NULL)
         pthread_cond_init(&(self.payload.cond), NULL)
-        self.payload.full = False
+        self.payload.occupied = False
         jack_set_process_callback(self.client, &callback, &(self.payload))
 
     def get_sample_rate(self):
@@ -138,13 +138,13 @@ cdef class Client:
 
     def send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
         pthread_mutex_lock(&(self.payload.mutex))
-        while self.payload.full:
+        while self.payload.occupied:
             pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
         cdef jack_default_audio_sample_t* p
         for i in xrange(self.payload.ports_length):
             p = &output_buffer[i, 0]
             memcpy(self.payload.blocks[i], p, len(output_buffer[i]) * sizeof(jack_default_audio_sample_t))
-        self.payload.full = True
+        self.payload.occupied = True
         pthread_mutex_unlock(&(self.payload.mutex))
 
     def deactivate(self):
