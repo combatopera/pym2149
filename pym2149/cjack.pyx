@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport numpy as np
-from libc.stdio cimport printf
+from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
 from libc.string cimport memcpy
 
@@ -84,7 +84,7 @@ cdef int callback(jack_nframes_t nframes, void* arg):
         pthread_cond_signal(&(payload.cond))
     else:
         # Unknown when send will run, so give up:
-        printf('Underrun!\n') # TODO: On stderr.
+        fprintf(stderr, 'Underrun!\n')
     pthread_mutex_unlock(&(payload.mutex))
     return 0 # Success.
 
