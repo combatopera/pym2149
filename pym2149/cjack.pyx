@@ -96,7 +96,7 @@ cdef struct Payload:
     int ports_length
     pthread_mutex_t mutex
     pthread_cond_t cond
-    int occupied
+    bint occupied
     jack_default_audio_sample_t* blocks[maxports]
 
 cdef class Client:
