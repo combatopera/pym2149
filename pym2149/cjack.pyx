@@ -141,9 +141,10 @@ cdef class Client:
         while self.payload.occupied:
             pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
         cdef jack_default_audio_sample_t* p
+        # XXX: Can we avoid these copies?
         for i in xrange(self.payload.ports_length):
             p = &output_buffer[i, 0]
-            memcpy(self.payload.blocks[i], p, len(output_buffer[i]) * sizeof(jack_default_audio_sample_t))
+            memcpy(self.payload.blocks[i], p, len(output_buffer[i]) * samplesize)
         self.payload.occupied = True
         pthread_mutex_unlock(&(self.payload.mutex))
 
