@@ -20,6 +20,7 @@ import numpy as pynp
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
 from libc.string cimport memcpy
+from cpython.ref cimport PyObject
 
 cdef extern from "pthread.h":
 
@@ -76,7 +77,7 @@ cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
 DEF maxports = 10
 
 cdef int callback(jack_nframes_t nframes, void* arg):
-    cdef Payload* payload = <Payload*> arg
+    cdef Payload payload = <Payload> arg
     pthread_mutex_lock(&(payload.mutex)) # Worst case is a tiny delay while we wait for send to finish.
     if payload.occupied:
         for i in xrange(payload.ports_length):
@@ -89,15 +90,15 @@ cdef int callback(jack_nframes_t nframes, void* arg):
     pthread_mutex_unlock(&(payload.mutex))
     return 0 # Success.
 
-cdef struct Payload:
+cdef class Payload:
 
-    jack_port_t* ports[maxports]
-    int ports_length
-    pthread_mutex_t mutex
-    pthread_cond_t cond
-    bint occupied
-    jack_default_audio_sample_t* blocks[maxports]
-    size_t bufferbytes
+    cdef jack_port_t* ports[maxports]
+    cdef int ports_length
+    cdef pthread_mutex_t mutex
+    cdef pthread_cond_t cond
+    cdef bint occupied
+    cdef jack_default_audio_sample_t* blocks[maxports]
+    cdef size_t bufferbytes
 
 cdef class Client:
 
@@ -116,7 +117,8 @@ cdef class Client:
         self.payload.occupied = False
         self.buffersize = jack_get_buffer_size(self.client)
         self.payload.bufferbytes = self.buffersize * samplesize
-        jack_set_process_callback(self.client, &callback, &(self.payload))
+        # Note the pointer will become invalid when Client is garbage-collected:
+        jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
