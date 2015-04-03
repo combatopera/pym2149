@@ -41,7 +41,7 @@ class SyncTimer(SimpleTimer):
     def __init__(self, stream, minbleps, clockinfo):
         self.naiverate = clockinfo.implclock
         SimpleTimer.__init__(self, self.naiverate)
-        self.buffersize = stream.buffersize
+        self.buffersize = stream.getbuffersize()
         self.naivex = 0
         self.bufferx = 0
         self.minbleps = minbleps

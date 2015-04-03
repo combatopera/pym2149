@@ -33,9 +33,7 @@ class JackClient(JackConnection):
   def start(self):
     self.jack = cjack.Client(clientname)
     self.outputrate = self.jack.get_sample_rate()
-
-  def get_buffer_size(self):
-    return self.jack.get_buffer_size()
+    self.buffersize = self.jack.get_buffer_size()
 
   def port_register_output(self, port_name):
     self.jack.port_register_output(port_name)
@@ -72,26 +70,28 @@ class JackStream(object, Node, Stream):
     self.client = client
 
   def start(self):
-    self.buffersize = self.client.get_buffer_size()
     self.client.activate()
     # Connect all system channels, cycling over our streams if necessary:
     for i, systemchannel in enumerate(self.systemchannels):
       clientchannelindex = i % len(self.wavs)
       self.client.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
-    self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
+    self.data = np.empty((len(self.wavs), self.client.buffersize), dtype = BufNode.floatdtype)
     self.cursor = 0
+
+  def getbuffersize(self):
+    return self.client.buffersize
 
   def callimpl(self):
     outbufs = [self.chain(wav) for wav in self.wavs]
     n = len(outbufs[0])
     i = 0
     while i < n:
-      m = min(n - i, self.buffersize - self.cursor)
+      m = min(n - i, self.client.buffersize - self.cursor)
       for chan in xrange(len(self.wavs)):
         outbufs[chan].partcopyintonp(i, i + m, self.data[chan, self.cursor:self.cursor + m])
       self.cursor += m
       i += m
-      if self.cursor == self.buffersize:
+      if self.cursor == self.client.buffersize:
         self.client.send(self.data)
         self.cursor = 0
 
