@@ -100,24 +100,27 @@ cdef class Payload:
     cdef jack_default_audio_sample_t* blocks[maxports]
     cdef size_t bufferbytes
 
+    def __init__(self, buffersize):
+        self.ports_length = 0
+        pthread_mutex_init(&(self.mutex), NULL)
+        pthread_cond_init(&(self.cond), NULL)
+        self.occupied = False
+        self.bufferbytes = buffersize * samplesize
+
 cdef class Client:
 
     cdef jack_status_t status
     cdef jack_client_t* client
-    cdef Payload payload
+    cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
 
     def __init__(self, const char* client_name):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
-        self.payload.ports_length = 0
-        pthread_mutex_init(&(self.payload.mutex), NULL)
-        pthread_cond_init(&(self.payload.cond), NULL)
-        self.payload.occupied = False
         self.buffersize = jack_get_buffer_size(self.client)
-        self.payload.bufferbytes = self.buffersize * samplesize
-        # Note the pointer will become invalid when Client is garbage-collected:
+        self.payload = Payload(self.buffersize)
+        # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
 
     def get_sample_rate(self):
