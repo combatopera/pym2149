@@ -76,20 +76,6 @@ cdef extern from "jack/jack.h":
 cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
 DEF maxports = 10
 
-cdef int callback(jack_nframes_t nframes, void* arg):
-    cdef Payload payload = <Payload> arg
-    pthread_mutex_lock(&(payload.mutex)) # Worst case is a tiny delay while we wait for send to finish.
-    if payload.occupied:
-        for i in xrange(payload.ports_length):
-            memcpy(jack_port_get_buffer(payload.ports[i], nframes), payload.blocks[i], payload.bufferbytes)
-        payload.occupied = False
-        pthread_cond_signal(&(payload.cond))
-    else:
-        # Unknown when send will run, so give up:
-        fprintf(stderr, 'Underrun!\n')
-    pthread_mutex_unlock(&(payload.mutex))
-    return 0 # Success.
-
 cdef class Payload:
 
     cdef jack_port_t* ports[maxports]
@@ -125,6 +111,23 @@ cdef class Payload:
             memcpy(self.blocks[i], &output_buffer[i, 0], self.bufferbytes)
         self.occupied = True
         pthread_mutex_unlock(&(self.mutex))
+
+    cdef callback(self, jack_nframes_t nframes):
+        pthread_mutex_lock(&(self.mutex)) # Worst case is a tiny delay while we wait for send to finish.
+        if self.occupied:
+            for i in xrange(self.ports_length):
+                memcpy(jack_port_get_buffer(self.ports[i], nframes), self.blocks[i], self.bufferbytes)
+            self.occupied = False
+            pthread_cond_signal(&(self.cond))
+        else:
+            # Unknown when send will run, so give up:
+            fprintf(stderr, 'Underrun!\n')
+        pthread_mutex_unlock(&(self.mutex))
+
+cdef int callback(jack_nframes_t nframes, void* arg):
+    cdef Payload payload = <Payload> arg
+    payload.callback(nframes)
+    return 0 # Success.
 
 cdef class Client:
 
