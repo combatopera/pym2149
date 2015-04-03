@@ -44,6 +44,9 @@ class JackClient(JackConnection):
   def connect(self, source_port_name, destination_port_name):
     self.jack.connect(source_port_name, destination_port_name)
 
+  def get_or_create_output_buffer(self, chancount):
+    return np.empty((chancount, self.buffersize), dtype = np.float32)
+
   def send(self, output_buffer):
     self.jack.send(output_buffer)
 
@@ -59,23 +62,24 @@ class JackStream(object, Node, Stream):
   # For jack the available amplitude range is 2 ** 1:
   log2maxpeaktopeak = 1
   # XXX: Can we detect how many system channels there are?
-  systemchannels = tuple("system:playback_%s" % (1 + i) for i in xrange(2))
+  syschannames = tuple("system:playback_%s" % (1 + syschanindex) for syschanindex in xrange(2))
 
   @types(FloatStream, JackClient)
   def __init__(self, wavs, client):
     Node.__init__(self)
-    for i in xrange(len(wavs)):
-      client.port_register_output("out_%s" % (1 + i))
+    self.chancount = len(wavs)
+    for chanindex in xrange(self.chancount):
+      client.port_register_output("out_%s" % (1 + chanindex))
     self.wavs = wavs
     self.client = client
 
   def start(self):
     self.client.activate()
     # Connect all system channels, cycling over our streams if necessary:
-    for i, systemchannel in enumerate(self.systemchannels):
-      clientchannelindex = i % len(self.wavs)
-      self.client.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
-    self.data = np.empty((len(self.wavs), self.client.buffersize), dtype = BufNode.floatdtype)
+    for syschanindex, syschanname in enumerate(self.syschannames):
+      chanindex = syschanindex % self.chancount
+      self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), syschanname)
+    self.outbuf = self.client.get_or_create_output_buffer(self.chancount)
     self.cursor = 0
 
   def getbuffersize(self):
@@ -87,12 +91,12 @@ class JackStream(object, Node, Stream):
     i = 0
     while i < n:
       m = min(n - i, self.client.buffersize - self.cursor)
-      for chan in xrange(len(self.wavs)):
-        outbufs[chan].partcopyintonp(i, i + m, self.data[chan, self.cursor:self.cursor + m])
+      for chanindex in xrange(self.chancount):
+        outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
       self.cursor += m
       i += m
       if self.cursor == self.client.buffersize:
-        self.client.send(self.data)
+        self.client.send(self.outbuf)
         self.cursor = 0
 
   def flush(self):
