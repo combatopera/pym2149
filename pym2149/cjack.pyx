@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport numpy as np
+import numpy as pynp
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
 from libc.string cimport memcpy
@@ -137,6 +138,9 @@ cdef class Client:
 
     def connect(self, const char* source_port_name, const char* destination_port_name):
         return jack_connect(self.client, source_port_name, destination_port_name)
+
+    def get_or_create_output_buffer(self, chancount):
+        return pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
 
     def send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
         pthread_mutex_lock(&(self.payload.mutex))

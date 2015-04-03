@@ -45,7 +45,7 @@ class JackClient(JackConnection):
     self.jack.connect(source_port_name, destination_port_name)
 
   def get_or_create_output_buffer(self, chancount):
-    return np.empty((chancount, self.buffersize), dtype = np.float32)
+    return self.jack.get_or_create_output_buffer(chancount)
 
   def send(self, output_buffer):
     self.jack.send(output_buffer)
