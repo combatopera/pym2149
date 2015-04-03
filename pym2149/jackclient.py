@@ -68,7 +68,6 @@ class JackStream(object, Node, Stream):
     Node.__init__(self)
     for i in xrange(len(wavs)):
       client.port_register_output("out_%s" % (1 + i))
-    self.bufferx = 0
     self.wavs = wavs
     self.client = client
 
@@ -80,20 +79,21 @@ class JackStream(object, Node, Stream):
       clientchannelindex = i % len(self.wavs)
       self.client.connect("%s:out_%s" % (clientname, 1 + clientchannelindex), systemchannel)
     self.data = np.empty((len(self.wavs), self.buffersize), dtype = BufNode.floatdtype)
+    self.cursor = 0
 
   def callimpl(self):
     outbufs = [self.chain(wav) for wav in self.wavs]
     n = len(outbufs[0])
     i = 0
     while i < n:
-      m = min(n - i, self.buffersize - self.bufferx)
-      for c in xrange(len(self.wavs)):
-        outbufs[c].partcopyintonp(i, i + m, self.data[c, self.bufferx:self.bufferx + m])
-      self.bufferx += m
+      m = min(n - i, self.buffersize - self.cursor)
+      for chan in xrange(len(self.wavs)):
+        outbufs[chan].partcopyintonp(i, i + m, self.data[chan, self.cursor:self.cursor + m])
+      self.cursor += m
       i += m
-      if self.bufferx == self.buffersize:
+      if self.cursor == self.buffersize:
         self.client.send(self.data)
-        self.bufferx = 0
+        self.cursor = 0
 
   def flush(self):
     pass # Nothing to be done.
