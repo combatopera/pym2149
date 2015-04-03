@@ -116,6 +116,16 @@ cdef class Payload:
         self.blocks[i] = <jack_default_audio_sample_t*> malloc(self.bufferbytes)
         self.ports_length += 1
 
+    cdef send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
+        pthread_mutex_lock(&(self.mutex))
+        while self.occupied:
+            pthread_cond_wait(&(self.cond), &(self.mutex))
+        # XXX: Can we avoid these copies?
+        for i in xrange(self.ports_length):
+            memcpy(self.blocks[i], &output_buffer[i, 0], self.bufferbytes)
+        self.occupied = True
+        pthread_mutex_unlock(&(self.mutex))
+
 cdef class Client:
 
     cdef jack_status_t status
@@ -151,14 +161,7 @@ cdef class Client:
         return pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
 
     def send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
-        pthread_mutex_lock(&(self.payload.mutex))
-        while self.payload.occupied:
-            pthread_cond_wait(&(self.payload.cond), &(self.payload.mutex))
-        # XXX: Can we avoid these copies?
-        for i in xrange(self.payload.ports_length):
-            memcpy(self.payload.blocks[i], &output_buffer[i, 0], self.payload.bufferbytes)
-        self.payload.occupied = True
-        pthread_mutex_unlock(&(self.payload.mutex))
+        self.payload.send(output_buffer)
 
     def deactivate(self):
         jack_deactivate(self.client)
