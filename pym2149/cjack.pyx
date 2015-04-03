@@ -107,6 +107,15 @@ cdef class Payload:
         self.occupied = False
         self.bufferbytes = buffersize * samplesize
 
+    cdef addportandblock(self, jack_client_t* client, port_name):
+        i = self.ports_length
+        if i == maxports:
+            raise Exception('Please increase maxports.')
+        # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
+        self.ports[i] = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
+        self.blocks[i] = <jack_default_audio_sample_t*> malloc(self.bufferbytes)
+        self.ports_length += 1
+
 cdef class Client:
 
     cdef jack_status_t status
@@ -130,13 +139,7 @@ cdef class Client:
         return self.buffersize
 
     def port_register_output(self, const char* port_name):
-        i = self.payload.ports_length
-        if i == maxports:
-            raise Exception('Please increase maxports.')
-        # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
-        self.payload.ports[i] = jack_port_register(self.client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.payload.blocks[i] = <jack_default_audio_sample_t*> malloc(self.payload.bufferbytes)
-        self.payload.ports_length += 1
+        self.payload.addportandblock(self.client, port_name)
 
     def activate(self):
         return jack_activate(self.client)
