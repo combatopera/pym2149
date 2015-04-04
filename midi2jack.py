@@ -91,7 +91,7 @@ def main():
         di.start()
         log.info(di(Channels))
         stream = di(Stream)
-        log.debug("JACK block size: %s or %.3f seconds", stream.buffersize, stream.buffersize / config.outputrate)
+        log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
         di.add(MidiPump)
         di.start()
