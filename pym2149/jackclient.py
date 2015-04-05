@@ -45,11 +45,11 @@ class JackClient(JackConnection):
   def connect(self, source_port_name, destination_port_name):
     self.jack.connect(source_port_name, destination_port_name)
 
-  def get_or_create_output_buffer(self, chancount):
-    return self.jack.get_or_create_output_buffer(chancount)
+  def current_output_buffer(self):
+    return self.jack.current_output_buffer()
 
-  def send(self, output_buffer):
-    self.jack.send(output_buffer)
+  def send(self):
+    self.jack.send()
 
   def deactivate(self):
     self.jack.deactivate()
@@ -80,7 +80,7 @@ class JackStream(object, Node, Stream):
     for syschanindex, syschanname in enumerate(self.syschannames):
       chanindex = syschanindex % self.chancount
       self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), syschanname)
-    self.outbuf = self.client.get_or_create_output_buffer(self.chancount)
+    self.outbuf = self.client.current_output_buffer()
     self.cursor = 0
 
   def getbuffersize(self):
@@ -97,7 +97,7 @@ class JackStream(object, Node, Stream):
       self.cursor += m
       i += m
       if self.cursor == self.client.buffersize:
-        self.client.send(self.outbuf)
+        self.client.send()
         self.cursor = 0
 
   def flush(self):

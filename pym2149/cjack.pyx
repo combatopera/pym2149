@@ -135,6 +135,7 @@ cdef class Client:
     cdef jack_client_t* client
     cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
+    cdef object outbuf
 
     def __init__(self, const char* client_name, chancount):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
@@ -144,6 +145,7 @@ cdef class Client:
         self.payload = Payload(self.buffersize)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
+        self.outbuf = pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -160,11 +162,11 @@ cdef class Client:
     def connect(self, const char* source_port_name, const char* destination_port_name):
         return jack_connect(self.client, source_port_name, destination_port_name)
 
-    def get_or_create_output_buffer(self, chancount):
-        return pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
+    def current_output_buffer(self):
+        return self.outbuf
 
-    def send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
-        self.payload.send(output_buffer)
+    def send(self):
+        self.payload.send(self.outbuf)
 
     def deactivate(self):
         jack_deactivate(self.client)
