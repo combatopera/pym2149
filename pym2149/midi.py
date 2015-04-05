@@ -102,9 +102,11 @@ class Midi:
     self.programbase = config.midiprogrambase
     alsaseq.client(clientname, 1, 0, False)
 
-  def iterevents(self):
+  def getevents(self):
+    events = []
     while alsaseq.inputpending():
-      type, _, _, _, _, _, _, data = alsaseq.input()
-      cls = self.classes.get(type)
+      event = alsaseq.input()
+      cls = self.classes.get(event[0])
       if cls is not None:
-        yield cls(self, data)
+        events.append(cls(self, event[7]))
+    return events

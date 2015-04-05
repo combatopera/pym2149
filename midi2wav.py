@@ -88,7 +88,7 @@ class MidiPump(Background):
         while not self.quit:
             # Simulate blocking behaviour of a real output device, but we do it here for best MIDI timing:
             streamready.await()
-            events = list(self.midi.iterevents())
+            events = self.midi.getevents()
             speeddetector(bool(events))
             for event in events:
                 log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
