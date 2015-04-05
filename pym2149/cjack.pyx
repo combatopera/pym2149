@@ -136,7 +136,7 @@ cdef class Client:
     cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
 
-    def __init__(self, const char* client_name):
+    def __init__(self, const char* client_name, chancount):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
