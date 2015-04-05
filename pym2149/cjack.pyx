@@ -82,16 +82,17 @@ cdef class Payload:
     cdef int ports_length
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
-    cdef bint occupied
-    cdef jack_default_audio_sample_t* blocks[maxports]
+    cdef jack_default_audio_sample_t* samples
     cdef size_t bufferbytes
+    cdef size_t buffersize
 
     def __init__(self, buffersize):
         self.ports_length = 0
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
-        self.occupied = False
+        self.samples = NULL
         self.bufferbytes = buffersize * samplesize
+        self.buffersize = buffersize
 
     cdef addportandblock(self, jack_client_t* client, port_name):
         i = self.ports_length
@@ -99,25 +100,22 @@ cdef class Payload:
             raise Exception('Please increase maxports.')
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
         self.ports[i] = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.blocks[i] = <jack_default_audio_sample_t*> malloc(self.bufferbytes)
         self.ports_length += 1
 
-    cdef send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
+    cdef send(self, np.ndarray[np.float32_t, ndim=2] samples):
         pthread_mutex_lock(&(self.mutex))
-        while self.occupied: # There is only one consumer, but we use while to catch spurious wakeups.
+        while self.samples != NULL: # There is only one consumer, but we use while to catch spurious wakeups.
             pthread_cond_wait(&(self.cond), &(self.mutex))
-        # XXX: Can we avoid these copies?
-        for i in xrange(self.ports_length):
-            memcpy(self.blocks[i], &output_buffer[i, 0], self.bufferbytes)
-        self.occupied = True
+        self.samples = &samples[0, 0]
         pthread_mutex_unlock(&(self.mutex))
 
     cdef callback(self, jack_nframes_t nframes):
         pthread_mutex_lock(&(self.mutex)) # Worst case is a tiny delay while we wait for send to finish.
-        if self.occupied:
+        if self.samples != NULL:
             for i in xrange(self.ports_length):
-                memcpy(jack_port_get_buffer(self.ports[i], nframes), self.blocks[i], self.bufferbytes)
-            self.occupied = False
+                memcpy(jack_port_get_buffer(self.ports[i], nframes), self.samples, self.bufferbytes)
+                self.samples = &self.samples[self.buffersize]
+            self.samples = NULL
             pthread_cond_signal(&(self.cond))
         else:
             # Unknown when send will run, so give up:
@@ -135,7 +133,8 @@ cdef class Client:
     cdef jack_client_t* client
     cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
-    cdef object outbuf
+    cdef object outbufcurrent
+    cdef object outbufstandby
 
     def __init__(self, const char* client_name, chancount):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
@@ -145,7 +144,8 @@ cdef class Client:
         self.payload = Payload(self.buffersize)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
-        self.outbuf = pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
+        self.outbufcurrent = pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
+        self.outbufstandby = pynp.empty((chancount, self.buffersize), dtype = pynp.float32)
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -163,11 +163,15 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        return self.outbuf
+        return self.outbufcurrent
 
     def send_and_get_output_buffer(self):
-        self.payload.send(self.outbuf)
-        return self.outbuf
+        self.payload.send(self.outbufcurrent) # Will block until JACK is ready.
+        # JACK was ready, so samples was NULL, so standby is free to use.
+        outbuf = self.outbufstandby
+        self.outbufstandby = self.outbufcurrent
+        self.outbufcurrent = outbuf
+        return outbuf
 
     def deactivate(self):
         jack_deactivate(self.client)
