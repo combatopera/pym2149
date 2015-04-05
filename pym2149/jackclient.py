@@ -18,7 +18,7 @@
 from nod import Node
 from const import clientname
 from iface import AmpScale
-from out import FloatStream
+from out import FloatStream, StereoInfo
 from iface import Stream, JackConnection
 from di import types
 import cjack, logging
@@ -64,10 +64,10 @@ class JackStream(object, Node, Stream):
   # XXX: Can we detect how many system channels there are?
   syschannames = tuple("system:playback_%s" % (1 + syschanindex) for syschanindex in xrange(2))
 
-  @types(FloatStream, JackClient)
-  def __init__(self, wavs, client):
+  @types(StereoInfo, FloatStream, JackClient)
+  def __init__(self, stereoinfo, wavs, client):
     Node.__init__(self)
-    self.chancount = len(wavs)
+    self.chancount = stereoinfo.getoutchans.size
     for chanindex in xrange(self.chancount):
       client.port_register_output("out_%s" % (1 + chanindex))
     self.wavs = wavs
