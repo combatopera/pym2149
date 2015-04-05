@@ -27,11 +27,12 @@ log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
-  @types()
-  def __init__(self): pass
+  @types(StereoInfo)
+  def __init__(self, stereoinfo):
+    self.chancount = stereoinfo.getoutchans.size
 
   def start(self):
-    self.jack = cjack.Client(clientname)
+    self.jack = cjack.Client(clientname, self.chancount)
     self.outputrate = self.jack.get_sample_rate()
     self.buffersize = self.jack.get_buffer_size()
 
