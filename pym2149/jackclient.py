@@ -48,8 +48,8 @@ class JackClient(JackConnection):
   def current_output_buffer(self):
     return self.jack.current_output_buffer()
 
-  def send(self):
-    self.jack.send()
+  def send_and_get_output_buffer(self):
+    return self.jack.send_and_get_output_buffer()
 
   def deactivate(self):
     self.jack.deactivate()
@@ -97,7 +97,7 @@ class JackStream(object, Node, Stream):
       self.cursor += m
       i += m
       if self.cursor == self.client.buffersize:
-        self.client.send()
+        self.outbuf = self.client.send_and_get_output_buffer()
         self.cursor = 0
 
   def flush(self):
