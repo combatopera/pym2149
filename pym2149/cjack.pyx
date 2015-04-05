@@ -104,7 +104,7 @@ cdef class Payload:
 
     cdef send(self, np.ndarray[np.float32_t, ndim=2] output_buffer):
         pthread_mutex_lock(&(self.mutex))
-        while self.occupied:
+        while self.occupied: # There is only one consumer, but we use while to catch spurious wakeups.
             pthread_cond_wait(&(self.cond), &(self.mutex))
         # XXX: Can we avoid these copies?
         for i in xrange(self.ports_length):
@@ -165,8 +165,9 @@ cdef class Client:
     def current_output_buffer(self):
         return self.outbuf
 
-    def send(self):
+    def send_and_get_output_buffer(self):
         self.payload.send(self.outbuf)
+        return self.outbuf
 
     def deactivate(self):
         jack_deactivate(self.client)
