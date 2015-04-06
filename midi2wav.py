@@ -29,7 +29,7 @@ from pym2149.minblep import MinBleps
 from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
-from pym2149.bg import Background
+from pym2149.bg import MainBackground
 from ymplayer import SimpleChipTimer
 import time
 
@@ -69,11 +69,11 @@ class SpeedDetector:
             self.lastevent = self.update
         self.update += 1
 
-class MidiPump(Background):
+class MidiPump(MainBackground):
 
     @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
-        Background.__init__(self, config)
+        MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.midi = midi
         self.channels = channels

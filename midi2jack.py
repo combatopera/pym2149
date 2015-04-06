@@ -31,7 +31,7 @@ from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
-from pym2149.bg import Background
+from pym2149.bg import MainBackground
 
 log = logging.getLogger(__name__)
 
@@ -56,11 +56,11 @@ class SyncTimer(SimpleTimer):
             self.naivex = (self.naivex + naiven) % self.naiverate
             naiveN -= naiven
 
-class MidiPump(Background):
+class MidiPump(MainBackground):
 
     @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
-        Background.__init__(self, config)
+        MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.midi = midi
         self.channels = channels

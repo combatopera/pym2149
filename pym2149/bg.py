@@ -19,7 +19,21 @@ import threading, logging, tempfile, shutil, os, time
 
 log = logging.getLogger(__name__)
 
-class Background:
+class SimpleBackground:
+
+    def bg(self):
+        self()
+
+    def start(self):
+        self.quit = False
+        self.thread = threading.Thread(target = self.bg)
+        self.thread.start()
+
+    def stop(self):
+        self.quit = True
+        self.thread.join()
+
+class MainBackground(SimpleBackground):
 
     def __init__(self, config):
         if config.profile:
@@ -29,8 +43,6 @@ class Background:
             self.bg = self.profile
         elif config.trace:
             self.bg = self.trace
-        else:
-            self.bg = self.__call__
 
     def profile(self, *args, **kwargs):
         profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')
@@ -56,12 +68,3 @@ class Background:
         t = Trace()
         t.runctx('self.__call__(*args, **kwargs)', globals(), locals())
         t.results().write_results()
-
-    def start(self):
-        self.quit = False
-        self.thread = threading.Thread(target = self.bg)
-        self.thread.start()
-
-    def stop(self):
-        self.quit = True
-        self.thread.join()
