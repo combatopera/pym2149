@@ -18,7 +18,7 @@
 from const import clientname
 from di import types
 from iface import Config
-import alsaseq
+import alsaseq, multiprocessing, multiprocessing.queues
 
 class ChannelMessage:
 
@@ -100,13 +100,26 @@ class Midi:
   def __init__(self, config):
     self.chanbase = config.midichannelbase
     self.programbase = config.midiprogrambase
+
+  def start(self):
+    self.eventqueue = multiprocessing.queues.SimpleQueue()
+    self.process = multiprocessing.Process(target = self, args = (self.eventqueue,))
+    self.process.start()
+
+  def __call__(self, eventqueue):
     alsaseq.client(clientname, 1, 0, False)
+    while True:
+      event = alsaseq.input() # Can't hold the GIL while blocking here, which is why we use multiprocessing.
+      cls = self.classes.get(event[0])
+      if cls is not None:
+        eventqueue.put(cls(self, event[7]))
 
   def getevents(self):
     events = []
-    while alsaseq.inputpending():
-      event = alsaseq.input()
-      cls = self.classes.get(event[0])
-      if cls is not None:
-        events.append(cls(self, event[7]))
+    while not self.eventqueue.empty():
+      events.append(self.eventqueue.get())
     return events
+
+  def stop(self):
+    self.process.terminate() # A bit heavy-handed.
+    self.process.join()
