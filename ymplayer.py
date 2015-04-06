@@ -20,7 +20,7 @@ from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile, Config
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
-from pym2149.bg import Background
+from pym2149.bg import MainBackground
 
 class ChipTimer(MinBlockRateTimer):
 
@@ -34,11 +34,11 @@ class SimpleChipTimer(SimpleTimer):
     def __init__(self, clockinfo):
         SimpleTimer.__init__(self, clockinfo.implclock)
 
-class Player(Background):
+class Player(MainBackground):
 
     @types(Config, YMFile, Chip, Roll, Timer, Stream)
     def __init__(self, config, ymfile, chip, roll, timer, stream):
-        Background.__init__(self, config)
+        MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.ym = ymfile.ym
         self.chip = chip
