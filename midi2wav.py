@@ -69,6 +69,7 @@ class SpeedDetector:
             self.lastevent = self.update
         self.update += 1
 
+# FIXME: Unduplicate with midi2jack.
 class MidiPump(MainBackground):
 
     @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
