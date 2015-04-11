@@ -36,6 +36,7 @@ class TestPLL(unittest.TestCase):
 
     updaterate = 50
     updateperiod = 1 / updaterate
+    alpha = .2
 
     def doit(self, positionshift, *offsetlists):
         mark = time.time()
@@ -43,12 +44,12 @@ class TestPLL(unittest.TestCase):
         for u, offsets in enumerate(offsetlists):
             updatetime = mark + self.updateperiod * (u + .5)
             eventlists.append([Event(updatetime + offset) for offset in offsets])
-        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, .2))
+        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, self.alpha))
         positionindex = 1
         positiontime = pll.getpositiontime(mark, positionindex)
         for events in eventlists:
             for event in events:
-                while event.eventtime > positiontime:
+                while positiontime < event.eventtime:
                     pll.closeupdate(positiontime)
                     positionindex += 1
                     positiontime = pll.getpositiontime(mark, positionindex)
