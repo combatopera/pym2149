@@ -51,7 +51,7 @@ class PLL:
             sleeptime = positiontime - time.time()
             if sleeptime > 0:
                 time.sleep(sleeptime)
-            self.closeupdate(positiontime) # XXX: Or take current time again?
+            self.closeupdate()
 
     def getpositiontime(self, mark, positionindex):
         positiontime = mark + positionindex * self.updateperiod
@@ -64,7 +64,9 @@ class PLL:
             eventtime = time.time()
         self.events.append((eventtime, event))
 
-    def closeupdate(self, positiontime):
+    def closeupdate(self, positiontime = None):
+        if positiontime is None:
+            positiontime = time.time()
         events = self.take(self.events)
         self.updates.append([e for _, e in events])
         # Now update the medianshift, only taking into account events in the context period:
@@ -86,4 +88,5 @@ class PLL:
                 self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
 
     def takeupdate(self):
-        return sum(self.take(self.updates), []) # TODO: We want exactly one update.
+        update, = self.take(self.updates) # FIXME: Won't always be the case.
+        return update
