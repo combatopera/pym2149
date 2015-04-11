@@ -19,7 +19,8 @@ from const import clientname
 from di import types
 from iface import Config
 from pll import PLL
-import calsa, multiprocessing, multiprocessing.queues
+from bg import SimpleBackground
+import calsa
 
 class ChannelMessage:
 
@@ -87,7 +88,7 @@ class ControlChange(ChannelMessage):
   def __str__(self):
     return "C %2d %3d %3d" % (self.midichan, self.controller, self.value)
 
-class Midi:
+class Midi(SimpleBackground):
 
   classes = {
     calsa.SND_SEQ_EVENT_NOTEON: NoteOn,
@@ -102,27 +103,15 @@ class Midi:
     self.chanbase = config.midichannelbase
     self.programbase = config.midiprogrambase
     self.pll = pll
+    self.events = []
 
-  def start(self):
-    self.eventqueue = multiprocessing.queues.SimpleQueue()
-    # XXX: Is it actually necessary to pass the queue?
-    self.process = multiprocessing.Process(target = self, args = (self.eventqueue,))
-    self.process.start()
-
-  def __call__(self, eventqueue):
+  def bg(self):
     client = calsa.Client(clientname)
-    while True:
-      event = client.event_input() # Can't hold the GIL while blocking here, which is why we use multiprocessing.
-      cls = self.classes.get(event['type'])
-      if cls is not None:
-        eventqueue.put(cls(self, event))
+    while not self.quit:
+      event = client.event_input()
+      self.events.append(self.classes.get(event['type'])(self, event))
 
   def getevents(self):
-    events = []
-    while not self.eventqueue.empty():
-      events.append(self.eventqueue.get())
+    events = self.events[:]
+    del self.events[:len(events)]
     return events
-
-  def stop(self):
-    self.process.terminate() # A bit heavy-handed.
-    self.process.join()
