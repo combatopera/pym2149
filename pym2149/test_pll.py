@@ -48,13 +48,13 @@ class TestPLL(unittest.TestCase):
         updates = []
         for events in eventlists:
             for event in events:
-                while pll.inclusivewindowend < event.eventtime:
-                    updates.append(pll.takeupdate(pll.inclusivewindowend+.001))
+                while pll.exclusivewindowend <= event.eventtime:
+                    updates.append(pll.takeupdate(pll.exclusivewindowend))
                 pll.event(event, eventtime = event.eventtime)
-        iwe = pll.inclusivewindowend
-        updates.append(pll.takeupdate(iwe+.001))
+        ewe = pll.exclusivewindowend
+        updates.append(pll.takeupdate(ewe))
         self.assertEqual(eventlists, updates)
-        self.assertEqual(positionshift, round(iwe - (pll.mark + self.updateperiod * len(eventlists)), dp))
+        self.assertEqual(positionshift, round(ewe - (pll.mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
         self.doit(0,
@@ -98,19 +98,6 @@ class TestPLL(unittest.TestCase):
             [0],
         )
 
-    def test_4hundredthgranularityaltsync(self):
-        # Same as 3hundredthgranularity but 2nd event slightly earlier:
-        self.doit(0.0058,
-            [0, .01],
-            [],
-            [0, .01],
-            [.01],
-            [],
-            [0, .01],
-            [],
-            [0],
-        )
-
     def test_5hundredthgranularityaltshift(self):
         self.doit(0.004779,
             [.009],
@@ -120,18 +107,6 @@ class TestPLL(unittest.TestCase):
             [0],
             [.01],
             [0],
-            [.01],
-        )
-
-    def test_5hundredthgranularityaltshiftaltsync(self):
-        self.doit(0.01324,
-            [.01],
-            [0],
-            [.01, .02],
-            [.02],
-            [],
-            [.01, .02],
-            [],
             [.01],
         )
 
