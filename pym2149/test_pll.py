@@ -98,6 +98,18 @@ class TestPLL(unittest.TestCase):
             [0],
         )
 
+    def test_4hundredthgranularityaltsync(self):
+        self.doit(0.005544,
+            [0, .009],
+            [],
+            [0, .01],
+            [.01],
+            [],
+            [0, .01],
+            [],
+            [0],
+        )
+
     def test_5hundredthgranularityaltshift(self):
         self.doit(0.004779,
             [.009],
