@@ -87,9 +87,9 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_3hundredthgranularity(self):
-        self.doit(-0.004894,
+        self.doit(-0.004959,
             [0],
-            [-.009],
+            [-.01],
             [0],
             [-.01],
             [-.01],
