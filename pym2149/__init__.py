@@ -19,7 +19,7 @@ import pyximport, numpy as np, subprocess, re, os
 
 def libraries():
     ldconfigpath = '/sbin/ldconfig'
-    trylibs = 'jack',
+    trylibs = 'jack', 'asound'
     if os.path.exists(ldconfigpath):
         installed = set(re.search(r'[^\s]+', line).group() for line in subprocess.check_output([ldconfigpath, '-p']).splitlines() if line.startswith('\t'))
         for name in trylibs:
