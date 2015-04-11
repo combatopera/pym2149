@@ -16,6 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+from iface import Config
+from di import types
 import time, threading
 
 class PLL:
@@ -26,6 +28,7 @@ class PLL:
         del v[:len(w)]
         return w
 
+    @types(Config)
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
         self.alpha = config.pllalpha
