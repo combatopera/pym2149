@@ -47,15 +47,18 @@ class TestPLL(unittest.TestCase):
         pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, self.alpha))
         positionindex = 1
         positiontime = pll.getpositiontime(mark, positionindex)
+        updates = []
         for events in eventlists:
             for event in events:
                 while positiontime < event.eventtime:
                     pll.closeupdate(positiontime)
+                    updates.append(pll.takeupdate())
                     positionindex += 1
                     positiontime = pll.getpositiontime(mark, positionindex)
                 pll.event(event, eventtime = event.eventtime)
         pll.closeupdate(positiontime)
-        self.assertEqual(eventlists, pll.updates)
+        updates.append(pll.takeupdate())
+        self.assertEqual(eventlists, updates)
         self.assertEqual(positionshift, round(positiontime - (mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
