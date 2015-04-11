@@ -18,10 +18,9 @@
 from __future__ import division
 from iface import Config
 from di import types
-from bg import SimpleBackground
 import time
 
-class PLL(SimpleBackground):
+class PLL:
 
     @staticmethod
     def take(v):
@@ -33,44 +32,43 @@ class PLL(SimpleBackground):
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
         self.alpha = config.pllalpha
+
+    def start(self):
         self.events = []
         self.updates = []
         self.medianshift = None
+        self.mark = time.time()
+        self.windowindex = 0
+        self.nextwindow()
 
-    def bg(self):
-        mark = time.time()
-        positionindex = 0
-        while not self.quit:
-            positionindex += 1
-            positiontime = self.getpositiontime(mark, positionindex)
-            sleeptime = positiontime - time.time()
-            if sleeptime > 0:
-                time.sleep(sleeptime)
-            self.closeupdate()
+    def stop(self):
+        pass
 
-    def getpositiontime(self, mark, positionindex):
-        positiontime = mark + positionindex * self.updateperiod
+    def nextwindow(self):
+        self.windowindex += 1
+        self.inclusivewindowend = self.mark + self.windowindex * self.updateperiod
         if self.medianshift is not None:
-            positiontime += self.medianshift
-        return positiontime
+            self.inclusivewindowend += self.medianshift
 
     def event(self, event, eventtime = None):
         if eventtime is None:
             eventtime = time.time()
         self.events.append((eventtime, event))
 
-    def closeupdate(self, positiontime = None):
-        if positiontime is None:
-            positiontime = time.time()
-        events = self.take(self.events)
-        self.updates.append([e for _, e in events])
-        # Now update the medianshift, only taking into account events in the context period:
-        prevpositiontime = positiontime - self.updateperiod
-        targettime = positiontime - self.updateperiod / 2
+    def closeupdate(self):
+        exclusivewindowstart = self.inclusivewindowend - self.updateperiod
+        targettime = self.inclusivewindowend - self.updateperiod / 2
         shifts = []
-        for etime, _ in events:
-            if prevpositiontime < etime and etime <= positiontime:
+        update = []
+        i = 0
+        for etime, e in self.events:
+            if etime > self.inclusivewindowend:
+                break
+            if etime > exclusivewindowstart:
                 shifts.append((0 if self.medianshift is None else self.medianshift) + etime - targettime)
+            i += 1
+        self.updates.append([e for _, e in self.events[:i]])
+        del self.events[:i]
         if shifts:
             n = len(shifts)
             if n & 1: # Odd.
@@ -81,7 +79,11 @@ class PLL(SimpleBackground):
                 self.medianshift = medianshift
             else:
                 self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
+        self.nextwindow()
 
-    def takeupdate(self):
-        update, = self.take(self.updates) # FIXME: Won't always be the case.
-        return update
+    def takeupdate(self, now = None):
+        if now is None:
+            now = time.time()
+        while now > self.inclusivewindowend: # No more events can qualify for this window.
+            self.closeupdate()
+        return sum(self.take(self.updates), [])

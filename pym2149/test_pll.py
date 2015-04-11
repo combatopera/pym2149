@@ -39,27 +39,22 @@ class TestPLL(unittest.TestCase):
     alpha = .2
 
     def doit(self, positionshift, *offsetlists):
-        mark = time.time()
+        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, self.alpha))
+        pll.start()
         eventlists = []
         for u, offsets in enumerate(offsetlists):
-            updatetime = mark + self.updateperiod * (u + .5)
+            updatetime = pll.mark + self.updateperiod * (u + .5)
             eventlists.append([Event(updatetime + offset) for offset in offsets])
-        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, self.alpha))
-        positionindex = 1
-        positiontime = pll.getpositiontime(mark, positionindex)
         updates = []
         for events in eventlists:
             for event in events:
-                while positiontime < event.eventtime:
-                    pll.closeupdate(positiontime)
-                    updates.append(pll.takeupdate())
-                    positionindex += 1
-                    positiontime = pll.getpositiontime(mark, positionindex)
+                while pll.inclusivewindowend < event.eventtime:
+                    updates.append(pll.takeupdate(pll.inclusivewindowend+.001))
                 pll.event(event, eventtime = event.eventtime)
-        pll.closeupdate(positiontime)
-        updates.append(pll.takeupdate())
+        iwe = pll.inclusivewindowend
+        updates.append(pll.takeupdate(iwe+.001))
         self.assertEqual(eventlists, updates)
-        self.assertEqual(positionshift, round(positiontime - (mark + self.updateperiod * len(eventlists)), dp))
+        self.assertEqual(positionshift, round(iwe - (pll.mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
         self.doit(0,
