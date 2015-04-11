@@ -20,7 +20,7 @@
 from __future__ import division
 from collections import namedtuple
 from pll import PLL
-import unittest, time, threading
+import unittest, time
 
 dp = 6
 

@@ -19,7 +19,7 @@ from __future__ import division
 from iface import Config
 from di import types
 from bg import SimpleBackground
-import time, threading
+import time
 
 class PLL(SimpleBackground):
 
