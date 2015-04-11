@@ -19,19 +19,19 @@ from const import clientname
 from di import types
 from iface import Config
 from pll import PLL
-import alsaseq, multiprocessing, multiprocessing.queues
+import calsa, multiprocessing, multiprocessing.queues
 
 class ChannelMessage:
 
   def __init__(self, midi, event):
-    self.midichan = midi.chanbase + event[0]
+    self.midichan = midi.chanbase + event['channel']
 
 class NoteOnOff(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.midinote = event[1]
-    self.vel = event[2]
+    self.midinote = event['note']
+    self.vel = event['velocity']
 
   def __str__(self):
     return "%s %2d %3d %3d" % (self.char, self.midichan, self.midinote, self.vel)
@@ -54,7 +54,7 @@ class PitchBend(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.bend = event[5] # In [-0x2000, 0x2000).
+    self.bend = event['value'] # In [-0x2000, 0x2000).
 
   def __call__(self, channels):
     return channels.pitchbend(self.midichan, self.bend)
@@ -66,7 +66,7 @@ class ProgramChange(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.program = midi.programbase + event[5]
+    self.program = midi.programbase + event['value']
 
   def __call__(self, channels):
     return channels.programchange(self.midichan, self.program)
@@ -78,8 +78,8 @@ class ControlChange(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.controller = event[4]
-    self.value = event[5]
+    self.controller = event['param']
+    self.value = event['value']
 
   def __call__(self, channels):
     return channels.controlchange(self.midichan, self.controller, self.value)
@@ -90,11 +90,11 @@ class ControlChange(ChannelMessage):
 class Midi:
 
   classes = {
-    alsaseq.SND_SEQ_EVENT_NOTEON: NoteOn,
-    alsaseq.SND_SEQ_EVENT_NOTEOFF: NoteOff,
-    alsaseq.SND_SEQ_EVENT_PITCHBEND: PitchBend,
-    alsaseq.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
-    alsaseq.SND_SEQ_EVENT_CONTROLLER: ControlChange,
+    calsa.SND_SEQ_EVENT_NOTEON: NoteOn,
+    calsa.SND_SEQ_EVENT_NOTEOFF: NoteOff,
+    calsa.SND_SEQ_EVENT_PITCHBEND: PitchBend,
+    calsa.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
+    calsa.SND_SEQ_EVENT_CONTROLLER: ControlChange,
   }
 
   @types(Config, PLL)
@@ -110,12 +110,12 @@ class Midi:
     self.process.start()
 
   def __call__(self, eventqueue):
-    alsaseq.client(clientname, 1, 0, False)
+    client = calsa.Client(clientname)
     while True:
-      event = alsaseq.input() # Can't hold the GIL while blocking here, which is why we use multiprocessing.
-      cls = self.classes.get(event[0])
+      event = client.event_input() # Can't hold the GIL while blocking here, which is why we use multiprocessing.
+      cls = self.classes.get(event['type'])
       if cls is not None:
-        eventqueue.put(cls(self, event[7]))
+        eventqueue.put(cls(self, event))
 
   def getevents(self):
     events = []
