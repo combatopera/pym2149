@@ -30,6 +30,7 @@ from pym2149.di import types
 from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
 from pym2149.bg import MainBackground
+from pym2149.pll import PLL
 from ymplayer import SimpleChipTimer
 import time
 
@@ -102,6 +103,7 @@ class MidiPump(MainBackground):
 def main():
     config = getprocessconfig('outpath')
     di = createdi(config)
+    di.add(PLL)
     di.add(Midi)
     configure(di)
     di.add(Channels)
