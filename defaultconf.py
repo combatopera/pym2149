@@ -88,3 +88,5 @@ profile = None
 
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
+
+pllalpha = .2 # TODO: Tune this.
