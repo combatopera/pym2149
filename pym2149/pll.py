@@ -46,9 +46,9 @@ class PLL:
 
     def nextwindow(self):
         self.windowindex += 1
-        self.inclusivewindowend = self.mark + self.windowindex * self.updateperiod
+        self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod
         if self.medianshift is not None:
-            self.inclusivewindowend += self.medianshift
+            self.exclusivewindowend += self.medianshift
 
     def event(self, event, eventtime = None):
         if eventtime is None:
@@ -56,15 +56,15 @@ class PLL:
         self.events.append((eventtime, event))
 
     def closeupdate(self):
-        exclusivewindowstart = self.inclusivewindowend - self.updateperiod
-        targettime = self.inclusivewindowend - self.updateperiod / 2
+        inclusivewindowstart = self.exclusivewindowend - self.updateperiod
+        targettime = self.exclusivewindowend - self.updateperiod / 2
         shifts = []
         update = []
         i = 0
         for etime, e in self.events:
-            if etime > self.inclusivewindowend:
+            if etime >= self.exclusivewindowend:
                 break
-            if etime > exclusivewindowstart:
+            if etime >= inclusivewindowstart:
                 shifts.append((0 if self.medianshift is None else self.medianshift) + etime - targettime)
             i += 1
         self.updates.append([e for _, e in self.events[:i]])
@@ -84,6 +84,6 @@ class PLL:
     def takeupdate(self, now = None):
         if now is None:
             now = time.time()
-        while now > self.inclusivewindowend: # No more events can qualify for this window.
+        while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
         return sum(self.take(self.updates), [])
