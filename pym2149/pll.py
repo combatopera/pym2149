@@ -22,12 +22,6 @@ import time
 
 class PLL:
 
-    @staticmethod
-    def take(v):
-        w = v[:]
-        del v[:len(w)]
-        return w
-
     @types(Config)
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
@@ -86,4 +80,6 @@ class PLL:
             now = time.time()
         while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
-        return sum(self.take(self.updates), [])
+        update = sum(self.updates, [])
+        del self.updates[:]
+        return update
