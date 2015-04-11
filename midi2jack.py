@@ -32,6 +32,7 @@ from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
+from pym2149.pll import PLL
 
 log = logging.getLogger(__name__)
 
@@ -82,6 +83,7 @@ class MidiPump(MainBackground):
 def main():
     config = getprocessconfig()
     di = createdi(config)
+    di.add(PLL)
     di.add(Midi)
     di.add(JackClient)
     di.start()
