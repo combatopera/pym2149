@@ -65,7 +65,7 @@ cdef extern from "alsa/seq.h":
     DEF SND_SEQ_PORT_TYPE_SYNTHESIZER = 1 << 18
 
     int snd_seq_open(snd_seq_t**, const char*, int, int)
-    int snd_seq_event_input(snd_seq_t*, snd_seq_event_t**)
+    int snd_seq_event_input(snd_seq_t*, snd_seq_event_t**) nogil
 
 cdef extern from "alsa/seqmid.h":
 
@@ -93,7 +93,8 @@ cdef class Client:
         cdef snd_seq_ev_note_t* note
         cdef snd_seq_ev_ctrl_t* control
         while True:
-            snd_seq_event_input(self.handle, &event)
+            with nogil:
+                snd_seq_event_input(self.handle, &event)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
                 note = <snd_seq_ev_note_t*> &(event.data)
                 return {'type': event.type, 'channel': note.channel, 'note': note.note, 'velocity': note.velocity}
