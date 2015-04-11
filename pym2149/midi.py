@@ -18,6 +18,7 @@
 from const import clientname
 from di import types
 from iface import Config
+from pll import PLL
 import alsaseq, multiprocessing, multiprocessing.queues
 
 class ChannelMessage:
@@ -96,10 +97,11 @@ class Midi:
     alsaseq.SND_SEQ_EVENT_CONTROLLER: ControlChange,
   }
 
-  @types(Config)
-  def __init__(self, config):
+  @types(Config, PLL)
+  def __init__(self, config, pll):
     self.chanbase = config.midichannelbase
     self.programbase = config.midiprogrambase
+    self.pll = pll
 
   def start(self):
     self.eventqueue = multiprocessing.queues.SimpleQueue()
