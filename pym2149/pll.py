@@ -18,9 +18,10 @@
 from __future__ import division
 from iface import Config
 from di import types
+from bg import SimpleBackground
 import time, threading
 
-class PLL:
+class PLL(SimpleBackground):
 
     @staticmethod
     def take(v):
@@ -36,16 +37,7 @@ class PLL:
         self.updates = []
         self.medianshift = None
 
-    def start(self):
-        self.quit = False
-        self.thread = threading.Thread(target = self.strobe)
-        self.thread.start()
-
-    def stop(self):
-        self.quit = True
-        self.thread.join()
-
-    def strobe(self):
+    def bg(self):
         mark = time.time()
         positionindex = 0
         while not self.quit:
