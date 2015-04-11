@@ -22,57 +22,118 @@ from collections import namedtuple
 from pll import PLL
 import unittest, time, threading
 
-class E(float): pass
+dp = 6
+
+class Event:
+
+    def __init__(self, eventtime):
+        self.eventtime = eventtime
+
+    def __repr__(self):
+        return "%s(%r)" % (self.__class__.__name__, round(self.eventtime, dp))
 
 class TestPLL(unittest.TestCase):
 
     updaterate = 50
     updateperiod = 1 / updaterate
 
-    def lists(self, positionshift, *lists):
-        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, .2))
+    def doit(self, positionshift, *offsetlists):
         mark = time.time()
-        for u, events in enumerate(lists):
+        eventlists = []
+        for u, offsets in enumerate(offsetlists):
+            updatetime = mark + self.updateperiod * (u + .5)
+            eventlists.append([Event(updatetime + offset) for offset in offsets])
+        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, .2))
+        positionindex = 1
+        positiontime = pll.getpositiontime(mark, positionindex)
+        for events in eventlists:
             for event in events:
-                pll.event(event, eventtime = mark + self.updateperiod * (u + .5) + event)
-            # Simulate what the thread would do:
-            positiontime = pll.getpositiontime(mark, u + 1)
-            pll.closeupdate(positiontime)
-        for u, events in enumerate(lists):
-            for i, event in enumerate(events):
-                self.assertIs(event, pll.updates[u][i])
-            self.assertEqual(len(events), len(pll.updates[u]))
-        self.assertEqual(len(lists), len(pll.updates))
-        self.assertEqual(positionshift, round(positiontime - (mark + self.updateperiod * len(lists)), 6))
+                while event.eventtime > positiontime:
+                    pll.closeupdate(positiontime)
+                    positionindex += 1
+                    positiontime = pll.getpositiontime(mark, positionindex)
+                pll.event(event, eventtime = event.eventtime)
+        pll.closeupdate(positiontime)
+        self.assertEqual(eventlists, pll.updates)
+        self.assertEqual(positionshift, round(positiontime - (mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
-        self.lists(0,
-            [E(0)],
-            [E(0)],
+        self.doit(0,
+            [0],
+            [0],
             [],
-            [E(0)],
-            [E(0), E(0)],
-            [E(0)],
+            [0],
+            [0, 0],
+            [0],
         )
 
     def test_1consistentlylate(self):
-        self.lists(.005,
-            [E(.005)],
-            [E(.005)],
+        self.doit(.005,
+            [.005],
+            [.005],
             [],
-            [E(.005)],
-            [E(.005), E(.005)],
-            [E(.005)],
+            [.005],
+            [.005, .005],
+            [.005],
         )
 
     def test_2consistentlyearly(self):
-        self.lists(-.005,
-            [E(-.005)],
-            [E(-.005)],
+        self.doit(-.005,
+            [-.005],
+            [-.005],
             [],
-            [E(-.005)],
-            [E(-.005), E(-.005)],
-            [E(-.005)],
+            [-.005],
+            [-.005, -.005],
+            [-.005],
+        )
+
+    def test_3hundredthgranularity(self):
+        self.doit(-0.004894,
+            [0],
+            [-.009],
+            [0],
+            [-.01],
+            [-.01],
+            [0],
+            [-.01],
+            [0],
+        )
+
+    def test_4hundredthgranularityaltsync(self):
+        # Same as 3hundredthgranularity but 2nd event slightly earlier:
+        self.doit(0.0058,
+            [0, .01],
+            [],
+            [0, .01],
+            [.01],
+            [],
+            [0, .01],
+            [],
+            [0],
+        )
+
+    def test_5hundredthgranularityaltshift(self):
+        self.doit(0.004779,
+            [.009],
+            [0],
+            [.01],
+            [0],
+            [0],
+            [.01],
+            [0],
+            [.01],
+        )
+
+    def test_5hundredthgranularityaltshiftaltsync(self):
+        self.doit(0.01324,
+            [.01],
+            [0],
+            [.01, .02],
+            [.02],
+            [],
+            [.01, .02],
+            [],
+            [.01],
         )
 
 if '__main__' == __name__:
