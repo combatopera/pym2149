@@ -105,6 +105,7 @@ class Midi:
 
   def start(self):
     self.eventqueue = multiprocessing.queues.SimpleQueue()
+    # XXX: Is it actually necessary to pass the queue?
     self.process = multiprocessing.Process(target = self, args = (self.eventqueue,))
     self.process.start()
 
