@@ -59,13 +59,13 @@ class PLL:
         inclusivewindowstart = self.exclusivewindowend - self.updateperiod
         targettime = self.exclusivewindowend - self.updateperiod / 2
         shifts = []
-        update = []
         i = 0
-        for etime, e in self.events:
-            if etime >= self.exclusivewindowend:
+        preshift = 0 if self.medianshift is None else self.medianshift
+        for eventtime, _ in self.events:
+            if eventtime >= self.exclusivewindowend:
                 break
-            if etime >= inclusivewindowstart:
-                shifts.append((0 if self.medianshift is None else self.medianshift) + etime - targettime)
+            if eventtime >= inclusivewindowstart:
+                shifts.append(preshift + eventtime - targettime)
             i += 1
         self.updates.append([e for _, e in self.events[:i]])
         del self.events[:i]
