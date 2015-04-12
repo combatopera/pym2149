@@ -49,10 +49,10 @@ class TestPLL(unittest.TestCase):
         for events in eventlists:
             for event in events:
                 while pll.exclusivewindowend <= event.eventtime:
-                    updates.append(pll.takeupdate(pll.exclusivewindowend))
+                    updates.append(pll.takeupdateimpl(pll.exclusivewindowend))
                 pll.eventimpl(event, event.eventtime)
         ewe = pll.exclusivewindowend
-        updates.append(pll.takeupdate(ewe))
+        updates.append(pll.takeupdateimpl(ewe))
         self.assertEqual(eventlists, updates)
         self.assertEqual(positionshift, round(ewe - (pll.mark + self.updateperiod * len(eventlists)), dp))
 

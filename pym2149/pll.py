@@ -76,9 +76,10 @@ class PLL:
                 self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
         self.nextwindow()
 
-    def takeupdate(self, now = None):
-        if now is None:
-            now = time.time()
+    def takeupdate(self):
+        return self.takeupdateimpl(time.time())
+
+    def takeupdateimpl(self, now)
         while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
         update = sum(self.updates, [])
