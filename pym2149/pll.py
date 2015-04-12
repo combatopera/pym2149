@@ -44,9 +44,10 @@ class PLL:
         if self.medianshift is not None:
             self.exclusivewindowend += self.medianshift
 
-    def event(self, event, eventtime = None):
-        if eventtime is None:
-            eventtime = time.time()
+    def event(self, event):
+        self.eventimpl(event, time.time())
+
+    def eventimpl(self, event, eventtime):
         self.events.append((eventtime, event))
 
     def closeupdate(self):
