@@ -79,7 +79,7 @@ class PLL:
     def takeupdate(self):
         return self.takeupdateimpl(time.time())
 
-    def takeupdateimpl(self, now)
+    def takeupdateimpl(self, now):
         while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
         update = sum(self.updates, [])
