@@ -72,6 +72,21 @@ cdef extern from "alsa/seqmid.h":
     int snd_seq_set_client_name(snd_seq_t*, const char*)
     int snd_seq_create_simple_port(snd_seq_t*, const char*, unsigned int, unsigned int)
 
+cdef extern from "sys/time.h":
+
+    ctypedef long time_t
+
+    ctypedef long suseconds_t
+
+    cdef struct timeval:
+        time_t tv_sec
+        suseconds_t tv_usec
+
+    cdef struct timezone:
+        pass # Obsolete.
+
+    int gettimeofday(timeval*, timezone*) nogil
+
 SND_SEQ_EVENT_NOTEON = 6
 SND_SEQ_EVENT_NOTEOFF = 7
 SND_SEQ_EVENT_CONTROLLER = 10
@@ -92,12 +107,14 @@ cdef class Client:
         cdef snd_seq_event_t* event
         cdef snd_seq_ev_note_t* note
         cdef snd_seq_ev_ctrl_t* control
+        cdef timeval now
         while True:
             with nogil:
                 snd_seq_event_input(self.handle, &event)
+                gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
                 note = <snd_seq_ev_note_t*> &(event.data)
-                return {'type': event.type, 'channel': note.channel, 'note': note.note, 'velocity': note.velocity}
+                return {'time': now.tv_sec+now.tv_usec/1e6, 'type': event.type, 'channel': note.channel, 'note': note.note, 'velocity': note.velocity}
             elif SND_SEQ_EVENT_CONTROLLER == event.type or SND_SEQ_EVENT_PGMCHANGE == event.type or SND_SEQ_EVENT_PITCHBEND == event.type:
                 control = <snd_seq_ev_ctrl_t*> &(event.data)
-                return {'type': event.type, 'channel': control.channel, 'param': control.param, 'value': control.value}
+                return {'time': now.tv_sec+now.tv_usec/1e6, 'type': event.type, 'channel': control.channel, 'param': control.param, 'value': control.value}
