@@ -18,9 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from collections import namedtuple
 from pll import PLL
-import unittest, time
+import unittest
 
 dp = 6
 
@@ -36,10 +35,11 @@ class TestPLL(unittest.TestCase):
 
     updaterate = 50
     updateperiod = 1 / updaterate
-    alpha = .2
+    plltargetpos = .5
+    pllalpha = .2
 
     def doit(self, positionshift, *offsetlists):
-        pll = PLL(namedtuple('Config', 'updaterate pllalpha')(self.updaterate, self.alpha))
+        pll = PLL(self)
         pll.start()
         eventlists = []
         for u, offsets in enumerate(offsetlists):
@@ -50,10 +50,10 @@ class TestPLL(unittest.TestCase):
             for event in events:
                 while pll.exclusivewindowend <= event.eventtime:
                     updates.append(pll.takeupdateimpl(pll.exclusivewindowend))
-                pll.eventimpl(event, event.eventtime)
+                pll.event(event.eventtime, event)
         ewe = pll.exclusivewindowend
         updates.append(pll.takeupdateimpl(ewe))
-        self.assertEqual(eventlists, updates)
+        self.assertEqual(eventlists, [[e for _, e in u] for u in updates])
         self.assertEqual(positionshift, round(ewe - (pll.mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
