@@ -89,4 +89,6 @@ profile = None
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
+plltargetpos = .5
+
 pllalpha = .001
