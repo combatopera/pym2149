@@ -25,6 +25,7 @@ class PLL:
     @types(Config)
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
+        self.targetpos = config.plltargetpos
         self.alpha = config.pllalpha
 
     def start(self):
@@ -44,15 +45,12 @@ class PLL:
         if self.medianshift is not None:
             self.exclusivewindowend += self.medianshift
 
-    def event(self, event):
-        self.eventimpl(event, time.time())
-
-    def eventimpl(self, event, eventtime):
+    def event(self, eventtime, event):
         self.events.append((eventtime, event))
 
     def closeupdate(self):
         inclusivewindowstart = self.exclusivewindowend - self.updateperiod
-        targettime = self.exclusivewindowend - self.updateperiod / 2
+        targettime = inclusivewindowstart + self.updateperiod * self.targetpos
         shifts = []
         i = 0
         preshift = 0 if self.medianshift is None else self.medianshift
@@ -62,7 +60,7 @@ class PLL:
             if eventtime >= inclusivewindowstart:
                 shifts.append(preshift + eventtime - targettime)
             i += 1
-        self.updates.append([e for _, e in self.events[:i]])
+        self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event in self.events[:i]])
         del self.events[:i]
         if shifts:
             n = len(shifts)
