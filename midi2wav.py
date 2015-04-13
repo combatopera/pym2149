@@ -92,11 +92,11 @@ class MidiPump(MainBackground):
             streamready.await()
             events = self.midi.getevents()
             speeddetector(bool(events))
-            for event in events:
-                log.debug("%s @ %s -> %s", event, self.channels.frameindex, event(self.channels))
+            for offset, event in events:
+                log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
-            for b in self.timer.blocksforperiod(self.updaterate):
-                self.stream.call(b)
+            for block in self.timer.blocksforperiod(self.updaterate):
+                self.stream.call(block)
             self.channels.closeframe()
         self.stream.flush()
 
