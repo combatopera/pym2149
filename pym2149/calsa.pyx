@@ -104,14 +104,20 @@ cdef class Event:
         self.type = type
         self.channel = channel
 
-class Note(Event):
+cdef class Note(Event):
+
+    cdef readonly unsigned char note
+    cdef readonly unsigned char velocity
 
     def __init__(self, time, type, channel, note, velocity):
         Event.__init__(self, time, type, channel)
         self.note = note
         self.velocity = velocity
 
-class Ctrl(Event):
+cdef class Ctrl(Event):
+
+    cdef readonly unsigned int param
+    cdef readonly signed int value
 
     def __init__(self, time, type, channel, param, value):
         Event.__init__(self, time, type, channel)
