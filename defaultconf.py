@@ -19,6 +19,7 @@ from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
 from pym2149.iface import YMFile, JackConnection
+import operator
 
 outputrate = config.di(JackConnection).outputrate if config.di.all(JackConnection) else 44100
 '''Note this does not have the power to modify the JACK output rate, only pym2149's impression of it.'''
@@ -89,6 +90,6 @@ profile = None
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
-plltargetpos = .5 / config.updaterate
+plltargetpos = operator.truediv(.5, config.updaterate)
 
 pllalpha = .001
