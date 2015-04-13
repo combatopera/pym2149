@@ -93,6 +93,22 @@ SND_SEQ_EVENT_CONTROLLER = 10
 SND_SEQ_EVENT_PGMCHANGE = 11
 SND_SEQ_EVENT_PITCHBEND = 13
 
+class Event:
+
+    def __init__(self, time, type):
+        self.time = time
+        self.type = type
+
+class Note(Event):
+
+    def __init__(self, time, type):
+        Event.__init__(self, time, type)
+
+class Ctrl(Event):
+
+    def __init__(self, time, type):
+        Event.__init__(self, time, type)
+
 cdef class Client:
 
     cdef snd_seq_t* handle
@@ -113,8 +129,16 @@ cdef class Client:
                 snd_seq_event_input(self.handle, &event)
                 gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
+                obj = Note(now.tv_sec+now.tv_usec/1e6, event.type)
                 note = <snd_seq_ev_note_t*> &(event.data)
-                return {'time': now.tv_sec+now.tv_usec/1e6, 'type': event.type, 'channel': note.channel, 'note': note.note, 'velocity': note.velocity}
+                obj.channel = note.channel
+                obj.note = note.note
+                obj.velocity = note.velocity
+                return obj
             elif SND_SEQ_EVENT_CONTROLLER == event.type or SND_SEQ_EVENT_PGMCHANGE == event.type or SND_SEQ_EVENT_PITCHBEND == event.type:
+                obj = Ctrl(now.tv_sec+now.tv_usec/1e6, event.type)
                 control = <snd_seq_ev_ctrl_t*> &(event.data)
-                return {'time': now.tv_sec+now.tv_usec/1e6, 'type': event.type, 'channel': control.channel, 'param': control.param, 'value': control.value}
+                obj.channel = control.channel
+                obj.param = control.param
+                obj.value = control.value
+                return obj
