@@ -21,7 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.nod import Block
-from pym2149.midi import Midi
+from pym2149.midi import Midi, SpeedDetector
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
@@ -71,9 +71,12 @@ class MidiPump(MainBackground):
         self.timer = timer
 
     def __call__(self):
+        speeddetector = SpeedDetector()
         while not self.quit:
+            events = self.midi.getevents()
+            speeddetector(bool(events))
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
-            for offset, event in self.midi.getevents():
+            for offset, event in events:
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):

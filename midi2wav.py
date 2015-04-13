@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.out import configure
-from pym2149.midi import Midi
+from pym2149.midi import Midi, SpeedDetector
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
@@ -47,28 +47,6 @@ class StreamReady:
         if sleeptime > 0:
             time.sleep(sleeptime)
         self.readytime += self.period
-
-class SpeedDetector:
-
-    def __init__(self):
-        self.update = 0
-        self.lastevent = None
-        self.speed = None
-
-    def __call__(self, event):
-        if event:
-            if self.lastevent is not None:
-                speed = self.update - self.lastevent
-                if self.speed is None:
-                    log.info("Speed detected: %s", speed)
-                    self.speed = speed
-                elif speed % self.speed:
-                    log.warn("Speed was %s but is now: %s", self.speed, speed)
-                    self.speed = speed
-                else:
-                    pass # Do nothing, multiples of current speed are fine.
-            self.lastevent = self.update
-        self.update += 1
 
 # FIXME: Unduplicate with midi2jack.
 class MidiPump(MainBackground):
