@@ -67,7 +67,7 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_1consistentlylate(self):
-        self.doit(.005,
+        self.doit(.002952,
             [.005],
             [.005],
             [],
@@ -77,7 +77,7 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_2consistentlyearly(self):
-        self.doit(-.005,
+        self.doit(-.002952,
             [-.005],
             [-.005],
             [],
@@ -87,7 +87,7 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_3hundredthgranularity(self):
-        self.doit(-0.004959,
+        self.doit(-.004959,
             [0],
             [-.01],
             [0],
@@ -99,7 +99,7 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_4hundredthgranularityaltsync(self):
-        self.doit(0.005544,
+        self.doit(.003701,
             [0, .009],
             [],
             [0, .01],
@@ -111,7 +111,7 @@ class TestPLL(unittest.TestCase):
         )
 
     def test_5hundredthgranularityaltshift(self):
-        self.doit(0.004779,
+        self.doit(.002891,
             [.009],
             [0],
             [.01],

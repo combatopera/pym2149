@@ -92,4 +92,4 @@ trace = None
 
 plltargetpos = operator.truediv(.5, config.updaterate)
 
-pllalpha = .001
+pllalpha = .1

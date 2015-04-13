@@ -31,7 +31,7 @@ class PLL:
     def start(self):
         self.events = []
         self.updates = []
-        self.medianshift = None
+        self.medianshift = 0
         self.mark = time.time()
         self.windowindex = 0
         self.nextwindow()
@@ -41,9 +41,7 @@ class PLL:
 
     def nextwindow(self):
         self.windowindex += 1
-        self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod
-        if self.medianshift is not None:
-            self.exclusivewindowend += self.medianshift
+        self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod + self.medianshift
 
     def event(self, eventtime, event):
         self.events.append((eventtime, event))
@@ -53,12 +51,11 @@ class PLL:
         targettime = inclusivewindowstart + self.targetpos
         shifts = []
         i = 0
-        preshift = 0 if self.medianshift is None else self.medianshift
         for eventtime, _ in self.events:
             if eventtime >= self.exclusivewindowend:
                 break
             if eventtime >= inclusivewindowstart:
-                shifts.append(preshift + eventtime - targettime)
+                shifts.append(self.medianshift + eventtime - targettime)
             i += 1
         self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event in self.events[:i]])
         del self.events[:i]
@@ -67,11 +64,9 @@ class PLL:
             if n & 1: # Odd.
                 medianshift = shifts[(n - 1) // 2]
             else:
-                medianshift = (shifts[n // 2 - 1] + shifts[n // 2]) / 2
-            if self.medianshift is None:
-                self.medianshift = medianshift
-            else:
-                self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
+                midindex = n // 2
+                medianshift = (shifts[midindex - 1] + shifts[midindex]) / 2
+            self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
         self.nextwindow()
 
     def takeupdate(self):
