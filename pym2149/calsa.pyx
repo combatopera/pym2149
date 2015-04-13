@@ -144,10 +144,10 @@ cdef class Client:
                 snd_seq_event_input(self.handle, &event)
                 gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
-                note = Note()
+                note = Note.__new__(Note)
                 note.init(&now, event.type, <snd_seq_ev_note_t*> &(event.data))
                 return note
             elif SND_SEQ_EVENT_CONTROLLER == event.type or SND_SEQ_EVENT_PGMCHANGE == event.type or SND_SEQ_EVENT_PITCHBEND == event.type:
-                ctrl = Ctrl()
+                ctrl = Ctrl.__new__(Ctrl)
                 ctrl.init(&now, event.type, <snd_seq_ev_ctrl_t*> &(event.data))
                 return ctrl
