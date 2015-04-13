@@ -91,11 +91,11 @@ class ControlChange(ChannelMessage):
 class Midi(SimpleBackground):
 
     classes = {
-      calsa.SND_SEQ_EVENT_NOTEON: NoteOn,
-      calsa.SND_SEQ_EVENT_NOTEOFF: NoteOff,
-      calsa.SND_SEQ_EVENT_PITCHBEND: PitchBend,
-      calsa.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
-      calsa.SND_SEQ_EVENT_CONTROLLER: ControlChange,
+        calsa.SND_SEQ_EVENT_NOTEON: NoteOn,
+        calsa.SND_SEQ_EVENT_NOTEOFF: NoteOff,
+        calsa.SND_SEQ_EVENT_PITCHBEND: PitchBend,
+        calsa.SND_SEQ_EVENT_PGMCHANGE: ProgramChange,
+        calsa.SND_SEQ_EVENT_CONTROLLER: ControlChange,
     }
 
     @types(Config, PLL)
