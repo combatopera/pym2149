@@ -143,7 +143,7 @@ cdef class Client:
                 gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
                 note = <snd_seq_ev_note_t*> &(event.data)
-                return Note(now.tv_sec+now.tv_usec/1e6, event.type, note.channel, note.note, note.velocity)
+                return Note.__new__(Note, now.tv_sec+now.tv_usec/1e6, event.type, note.channel, note.note, note.velocity)
             elif SND_SEQ_EVENT_CONTROLLER == event.type or SND_SEQ_EVENT_PGMCHANGE == event.type or SND_SEQ_EVENT_PITCHBEND == event.type:
                 control = <snd_seq_ev_ctrl_t*> &(event.data)
-                return Ctrl(now.tv_sec+now.tv_usec/1e6, event.type, control.channel, control.param, control.value)
+                return Ctrl.__new__(Ctrl, now.tv_sec+now.tv_usec/1e6, event.type, control.channel, control.param, control.value)
