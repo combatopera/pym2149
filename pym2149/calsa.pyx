@@ -93,7 +93,11 @@ SND_SEQ_EVENT_CONTROLLER = 10
 SND_SEQ_EVENT_PGMCHANGE = 11
 SND_SEQ_EVENT_PITCHBEND = 13
 
-class Event:
+cdef class Event:
+
+    cdef readonly double time
+    cdef readonly snd_seq_event_type_t type
+    cdef readonly unsigned char channel
 
     def __init__(self, time, type, channel):
         self.time = time
