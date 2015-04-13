@@ -99,8 +99,8 @@ cdef class Event:
     cdef readonly snd_seq_event_type_t type
     cdef readonly unsigned char channel
 
-    def __cinit__(self, time, type, channel, *args):
-        self.time = time
+    cdef initevent(self, timeval* time, snd_seq_event_type_t type, unsigned char channel):
+        self.time = time.tv_sec + time.tv_usec / 1e6
         self.type = type
         self.channel = channel
 
@@ -109,7 +109,8 @@ cdef class Note(Event):
     cdef readonly unsigned char note
     cdef readonly unsigned char velocity
 
-    def __cinit__(self, time, type, channel, note, velocity):
+    cdef init(self, timeval* time, snd_seq_event_type_t type, unsigned char channel, unsigned char note, unsigned char velocity):
+        self.initevent(time, type, channel)
         self.note = note
         self.velocity = velocity
 
@@ -118,7 +119,8 @@ cdef class Ctrl(Event):
     cdef readonly unsigned int param
     cdef readonly signed int value
 
-    def __cinit__(self, time, type, channel, param, value):
+    cdef init(self, timeval* time, snd_seq_event_type_t type, unsigned char channel, unsigned int param, signed int value):
+        self.initevent(time, type, channel)
         self.param = param
         self.value = value
 
@@ -137,13 +139,19 @@ cdef class Client:
         cdef snd_seq_ev_note_t* note
         cdef snd_seq_ev_ctrl_t* control
         cdef timeval now
+        cdef Note noteobj
+        cdef Ctrl ctrlobj
         while True:
             with nogil:
                 snd_seq_event_input(self.handle, &event)
                 gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
+                noteobj = Note()
                 note = <snd_seq_ev_note_t*> &(event.data)
-                return Note.__new__(Note, now.tv_sec+now.tv_usec/1e6, event.type, note.channel, note.note, note.velocity)
+                noteobj.init(&now, event.type, note.channel, note.note, note.velocity)
+                return noteobj
             elif SND_SEQ_EVENT_CONTROLLER == event.type or SND_SEQ_EVENT_PGMCHANGE == event.type or SND_SEQ_EVENT_PITCHBEND == event.type:
+                ctrlobj = Ctrl()
                 control = <snd_seq_ev_ctrl_t*> &(event.data)
-                return Ctrl.__new__(Ctrl, now.tv_sec+now.tv_usec/1e6, event.type, control.channel, control.param, control.value)
+                ctrlobj.init(&now, event.type, control.channel, control.param, control.value)
+                return ctrlobj
