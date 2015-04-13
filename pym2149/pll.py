@@ -50,7 +50,7 @@ class PLL:
 
     def closeupdate(self):
         inclusivewindowstart = self.exclusivewindowend - self.updateperiod
-        targettime = inclusivewindowstart + self.updateperiod * self.targetpos
+        targettime = inclusivewindowstart + self.targetpos
         shifts = []
         i = 0
         preshift = 0 if self.medianshift is None else self.medianshift
