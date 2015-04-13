@@ -99,7 +99,7 @@ cdef class Event:
     cdef readonly snd_seq_event_type_t type
     cdef readonly unsigned char channel
 
-    def __init__(self, time, type, channel):
+    def __cinit__(self, time, type, channel, *args):
         self.time = time
         self.type = type
         self.channel = channel
@@ -109,8 +109,7 @@ cdef class Note(Event):
     cdef readonly unsigned char note
     cdef readonly unsigned char velocity
 
-    def __init__(self, time, type, channel, note, velocity):
-        Event.__init__(self, time, type, channel)
+    def __cinit__(self, time, type, channel, note, velocity):
         self.note = note
         self.velocity = velocity
 
@@ -119,8 +118,7 @@ cdef class Ctrl(Event):
     cdef readonly unsigned int param
     cdef readonly signed int value
 
-    def __init__(self, time, type, channel, param, value):
-        Event.__init__(self, time, type, channel)
+    def __cinit__(self, time, type, channel, param, value):
         self.param = param
         self.value = value
 
