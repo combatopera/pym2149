@@ -25,14 +25,14 @@ import calsa
 class ChannelMessage:
 
   def __init__(self, midi, event):
-    self.midichan = midi.chanbase + event['channel']
+    self.midichan = midi.chanbase + event.channel
 
 class NoteOnOff(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.midinote = event['note']
-    self.vel = event['velocity']
+    self.midinote = event.note
+    self.vel = event.velocity
 
   def __str__(self):
     return "%s %2d %3d %3d" % (self.char, self.midichan, self.midinote, self.vel)
@@ -55,7 +55,7 @@ class PitchBend(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.bend = event['value'] # In [-0x2000, 0x2000).
+    self.bend = event.value # In [-0x2000, 0x2000).
 
   def __call__(self, channels):
     return channels.pitchbend(self.midichan, self.bend)
@@ -67,7 +67,7 @@ class ProgramChange(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.program = midi.programbase + event['value']
+    self.program = midi.programbase + event.value
 
   def __call__(self, channels):
     return channels.programchange(self.midichan, self.program)
@@ -79,8 +79,8 @@ class ControlChange(ChannelMessage):
 
   def __init__(self, midi, event):
     ChannelMessage.__init__(self, midi, event)
-    self.controller = event['param']
-    self.value = event['value']
+    self.controller = event.param
+    self.value = event.value
 
   def __call__(self, channels):
     return channels.controlchange(self.midichan, self.controller, self.value)
@@ -103,15 +103,12 @@ class Midi(SimpleBackground):
     self.chanbase = config.midichannelbase
     self.programbase = config.midiprogrambase
     self.pll = pll
-    self.events = []
 
   def bg(self):
     client = calsa.Client(clientname)
     while not self.quit:
       event = client.event_input()
-      self.events.append(self.classes.get(event['type'])(self, event))
+      self.pll.event(event.time, self.classes.get(event.type)(self, event))
 
   def getevents(self):
-    events = self.events[:]
-    del self.events[:len(events)]
-    return events
+    return self.pll.takeupdate()
