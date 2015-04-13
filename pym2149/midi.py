@@ -106,7 +106,7 @@ class Midi(SimpleBackground):
 
     def bg(self):
         client = calsa.Client(clientname)
-        while not self.quit:
+        while not self.quit: # FIXME: Prevents app exit if MIDI is quiet.
             event = client.event_input()
             self.pll.event(event.time, self.classes.get(event.type)(self, event))
 
