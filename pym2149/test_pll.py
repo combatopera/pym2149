@@ -35,7 +35,7 @@ class TestPLL(unittest.TestCase):
 
     updaterate = 50
     updateperiod = 1 / updaterate
-    plltargetpos = .5
+    plltargetpos = updateperiod / 2
     pllalpha = .2
 
     def doit(self, positionshift, *offsetlists):
