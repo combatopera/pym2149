@@ -20,7 +20,9 @@ from di import types
 from iface import Config
 from pll import PLL
 from bg import SimpleBackground
-import calsa
+import calsa, logging
+
+log = logging.getLogger(__name__)
 
 class SpeedDetector:
 
