@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-cimport numpy as np
+cimport numpy as np, ctime
 import numpy as pynp
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
@@ -31,11 +31,11 @@ cdef extern from "pthread.h":
         pass
 
     int pthread_mutex_init(pthread_mutex_t*, void*)
-    int pthread_mutex_lock(pthread_mutex_t*)
-    int pthread_mutex_unlock(pthread_mutex_t*)
+    int pthread_mutex_lock(pthread_mutex_t*) nogil
+    int pthread_mutex_unlock(pthread_mutex_t*) nogil
     int pthread_cond_init(pthread_cond_t*, void*)
     int pthread_cond_signal(pthread_cond_t*)
-    int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*)
+    int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*) nogil
 
 cdef extern from "jack/jack.h":
 
@@ -102,11 +102,11 @@ cdef class Payload:
         self.ports[i] = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
         self.ports_length += 1
 
-    cdef send(self, np.ndarray[np.float32_t, ndim=2] samples):
+    cdef void send(self, jack_default_audio_sample_t* samples) nogil:
         pthread_mutex_lock(&(self.mutex))
         while self.samples != NULL: # There is only one consumer, but we use while to catch spurious wakeups.
             pthread_cond_wait(&(self.cond), &(self.mutex))
-        self.samples = &samples[0, 0]
+        self.samples = samples
         pthread_mutex_unlock(&(self.mutex))
 
     cdef callback(self, jack_nframes_t nframes):
@@ -126,6 +126,9 @@ cdef int callback(jack_nframes_t nframes, void* arg):
     cdef Payload payload = <Payload> arg
     payload.callback(nframes)
     return 0 # Success.
+
+cdef jack_default_audio_sample_t* getaddress(np.ndarray[np.float32_t, ndim=2] samples):
+    return &samples[0, 0]
 
 cdef class Client:
 
@@ -166,12 +169,16 @@ cdef class Client:
         return self.outbufcurrent
 
     def send_and_get_output_buffer(self):
-        self.payload.send(self.outbufcurrent) # Will block until JACK is ready.
+        cdef jack_default_audio_sample_t* samples = getaddress(self.outbufcurrent)
+        cdef ctime.timeval mark
+        with nogil:
+            self.payload.send(samples) # Will block until JACK is ready.
+            ctime.gettimeofday(&mark, NULL)
         # JACK was ready, so samples was NULL, so standby is free to use.
         outbuf = self.outbufstandby
         self.outbufstandby = self.outbufcurrent
         self.outbufcurrent = outbuf
-        return outbuf
+        return mark.tv_sec + mark.tv_usec / 1e6, outbuf
 
     def deactivate(self):
         jack_deactivate(self.client)

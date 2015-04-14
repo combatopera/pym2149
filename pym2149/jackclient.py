@@ -90,6 +90,7 @@ class JackStream(object, Node, Stream):
     outbufs = [self.chain(wav) for wav in self.wavs]
     n = len(outbufs[0])
     i = 0
+    mark = None
     while i < n:
       m = min(n - i, self.client.buffersize - self.cursor)
       for chanindex in xrange(self.chancount):
@@ -97,8 +98,9 @@ class JackStream(object, Node, Stream):
       self.cursor += m
       i += m
       if self.cursor == self.client.buffersize:
-        self.outbuf = self.client.send_and_get_output_buffer()
+        mark, self.outbuf = self.client.send_and_get_output_buffer()
         self.cursor = 0
+    return mark
 
   def flush(self):
     pass # Nothing to be done.
