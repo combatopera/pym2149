@@ -56,6 +56,7 @@ class PLL:
                 break
             if eventtime >= inclusivewindowstart:
                 shifts.append(self.medianshift + eventtime - targettime)
+            # If eventtime < inclusivewindowstart we consume the event without harvesting its shift.
             i += 1
         self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event in self.events[:i]])
         del self.events[:i]
