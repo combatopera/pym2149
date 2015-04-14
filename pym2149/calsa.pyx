@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+cimport ctime
+
 cdef extern from "alsa/global.h":
     pass
 
@@ -72,21 +74,6 @@ cdef extern from "alsa/seqmid.h":
     int snd_seq_set_client_name(snd_seq_t*, const char*)
     int snd_seq_create_simple_port(snd_seq_t*, const char*, unsigned int, unsigned int)
 
-cdef extern from "sys/time.h":
-
-    ctypedef long time_t
-
-    ctypedef long suseconds_t
-
-    cdef struct timeval:
-        time_t tv_sec
-        suseconds_t tv_usec
-
-    cdef struct timezone:
-        pass # Obsolete.
-
-    int gettimeofday(timeval*, timezone*) nogil
-
 SND_SEQ_EVENT_NOTEON = 6
 SND_SEQ_EVENT_NOTEOFF = 7
 SND_SEQ_EVENT_CONTROLLER = 10
@@ -99,7 +86,7 @@ cdef class Event:
     cdef readonly snd_seq_event_type_t type
     cdef readonly unsigned char channel
 
-    cdef initevent(self, timeval* time, snd_seq_event_type_t type, unsigned char channel):
+    cdef initevent(self, ctime.timeval* time, snd_seq_event_type_t type, unsigned char channel):
         self.time = time.tv_sec + time.tv_usec / 1e6
         self.type = type
         self.channel = channel
@@ -109,7 +96,7 @@ cdef class Note(Event):
     cdef readonly unsigned char note
     cdef readonly unsigned char velocity
 
-    cdef init(self, timeval* time, snd_seq_event_type_t type, snd_seq_ev_note_t* data):
+    cdef init(self, ctime.timeval* time, snd_seq_event_type_t type, snd_seq_ev_note_t* data):
         self.initevent(time, type, data.channel)
         self.note = data.note
         self.velocity = data.velocity
@@ -119,7 +106,7 @@ cdef class Ctrl(Event):
     cdef readonly unsigned int param
     cdef readonly signed int value
 
-    cdef init(self, timeval* time, snd_seq_event_type_t type, snd_seq_ev_ctrl_t* data):
+    cdef init(self, ctime.timeval* time, snd_seq_event_type_t type, snd_seq_ev_ctrl_t* data):
         self.initevent(time, type, data.channel)
         self.param = data.param
         self.value = data.value
@@ -136,13 +123,13 @@ cdef class Client:
 
     def event_input(self):
         cdef snd_seq_event_t* event
-        cdef timeval now
+        cdef ctime.timeval now
         cdef Note note
         cdef Ctrl ctrl
         while True:
             with nogil:
                 snd_seq_event_input(self.handle, &event)
-                gettimeofday(&now, NULL)
+                ctime.gettimeofday(&now, NULL)
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
                 note = Note.__new__(Note)
                 note.init(&now, event.type, <snd_seq_ev_note_t*> &(event.data))
