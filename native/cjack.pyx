@@ -75,14 +75,17 @@ cdef extern from "jack/jack.h":
 
 cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
 DEF maxports = 10
+DEF ringsize = 10
 
 cdef class Payload:
 
     cdef jack_port_t* ports[maxports]
-    cdef int ports_length
+    cdef unsigned ports_length
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
-    cdef jack_default_audio_sample_t* samples
+    cdef jack_default_audio_sample_t* chunks[ringsize]
+    cdef unsigned writecursor
+    cdef unsigned readcursor
     cdef size_t bufferbytes
     cdef size_t buffersize
 
@@ -90,7 +93,10 @@ cdef class Payload:
         self.ports_length = 0
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
-        self.samples = NULL
+        for i in xrange(ringsize):
+            self.chunks[i] = NULL
+        self.writecursor = 0
+        self.readcursor = 0
         self.bufferbytes = buffersize * samplesize
         self.buffersize = buffersize
 
@@ -102,20 +108,26 @@ cdef class Payload:
         self.ports[i] = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
         self.ports_length += 1
 
-    cdef void send(self, jack_default_audio_sample_t* samples) nogil:
+    cdef unsigned send(self, jack_default_audio_sample_t* samples) nogil:
         pthread_mutex_lock(&(self.mutex))
-        while self.samples != NULL: # There is only one consumer, but we use while to catch spurious wakeups.
+        # There is only one consumer, but we use while to catch spurious wakeups:
+        while self.chunks[self.writecursor] != NULL:
+            fprintf(stderr, 'Overrun!\n') # The producer is too fast.
             pthread_cond_wait(&(self.cond), &(self.mutex))
-        self.samples = samples
+        self.chunks[self.writecursor] = samples
+        self.writecursor = (self.writecursor + 1) % ringsize
         pthread_mutex_unlock(&(self.mutex))
+        return self.writecursor # Caller can use the numpy buffer, send will block until its slot is free.
 
     cdef callback(self, jack_nframes_t nframes):
         pthread_mutex_lock(&(self.mutex)) # Worst case is a tiny delay while we wait for send to finish.
-        if self.samples != NULL:
+        cdef jack_default_audio_sample_t* samples = self.chunks[self.readcursor]
+        if samples != NULL:
             for i in xrange(self.ports_length):
-                memcpy(jack_port_get_buffer(self.ports[i], nframes), self.samples, self.bufferbytes)
-                self.samples = &self.samples[self.buffersize]
-            self.samples = NULL
+                memcpy(jack_port_get_buffer(self.ports[i], nframes), samples, self.bufferbytes)
+                samples = &samples[self.buffersize]
+            self.chunks[self.readcursor] = NULL
+            self.readcursor = (self.readcursor + 1) % ringsize
             pthread_cond_signal(&(self.cond))
         else:
             # Unknown when send will run, so give up:
@@ -137,6 +149,7 @@ cdef class Client:
     cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
     cdef object outbufs
+    cdef unsigned localwritecursor
 
     def __init__(self, const char* client_name, chancount):
         self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
@@ -146,7 +159,8 @@ cdef class Client:
         self.payload = Payload(self.buffersize)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
-        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(2)]
+        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
+        self.localwritecursor = 0
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -164,19 +178,15 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        return self.outbufs[0]
+        return self.outbufs[self.localwritecursor]
 
     def send_and_get_output_buffer(self):
-        cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[0])
+        cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
         cdef ctime.timeval mark
         with nogil:
-            self.payload.send(samples) # Will block until JACK is ready.
+            self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
             ctime.gettimeofday(&mark, NULL)
-        # JACK was ready, so samples was NULL, so standby is free to use.
-        newcurrentoutbuf = self.outbufs[1]
-        self.outbufs[1] = self.outbufs[0]
-        self.outbufs[0] = newcurrentoutbuf
-        return mark.tv_sec + mark.tv_usec / 1e6, newcurrentoutbuf
+        return mark.tv_sec + mark.tv_usec / 1e6, self.outbufs[self.localwritecursor]
 
     def deactivate(self):
         jack_deactivate(self.client)
