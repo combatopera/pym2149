@@ -20,7 +20,7 @@ from di import types
 from iface import Config
 from pll import PLL
 from bg import SimpleBackground
-import calsa, logging
+import native.calsa as calsa, logging
 
 log = logging.getLogger(__name__)
 
