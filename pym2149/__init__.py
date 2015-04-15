@@ -15,16 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyximport, numpy as np, subprocess, re, os
-
-def libraries():
-    ldconfigpath = '/sbin/ldconfig'
-    trylibs = 'jack', 'asound'
-    if os.path.exists(ldconfigpath):
-        installed = set(re.search(r'[^\s]+', line).group() for line in subprocess.check_output([ldconfigpath, '-p']).splitlines() if line.startswith('\t'))
-        for name in trylibs:
-            if "lib%s.so" % name in installed:
-                yield name, {}
+import pyximport, numpy as np
+from native import iterlibraries
 
 # Note -O3 is apparently the default:
-pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': list(libraries())}, inplace = True)
+pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': list(iterlibraries())}, inplace = True)

@@ -15,3 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+import subprocess, re, os
+
+def iterlibraries():
+    ldconfigpath = '/sbin/ldconfig'
+    trylibs = 'jack', 'asound'
+    if os.path.exists(ldconfigpath):
+        installed = set(re.search(r'[^\s]+', line).group() for line in subprocess.check_output([ldconfigpath, '-p']).splitlines() if line.startswith('\t'))
+        for name in trylibs:
+            if "lib%s.so" % name in installed:
+                yield name, {}
