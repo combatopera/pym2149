@@ -33,6 +33,7 @@ from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
 from pym2149.pll import PLL
+from midi2wav import StreamReady
 
 log = logging.getLogger(__name__)
 
@@ -71,8 +72,10 @@ class MidiPump(MainBackground):
         self.timer = timer
 
     def __call__(self):
+        streamready = StreamReady(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
+            streamready.await()
             events = self.midi.getevents()
             speeddetector(bool(events))
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
