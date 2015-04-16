@@ -86,10 +86,12 @@ chipchannels = 3
 
 profile = None
 '''If not None, a tuple of (profiling time, sort column, output path).'''
+# TODO: Let's not use tuples.
 
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
 plltargetpos = operator.truediv(.5, config.updaterate)
+# TODO: Make it possible to use slash here.
 
 pllalpha = .1
