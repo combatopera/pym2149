@@ -34,6 +34,7 @@ class SpeedDetector:
     def __call__(self, event):
         if event:
             if self.lastevent is not None:
+                # FIXME: When this goes to 1 it can't recover.
                 speed = self.update - self.lastevent
                 if self.speed is None:
                     log.info("Speed detected: %s", speed)
