@@ -160,7 +160,7 @@ cdef class Client:
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
         self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
-        self.localwritecursor = 0
+        self.localwritecursor = 0 # FIXME: I don't think this works correctly.
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
