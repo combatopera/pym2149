@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-cimport numpy as np, ctime
+cimport numpy as np
 import numpy as pynp
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
@@ -182,11 +182,9 @@ cdef class Client:
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
-        cdef ctime.timeval mark
         with nogil:
             self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
-            ctime.gettimeofday(&mark, NULL)
-        return mark.tv_sec + mark.tv_usec / 1e6, self.outbufs[self.localwritecursor]
+        return self.outbufs[self.localwritecursor]
 
     def deactivate(self):
         jack_deactivate(self.client)
