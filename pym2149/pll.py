@@ -76,6 +76,6 @@ class PLL:
     def takeupdateimpl(self, now):
         while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
-        update = sum(self.updates, [])
+        update = sum(self.updates, []) # XXX: Can we be stricter?
         del self.updates[:]
         return update
