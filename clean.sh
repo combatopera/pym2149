@@ -25,4 +25,6 @@ find -name '*.so' -exec rm -fv '{}' +
 
 find -name '*.dsd' -exec rm -fv '{}' +
 
+rm -fv pym2149/cpaste?*.pyx
+
 hg st -A | grep -v ^C
