@@ -36,13 +36,13 @@ class ConfigImpl(lazyconf.View, Config):
         for argname, arg in zip(argnames, args):
             setattr(self, argname, arg)
         expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
-        configspath = os.path.join(appconfigdir, 'configs')
+        workspacepath = os.path.join(appconfigdir, 'workspace')
         if 'configname' in kwargs:
             configname = kwargs['configname']
         else:
             confignames = [self.defaultconfigname]
-            if os.path.exists(configspath):
-                confignames += sorted(os.listdir(configspath))
+            if os.path.exists(workspacepath):
+                confignames += sorted(os.listdir(workspacepath))
             if 1 == len(confignames):
                 configname, = confignames
             else:
@@ -51,7 +51,7 @@ class ConfigImpl(lazyconf.View, Config):
                 sys.stderr.write('#? ')
                 configname = confignames[int(raw_input())]
         if self.defaultconfigname != configname:
-            expressions.load(os.path.join(configspath, configname))
+            expressions.load(os.path.join(workspacepath, configname, configname + '.py'))
 
     def fork(self):
         return Fork(self)
