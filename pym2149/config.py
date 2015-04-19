@@ -26,34 +26,34 @@ def getprocessconfig(*argnames, **kwargs):
 
 class ConfigImpl(lazyconf.View, Config):
 
-  defaultconfigname = 'defaults'
+    defaultconfigname = 'defaults'
 
-  def __init__(self, argnames, args, **kwargs):
-    if len(argnames) != len(args):
-      raise Exception("Expected %s but got: %s" % (argnames, args))
-    expressions = lazyconf.Expressions()
-    lazyconf.View.__init__(self, expressions)
-    for argname, arg in zip(argnames, args):
-      setattr(self, argname, arg)
-    expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
-    configspath = os.path.join(appconfigdir, 'configs')
-    if 'configname' in kwargs:
-      configname = kwargs['configname']
-    else:
-      confignames = [self.defaultconfigname]
-      if os.path.exists(configspath):
-        confignames += sorted(os.listdir(configspath))
-      if 1 == len(confignames):
-        configname, = confignames
-      else:
-        for i, cn in enumerate(confignames):
-          print >> sys.stderr, "%s) %s" % (i, cn)
-        sys.stderr.write('#? ')
-        configname = confignames[int(raw_input())]
-    if self.defaultconfigname != configname:
-      expressions.load(os.path.join(configspath, configname))
+    def __init__(self, argnames, args, **kwargs):
+        if len(argnames) != len(args):
+            raise Exception("Expected %s but got: %s" % (argnames, args))
+        expressions = lazyconf.Expressions()
+        lazyconf.View.__init__(self, expressions)
+        for argname, arg in zip(argnames, args):
+            setattr(self, argname, arg)
+        expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
+        configspath = os.path.join(appconfigdir, 'configs')
+        if 'configname' in kwargs:
+            configname = kwargs['configname']
+        else:
+            confignames = [self.defaultconfigname]
+            if os.path.exists(configspath):
+                confignames += sorted(os.listdir(configspath))
+            if 1 == len(confignames):
+                configname, = confignames
+            else:
+                for i, cn in enumerate(confignames):
+                    print >> sys.stderr, "%s) %s" % (i, cn)
+                sys.stderr.write('#? ')
+                configname = confignames[int(raw_input())]
+        if self.defaultconfigname != configname:
+            expressions.load(os.path.join(configspath, configname))
 
-  def fork(self):
-    return Fork(self)
+    def fork(self):
+        return Fork(self)
 
 class Fork(lazyconf.Fork, Config): pass
