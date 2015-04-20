@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.out import configure
 from pym2149.midi import Midi, SpeedDetector
@@ -31,22 +30,9 @@ from pym2149.util import awaitinterrupt
 from pym2149.timer import Timer
 from pym2149.bg import MainBackground
 from pym2149.pll import PLL
-from ymplayer import SimpleChipTimer
-import time
+from ymplayer import SimpleChipTimer, StreamReady
 
 log = logging.getLogger(__name__)
-
-class StreamReady:
-
-    def __init__(self, updaterate):
-        self.period = 1 / updaterate
-        self.readytime = time.time()
-
-    def await(self):
-        sleeptime = self.readytime - time.time()
-        if sleeptime > 0:
-            time.sleep(sleeptime)
-        self.readytime += self.period
 
 # FIXME: Unduplicate with midi2jack.
 class MidiPump(MainBackground):

@@ -33,7 +33,7 @@ from pym2149.timer import Timer, SimpleTimer
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
 from pym2149.pll import PLL
-from midi2wav import StreamReady
+from ymplayer import StreamReady
 
 log = logging.getLogger(__name__)
 

@@ -15,12 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from pym2149.timer import Timer, MinBlockRateTimer, SimpleTimer
 from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile, Config
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
+import time
+
+class StreamReady:
+
+    def __init__(self, updaterate):
+        self.period = 1 / updaterate
+        self.readytime = time.time()
+
+    def await(self):
+        sleeptime = self.readytime - time.time()
+        if sleeptime > 0:
+            time.sleep(sleeptime)
+        self.readytime += self.period
 
 class ChipTimer(MinBlockRateTimer):
 
