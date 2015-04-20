@@ -138,9 +138,11 @@ cdef int callback(jack_nframes_t nframes, void* arg):
 cdef class OutBuf:
 
     cdef readonly object array
+    cdef bint occupied
 
     def __init__(self, chancount, buffersize):
         self.array = pynp.empty((chancount, buffersize), dtype = pynp.float32)
+        self.occupied = False
 
 cdef jack_default_audio_sample_t* getaddress(outbuf):
     cdef np.ndarray[np.float32_t, ndim=2] samples = outbuf.array
