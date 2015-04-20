@@ -88,11 +88,11 @@ cdef class Payload:
     cdef size_t bufferbytes
     cdef size_t buffersize
 
-    def __init__(self, buffersize):
+    def __init__(self, buffersize, outbufs):
         self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
-        for i in xrange(ringsize):
+        for i in xrange(len(outbufs)):
             self.chunks[i] = NULL
         self.writecursor = 0
         self.readcursor = 0
@@ -140,11 +140,11 @@ cdef jack_default_audio_sample_t* getaddress(np.ndarray[np.float32_t, ndim=2] sa
 
 cdef class Client:
 
-    cdef jack_status_t status
+    cdef jack_status_t status # TODO: Use this or remove it.
     cdef jack_client_t* client
-    cdef Payload payload # This is a pointer in C.
     cdef size_t buffersize
     cdef object outbufs
+    cdef Payload payload # This is a pointer in C.
     cdef unsigned localwritecursor
 
     def __init__(self, const char* client_name, chancount):
@@ -152,10 +152,10 @@ cdef class Client:
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
         self.buffersize = jack_get_buffer_size(self.client)
-        self.payload = Payload(self.buffersize)
+        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
+        self.payload = Payload(self.buffersize, self.outbufs)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
-        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
         self.localwritecursor = 0 # FIXME: I don't think this works correctly.
 
     def get_sample_rate(self):
