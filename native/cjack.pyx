@@ -110,10 +110,11 @@ cdef class Payload:
 
     cdef unsigned send(self, jack_default_audio_sample_t* samples) nogil:
         pthread_mutex_lock(&(self.mutex))
-        # There is only one consumer, but we use while to catch spurious wakeups:
-        while self.chunks[self.writecursor] != NULL:
+        if self.chunks[self.writecursor] != NULL:
             fprintf(stderr, 'Overrun!\n') # The producer is too fast.
-            pthread_cond_wait(&(self.cond), &(self.mutex))
+            # There is only one consumer, but we use while to catch spurious wakeups:
+            while self.chunks[self.writecursor] != NULL:
+                pthread_cond_wait(&(self.cond), &(self.mutex))
         self.chunks[self.writecursor] = samples
         self.writecursor = (self.writecursor + 1) % ringsize
         pthread_mutex_unlock(&(self.mutex))
