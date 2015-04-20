@@ -135,7 +135,15 @@ cdef int callback(jack_nframes_t nframes, void* arg):
     payload.callback(nframes)
     return 0 # Success.
 
-cdef jack_default_audio_sample_t* getaddress(np.ndarray[np.float32_t, ndim=2] samples):
+cdef class OutBuf:
+
+    cdef readonly object array
+
+    def __init__(self, chancount, buffersize):
+        self.array = pynp.empty((chancount, buffersize), dtype = pynp.float32)
+
+cdef jack_default_audio_sample_t* getaddress(outbuf):
+    cdef np.ndarray[np.float32_t, ndim=2] samples = outbuf.array
     return &samples[0, 0]
 
 cdef class Client:
@@ -152,7 +160,7 @@ cdef class Client:
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
         self.buffersize = jack_get_buffer_size(self.client)
-        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
+        self.outbufs = [OutBuf(chancount, self.buffersize) for _ in xrange(ringsize)]
         self.payload = Payload(self.buffersize, self.outbufs)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
@@ -174,13 +182,13 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        return self.outbufs[self.localwritecursor]
+        return self.outbufs[self.localwritecursor].array
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
         with nogil:
             self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
-        return self.outbufs[self.localwritecursor]
+        return self.outbufs[self.localwritecursor].array
 
     def deactivate(self):
         jack_deactivate(self.client)
