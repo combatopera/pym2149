@@ -22,7 +22,30 @@ from pym2149.iface import Chip, Stream, YMFile, Config
 from pym2149.di import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
+from pym2149.nod import Block
+from pym2149.minblep import MinBleps
 import time
+
+class SyncTimer(SimpleTimer):
+
+    @types(Stream, MinBleps, ClockInfo)
+    def __init__(self, stream, minbleps, clockinfo):
+        self.naiverate = clockinfo.implclock
+        SimpleTimer.__init__(self, self.naiverate)
+        self.buffersize = stream.getbuffersize()
+        self.naivex = 0
+        self.bufferx = 0
+        self.minbleps = minbleps
+
+    def blocksforperiod(self, refreshrate):
+        wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
+        naiveN = wholeperiodblock.framecount
+        while naiveN:
+            naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.buffersize - self.bufferx))
+            yield Block(naiven)
+            self.bufferx = (self.bufferx + self.minbleps.getoutcount(self.naivex, naiven)) % self.buffersize
+            self.naivex = (self.naivex + naiven) % self.naiverate
+            naiveN -= naiven
 
 class StreamReady:
 

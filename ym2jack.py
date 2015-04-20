@@ -24,8 +24,7 @@ from pym2149.config import getprocessconfig
 from pym2149.vis import Roll
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
-from midi2jack import SyncTimer
-from ymplayer import Player
+from ymplayer import Player, SyncTimer
 
 log = logging.getLogger(__name__)
 
