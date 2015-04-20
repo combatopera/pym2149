@@ -27,4 +27,6 @@ find -name '*.dsd' -exec rm -fv '{}' +
 
 rm -fv pym2149/cpaste?*.pyx
 
+rm -rfv target
+
 hg st -A | grep -v ^C
