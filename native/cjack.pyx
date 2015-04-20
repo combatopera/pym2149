@@ -20,6 +20,7 @@ import numpy as pynp
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
 from libc.string cimport memcpy
+from libc.stdint cimport uintptr_t
 from cpython.ref cimport PyObject
 
 cdef extern from "pthread.h":
@@ -74,13 +75,11 @@ cdef extern from "jack/jack.h":
     void* jack_port_get_buffer(jack_port_t*, jack_nframes_t)
 
 cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
-DEF maxports = 10
 DEF ringsize = 10
 
 cdef class Payload:
 
-    cdef jack_port_t* ports[maxports]
-    cdef unsigned ports_length
+    cdef object ports
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
     cdef jack_default_audio_sample_t* chunks[ringsize]
@@ -90,7 +89,7 @@ cdef class Payload:
     cdef size_t buffersize
 
     def __init__(self, buffersize):
-        self.ports_length = 0
+        self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
         for i in xrange(ringsize):
@@ -100,13 +99,9 @@ cdef class Payload:
         self.bufferbytes = buffersize * samplesize
         self.buffersize = buffersize
 
-    cdef addportandblock(self, jack_client_t* client, port_name):
-        i = self.ports_length
-        if i == maxports:
-            raise Exception('Please increase maxports.')
+    cdef addport(self, jack_client_t* client, port_name):
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
-        self.ports[i] = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)
-        self.ports_length += 1
+        self.ports.append(<uintptr_t> jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0))
 
     cdef unsigned send(self, jack_default_audio_sample_t* samples) nogil:
         pthread_mutex_lock(&(self.mutex))
@@ -124,8 +119,8 @@ cdef class Payload:
         pthread_mutex_lock(&(self.mutex)) # Worst case is a tiny delay while we wait for send to finish.
         cdef jack_default_audio_sample_t* samples = self.chunks[self.readcursor]
         if samples != NULL:
-            for i in xrange(self.ports_length):
-                memcpy(jack_port_get_buffer(self.ports[i], nframes), samples, self.bufferbytes)
+            for port in self.ports:
+                memcpy(jack_port_get_buffer(<jack_port_t*> <uintptr_t> port, nframes), samples, self.bufferbytes)
                 samples = &samples[self.buffersize]
             self.chunks[self.readcursor] = NULL
             self.readcursor = (self.readcursor + 1) % ringsize
@@ -170,7 +165,7 @@ cdef class Client:
         return self.buffersize
 
     def port_register_output(self, const char* port_name):
-        self.payload.addportandblock(self.client, port_name)
+        self.payload.addport(self.client, port_name)
 
     def activate(self):
         return jack_activate(self.client)
