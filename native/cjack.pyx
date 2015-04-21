@@ -74,7 +74,6 @@ cdef extern from "jack/jack.h":
     int jack_set_process_callback(jack_client_t*, JackProcessCallback, void*)
     void* jack_port_get_buffer(jack_port_t*, jack_nframes_t)
 
-cdef size_t samplesize = sizeof (jack_default_audio_sample_t)
 DEF ringsize = 10
 
 cdef class Payload:
@@ -82,7 +81,7 @@ cdef class Payload:
     cdef object ports
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
-    cdef jack_default_audio_sample_t* chunks[ringsize]
+    cdef jack_default_audio_sample_t** chunks
     cdef unsigned writecursor # Always points to a free chunk.
     cdef unsigned readcursor
     cdef size_t bufferbytes
@@ -92,11 +91,12 @@ cdef class Payload:
         self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
+        self.chunks = <jack_default_audio_sample_t**> malloc(len(outbufs) * sizeof (jack_default_audio_sample_t*))
         for i in xrange(len(outbufs)):
             self.chunks[i] = NULL
         self.writecursor = 0
         self.readcursor = 0
-        self.bufferbytes = buffersize * samplesize
+        self.bufferbytes = buffersize * sizeof (jack_default_audio_sample_t)
         self.buffersize = buffersize
 
     cdef addport(self, jack_client_t* client, port_name):
