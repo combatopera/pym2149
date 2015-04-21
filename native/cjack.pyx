@@ -180,7 +180,7 @@ cdef class Client:
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.current_output_buffer())
-        self.writecursorproxy = self.payload.send(samples) # May block until JACK is ready.
+        self.writecursorproxy = self.payload.send(samples) # May block until there is a free buffer.
         return self.current_output_buffer()
 
     def deactivate(self):
