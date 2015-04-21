@@ -19,7 +19,7 @@ from nod import Node
 from const import clientname
 from iface import AmpScale
 from out import FloatStream, StereoInfo
-from iface import Stream, JackConnection
+from iface import Stream, JackConnection, Config
 from di import types
 import native.cjack as cjack, logging
 
@@ -27,12 +27,14 @@ log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
-  @types(StereoInfo)
-  def __init__(self, stereoinfo):
+  @types(Config, StereoInfo)
+  def __init__(self, config, stereoinfo):
+    self.ringsize = config.jackringsize
+    self.coupling = config.jackcoupling
     self.chancount = stereoinfo.getoutchans.size
 
   def start(self):
-    self.jack = cjack.Client(clientname, self.chancount, 10)
+    self.jack = cjack.Client(clientname, self.chancount, self.ringsize, self.coupling)
     self.outputrate = self.jack.get_sample_rate() # defaultconf.py uses this.
     self.buffersize = self.jack.get_buffer_size()
 

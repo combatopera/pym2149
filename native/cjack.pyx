@@ -85,8 +85,9 @@ cdef class Payload:
     cdef unsigned readcursor
     cdef size_t bufferbytes
     cdef size_t buffersize
+    cdef bint coupling
 
-    def __init__(self, buffersize, ringsize):
+    def __init__(self, buffersize, ringsize, coupling):
         self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
@@ -98,6 +99,7 @@ cdef class Payload:
         self.readcursor = 0
         self.bufferbytes = buffersize * sizeof (jack_default_audio_sample_t)
         self.buffersize = buffersize
+        self.coupling = coupling
 
     cdef addport(self, jack_client_t* client, port_name):
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
@@ -109,7 +111,8 @@ cdef class Payload:
         self.writecursor = (self.writecursor + 1) % self.ringsize
         # Allow callback to see the data before releasing slot to the producer:
         if self.chunks[self.writecursor] != NULL:
-            fprintf(stderr, 'Overrun!\n') # The producer is too fast.
+            if not self.coupling:
+                fprintf(stderr, 'Overrun!\n') # The producer is too fast.
             # There is only one consumer, but we use while to catch spurious wakeups:
             while self.chunks[self.writecursor] != NULL:
                 with nogil:
@@ -149,13 +152,13 @@ cdef class Client:
     cdef Payload payload # This is a pointer in C.
     cdef unsigned writecursorproxy
 
-    def __init__(self, const char* client_name, chancount, ringsize):
+    def __init__(self, const char* client_name, chancount, ringsize, coupling):
         self.client = jack_client_open(client_name, JackNoStartServer, NULL)
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
         self.buffersize = jack_get_buffer_size(self.client)
         self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
-        self.payload = Payload(self.buffersize, ringsize)
+        self.payload = Payload(self.buffersize, ringsize, coupling)
         self.writecursorproxy = self.payload.writecursor
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
