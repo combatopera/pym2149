@@ -32,8 +32,8 @@ cdef extern from "pthread.h":
         pass
 
     int pthread_mutex_init(pthread_mutex_t*, void*)
-    int pthread_mutex_lock(pthread_mutex_t*) nogil
-    int pthread_mutex_unlock(pthread_mutex_t*) nogil
+    int pthread_mutex_lock(pthread_mutex_t*)
+    int pthread_mutex_unlock(pthread_mutex_t*)
     int pthread_cond_init(pthread_cond_t*, void*)
     int pthread_cond_signal(pthread_cond_t*)
     int pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*) nogil
@@ -103,13 +103,14 @@ cdef class Payload:
         # Last arg ignored for JACK_DEFAULT_AUDIO_TYPE:
         self.ports.append(<uintptr_t> jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0))
 
-    cdef unsigned send(self, jack_default_audio_sample_t* samples) nogil:
+    cdef unsigned send(self, jack_default_audio_sample_t* samples):
         pthread_mutex_lock(&(self.mutex))
         if self.chunks[self.writecursor] != NULL:
             fprintf(stderr, 'Overrun!\n') # The producer is too fast.
             # There is only one consumer, but we use while to catch spurious wakeups:
             while self.chunks[self.writecursor] != NULL:
-                pthread_cond_wait(&(self.cond), &(self.mutex))
+                with nogil:
+                    pthread_cond_wait(&(self.cond), &(self.mutex))
         self.chunks[self.writecursor] = samples
         self.writecursor = (self.writecursor + 1) % ringsize
         pthread_mutex_unlock(&(self.mutex))
@@ -188,8 +189,7 @@ cdef class Client:
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
-        with nogil:
-            self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
+        self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
         return self.outbufs[self.localwritecursor].array
 
     def deactivate(self):
