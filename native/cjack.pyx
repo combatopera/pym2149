@@ -74,13 +74,12 @@ cdef extern from "jack/jack.h":
     int jack_set_process_callback(jack_client_t*, JackProcessCallback, void*)
     void* jack_port_get_buffer(jack_port_t*, jack_nframes_t)
 
-DEF ringsize = 10
-
 cdef class Payload:
 
     cdef object ports
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
+    cdef unsigned ringsize
     cdef jack_default_audio_sample_t** chunks
     cdef unsigned writecursor # Always points to a free chunk.
     cdef unsigned readcursor
@@ -91,8 +90,9 @@ cdef class Payload:
         self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
-        self.chunks = <jack_default_audio_sample_t**> malloc(len(outbufs) * sizeof (jack_default_audio_sample_t*))
-        for i in xrange(len(outbufs)):
+        self.ringsize = len(outbufs)
+        self.chunks = <jack_default_audio_sample_t**> malloc(self.ringsize * sizeof (jack_default_audio_sample_t*))
+        for i in xrange(self.ringsize):
             self.chunks[i] = NULL
         self.writecursor = 0
         self.readcursor = 0
@@ -106,7 +106,7 @@ cdef class Payload:
     cdef unsigned send(self, jack_default_audio_sample_t* samples):
         pthread_mutex_lock(&(self.mutex))
         self.chunks[self.writecursor] = samples
-        self.writecursor = (self.writecursor + 1) % ringsize
+        self.writecursor = (self.writecursor + 1) % self.ringsize
         # Allow callback to see the data before releasing slot to the producer:
         if self.chunks[self.writecursor] != NULL:
             fprintf(stderr, 'Overrun!\n') # The producer is too fast.
@@ -126,7 +126,7 @@ cdef class Payload:
                 memcpy(jack_port_get_buffer(<jack_port_t*> <uintptr_t> port, nframes), samples, self.bufferbytes)
                 samples = &samples[self.buffersize]
             self.chunks[self.readcursor] = NULL
-            self.readcursor = (self.readcursor + 1) % ringsize
+            self.readcursor = (self.readcursor + 1) % self.ringsize
             pthread_cond_signal(&(self.cond))
         else:
             # Unknown when send will run, so give up:
@@ -159,7 +159,7 @@ cdef class Client:
     cdef Payload payload # This is a pointer in C.
     cdef unsigned localwritecursor
 
-    def __init__(self, const char* client_name, chancount):
+    def __init__(self, const char* client_name, chancount, ringsize):
         self.client = jack_client_open(client_name, JackNoStartServer, NULL)
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')

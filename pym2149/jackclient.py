@@ -32,7 +32,7 @@ class JackClient(JackConnection):
     self.chancount = stereoinfo.getoutchans.size
 
   def start(self):
-    self.jack = cjack.Client(clientname, self.chancount)
+    self.jack = cjack.Client(clientname, self.chancount, 10)
     self.outputrate = self.jack.get_sample_rate() # defaultconf.py uses this.
     self.buffersize = self.jack.get_buffer_size()
 
