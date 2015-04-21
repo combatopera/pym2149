@@ -140,14 +140,14 @@ cdef int callback(jack_nframes_t nframes, void* arg):
 
 cdef class OutBuf:
 
-    cdef readonly object array
+    cdef object array
     cdef bint occupied
 
     def __init__(self, chancount, buffersize):
         self.array = pynp.empty((chancount, buffersize), dtype = pynp.float32)
         self.occupied = False
 
-cdef jack_default_audio_sample_t* getaddress(outbuf):
+cdef jack_default_audio_sample_t* getaddress(OutBuf outbuf):
     cdef np.ndarray[np.float32_t, ndim=2] samples = outbuf.array
     return &samples[0, 0]
 
@@ -186,12 +186,13 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        return self.outbufs[self.localwritecursor].array
+        cdef OutBuf outbuf = self.outbufs[self.localwritecursor]
+        return outbuf.array
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
         self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
-        return self.outbufs[self.localwritecursor].array
+        return self.current_output_buffer()
 
     def deactivate(self):
         jack_deactivate(self.client)
