@@ -95,3 +95,9 @@ plltargetpos = operator.truediv(.5, config.updaterate)
 # TODO: Make it possible to use slash here.
 
 pllalpha = .1
+
+jackringsize = 2 if config.di.all(YMFile) else 10
+'''In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.'''
+
+jackcoupling = bool(config.di.all(YMFile))
+'''If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition.'''
