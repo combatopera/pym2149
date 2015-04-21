@@ -147,7 +147,7 @@ cdef class Client:
     cdef size_t buffersize
     cdef object outbufs
     cdef Payload payload # This is a pointer in C.
-    cdef unsigned localwritecursor
+    cdef unsigned writecursorproxy
 
     def __init__(self, const char* client_name, chancount, ringsize):
         self.client = jack_client_open(client_name, JackNoStartServer, NULL)
@@ -156,9 +156,9 @@ cdef class Client:
         self.buffersize = jack_get_buffer_size(self.client)
         self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
         self.payload = Payload(self.buffersize, ringsize)
+        self.writecursorproxy = self.payload.writecursor
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
-        self.localwritecursor = 0 # FIXME: I don't think this works correctly.
 
     def get_sample_rate(self):
         return jack_get_sample_rate(self.client)
@@ -176,11 +176,11 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        return self.outbufs[self.localwritecursor]
+        return self.outbufs[self.writecursorproxy]
 
     def send_and_get_output_buffer(self):
         cdef jack_default_audio_sample_t* samples = getaddress(self.current_output_buffer())
-        self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
+        self.writecursorproxy = self.payload.send(samples) # May block until JACK is ready.
         return self.current_output_buffer()
 
     def deactivate(self):
