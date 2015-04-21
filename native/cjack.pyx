@@ -114,9 +114,11 @@ cdef class Payload:
         self.chunks[self.writecursor] = samples
         self.writecursor = (self.writecursor + 1) % ringsize
         pthread_mutex_unlock(&(self.mutex))
+        # FIXME: Don't release next chunk until it's available.
         return self.writecursor # Caller can use the numpy buffer, send will block until its slot is free.
 
     cdef callback(self, jack_nframes_t nframes):
+        # This is a Python-free zone!
         pthread_mutex_lock(&(self.mutex)) # Worst case is a tiny delay while we wait for send to finish.
         cdef jack_default_audio_sample_t* samples = self.chunks[self.readcursor]
         if samples != NULL:
