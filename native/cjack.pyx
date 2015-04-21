@@ -86,11 +86,11 @@ cdef class Payload:
     cdef size_t bufferbytes
     cdef size_t buffersize
 
-    def __init__(self, buffersize, outbufs):
+    def __init__(self, buffersize, ringsize):
         self.ports = []
         pthread_mutex_init(&(self.mutex), NULL)
         pthread_cond_init(&(self.cond), NULL)
-        self.ringsize = len(outbufs)
+        self.ringsize = ringsize
         self.chunks = <jack_default_audio_sample_t**> malloc(self.ringsize * sizeof (jack_default_audio_sample_t*))
         for i in xrange(self.ringsize):
             self.chunks[i] = NULL
@@ -138,15 +138,7 @@ cdef int callback(jack_nframes_t nframes, void* arg):
     payload.callback(nframes)
     return 0 # Success.
 
-cdef class OutBuf:
-
-    cdef object array
-
-    def __init__(self, chancount, buffersize):
-        self.array = pynp.empty((chancount, buffersize), dtype = pynp.float32)
-
-cdef jack_default_audio_sample_t* getaddress(OutBuf outbuf):
-    cdef np.ndarray[np.float32_t, ndim=2] samples = outbuf.array
+cdef jack_default_audio_sample_t* getaddress(np.ndarray[np.float32_t, ndim=2] samples):
     return &samples[0, 0]
 
 cdef class Client:
@@ -162,8 +154,8 @@ cdef class Client:
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
         self.buffersize = jack_get_buffer_size(self.client)
-        self.outbufs = [OutBuf(chancount, self.buffersize) for _ in xrange(ringsize)]
-        self.payload = Payload(self.buffersize, self.outbufs)
+        self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
+        self.payload = Payload(self.buffersize, ringsize)
         # Note the pointer stays valid until Client is garbage-collected:
         jack_set_process_callback(self.client, &callback, <PyObject*> self.payload)
         self.localwritecursor = 0 # FIXME: I don't think this works correctly.
@@ -184,11 +176,10 @@ cdef class Client:
         return jack_connect(self.client, source_port_name, destination_port_name)
 
     def current_output_buffer(self):
-        cdef OutBuf outbuf = self.outbufs[self.localwritecursor]
-        return outbuf.array
+        return self.outbufs[self.localwritecursor]
 
     def send_and_get_output_buffer(self):
-        cdef jack_default_audio_sample_t* samples = getaddress(self.outbufs[self.localwritecursor])
+        cdef jack_default_audio_sample_t* samples = getaddress(self.current_output_buffer())
         self.localwritecursor = self.payload.send(samples) # May block until JACK is ready.
         return self.current_output_buffer()
 
