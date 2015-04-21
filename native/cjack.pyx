@@ -105,7 +105,7 @@ cdef class Payload:
 
     cdef unsigned send(self, jack_default_audio_sample_t* samples):
         pthread_mutex_lock(&(self.mutex))
-        self.chunks[self.writecursor] = samples
+        self.chunks[self.writecursor] = samples # It was NULL.
         self.writecursor = (self.writecursor + 1) % self.ringsize
         # Allow callback to see the data before releasing slot to the producer:
         if self.chunks[self.writecursor] != NULL:
@@ -141,11 +141,9 @@ cdef int callback(jack_nframes_t nframes, void* arg):
 cdef class OutBuf:
 
     cdef object array
-    cdef bint occupied
 
     def __init__(self, chancount, buffersize):
         self.array = pynp.empty((chancount, buffersize), dtype = pynp.float32)
-        self.occupied = False
 
 cdef jack_default_audio_sample_t* getaddress(OutBuf outbuf):
     cdef np.ndarray[np.float32_t, ndim=2] samples = outbuf.array
