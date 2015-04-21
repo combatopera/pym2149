@@ -107,6 +107,7 @@ cdef class Payload:
         pthread_mutex_lock(&(self.mutex))
         self.chunks[self.writecursor] = samples
         self.writecursor = (self.writecursor + 1) % ringsize
+        # Allow callback to see the data before releasing slot to the producer:
         if self.chunks[self.writecursor] != NULL:
             fprintf(stderr, 'Overrun!\n') # The producer is too fast.
             # There is only one consumer, but we use while to catch spurious wakeups:
@@ -114,7 +115,7 @@ cdef class Payload:
                 with nogil:
                     pthread_cond_wait(&(self.cond), &(self.mutex))
         pthread_mutex_unlock(&(self.mutex))
-        return self.writecursor # Caller can use the numpy buffer, send will block until its slot is free.
+        return self.writecursor
 
     cdef callback(self, jack_nframes_t nframes):
         # This is a Python-free zone!
