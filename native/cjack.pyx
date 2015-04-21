@@ -83,7 +83,7 @@ cdef class Payload:
     cdef pthread_mutex_t mutex
     cdef pthread_cond_t cond
     cdef jack_default_audio_sample_t* chunks[ringsize]
-    cdef unsigned writecursor
+    cdef unsigned writecursor # Always points to a free chunk.
     cdef unsigned readcursor
     cdef size_t bufferbytes
     cdef size_t buffersize
@@ -105,16 +105,15 @@ cdef class Payload:
 
     cdef unsigned send(self, jack_default_audio_sample_t* samples):
         pthread_mutex_lock(&(self.mutex))
+        self.chunks[self.writecursor] = samples
+        self.writecursor = (self.writecursor + 1) % ringsize
         if self.chunks[self.writecursor] != NULL:
             fprintf(stderr, 'Overrun!\n') # The producer is too fast.
             # There is only one consumer, but we use while to catch spurious wakeups:
             while self.chunks[self.writecursor] != NULL:
                 with nogil:
                     pthread_cond_wait(&(self.cond), &(self.mutex))
-        self.chunks[self.writecursor] = samples
-        self.writecursor = (self.writecursor + 1) % ringsize
         pthread_mutex_unlock(&(self.mutex))
-        # FIXME: Don't release next chunk until it's available.
         return self.writecursor # Caller can use the numpy buffer, send will block until its slot is free.
 
     cdef callback(self, jack_nframes_t nframes):
