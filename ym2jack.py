@@ -32,10 +32,9 @@ def main():
     config = getprocessconfig('inpath')
     di = createdi(config)
     di.add(JackClient)
+    di.add(YMOpen)
     di.start()
     try:
-        di.add(YMOpen)
-        di.start()
         configure(di)
         di.add(Roll)
         di.add(SyncTimer)
