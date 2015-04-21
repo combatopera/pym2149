@@ -138,7 +138,7 @@ class YM23(YM):
     YM.__init__(self, f, False)
     self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
 
-class YM2(YM23): # FIXME: Work out format from ST-Sound source, it's not this simple.
+class YM2(YM23): # FIXME LATER: Work out format from ST-Sound source, it's not this simple.
 
   formatid = 'YM2!'
 

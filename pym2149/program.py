@@ -93,7 +93,7 @@ class Note:
   def noteoff(self): pass
 
   def noteoffframe(self, frame):
-    self.noteonframe(self.onframes + frame) # FIXME: Has failed due to lack of onframes.
+    self.noteonframe(self.onframes + frame) # FIXME LATER: Has failed due to lack of onframes.
 
 class NullNote(Note): pass
 
