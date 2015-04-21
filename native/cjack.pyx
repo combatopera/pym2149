@@ -153,7 +153,6 @@ cdef jack_default_audio_sample_t* getaddress(outbuf):
 
 cdef class Client:
 
-    cdef jack_status_t status # TODO: Use this or remove it.
     cdef jack_client_t* client
     cdef size_t buffersize
     cdef object outbufs
@@ -161,7 +160,7 @@ cdef class Client:
     cdef unsigned localwritecursor
 
     def __init__(self, const char* client_name, chancount):
-        self.client = jack_client_open(client_name, JackNoStartServer, &self.status)
+        self.client = jack_client_open(client_name, JackNoStartServer, NULL)
         if NULL == self.client:
             raise Exception('Failed to create a JACK client.')
         self.buffersize = jack_get_buffer_size(self.client)
