@@ -52,10 +52,10 @@ class MidiPump(MainBackground):
         streamready = StreamReady(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
-            # Simulate blocking behaviour of a real output device, but we do it here for best MIDI timing:
             streamready.await()
             events = self.midi.getevents()
             speeddetector(bool(events))
+            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in events:
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
