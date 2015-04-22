@@ -18,7 +18,9 @@
 from __future__ import division
 from iface import Config
 from di import types
-import time
+import time, logging
+
+log = logging.getLogger(__name__)
 
 class PLL:
 
@@ -76,6 +78,12 @@ class PLL:
     def takeupdateimpl(self, now):
         while now >= self.exclusivewindowend: # No more events can qualify for this window.
             self.closeupdate()
-        update = sum(self.updates, []) # XXX: Can we be stricter?
-        del self.updates[:]
+        copy = self.updates[:]
+        n = len(copy)
+        del self.updates[:n] # Not actually necessary to use n, as only we call closeupdate.
+        if 1 == n:
+            update, = copy
+        else:
+            log.warn("Yielding %s updates as one.", n)
+            update = sum(copy, [])
         return update
