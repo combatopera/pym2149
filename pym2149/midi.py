@@ -171,6 +171,7 @@ class MidiPump(MainBackground):
         streamready = StreamReady(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
+            # FIXME LATER: Make PLL-aware so we don't occasionally get 2-then-0 updates.
             streamready.await()
             events = self.midi.getevents()
             speeddetector(bool(events))
