@@ -15,14 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from const import clientname
 from di import types
-from iface import Config
+from iface import Config, Stream, Chip
 from pll import PLL
-from bg import SimpleBackground
-import native.calsa as calsa, logging
+from bg import SimpleBackground, MainBackground
+from channels import Channels
+from minblep import MinBleps
+from timer import Timer
+import native.calsa as calsa, logging, time
 
 log = logging.getLogger(__name__)
+
+class StreamReady:
+
+    def __init__(self, updaterate):
+        self.period = 1 / updaterate
+        self.readytime = time.time()
+
+    def await(self):
+        sleeptime = self.readytime - time.time()
+        if sleeptime > 0:
+            time.sleep(sleeptime)
+        self.readytime += self.period
 
 class SpeedDetector:
 
@@ -137,3 +153,32 @@ class Midi(SimpleBackground):
 
     def getevents(self):
         return self.pll.takeupdate()
+
+class MidiPump(MainBackground):
+
+    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
+    def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
+        MainBackground.__init__(self, config)
+        self.updaterate = config.updaterate
+        self.midi = midi
+        self.channels = channels
+        self.minbleps = minbleps
+        self.stream = stream
+        self.chip = chip
+        self.timer = timer
+
+    def __call__(self):
+        streamready = StreamReady(self.updaterate)
+        speeddetector = SpeedDetector()
+        while not self.quit:
+            streamready.await()
+            events = self.midi.getevents()
+            speeddetector(bool(events))
+            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
+            for offset, event in events:
+                log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
+            self.channels.updateall()
+            for block in self.timer.blocksforperiod(self.updaterate):
+                self.stream.call(block)
+            self.channels.closeframe()
+        self.stream.flush()

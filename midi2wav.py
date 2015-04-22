@@ -19,50 +19,15 @@
 
 from pym2149.initlogging import logging
 from pym2149.out import configure
-from pym2149.midi import Midi, SpeedDetector
+from pym2149.midi import Midi, MidiPump
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream, Config
-from pym2149.minblep import MinBleps
-from pym2149.di import types
 from pym2149.util import awaitinterrupt
-from pym2149.timer import Timer
-from pym2149.bg import MainBackground
 from pym2149.pll import PLL
-from ymplayer import SimpleChipTimer, StreamReady
+from ymplayer import SimpleChipTimer
 
 log = logging.getLogger(__name__)
-
-# FIXME: Unduplicate with midi2jack.
-class MidiPump(MainBackground):
-
-    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
-    def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
-        MainBackground.__init__(self, config)
-        self.updaterate = config.updaterate
-        self.midi = midi
-        self.channels = channels
-        self.minbleps = minbleps
-        self.stream = stream
-        self.chip = chip
-        self.timer = timer
-
-    def __call__(self):
-        streamready = StreamReady(self.updaterate)
-        speeddetector = SpeedDetector()
-        while not self.quit:
-            streamready.await()
-            events = self.midi.getevents()
-            speeddetector(bool(events))
-            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
-            for offset, event in events:
-                log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
-            self.channels.updateall()
-            for block in self.timer.blocksforperiod(self.updaterate):
-                self.stream.call(block)
-            self.channels.closeframe()
-        self.stream.flush()
 
 def main():
     config = getprocessconfig('outpath')
