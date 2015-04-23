@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport ctime
+from libc.string cimport memset
 
 cdef extern from "alsa/global.h":
     pass
@@ -52,8 +53,14 @@ cdef extern from "alsa/seq_event.h":
 
     ctypedef unsigned char snd_seq_event_type_t
 
+    ctypedef struct snd_seq_addr_t:
+        unsigned char client
+        unsigned char port
+
     ctypedef struct snd_seq_event_t:
         snd_seq_event_type_t type
+        unsigned char queue
+        snd_seq_addr_t dest
         snd_seq_event_data data
 
 cdef extern from "alsa/seq.h":
@@ -61,13 +68,18 @@ cdef extern from "alsa/seq.h":
     ctypedef struct snd_seq_t:
         pass # Opaque.
 
+    DEF SND_SEQ_OPEN_OUTPUT = 1
     DEF SND_SEQ_OPEN_INPUT = 2
     DEF SND_SEQ_PORT_CAP_WRITE = 1 << 1
     DEF SND_SEQ_PORT_CAP_SUBS_WRITE = 1 << 6 # XXX: What is this?
     DEF SND_SEQ_PORT_TYPE_SYNTHESIZER = 1 << 18
 
+    DEF SND_SEQ_QUEUE_DIRECT = 253
+
     int snd_seq_open(snd_seq_t**, const char*, int, int)
     int snd_seq_event_input(snd_seq_t*, snd_seq_event_t**) nogil
+    int snd_seq_event_output_direct(snd_seq_t*, snd_seq_event_t*)
+    int snd_seq_client_id(snd_seq_t*)
 
 cdef extern from "alsa/seqmid.h":
 
@@ -79,6 +91,7 @@ SND_SEQ_EVENT_NOTEOFF = 7
 SND_SEQ_EVENT_CONTROLLER = 10
 SND_SEQ_EVENT_PGMCHANGE = 11
 SND_SEQ_EVENT_PITCHBEND = 13
+SND_SEQ_EVENT_USR0 = 90
 
 cdef class Event:
 
@@ -114,12 +127,13 @@ cdef class Ctrl(Event):
 cdef class Client:
 
     cdef snd_seq_t* handle
+    cdef int portid
 
     def __init__(self, const char* client_name):
-        if snd_seq_open(&(self.handle), 'default', SND_SEQ_OPEN_INPUT, 0):
+        if snd_seq_open(&(self.handle), 'default', SND_SEQ_OPEN_INPUT | SND_SEQ_OPEN_OUTPUT, 0):
             raise Exception('Failed to open ALSA.')
         snd_seq_set_client_name(self.handle, client_name)
-        snd_seq_create_simple_port(self.handle, 'IN', SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE, SND_SEQ_PORT_TYPE_SYNTHESIZER)
+        self.portid = snd_seq_create_simple_port(self.handle, 'IN', SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE, SND_SEQ_PORT_TYPE_SYNTHESIZER)
 
     def event_input(self):
         cdef snd_seq_event_t* event
@@ -139,3 +153,14 @@ cdef class Client:
                 ctrl = Ctrl.__new__(Ctrl)
                 ctrl.init(&now, event.type, <snd_seq_ev_ctrl_t*> &(event.data))
                 return ctrl
+            elif SND_SEQ_EVENT_USR0 == event.type:
+                return
+
+    def interrupt(self):
+        cdef snd_seq_event_t event
+        memset(&event, 0, sizeof (snd_seq_event_t)) # Compiles to a real sizeof.
+        event.type = SND_SEQ_EVENT_USR0
+        event.queue = SND_SEQ_QUEUE_DIRECT
+        event.dest.client = snd_seq_client_id(self.handle)
+        event.dest.port = self.portid
+        snd_seq_event_output_direct(self.handle, &event)

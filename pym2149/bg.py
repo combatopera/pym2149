@@ -24,6 +24,9 @@ class SimpleBackground:
     def bg(self):
         self()
 
+    def interrupt(self):
+        pass
+
     def start(self):
         self.quit = False
         self.thread = threading.Thread(target = self.bg)
@@ -31,6 +34,7 @@ class SimpleBackground:
 
     def stop(self):
         self.quit = True
+        self.interrupt()
         self.thread.join()
 
 class MainBackground(SimpleBackground):
