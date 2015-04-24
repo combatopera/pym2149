@@ -27,86 +27,86 @@ log = logging.getLogger(__name__)
 
 class JackClient(JackConnection):
 
-  @types(Config, StereoInfo)
-  def __init__(self, config, stereoinfo):
-    self.ringsize = config.jackringsize
-    self.coupling = config.jackcoupling
-    self.chancount = stereoinfo.getoutchans.size
+    @types(Config, StereoInfo)
+    def __init__(self, config, stereoinfo):
+        self.ringsize = config.jackringsize
+        self.coupling = config.jackcoupling
+        self.chancount = stereoinfo.getoutchans.size
 
-  def start(self):
-    self.jack = cjack.Client(clientname, self.chancount, self.ringsize, self.coupling)
-    self.outputrate = self.jack.get_sample_rate() # defaultconf.py uses this.
-    self.buffersize = self.jack.get_buffer_size()
+    def start(self):
+        self.jack = cjack.Client(clientname, self.chancount, self.ringsize, self.coupling)
+        self.outputrate = self.jack.get_sample_rate() # defaultconf.py uses this.
+        self.buffersize = self.jack.get_buffer_size()
 
-  def port_register_output(self, port_name):
-    self.jack.port_register_output(port_name)
+    def port_register_output(self, port_name):
+        self.jack.port_register_output(port_name)
 
-  def activate(self):
-    self.jack.activate()
+    def activate(self):
+        self.jack.activate()
 
-  def connect(self, source_port_name, destination_port_name):
-    self.jack.connect(source_port_name, destination_port_name)
+    def connect(self, source_port_name, destination_port_name):
+        self.jack.connect(source_port_name, destination_port_name)
 
-  def current_output_buffer(self):
-    return self.jack.current_output_buffer()
+    def current_output_buffer(self):
+        return self.jack.current_output_buffer()
 
-  def send_and_get_output_buffer(self):
-    return self.jack.send_and_get_output_buffer()
+    def send_and_get_output_buffer(self):
+        return self.jack.send_and_get_output_buffer()
 
-  def deactivate(self):
-    self.jack.deactivate()
+    def deactivate(self):
+        self.jack.deactivate()
 
-  def stop(self):
-    self.jack.dispose()
+    def stop(self):
+        self.jack.dispose()
 
 class JackStream(object, Node, Stream):
 
-  __metaclass__ = AmpScale
-  # For jack the available amplitude range is 2 ** 1:
-  log2maxpeaktopeak = 1
-  # XXX: Can we detect how many system channels there are?
-  syschannames = tuple("system:playback_%s" % (1 + syschanindex) for syschanindex in xrange(2))
+    __metaclass__ = AmpScale
+    # For jack the available amplitude range is 2 ** 1:
+    log2maxpeaktopeak = 1
+    # XXX: Can we detect how many system channels there are?
+    syschannames = tuple("system:playback_%s" % (1 + syschanindex) for syschanindex in xrange(2))
 
-  @types(StereoInfo, FloatStream, JackClient)
-  def __init__(self, stereoinfo, wavs, client):
-    Node.__init__(self)
-    self.chancount = stereoinfo.getoutchans.size
-    for chanindex in xrange(self.chancount):
-      client.port_register_output("out_%s" % (1 + chanindex))
-    self.wavs = wavs
-    self.client = client
+    @types(StereoInfo, FloatStream, JackClient)
+    def __init__(self, stereoinfo, wavs, client):
+        Node.__init__(self)
+        self.chancount = stereoinfo.getoutchans.size
+        for chanindex in xrange(self.chancount):
+            client.port_register_output("out_%s" % (1 + chanindex))
+        self.wavs = wavs
+        self.client = client
 
-  def start(self):
-    self.client.activate()
-    # Connect all system channels, cycling over our streams if necessary:
-    for syschanindex, syschanname in enumerate(self.syschannames):
-      chanindex = syschanindex % self.chancount
-      self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), syschanname)
-    self.outbuf = self.client.current_output_buffer()
-    self.cursor = 0
-
-  def getbuffersize(self):
-    return self.client.buffersize
-
-  def callimpl(self):
-    outbufs = [self.chain(wav) for wav in self.wavs]
-    n = len(outbufs[0])
-    i = 0
-    while i < n:
-      m = min(n - i, self.client.buffersize - self.cursor)
-      for chanindex in xrange(self.chancount):
-        outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
-      self.cursor += m
-      i += m
-      if self.cursor == self.client.buffersize:
-        self.outbuf = self.client.send_and_get_output_buffer()
+    def start(self):
+        self.client.activate()
+        # Connect all system channels, cycling over our streams if necessary:
+        for syschanindex, syschanname in enumerate(self.syschannames):
+            chanindex = syschanindex % self.chancount
+            self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), syschanname)
+        self.outbuf = self.client.current_output_buffer()
         self.cursor = 0
 
-  def flush(self):
-    pass # Nothing to be done.
+    def getbuffersize(self):
+        return self.client.buffersize
 
-  def stop(self):
-    self.client.deactivate()
+    def callimpl(self):
+        outbufs = [self.chain(wav) for wav in self.wavs]
+        n = len(outbufs[0])
+        i = 0
+        while i < n:
+            m = min(n - i, self.client.buffersize - self.cursor)
+            for chanindex in xrange(self.chancount):
+                outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
+            self.cursor += m
+            i += m
+            if self.cursor == self.client.buffersize:
+                self.outbuf = self.client.send_and_get_output_buffer()
+                self.cursor = 0
+
+    def flush(self):
+        pass # Nothing to be done.
+
+    def stop(self):
+        self.client.deactivate()
 
 def configure(di):
     di.add(JackStream)
