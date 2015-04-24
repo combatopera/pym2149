@@ -99,7 +99,7 @@ class Channels:
   def __init__(self, config, chip):
     self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
     self.midiprograms = config.midiprograms
-    self.midichantoprogram = dict([c, self.midiprograms[p]] for c, p in config.midichanneltoprogram.iteritems())
+    self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
     self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
     self.mediation = Mediation(config.midichannelbase, config.chipchannels)
     self.controllers = {}
@@ -121,7 +121,7 @@ class Channels:
     self.frameindex = 0
 
   def noteon(self, midichan, midinote, vel):
-    program = self.midichantoprogram[midichan]
+    program = self.midiprograms[self.midichantoprogram[midichan]]
     fx = self.midichantofx[midichan]
     channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, self.frameindex)]
     channel.newnote(self.frameindex, program, midinote, vel, fx)
@@ -142,7 +142,7 @@ class Channels:
       self.controllers[controller](midichan, value)
 
   def programchange(self, midichan, program):
-    self.midichantoprogram[midichan] = self.midiprograms[program]
+    self.midichantoprogram[midichan] = program
 
   def updateall(self):
     text = ' | '.join("%s@%s" % (c.programornone(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
@@ -162,4 +162,4 @@ class Channels:
       yield c.getpan()
 
   def __str__(self):
-    return ', '.join("%s -> %s" % entry for entry in sorted(self.midichantoprogram.iteritems()))
+    return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.iteritems()))
