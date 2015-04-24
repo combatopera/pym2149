@@ -64,12 +64,11 @@ class JackStream(object, Node, Stream):
     __metaclass__ = AmpScale
     # For jack the available amplitude range is 2 ** 1:
     log2maxpeaktopeak = 1
-    # XXX: Can we detect how many system channels there are?
-    syschannames = tuple("system:playback_%s" % (1 + syschanindex) for syschanindex in xrange(2))
 
-    @types(StereoInfo, FloatStream, JackClient)
-    def __init__(self, stereoinfo, wavs, client):
+    @types(Config, StereoInfo, FloatStream, JackClient)
+    def __init__(self, config, stereoinfo, wavs, client):
         Node.__init__(self)
+        self.systemchannelcount = config.systemchannelcount
         self.chancount = stereoinfo.getoutchans.size
         for chanindex in xrange(self.chancount):
             client.port_register_output("out_%s" % (1 + chanindex))
@@ -79,9 +78,9 @@ class JackStream(object, Node, Stream):
     def start(self):
         self.client.activate()
         # Connect all system channels, cycling over our streams if necessary:
-        for syschanindex, syschanname in enumerate(self.syschannames):
+        for syschanindex in xrange(self.systemchannelcount):
             chanindex = syschanindex % self.chancount
-            self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), syschanname)
+            self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
         self.outbuf = self.client.current_output_buffer()
         self.cursor = 0
 

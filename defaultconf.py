@@ -44,6 +44,8 @@ panlaw = 3
 
 maxpan = .75
 
+systemchannelcount = 2
+
 ignoreloop = hasattr(config, 'outpath')
 '''If True playback will not loop.'''
 
