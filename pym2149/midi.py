@@ -170,6 +170,7 @@ class MidiPump(MainBackground):
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
+        self.performancemidichans = set(config.performancechannels)
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
@@ -184,7 +185,12 @@ class MidiPump(MainBackground):
             # FIXME LATER: Make PLL-aware so we don't occasionally get 2-then-0 updates.
             streamready.await()
             events = self.midi.getevents()
-            speeddetector(bool(events)) # FIXME: Ignore performance channels.
+            for _, e in events:
+                if e.midichan not in self.performancemidichans:
+                    speeddetector(True)
+                    break
+            else:
+                speeddetector(False)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in events:
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
