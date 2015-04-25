@@ -103,3 +103,5 @@ jackringsize = 2 if config.di.all(YMFile) else 10
 
 jackcoupling = bool(config.di.all(YMFile))
 '''If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition.'''
+
+zerovelocityisnoteoffchannels = ()
