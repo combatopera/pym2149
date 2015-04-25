@@ -143,6 +143,8 @@ class Midi(SimpleBackground):
     def __init__(self, config, pll):
         self.chanbase = config.midichannelbase
         self.programbase = config.midiprogrambase
+        self.pllignoremidichans = set(config.performancechannels)
+        log.info("MIDI channels not significant for PLL: {%s}", ', '.join(str(c) for c in sorted(self.pllignoremidichans)))
         self.pll = pll
 
     def start(self):
@@ -153,7 +155,8 @@ class Midi(SimpleBackground):
         while not self.quit:
             event = self.client.event_input()
             if event is not None:
-                self.pll.event(event.time, self.classes[event.type](self, event))
+                eventobj = self.classes[event.type](self, event)
+                self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
 
     def getevents(self):
         return self.pll.takeupdate()
@@ -181,7 +184,7 @@ class MidiPump(MainBackground):
             # FIXME LATER: Make PLL-aware so we don't occasionally get 2-then-0 updates.
             streamready.await()
             events = self.midi.getevents()
-            speeddetector(bool(events))
+            speeddetector(bool(events)) # FIXME: Ignore performance channels.
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in events:
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))

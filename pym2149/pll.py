@@ -45,22 +45,22 @@ class PLL:
         self.windowindex += 1
         self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod + self.medianshift
 
-    def event(self, eventtime, event):
-        self.events.append((eventtime, event))
+    def event(self, eventtime, event, significant):
+        self.events.append((eventtime, event, significant))
 
     def closeupdate(self):
         inclusivewindowstart = self.exclusivewindowend - self.updateperiod
         targettime = inclusivewindowstart + self.targetpos
         shifts = []
         i = 0
-        for eventtime, _ in self.events:
+        for eventtime, _, significant in self.events:
             if eventtime >= self.exclusivewindowend:
                 break
-            if eventtime >= inclusivewindowstart:
+            if significant and eventtime >= inclusivewindowstart:
                 shifts.append(self.medianshift + eventtime - targettime)
             # If eventtime < inclusivewindowstart we consume the event without harvesting its shift.
             i += 1
-        self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event in self.events[:i]])
+        self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event, _ in self.events[:i]])
         del self.events[:i]
         if shifts:
             n = len(shifts)

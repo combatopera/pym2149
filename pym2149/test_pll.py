@@ -50,7 +50,7 @@ class TestPLL(unittest.TestCase):
             for event in events:
                 while pll.exclusivewindowend <= event.eventtime:
                     updates.append(pll.takeupdateimpl(pll.exclusivewindowend))
-                pll.event(event.eventtime, event)
+                pll.event(event.eventtime, event, True)
         ewe = pll.exclusivewindowend
         updates.append(pll.takeupdateimpl(ewe))
         self.assertEqual(eventlists, [[e for _, e in u] for u in updates])
