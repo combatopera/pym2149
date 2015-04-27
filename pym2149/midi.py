@@ -45,7 +45,7 @@ class StreamReady:
         self.readytime += self.period
 
     def adjust(self, nexttime):
-        # TODO LATER: Instead of EMA, improve sync with PLL.
+        # TODO: Instead of EMA, improve sync with PLL.
         empiricalreadytime = nexttime + self.targetlatency
         self.readytime = ema(self.alpha, empiricalreadytime, self.readytime)
 
@@ -191,7 +191,6 @@ class MidiPump(MainBackground):
         streamready = StreamReady(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
-            # FIXME LATER: Make PLL-aware so we don't occasionally get 2-then-0 updates.
             streamready.await()
             update = self.midi.getevents()
             streamready.adjust(update.nexttime)
