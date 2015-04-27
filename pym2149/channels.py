@@ -77,9 +77,10 @@ class Channel:
 
 class ControlPair:
 
-    def __init__(self, binaryzero, flush):
+    def __init__(self, binaryzero, flush, shift):
         self.binary = self.binaryzero = binaryzero
         self.flush = flush
+        self.shift = shift
 
     def install(self, d, msbindex):
         d[msbindex] = self.setmsb
@@ -87,11 +88,11 @@ class ControlPair:
 
     def setmsb(self, midichan, msb):
         self.binary = (msb << 7) | (self.binary & 0x7f)
-        self.flush(midichan, self.binary - self.binaryzero)
+        self.flush(midichan, (self.binary - self.binaryzero) >> self.shift)
 
     def setlsb(self, midichan, lsb):
         self.binary = (self.binary & (0x7f << 7)) | lsb
-        self.flush(midichan, self.binary - self.binaryzero)
+        self.flush(midichan, (self.binary - self.binaryzero) >> self.shift)
 
 class Channels:
 
@@ -106,18 +107,18 @@ class Channels:
         self.controllers = {}
         def flush(midichan, value):
             self.midichantofx[midichan].modulation = value
-        ControlPair(0, flush).install(self.controllers, 0x01)
+        ControlPair(0, flush, 0).install(self.controllers, 0x01)
         def flush(midichan, value):
             self.midichantofx[midichan].pan = value
-        ControlPair(0x2000, flush).install(self.controllers, 0x0a)
+        ControlPair(0x2000, flush, 0).install(self.controllers, 0x0a)
         if config.pitchbendratecontroller is not None:
             def flush(midichan, value):
                 self.midichantofx[midichan].bendrate = value
-            ControlPair(0x2000, flush).install(self.controllers, config.pitchbendratecontroller)
+            ControlPair(0x2000, flush, config.pitchbendratecontrollershift).install(self.controllers, config.pitchbendratecontroller)
         if config.pitchbendlimitcontroller is not None:
             def flush(midichan, value):
                 self.midichantofx[midichan].bendlimit = value
-            ControlPair(0x2000, flush).install(self.controllers, config.pitchbendlimitcontroller)
+            ControlPair(0x2000, flush, 0).install(self.controllers, config.pitchbendlimitcontroller)
         self.prevtext = None
         self.frameindex = 0
 

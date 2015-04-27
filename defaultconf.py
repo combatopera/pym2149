@@ -80,6 +80,9 @@ pitchbendratecontroller = None
 pitchbendlimitcontroller = None
 '''If not None, the 0-based MIDI controller number for the pitch bend value to stop at.'''
 
+pitchbendratecontrollershift = 0
+'''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
+
 dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
