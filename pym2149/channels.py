@@ -104,6 +104,7 @@ class Channels:
         self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
+        self.monophonicmidichans = set(config.monophonicchannels)
         self.controllers = {}
         def flush(midichan, value):
             self.midichantofx[midichan].modulation = value
@@ -125,6 +126,9 @@ class Channels:
     def noteon(self, midichan, midinote, vel):
         if (not vel) and midichan in self.zerovelisnoteoffmidichans:
             return self.noteoff(midichan, midinote, vel)
+        if midichan in self.monophonicmidichans:
+            for mn in xrange(0x80):
+                self.noteoff(midichan, mn, 0)
         program = self.midiprograms[self.midichantoprogram[midichan]]
         fx = self.midichantofx[midichan]
         channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, self.frameindex)]
