@@ -17,7 +17,7 @@
 
 from __future__ import division
 from nod import Block
-import logging, inspect
+import logging
 
 log = logging.getLogger(__name__)
 
