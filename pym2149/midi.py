@@ -24,11 +24,15 @@ from bg import SimpleBackground, MainBackground
 from channels import Channels
 from minblep import MinBleps
 from timer import Timer
+from util import ema
 import native.calsa as calsa, logging, time
 
 log = logging.getLogger(__name__)
 
 class StreamReady:
+
+    targetlatency = .01 # Conservative?
+    alpha = .1
 
     def __init__(self, updaterate):
         self.period = 1 / updaterate
@@ -39,6 +43,11 @@ class StreamReady:
         if sleeptime > 0:
             time.sleep(sleeptime)
         self.readytime += self.period
+
+    def adjust(self, nexttime):
+        # TODO LATER: Instead of EMA, improve sync with PLL.
+        empiricalreadytime = nexttime + self.targetlatency
+        self.readytime = ema(self.alpha, empiricalreadytime, self.readytime)
 
 class SpeedDetector:
 
@@ -184,15 +193,16 @@ class MidiPump(MainBackground):
         while not self.quit:
             # FIXME LATER: Make PLL-aware so we don't occasionally get 2-then-0 updates.
             streamready.await()
-            events = self.midi.getevents()
-            for _, e in events:
+            update = self.midi.getevents()
+            streamready.adjust(update.nexttime)
+            for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
                     speeddetector(True)
                     break
             else:
                 speeddetector(False)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
-            for offset, event in events:
+            for offset, event in update.events:
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
