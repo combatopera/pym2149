@@ -35,3 +35,6 @@ def awaitinterrupt(config):
                 time.sleep(1)
         except KeyboardInterrupt:
             log.debug('Caught interrupt, shutting down.')
+
+def ema(alpha, empirical, current):
+    return alpha * empirical + (1 - alpha) * current

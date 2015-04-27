@@ -18,9 +18,16 @@
 from __future__ import division
 from iface import Config
 from di import types
+from util import ema
 import time, logging
 
 log = logging.getLogger(__name__)
+
+class Update:
+
+    def __init__(self, events, nexttime):
+        self.events = events
+        self.nexttime = nexttime
 
 class PLL:
 
@@ -69,7 +76,7 @@ class PLL:
             else:
                 midindex = n // 2
                 medianshift = (shifts[midindex - 1] + shifts[midindex]) / 2
-            self.medianshift = self.alpha * medianshift + (1 - self.alpha) * self.medianshift
+            self.medianshift = ema(self.alpha, medianshift, self.medianshift)
         self.nextwindow()
 
     def takeupdate(self):
@@ -86,4 +93,4 @@ class PLL:
         else:
             log.warn("Yielding %s updates as one.", n)
             update = sum(copy, [])
-        return update
+        return Update(update, self.exclusivewindowend)
