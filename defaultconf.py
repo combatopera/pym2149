@@ -110,3 +110,5 @@ jackcoupling = bool(config.di.all(YMFile))
 zerovelocityisnoteoffchannels = ()
 
 performancechannels = ()
+
+monophonicchannels = ()
