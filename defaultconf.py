@@ -67,7 +67,7 @@ neutralvelocity = 0x60
 
 velocityperlevel = 0x10
 
-midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(midichannelcount))
+midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(0x80))
 
 midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
 
