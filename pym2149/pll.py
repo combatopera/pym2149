@@ -25,9 +25,9 @@ log = logging.getLogger(__name__)
 
 class Update:
 
-    def __init__(self, events, nexttime):
+    def __init__(self, events, nexttaketime):
         self.events = events
-        self.nexttime = nexttime
+        self.nexttaketime = nexttaketime
 
 class PLL:
 
