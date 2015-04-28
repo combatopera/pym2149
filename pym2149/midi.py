@@ -53,6 +53,7 @@ class MidiSchedule:
                 break
         if skipped:
             log.warn("Skipped sync with %s updates.", skipped)
+        return now
 
     def step(self, idealtaketime):
         # TODO: Instead of EMA, improve sync with PLL.
@@ -198,8 +199,7 @@ class MidiPump(MainBackground):
         schedule = MidiSchedule(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
-            schedule.awaittaketime()
-            update = self.pll.takeupdate()
+            update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
