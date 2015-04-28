@@ -167,16 +167,13 @@ class Midi(SimpleBackground):
                 eventobj = self.classes[event.type](self, event)
                 self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
 
-    def getevents(self):
-        return self.pll.takeupdate()
-
     def interrupt(self):
         self.client.interrupt()
 
 class MidiPump(MainBackground):
 
-    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer)
-    def __init__(self, config, midi, channels, minbleps, stream, chip, timer):
+    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer, PLL)
+    def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
@@ -186,13 +183,14 @@ class MidiPump(MainBackground):
         self.stream = stream
         self.chip = chip
         self.timer = timer
+        self.pll = pll
 
     def __call__(self):
         streamready = StreamReady(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
             streamready.await()
-            update = self.midi.getevents()
+            update = self.pll.takeupdate()
             streamready.adjust(update.nexttime)
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
