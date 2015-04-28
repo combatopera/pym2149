@@ -33,7 +33,6 @@ def main():
     config = getprocessconfig('outpath')
     di = createdi(config)
     di.add(PLL)
-    di.add(MidiListen)
     configure(di)
     di.add(Channels)
     di.start()
@@ -42,6 +41,7 @@ def main():
         log.info(channels)
         di.add(SimpleChipTimer) # One block per update.
         di.add(MidiPump)
+        di.add(MidiListen)
         di.start()
         awaitinterrupt(config)
     finally:

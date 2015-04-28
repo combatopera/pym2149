@@ -35,7 +35,6 @@ def main():
     config = getprocessconfig()
     di = createdi(config)
     di.add(PLL)
-    di.add(MidiListen)
     di.add(JackClient)
     di.start()
     try:
@@ -47,6 +46,7 @@ def main():
         log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
         di.add(MidiPump)
+        di.add(MidiListen)
         di.start()
         awaitinterrupt(config)
     finally:
