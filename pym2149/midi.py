@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 
 class MidiSchedule:
 
+    maxdelay = .01
     targetlatency = .01 # Conservative?
     alpha = .1
 
@@ -39,14 +40,23 @@ class MidiSchedule:
         self.taketime = time.time()
 
     def awaittaketime(self):
-        sleeptime = self.taketime - time.time()
-        if sleeptime > 0:
-            time.sleep(sleeptime)
-        self.taketime += self.period
+        skipped = 0
+        while True:
+            now = time.time()
+            if now < self.taketime:
+                time.sleep(self.taketime - now)
+            elif now > self.taketime + self.maxdelay:
+                # Forget sync with current update, try the next one:
+                self.taketime += self.period
+                skipped += 1
+            else: # We're in the [0, maxdelay] window.
+                break
+        if skipped:
+            log.warn("Skipped sync with %s updates.", skipped)
 
-    def feedback(self, idealtaketime):
+    def step(self, idealtaketime):
         # TODO: Instead of EMA, improve sync with PLL.
-        self.taketime = ema(self.alpha, idealtaketime + self.targetlatency, self.taketime)
+        self.taketime = ema(self.alpha, idealtaketime + self.targetlatency, self.taketime + self.period)
 
 class SpeedDetector:
 
@@ -190,7 +200,7 @@ class MidiPump(MainBackground):
         while not self.quit:
             schedule.awaittaketime()
             update = self.pll.takeupdate()
-            schedule.feedback(update.idealtaketime)
+            schedule.step(update.idealtaketime)
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
                     speeddetector(True)
