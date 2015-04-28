@@ -38,15 +38,15 @@ class MidiSchedule:
         self.period = 1 / updaterate
         self.taketime = time.time()
 
-    def await(self):
+    def awaittaketime(self):
         sleeptime = self.taketime - time.time()
         if sleeptime > 0:
             time.sleep(sleeptime)
         self.taketime += self.period
 
-    def adjust(self, nexttaketime):
+    def feedback(self, idealtaketime):
         # TODO: Instead of EMA, improve sync with PLL.
-        self.taketime = ema(self.alpha, nexttaketime + self.targetlatency, self.taketime)
+        self.taketime = ema(self.alpha, idealtaketime + self.targetlatency, self.taketime)
 
 class SpeedDetector:
 
@@ -188,9 +188,9 @@ class MidiPump(MainBackground):
         schedule = MidiSchedule(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
-            schedule.await()
+            schedule.awaittaketime()
             update = self.pll.takeupdate()
-            schedule.adjust(update.nexttaketime)
+            schedule.feedback(update.idealtaketime)
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
                     speeddetector(True)
