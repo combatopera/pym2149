@@ -29,7 +29,7 @@ import native.calsa as calsa, logging, time
 
 log = logging.getLogger(__name__)
 
-class StreamReady:
+class MidiSchedule:
 
     targetlatency = .01 # Conservative?
     alpha = .1
@@ -186,12 +186,12 @@ class MidiPump(MainBackground):
         self.pll = pll
 
     def __call__(self):
-        streamready = StreamReady(self.updaterate)
+        schedule = MidiSchedule(self.updaterate)
         speeddetector = SpeedDetector()
         while not self.quit:
-            streamready.await()
+            schedule.await()
             update = self.pll.takeupdate()
-            streamready.adjust(update.nexttaketime)
+            schedule.adjust(update.nexttaketime)
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
                     speeddetector(True)
