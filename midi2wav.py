@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.out import configure
-from pym2149.midi import Midi, MidiPump
+from pym2149.midi import MidiListen, MidiPump
 from pym2149.config import getprocessconfig
 from pym2149.channels import Channels
 from pym2149.boot import createdi
@@ -33,7 +33,7 @@ def main():
     config = getprocessconfig('outpath')
     di = createdi(config)
     di.add(PLL)
-    di.add(Midi)
+    di.add(MidiListen)
     configure(di)
     di.add(Channels)
     di.start()

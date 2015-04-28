@@ -148,7 +148,7 @@ class ControlChange(ChannelMessage):
     def __str__(self):
         return "C %2d %3d %3d" % (self.midichan, self.controller, self.value)
 
-class Midi(SimpleBackground):
+class MidiListen(SimpleBackground):
 
     classes = {
         calsa.SND_SEQ_EVENT_NOTEON: NoteOn,
@@ -182,7 +182,7 @@ class Midi(SimpleBackground):
 
 class MidiPump(MainBackground):
 
-    @types(Config, Midi, Channels, MinBleps, Stream, Chip, Timer, PLL)
+    @types(Config, MidiListen, Channels, MinBleps, Stream, Chip, Timer, PLL)
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
