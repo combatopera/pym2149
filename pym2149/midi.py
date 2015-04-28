@@ -36,18 +36,17 @@ class MidiSchedule:
 
     def __init__(self, updaterate):
         self.period = 1 / updaterate
-        self.readytime = time.time()
+        self.taketime = time.time()
 
     def await(self):
-        sleeptime = self.readytime - time.time()
+        sleeptime = self.taketime - time.time()
         if sleeptime > 0:
             time.sleep(sleeptime)
-        self.readytime += self.period
+        self.taketime += self.period
 
     def adjust(self, nexttaketime):
         # TODO: Instead of EMA, improve sync with PLL.
-        empiricalreadytime = nexttaketime + self.targetlatency
-        self.readytime = ema(self.alpha, empiricalreadytime, self.readytime)
+        self.taketime = ema(self.alpha, nexttaketime + self.targetlatency, self.taketime)
 
 class SpeedDetector:
 
