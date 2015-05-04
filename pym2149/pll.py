@@ -18,7 +18,7 @@
 from __future__ import division
 from iface import Config
 from di import types
-from util import ema
+from util import EMA
 import time, logging
 
 log = logging.getLogger(__name__)
@@ -35,12 +35,12 @@ class PLL:
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
         self.targetpos = config.plltargetpos
-        self.alpha = config.pllalpha
+        self.medianshiftema = EMA(config.pllalpha, None)
 
     def start(self):
         self.events = []
         self.updates = []
-        self.medianshift = 0
+        self.medianshiftema.value = 0
         self.mark = time.time()
         self.windowindex = 0
         self.nextwindow()
@@ -50,7 +50,7 @@ class PLL:
 
     def nextwindow(self):
         self.windowindex += 1
-        self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod + self.medianshift
+        self.exclusivewindowend = self.mark + self.windowindex * self.updateperiod + self.medianshiftema.value
 
     def event(self, eventtime, event, significant):
         self.events.append((eventtime, event, significant))
@@ -64,7 +64,7 @@ class PLL:
             if eventtime >= self.exclusivewindowend:
                 break
             if significant and eventtime >= inclusivewindowstart:
-                shifts.append(self.medianshift + eventtime - targettime)
+                shifts.append(self.medianshiftema.value + eventtime - targettime)
             # If eventtime < inclusivewindowstart we consume the event without harvesting its shift.
             i += 1
         self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event, _ in self.events[:i]])
@@ -76,7 +76,7 @@ class PLL:
             else:
                 midindex = n // 2
                 medianshift = (shifts[midindex - 1] + shifts[midindex]) / 2
-            self.medianshift = ema(self.alpha, medianshift, self.medianshift)
+            self.medianshiftema(medianshift)
         self.nextwindow()
 
     def takeupdate(self):

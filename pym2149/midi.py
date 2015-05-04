@@ -24,7 +24,7 @@ from bg import SimpleBackground, MainBackground
 from channels import Channels
 from minblep import MinBleps
 from timer import Timer
-from util import ema
+from util import EMA
 import native.calsa as calsa, logging, time
 
 log = logging.getLogger(__name__)
@@ -33,21 +33,20 @@ class MidiSchedule:
 
     maxdelay = .01
     targetlatency = .01 # Conservative?
-    alpha = .1
 
     def __init__(self, updaterate):
         self.period = 1 / updaterate
-        self.taketime = time.time()
+        self.taketimeema = EMA(.1, time.time())
 
     def awaittaketime(self):
         skipped = 0
         while True:
             now = time.time()
-            if now < self.taketime:
-                time.sleep(self.taketime - now)
-            elif now > self.taketime + self.maxdelay:
+            if now < self.taketimeema.value:
+                time.sleep(self.taketimeema.value - now)
+            elif now > self.taketimeema.value + self.maxdelay:
                 # Forget sync with current update, try the next one:
-                self.taketime += self.period
+                self.taketimeema.value += self.period
                 skipped += 1
             else: # We're in the [0, maxdelay] window.
                 break
@@ -57,7 +56,8 @@ class MidiSchedule:
 
     def step(self, idealtaketime):
         # TODO: Instead of EMA, improve sync with PLL.
-        self.taketime = ema(self.alpha, idealtaketime + self.targetlatency, self.taketime + self.period)
+        self.taketimeema.value += self.period
+        self.taketimeema(idealtaketime + self.targetlatency)
 
 class SpeedDetector:
 
