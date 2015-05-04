@@ -70,5 +70,17 @@ class TestMinBleps(unittest.TestCase):
         self.assertEqual([-1, 1, 2, 4, 6, 7, 9, 11, 12, 14], [mb.getminnaiven(8, n) for n in xrange(10)])
         self.assertEqual([0, 1, 3, 5, 6, 8, 10, 11, 13, 15], [mb.getminnaiven(9, n) for n in xrange(10)])
 
+    def test_minrepr(self):
+        self.assertEqual('1', MinBleps.minrepr(1))
+        self.assertEqual('1.0', MinBleps.minrepr(1.))
+        self.assertEqual('1.5', MinBleps.minrepr(1.5))
+        self.assertEqual("'hello'", MinBleps.minrepr("hello"))
+        l = long(100)
+        self.assertEqual('100L', repr(l))
+        self.assertEqual('100', MinBleps.minrepr(l))
+        l = 10 ** 20
+        self.assertEqual(long, type(l))
+        self.assertEqual('1' + 20 * '0' + 'L', MinBleps.minrepr(l))
+
 if '__main__' == __name__:
     unittest.main()
