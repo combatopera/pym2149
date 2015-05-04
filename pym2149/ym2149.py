@@ -27,6 +27,8 @@ import logging
 log = logging.getLogger(__name__)
 
 stclock = 2000000
+spectrum128crystal = 17734470 # Correct according to service manual.
+spectrumclock = spectrum128crystal // 10
 defaultscale = 8
 ym2149nzdegrees = 17, 14
 
