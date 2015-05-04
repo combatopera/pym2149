@@ -29,6 +29,8 @@ find -name '*.c' -exec rm -fv '{}' +
 
 rm -fv pym2149/cpaste?*.pyx
 
+rm -fv pym2149/'MinBleps('*')'
+
 rm -rfv target
 
 hg st -A | grep -v ^C
