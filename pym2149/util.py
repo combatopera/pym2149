@@ -36,5 +36,12 @@ def awaitinterrupt(config):
         except KeyboardInterrupt:
             log.debug('Caught interrupt, shutting down.')
 
-def ema(alpha, empirical, current):
-    return alpha * empirical + (1 - alpha) * current
+class EMA:
+
+    def __init__(self, alpha, initial):
+        self.alpha = alpha
+        self.value = initial
+
+    def __call__(self, instantaneous):
+        self.value = self.alpha * instantaneous + (1 - self.alpha) * self.value
+        return self.value
