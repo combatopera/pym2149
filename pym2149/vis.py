@@ -19,7 +19,7 @@ from __future__ import division
 from pitch import Period, Freq
 from di import types
 from iface import Chip, Config
-from osc import mfpclock
+from mfp import mfpclock
 import sys
 
 class Roll:
