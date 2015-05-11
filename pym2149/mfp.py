@@ -17,3 +17,10 @@
 
 prescalers = 0, 4, 10, 16, 50, 64, 100, 200
 mfpclock = 2457600
+
+def updatetimer(chip, chan, tcr, tdr):
+    mfpinterruptperiod = prescalers[tcr] * tdr
+    if mfpinterruptperiod:
+        # Signal period is double the interrupt period, so mul by 2:
+        chip.rtoneperiods[chan].value = 2 * mfpinterruptperiod
+        chip.rtoneflags[chan].value = True
