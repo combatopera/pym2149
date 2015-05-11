@@ -23,11 +23,13 @@ mfpclock = 2457600
 class MFPTimer:
 
     def __init__(self):
+        self.wavelength = Reg()
+        self.wavelength.value = 2
         self.control = Reg()
         self.data = Reg()
         self.rtoneperiod = Reg()
         # Signal period is double the interrupt period, so mul by 2:
-        self.rtoneperiod.link(lambda tcr, tdr: prescalers[tcr] * tdr * 2, self.control, self.data)
+        self.rtoneperiod.link(lambda tcr, tdr, wl: prescalers[tcr] * tdr * wl, self.control, self.data, self.wavelength)
         self.control.value = 0
         self.data.value = 0
         self.rtoneflag = Reg()
