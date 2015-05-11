@@ -17,7 +17,7 @@
 
 from __future__ import division
 from util import singleton
-from osc import mfpclock, prescalers
+from mfp import mfpclock, prescalers
 import math
 
 class Pitch(float):

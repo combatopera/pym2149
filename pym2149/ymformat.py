@@ -19,7 +19,7 @@ import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from di import types
 from iface import YMFile, Config
-from osc import prescalers
+from mfp import prescalers
 
 log = logging.getLogger(__name__)
 

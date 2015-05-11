@@ -21,9 +21,8 @@ from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
 from fractions import Fraction
+from mfp import mfpclock
 
-prescalers = 0, 4, 10, 16, 50, 64, 100, 200
-mfpclock = 2457600
 loopsize = 1024
 
 class BinDiff(BufNode):
