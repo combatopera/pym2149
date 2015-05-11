@@ -102,7 +102,7 @@ cdef class Event:
     cdef initevent(self, ctime.timeval* time, snd_seq_event_type_t type, unsigned char channel):
         self.time = time.tv_sec + time.tv_usec / 1e6
         self.type = type
-        self.channel = channel
+        self.channel = channel # XXX: Can we also get the client?
 
 cdef class Note(Event):
 
