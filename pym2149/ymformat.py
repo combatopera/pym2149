@@ -19,7 +19,6 @@ import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from di import types
 from iface import YMFile, Config
-from mfp import updatetimer
 
 log = logging.getLogger(__name__)
 
@@ -212,7 +211,7 @@ class Frame5(Frame56):
     PlainFrame.__call__(self, chip)
     if self.data[0x1] & 0x30:
       chan = ((self.data[0x1] & 0x30) >> 4) - 1
-      updatetimer(chip, chan, (self.data[0x6] & 0xe0) >> 5, self.data[0xE])
+      chip.timers[chan].update((self.data[0x6] & 0xe0) >> 5, self.data[0xE])
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
@@ -221,14 +220,14 @@ class Frame6(Frame56):
 
   def __call__(self, chip):
     PlainFrame.__call__(self, chip)
-    for flag in chip.rtoneflags:
-      flag.value = False
+    for timer in chip.timers:
+      timer.rtoneflag.value = False
     for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
       if self.data[r] & 0x30:
         chan = ((self.data[r] & 0x30) >> 4) - 1
         fx = self.data[r] & 0xc0
         if 0x00 == fx:
-          updatetimer(chip, chan, (self.data[rr] & 0xe0) >> 5, self.data[rrr])
+          chip.timers[chan].update((self.data[rr] & 0xe0) >> 5, self.data[rrr])
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
