@@ -18,8 +18,12 @@
 from __future__ import division
 from reg import Reg
 
-prescalers = 0, 4, 10, 16, 50, 64, 100, 200
+prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
 mfpclock = 2457600
+
+def getrtoneperiod(tcr, tdr, wl):
+    # TODO: Maybe something more logical than 0 for timer off.
+    return prescalers[tcr] * tdr * wl if tcr in prescalers else 0
 
 class MFPTimer:
 
@@ -29,8 +33,7 @@ class MFPTimer:
         self.control = Reg()
         self.data = Reg()
         self.rtoneperiod = Reg()
-        # Signal period is double the interrupt period, so mul by 2:
-        self.rtoneperiod.link(lambda tcr, tdr, wl: prescalers[tcr] * tdr * wl, self.control, self.data, self.wavelength)
+        self.rtoneperiod.link(getrtoneperiod, self.control, self.data, self.wavelength)
         self.control.value = 0
         self.data.value = 0
         self.rtoneflag = Reg()
@@ -43,14 +46,13 @@ class MFPTimer:
 
     def tcrtdr(self, freq):
         diff = None
-        for tcr, prescaler in enumerate(prescalers):
-            if prescaler:
-                prescaler *= self.wavelength.value # Avoid having to multiply twice.
-                tdr = int(round(mfpclock / (freq * prescaler)))
-                if 1 <= tdr and tdr <= 255:
-                    rtp = tdr * prescaler
-                    d = abs(mfpclock / rtp - freq)
-                    if diff is None or d < diff:
-                        tcrtdr = tcr, tdr
-                        diff = d
+        for tcr, prescaler in prescalers.iteritems(): # XXX: Do we care about non-determinism?
+            prescaler *= self.wavelength.value # Avoid having to multiply twice.
+            tdr = int(round(mfpclock / (freq * prescaler)))
+            if 1 <= tdr and tdr <= 255:
+                rtp = tdr * prescaler
+                d = abs(mfpclock / rtp - freq)
+                if diff is None or d < diff:
+                    tcrtdr = tcr, tdr
+                    diff = d
         return tcrtdr
