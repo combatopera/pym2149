@@ -77,9 +77,13 @@ class Freq(float):
         return self.periodimpl(clock, shapescale(shape))
 
     def rtoneperiod(self):
-        steps = 2 # TODO LATER: Other shapes will have different numbers of steps.
+        # TODO LATER: Other shapes will have different numbers of steps.
+        tcr, tdr = self.tcrtdr(2)
+        return prescalers[tcr] * tdr
+
+    def tcrtdr(self, steps):
         diff = None
-        for prescaler in prescalers:
+        for tcr, prescaler in enumerate(prescalers):
             if prescaler:
                 prescaler *= steps # Avoid having to multiply twice.
                 tdr = int(round(mfpclock / (self * prescaler)))
@@ -87,9 +91,9 @@ class Freq(float):
                     rtp = tdr * prescaler
                     d = abs(mfpclock / rtp - self)
                     if diff is None or d < diff:
-                        rtoneperiod = rtp
+                        tcrtdr = tcr, tdr
                         diff = d
-        return rtoneperiod
+        return tcrtdr
 
     def pitch(self):
         return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
