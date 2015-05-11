@@ -19,6 +19,7 @@
 
 import unittest
 from pitch import Pitch, Freq
+from mfp import MFPTimer
 
 class TestPitch(unittest.TestCase):
 
@@ -37,8 +38,9 @@ class TestPitch(unittest.TestCase):
 class TestFreq(unittest.TestCase):
 
     def test_rtoneperiod(self):
-        self.assertEqual(2460, Freq(1000).rtoneperiod()) # Close.
-        self.assertEqual(24576, Freq(100).rtoneperiod()) # Exact.
+        timer = MFPTimer()
+        self.assertEqual(2460, Freq(1000).rtoneperiod(timer)) # Close.
+        self.assertEqual(24576, Freq(100).rtoneperiod(timer)) # Exact.
 
 if '__main__' == __name__:
     unittest.main()

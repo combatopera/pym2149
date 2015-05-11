@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from reg import Reg
 
 prescalers = 0, 4, 10, 16, 50, 64, 100, 200
@@ -24,7 +25,7 @@ class MFPTimer:
 
     def __init__(self):
         self.wavelength = Reg()
-        self.wavelength.value = 2
+        self.wavelength.value = 2 # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
         self.rtoneperiod = Reg()
@@ -39,3 +40,17 @@ class MFPTimer:
         self.control.value = tcr
         self.data.value = tdr
         self.rtoneflag.value = True
+
+    def tcrtdr(self, freq):
+        diff = None
+        for tcr, prescaler in enumerate(prescalers):
+            if prescaler:
+                prescaler *= self.wavelength.value # Avoid having to multiply twice.
+                tdr = int(round(mfpclock / (freq * prescaler)))
+                if 1 <= tdr and tdr <= 255:
+                    rtp = tdr * prescaler
+                    d = abs(mfpclock / rtp - freq)
+                    if diff is None or d < diff:
+                        tcrtdr = tcr, tdr
+                        diff = d
+        return tcrtdr

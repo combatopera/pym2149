@@ -17,7 +17,7 @@
 
 from __future__ import division
 from util import singleton
-from mfp import mfpclock, prescalers
+from mfp import prescalers
 import math
 
 class Pitch(float):
@@ -76,24 +76,9 @@ class Freq(float):
     def envperiod(self, clock, shape):
         return self.periodimpl(clock, shapescale(shape))
 
-    def rtoneperiod(self):
-        steps = 2 # TODO LATER: Other shapes will have different numbers of steps.
-        tcr, tdr = self.tcrtdr(steps)
-        return prescalers[tcr] * tdr * steps
-
-    def tcrtdr(self, steps):
-        diff = None
-        for tcr, prescaler in enumerate(prescalers):
-            if prescaler:
-                prescaler *= steps # Avoid having to multiply twice.
-                tdr = int(round(mfpclock / (self * prescaler)))
-                if 1 <= tdr and tdr <= 255:
-                    rtp = tdr * prescaler
-                    d = abs(mfpclock / rtp - self)
-                    if diff is None or d < diff:
-                        tcrtdr = tcr, tdr
-                        diff = d
-        return tcrtdr
+    def rtoneperiod(self, timer):
+        tcr, tdr = timer.tcrtdr(self)
+        return prescalers[tcr] * tdr * timer.wavelength.value
 
     def pitch(self):
         return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
