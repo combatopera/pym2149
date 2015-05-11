@@ -211,7 +211,10 @@ class Frame5(Frame56):
     PlainFrame.__call__(self, chip)
     if self.data[0x1] & 0x30:
       chan = ((self.data[0x1] & 0x30) >> 4) - 1
-      chip.timers[chan].update((self.data[0x6] & 0xe0) >> 5, self.data[0xE])
+      tcr = (self.data[0x6] & 0xe0) >> 5
+      tdr = self.data[0xE]
+      if tcr and tdr:
+        chip.timers[chan].update(tcr, tdr)
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
@@ -227,7 +230,10 @@ class Frame6(Frame56):
         chan = ((self.data[r] & 0x30) >> 4) - 1
         fx = self.data[r] & 0xc0
         if 0x00 == fx:
-          chip.timers[chan].update((self.data[rr] & 0xe0) >> 5, self.data[rrr])
+          tcr = (self.data[rr] & 0xe0) >> 5
+          tdr = self.data[rrr]
+          if tcr and tdr:
+            chip.timers[chan].update(tcr, tdr)
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False

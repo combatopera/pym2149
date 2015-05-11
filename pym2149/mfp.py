@@ -29,8 +29,6 @@ class MFPTimer:
         self.rtoneflag.value = 0
 
     def update(self, tcr, tdr):
-        mfpinterruptperiod = prescalers[tcr] * tdr
-        if mfpinterruptperiod:
-            # Signal period is double the interrupt period, so mul by 2:
-            self.rtoneperiod.value = 2 * mfpinterruptperiod
-            self.rtoneflag.value = True
+        # Signal period is double the interrupt period, so mul by 2:
+        self.rtoneperiod.value = prescalers[tcr] * tdr * 2
+        self.rtoneflag.value = True
