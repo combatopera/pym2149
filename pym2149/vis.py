@@ -49,7 +49,7 @@ class Roll:
       level = self.chip.fixedlevels[c].value
       newshape = (self.shapeversion != self.chip.envshape.version)
       self.shapeversion = self.chip.envshape.version
-      rtone = self.chip.rtoneflags[c].value
+      rtone = self.chip.timers[c].rtoneflag.value
       rhs = env or level
       if tone and rhs:
         vals.append(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock).pitch())
@@ -73,7 +73,7 @@ class Roll:
         else:
           vals.append(level)
         vals.append('')
-        vals.append(Freq(mfpclock / self.chip.rtoneperiods[c].value).pitch())
+        vals.append(Freq(mfpclock / self.chip.timers[c].rtoneperiod.value).pitch())
       elif env:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])

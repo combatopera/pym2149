@@ -22,6 +22,7 @@ from mix import BinMix
 from nod import Container
 from iface import AmpScale, Chip, YMFile, Config
 from di import types
+from mfp import MFPTimer
 import logging
 
 log = logging.getLogger(__name__)
@@ -71,13 +72,7 @@ class Registers:
     self.envshape.link(lambda s: s & 0x0f, self.R[0xD])
     for r in self.R:
       r.value = 0
-    # TODO: Rename to rtone and make configurable.
-    self.rtoneperiods = tuple(Reg() for _ in xrange(channels))
-    for r in self.rtoneperiods:
-      r.value = 0
-    self.rtoneflags = tuple(Reg() for _ in xrange(channels))
-    for r in self.rtoneflags:
-      r.value = 0
+    self.timers = tuple(MFPTimer() for _ in xrange(channels))
 
 class ClockInfo:
 
@@ -118,11 +113,11 @@ class YM2149(Registers, Container, Chip):
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
-    rtones = [RToneOsc(self.clock, self.rtoneperiods[c]) for c in xrange(channels)]
+    rtones = [RToneOsc(self.clock, self.timers[c].rtoneperiod) for c in xrange(channels)]
     # We don't add rtones to maskables as it is probably authentic to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.rtoneflags[c]) for c in xrange(channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].rtoneflag) for c in xrange(channels)]
     Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
@@ -137,4 +132,4 @@ class YM2149(Registers, Container, Chip):
     self.levelmodes[chan].value = 0 # Effectively the envelope flag.
     self.toneflags[chan].value = False
     self.noiseflags[chan].value = False
-    self.rtoneflags[chan].value = False
+    self.timers[chan].rtoneflag.value = False

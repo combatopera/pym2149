@@ -15,12 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from reg import Reg
+
 prescalers = 0, 4, 10, 16, 50, 64, 100, 200
 mfpclock = 2457600
 
-def updatetimer(chip, chan, tcr, tdr):
-    mfpinterruptperiod = prescalers[tcr] * tdr
-    if mfpinterruptperiod:
-        # Signal period is double the interrupt period, so mul by 2:
-        chip.rtoneperiods[chan].value = 2 * mfpinterruptperiod
-        chip.rtoneflags[chan].value = True
+class MFPTimer:
+
+    def __init__(self):
+        self.rtoneperiod = Reg()
+        self.rtoneperiod.value = 0
+        self.rtoneflag = Reg()
+        self.rtoneflag.value = 0
+
+    def update(self, tcr, tdr):
+        mfpinterruptperiod = prescalers[tcr] * tdr
+        if mfpinterruptperiod:
+            # Signal period is double the interrupt period, so mul by 2:
+            self.rtoneperiod.value = 2 * mfpinterruptperiod
+            self.rtoneflag.value = True
