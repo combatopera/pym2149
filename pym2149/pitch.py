@@ -77,9 +77,9 @@ class Freq(float):
         return self.periodimpl(clock, shapescale(shape))
 
     def rtoneperiod(self):
-        # TODO LATER: Other shapes will have different numbers of steps.
-        tcr, tdr = self.tcrtdr(2)
-        return prescalers[tcr] * tdr
+        steps = 2 # TODO LATER: Other shapes will have different numbers of steps.
+        tcr, tdr = self.tcrtdr(steps)
+        return prescalers[tcr] * tdr * steps
 
     def tcrtdr(self, steps):
         diff = None
