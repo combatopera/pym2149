@@ -71,12 +71,16 @@ class Note:
     self.chipchan = chipchan
     self.pitch = pitch
     self.fx = fx
+    self.tonefreq = Reg()
+    self.toneperiod.link(freq.toneperiod(nomclock), self.tonefreq) # No reverse link.
+    self.tonepitch = Reg()
+    self.tonefreq.link((pitch + fx.bendsemitones()).freq(), self.tonepitch)
 
   def applypitch(self, pitch = None):
-    self.applyfreq(((self.pitch if pitch is None else pitch) + self.fx.bendsemitones()).freq())
+    self.tonepitch.value = self.pitch if pitch is None else pitch
 
   def applyfreq(self, freq):
-    self.toneperiod.value = freq.toneperiod(self.nomclock)
+    self.tonefreq.value = freq
 
   def callnoteon(self, voladj):
     self.voladj = voladj
@@ -108,10 +112,10 @@ class DefaultNote(Note):
     self.fixedlevel.value = 13 + self.voladj
 
   def noteonframe(self, frame):
-    self.applypitch(self.pitch + self.fx.relmodulation() * self.vib(frame))
+    self.tonepitch.value = self.pitch + self.fx.relmodulation() * self.vib(frame)
 
   def noteoffframe(self, frame):
-    self.applypitch(self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame))
+    self.tonepitch.value = self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame)
     self.fixedlevel.value = 13 + self.voladj + self.fadeout(frame)
 
 class Unpitched(Note):
