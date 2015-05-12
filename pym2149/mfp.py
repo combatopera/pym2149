@@ -22,10 +22,6 @@ from fractions import Fraction
 prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
 mfpclock = 2457600
 
-def getrtoneperiod(tcr, tdr, wl):
-    # TODO: Maybe something more logical than 0 for timer off.
-    return prescalers[tcr] * tdr * wl if tcr in prescalers else 0
-
 class MFPTimer:
 
     def __init__(self):
@@ -33,8 +29,6 @@ class MFPTimer:
         self.wavelength.value = 2 # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
-        self.rtoneperiod = Reg()
-        self.rtoneperiod.link(getrtoneperiod, self.control, self.data, self.wavelength)
         self.control.value = 0
         self.data.value = 0
         self.rtoneflag = Reg()
@@ -63,7 +57,9 @@ class MFPTimer:
         return tcrtdr
 
     def getfreq(self):
-        return mfpclock / self.rtoneperiod.value
+        return mfpclock / (prescalers[self.control.value] * self.data.value * self.wavelength.value)
 
     def getstepsize(self):
-        return Fraction(self.rtoneperiod.value, self.wavelength.value * mfpclock)
+        tcr = self.control.value
+        # TODO: Maybe something more logical than 0 for timer off.
+        return Fraction(prescalers[tcr] * self.data.value if tcr in prescalers else 0, mfpclock)
