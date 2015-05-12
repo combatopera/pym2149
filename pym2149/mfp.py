@@ -45,8 +45,7 @@ class MFPTimer:
         self.control_data.link(self.findtcrtdr, self.freq)
 
     def update(self, tcr, tdr):
-        self.control.value = tcr
-        self.data.value = tdr
+        self.control_data.value = tcr, tdr
         self.rtoneflag.value = True
 
     def findtcrtdr(self, freq):
