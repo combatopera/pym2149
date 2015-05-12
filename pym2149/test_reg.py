@@ -68,17 +68,19 @@ class TestReg(unittest.TestCase):
         self.assertEqual(0xcd, value.value)
 
     def test_diamond(self):
+        self.spectator = Reg()
+        self.spectator.value = -1
         self.leaf = Reg()
         self.lhs = Reg()
         self.rhs = Reg()
         self.pair = Reg()
-        self.leaf.link(lambda l, r: (l, r), self.lhs, self.rhs)
+        self.leaf.link(lambda l, r, s: (l, r, s), self.lhs, self.rhs, self.spectator)
         self.lhs.link(lambda p: p[0], self.pair)
         self.rhs.link(lambda p: p[1], self.pair)
         self.pair.value = 1, 2
-        self.assertEqual((1, 2), self.leaf.value)
+        self.assertEqual((1, 2, -1), self.leaf.value)
         self.pair.value = 3, 4
-        self.assertEqual((3, 4), self.leaf.value)
+        self.assertEqual((3, 4, -1), self.leaf.value)
 
 if '__main__' == __name__:
     unittest.main()
