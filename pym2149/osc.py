@@ -21,7 +21,6 @@ from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
 from fractions import Fraction
-from mfp import mfpclock
 
 loopsize = 1024
 
@@ -101,14 +100,14 @@ def fracsub(f, g):
 
 class RationalDiff(BinDiff):
 
-  def __init__(self, dtype, chipimplclock, periodreg):
+  def __init__(self, dtype, chipimplclock, timer):
     BinDiff.__init__(self, dtype)
     self.chipimplclock = chipimplclock
-    self.periodreg = periodreg
+    self.timer = timer
 
   def callimpl(self):
-    period = self.periodreg.value
-    if not period: # Timer should stop, according to the spec.
+    stepsize = self.timer.getstepsize()
+    if not stepsize: # Timer should stop, according to the spec.
       if not self.progress:
         self.blockbuf.fill(0)
         dc = self.ringcursor.currentdc()
@@ -119,7 +118,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize = Fraction(period * self.chipimplclock, 2 * mfpclock)
+    stepsize *= self.chipimplclock
     if 0 == self.progress:
       stepindex = 0
     else:
@@ -145,9 +144,9 @@ class RationalDiff(BinDiff):
 
 class RToneOsc(BufNode):
 
-  def __init__(self, chipimplclock, periodreg):
+  def __init__(self, chipimplclock, timer):
     BufNode.__init__(self, self.binarydtype)
-    self.diff = RationalDiff(self.bindiffdtype, chipimplclock, periodreg).reset(ToneOsc.diffs)
+    self.diff = RationalDiff(self.bindiffdtype, chipimplclock, timer).reset(ToneOsc.diffs)
 
   def callimpl(self):
     self.chain(self.diff)(self.blockbuf)
