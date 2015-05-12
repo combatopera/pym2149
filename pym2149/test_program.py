@@ -61,7 +61,7 @@ class TestNote(unittest.TestCase):
         noiseflags = [None]
         fixedlevels = [Reg()]
         levelmodes = [None]
-        timers = [namedtuple('MFPTimer', 'rtoneperiod rtoneflag')(None, None)]
+        timers = [namedtuple('MFPTimer', 'rtoneflag')(None)]
         chip = namedtuple('Chip', 'toneperiods toneflags noiseflags fixedlevels levelmodes timers')(toneperiods, toneflags, noiseflags, fixedlevels, levelmodes, timers)
         note = Note(None, chip, 0, None, None)
         self.assertFalse(hasattr(fixedlevels[0], 'value'))
