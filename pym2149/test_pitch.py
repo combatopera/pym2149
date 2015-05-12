@@ -19,7 +19,7 @@
 
 import unittest
 from pitch import Pitch
-from mfp import MFPTimer
+from mfp import MFPTimer, prescalers
 
 class TestPitch(unittest.TestCase):
 
@@ -39,10 +39,11 @@ class TestFreq(unittest.TestCase):
 
     def test_rtoneperiod(self):
         timer = MFPTimer()
+        rtoneperiod = lambda: prescalers[timer.control.value] * timer.data.value * timer.wavelength.value
         timer.freq.value = 1000
-        self.assertEqual(2460, timer.rtoneperiod.value) # Close.
+        self.assertEqual(2460, rtoneperiod()) # Close.
         timer.freq.value = 100
-        self.assertEqual(24576, timer.rtoneperiod.value) # Exact.
+        self.assertEqual(24576, rtoneperiod()) # Exact.
 
 if '__main__' == __name__:
     unittest.main()
