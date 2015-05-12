@@ -60,3 +60,6 @@ class MFPTimer:
                     tcrtdr = tcr, tdr
                     diff = d
         return tcrtdr
+
+    def getfreq(self):
+        return mfpclock / self.rtoneperiod.value
