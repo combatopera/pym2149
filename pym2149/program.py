@@ -76,12 +76,6 @@ class Note:
     self.tonepitch = Reg()
     self.tonefreq.link((pitch + fx.bendsemitones()).freq(), self.tonepitch)
 
-  def applypitch(self, pitch = None):
-    self.tonepitch.value = self.pitch if pitch is None else pitch
-
-  def applyfreq(self, freq):
-    self.tonefreq.value = freq
-
   def callnoteon(self, voladj):
     self.voladj = voladj
     self.noteon()
@@ -89,7 +83,7 @@ class Note:
   def noteon(self): pass
 
   def noteonframe(self, frame):
-    """Note this may never be called, so should not make changes that noteoff or a custom impl of noteoffframe later relies on."""
+    """Note may never be called, so don't make changes that noteoff or a custom impl of noteoffframe later relies on."""
 
   def callnoteoff(self, onframes):
     self.onframes = onframes
