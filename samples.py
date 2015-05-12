@@ -94,7 +94,7 @@ class PWM(Note):
         self.rtoneflag.value = True
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.rtoneperiod.value = Freq(self.rtfreq).rtoneperiod(self.timer)
+        self.timer.freq.value = self.rtfreq
 
 class Frames(list): pass
 
