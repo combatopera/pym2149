@@ -22,19 +22,19 @@ class Link:
         self.xform = xform
         self.upstream = upstream
 
-    def update(self, done):
-        if self.reg not in done:
+    def update(self, stack):
+        if self.reg not in stack:
             try:
                 upstreamvals = [r.value for r in self.upstream]
             except AttributeError:
                 return
-            self.reg.setimpl(self.xform(*upstreamvals), done)
+            self.reg.setimpl(self.xform(*upstreamvals), stack)
 
 class Reg(object):
 
     def __init__(self):
         self.links = []
-        self.done = set() # In the hope that clearing is cheaper than creating.
+        self.stack = set() # In the hope that clearing is cheaper than creating.
 
     def link(self, xform, *upstream):
         link = Link(self, xform, upstream)
@@ -52,16 +52,16 @@ class Reg(object):
             object.__setattr__(self, name, value)
 
     def set(self, value):
-        try:
-            self.setimpl(value, self.done)
-        finally:
-            self.done.clear()
+        self.setimpl(value, self.stack)
 
-    def setimpl(self, value, done):
+    def setimpl(self, value, stack):
         object.__setattr__(self, 'value', value)
-        done.add(self)
-        for link in self.links:
-            link.update(done)
+        stack.add(self)
+        try:
+            for link in self.links:
+                link.update(stack)
+        finally:
+            stack.remove(self)
 
 class VersionReg(Reg):
 
