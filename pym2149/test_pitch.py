@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pitch import Pitch, Freq
+from pitch import Pitch
 from mfp import MFPTimer
 
 class TestPitch(unittest.TestCase):
@@ -39,8 +39,10 @@ class TestFreq(unittest.TestCase):
 
     def test_rtoneperiod(self):
         timer = MFPTimer()
-        self.assertEqual(2460, Freq(1000).rtoneperiod(timer)) # Close.
-        self.assertEqual(24576, Freq(100).rtoneperiod(timer)) # Exact.
+        timer.freq.value = 1000
+        self.assertEqual(2460, timer.rtoneperiod.value) # Close.
+        timer.freq.value = 100
+        self.assertEqual(24576, timer.rtoneperiod.value) # Exact.
 
 if '__main__' == __name__:
     unittest.main()
