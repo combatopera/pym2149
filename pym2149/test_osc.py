@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import unittest, time, sys, numpy as np
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc
 from mfp import mfpclock
@@ -32,11 +33,14 @@ def Reg(value):
     r.value = value
     return r
 
-def DerivedReg(xform, that):
-    r = VersionReg()
-    r.link(xform, that)
-    that.value = that.value # Send it through the xform.
-    return r
+class Timer:
+
+    def __init__(self, xform, that):
+        self.xform = xform
+        self.that = that
+
+    def getstepsize(self):
+        return Fraction(self.xform(self.that.value), 2 * mfpclock)
 
 class TestToneOsc(unittest.TestCase):
 
@@ -135,7 +139,7 @@ class TestRToneOsc(TestToneOsc):
     def createosc(scale, periodreg):
         clock = 2000000
         xform = lambda period: Fraction(scale * 2 * period * mfpclock, clock)
-        return RToneOsc(clock, DerivedReg(xform, periodreg))
+        return RToneOsc(clock, Timer(xform, periodreg))
 
 def diffblock(d, n):
     v = Buf(np.empty(n, dtype = int))
@@ -144,8 +148,16 @@ def diffblock(d, n):
 
 class TestRationalDiff(unittest.TestCase):
 
+    class Timer:
+
+        def __init__(self, value):
+            self.value = value
+
+        def getstepsize(self):
+            return self.value / (2 * mfpclock)
+
     def test_works(self):
-        p = Reg(Fraction(mfpclock, 15))
+        p = self.Timer(Fraction(mfpclock, 15))
         d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -160,7 +172,7 @@ class TestRationalDiff(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_zeroperiod(self):
-        p = Reg(Fraction(0))
+        p = self.Timer(Fraction(0))
         d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(ToneOsc.diffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
