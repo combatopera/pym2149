@@ -56,7 +56,7 @@ class TestDefaultNote(unittest.TestCase):
 class TestNote(unittest.TestCase):
 
     def test_fixedlevel(self):
-        toneperiods = [None]
+        toneperiods = [Reg()]
         toneflags = [None]
         noiseflags = [None]
         fixedlevels = [Reg()]
