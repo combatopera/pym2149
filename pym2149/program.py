@@ -72,9 +72,9 @@ class Note:
     self.pitch = pitch
     self.fx = fx
     self.tonefreq = Reg()
-    self.toneperiod.link(freq.toneperiod(nomclock), self.tonefreq) # No reverse link.
+    self.toneperiod.link(lambda f: f.toneperiod(nomclock), self.tonefreq) # No reverse link.
     self.tonepitch = Reg()
-    self.tonefreq.link((pitch + fx.bendsemitones()).freq(), self.tonepitch)
+    self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitch)
 
   def callnoteon(self, voladj):
     self.voladj = voladj
