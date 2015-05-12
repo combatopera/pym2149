@@ -38,13 +38,18 @@ class MFPTimer:
         self.data.value = 0
         self.rtoneflag = Reg()
         self.rtoneflag.value = False
+        self.control_data = Reg()
+        self.control.link(lambda cd: cd[0], self.control_data)
+        self.data.link(lambda cd: cd[1], self.control_data)
+        self.freq = Reg()
+        self.control_data.link(self.findtcrtdr, self.freq)
 
     def update(self, tcr, tdr):
         self.control.value = tcr
         self.data.value = tdr
         self.rtoneflag.value = True
 
-    def tcrtdr(self, freq):
+    def findtcrtdr(self, freq):
         diff = None
         for tcr, prescaler in prescalers.iteritems(): # XXX: Do we care about non-determinism?
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
