@@ -56,6 +56,10 @@ class MFPTimer:
                     diff = d
         return tcrtdr
 
+    def isrunning(self):
+        # TODO: What actually happens when data is zero?
+        return self.control.value and self.data.value
+
     def getnormperiod(self):
         return prescalers[self.control.value] * self.data.value * self.wavelength.value
 
@@ -63,6 +67,4 @@ class MFPTimer:
         return mfpclock / self.getnormperiod()
 
     def getstepsize(self):
-        tcr = self.control.value
-        # TODO: Maybe something more logical than 0 for timer off.
-        return Fraction(prescalers[tcr] * self.data.value if tcr in prescalers else 0, mfpclock)
+        return Fraction(prescalers[self.control.value] * self.data.value, mfpclock)

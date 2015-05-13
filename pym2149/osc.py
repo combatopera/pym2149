@@ -106,8 +106,7 @@ class RationalDiff(BinDiff):
     self.timer = timer
 
   def callimpl(self):
-    stepsize = self.timer.getstepsize()
-    if not stepsize: # Timer should stop, according to the spec.
+    if not self.timer.isrunning():
       if not self.progress:
         self.blockbuf.fill(0)
         dc = self.ringcursor.currentdc()
@@ -118,7 +117,7 @@ class RationalDiff(BinDiff):
       else:
         self.progress += self.block.framecount
         return self.hold
-    stepsize *= self.chipimplclock
+    stepsize = self.timer.getstepsize() * self.chipimplclock
     if 0 == self.progress:
       stepindex = 0
     else:
