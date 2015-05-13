@@ -56,7 +56,7 @@ class MFPTimer:
                     diff = d
         return tcrtdr
 
-    def getfreq(self):
+    def getfreq(self): # Currently only called when rtoneflag True.
         return mfpclock / (prescalers[self.control.value] * self.data.value * self.wavelength.value)
 
     def getstepsize(self):
