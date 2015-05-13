@@ -29,6 +29,9 @@ class MFPTimer:
         self.wavelength.value = 2 # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
+        self.effectivedata = Reg()
+        # TODO: Verify that TDR 0 indeed behaves like 0x100.
+        self.effectivedata.link(lambda tdr: tdr if tdr else 0x100, self.data)
         self.control.value = 0
         self.data.value = 0
         self.effect = Reg()
@@ -57,14 +60,13 @@ class MFPTimer:
         return tcrtdr
 
     def isrunning(self):
-        # TODO: What actually happens when data is zero?
-        return self.control.value and self.data.value
+        return bool(self.control.value)
 
     def getnormperiod(self):
-        return prescalers[self.control.value] * self.data.value * self.wavelength.value
+        return prescalers[self.control.value] * self.effectivedata.value * self.wavelength.value
 
     def getfreq(self): # Currently only called when effect is True.
         return mfpclock / self.getnormperiod()
 
     def getstepsize(self):
-        return Fraction(prescalers[self.control.value] * self.data.value, mfpclock)
+        return Fraction(prescalers[self.control.value] * self.effectivedata.value, mfpclock)
