@@ -224,7 +224,7 @@ class Frame6(Frame56):
   def __call__(self, chip):
     PlainFrame.__call__(self, chip)
     for timer in chip.timers:
-      timer.rtoneflag.value = False
+      timer.effect.value = False
     for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
       if self.data[r] & 0x30:
         chan = ((self.data[r] & 0x30) >> 4) - 1

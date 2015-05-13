@@ -117,7 +117,7 @@ class YM2149(Registers, Container, Chip):
     # We don't add rtones to maskables as it is probably authentic to pause them when not in use:
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].rtoneflag) for c in xrange(channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].effect) for c in xrange(channels)]
     Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
@@ -132,4 +132,4 @@ class YM2149(Registers, Container, Chip):
     self.levelmodes[chan].value = 0 # Effectively the envelope flag.
     self.toneflags[chan].value = False
     self.noiseflags[chan].value = False
-    self.timers[chan].rtoneflag.value = False
+    self.timers[chan].effect.value = False
