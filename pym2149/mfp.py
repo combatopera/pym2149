@@ -51,12 +51,12 @@ class MFPTimer:
         diff = None
         for tcr, prescaler in prescalers.iteritems(): # XXX: Do we care about non-determinism?
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
-            tdr = int(round(mfpclock / (freq * prescaler)))
-            if 1 <= tdr and tdr <= 255:
-                rtp = tdr * prescaler
+            etdr = int(round(mfpclock / (freq * prescaler)))
+            if 1 <= etdr and etdr <= 0x100:
+                rtp = etdr * prescaler
                 d = abs(mfpclock / rtp - freq)
                 if diff is None or d < diff:
-                    tcrtdr = tcr, tdr
+                    tcrtdr = tcr, etdr & 0xff
                     diff = d
         return tcrtdr
 

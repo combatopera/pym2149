@@ -29,5 +29,11 @@ class TestMFPTimer(unittest.TestCase):
         timer.freq.value = 100
         self.assertEqual(24576, timer.getnormperiod()) # Exact.
 
+    def test_zerotdr(self):
+        t = MFPTimer()
+        t.control_data.value = 3, 0
+        self.assertEqual(300, t.getfreq())
+        self.assertEqual((3, 0), t.findtcrtdr(300))
+
 if '__main__' == __name__:
     unittest.main()
