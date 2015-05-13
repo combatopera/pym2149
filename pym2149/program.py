@@ -59,7 +59,6 @@ class Note:
     self.toneperiod = chip.toneperiods[chipchan]
     self.toneflag = chip.toneflags[chipchan]
     self.timer = chip.timers[chipchan]
-    self.rtoneflag = self.timer.rtoneflag
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = Reg()
     # No reverse link, we don't want to pollute the chip with references:

@@ -91,7 +91,7 @@ class PWM(Note):
 
     def noteon(self):
         self.toneflag.value = True
-        self.rtoneflag.value = True
+        self.timer.effect.value = True
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq

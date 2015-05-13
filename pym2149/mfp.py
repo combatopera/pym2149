@@ -31,8 +31,8 @@ class MFPTimer:
         self.data = Reg()
         self.control.value = 0
         self.data.value = 0
-        self.rtoneflag = Reg()
-        self.rtoneflag.value = False
+        self.effect = Reg()
+        self.effect.value = False
         self.control_data = Reg()
         self.control.link(lambda cd: cd[0], self.control_data)
         self.data.link(lambda cd: cd[1], self.control_data)
@@ -41,7 +41,7 @@ class MFPTimer:
 
     def update(self, tcr, tdr):
         self.control_data.value = tcr, tdr
-        self.rtoneflag.value = True
+        self.effect.value = True
 
     def findtcrtdr(self, freq):
         diff = None
@@ -56,7 +56,7 @@ class MFPTimer:
                     diff = d
         return tcrtdr
 
-    def getfreq(self): # Currently only called when rtoneflag True.
+    def getfreq(self): # Currently only called when effect is True.
         return mfpclock / (prescalers[self.control.value] * self.data.value * self.wavelength.value)
 
     def getstepsize(self):

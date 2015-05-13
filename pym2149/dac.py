@@ -30,18 +30,18 @@ class Level(BufNode):
 
   to5bit = staticmethod(to5bit)
 
-  def __init__(self, modereg, fixedreg, env, signal, rtone, rtoneflagreg):
+  def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
     BufNode.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
-    self.modereg = modereg
+    self.levelmodereg = levelmodereg
     self.fixedreg = fixedreg
     self.env = env
     self.signal = signal
     self.rtone = rtone
-    self.rtoneflagreg = rtoneflagreg
+    self.timereffectreg = timereffectreg
 
   def callimpl(self):
-    if self.rtoneflagreg.value:
-      if self.modereg.value:
+    if self.timereffectreg.value:
+      if self.levelmodereg.value:
         # TODO: Test this branch.
         self.blockbuf.copybuf(self.chain(self.env)) # Values in [0, 31].
         self.blockbuf.add(1) # Shift env values to [1, 32].
@@ -54,7 +54,7 @@ class Level(BufNode):
         # Map 0 to pwmzero and 1 to fixed level:
         self.blockbuf.mul(self.to5bit(self.fixedreg.value) - self.pwmzero5bit)
         self.blockbuf.add(self.pwmzero5bit)
-    elif self.modereg.value:
+    elif self.levelmodereg.value:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mulbuf(self.chain(self.env))
     else:
