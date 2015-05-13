@@ -18,21 +18,17 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pitch import Pitch
+from mfp import MFPTimer, prescalers
 
-class TestPitch(unittest.TestCase):
+class TestMFPTimer(unittest.TestCase):
 
-    def test_str(self):
-        self.assertEqual('C..4   ', str(Pitch(60)))
-        self.assertEqual('C#.4   ', str(Pitch(61)))
-        self.assertEqual('B..3   ', str(Pitch(59)))
-        self.assertEqual('B..3+40', str(Pitch(59.4)))
-        self.assertEqual('C..4-40', str(Pitch(59.6)))
-        self.assertEqual('B..3+50', str(Pitch(59.5)))
-        self.assertEqual('C..0   ', str(Pitch(12)))
-        self.assertEqual('B.-1   ', str(Pitch(11)))
-        self.assertEqual('B..9   ', str(Pitch(131)))
-        self.assertEqual('C.10   ', str(Pitch(132)))
+    def test_setfreq(self):
+        timer = MFPTimer()
+        rtoneperiod = lambda: prescalers[timer.control.value] * timer.data.value * timer.wavelength.value
+        timer.freq.value = 1000
+        self.assertEqual(2460, rtoneperiod()) # Close.
+        timer.freq.value = 100
+        self.assertEqual(24576, rtoneperiod()) # Exact.
 
 if '__main__' == __name__:
     unittest.main()
