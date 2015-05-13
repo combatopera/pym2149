@@ -39,6 +39,8 @@ class Timer:
         self.xform = xform
         self.that = that
 
+    def isrunning(self): return True
+
     def getstepsize(self):
         return Fraction(self.xform(self.that.value), 2 * mfpclock)
 
@@ -150,14 +152,17 @@ class TestRationalDiff(unittest.TestCase):
 
     class Timer:
 
-        def __init__(self, value):
+        def __init__(self, running, value):
+            self.running = running
             self.value = value
+
+        def isrunning(self): return self.running
 
         def getstepsize(self):
             return self.value / (2 * mfpclock)
 
     def test_works(self):
-        p = self.Timer(Fraction(mfpclock, 15))
+        p = self.Timer(True, Fraction(mfpclock, 15))
         d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -171,16 +176,18 @@ class TestRationalDiff(unittest.TestCase):
         block(1)
         self.assertEqual(expected, actual)
 
-    def test_zeroperiod(self):
-        p = self.Timer(Fraction(0))
+    def test_notrunning(self):
+        p = self.Timer(False, None)
         d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(ToneOsc.diffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000, d.progress)
+        p.running = True
         p.value = Fraction(mfpclock, 50)
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
         self.assertEqual(5, d.progress)
-        p.value = Fraction(0)
+        p.running = False
+        p.value = None
         self.assertEqual([0] * 25, diffblock(d, 25))
         self.assertEqual(30, d.progress)
 
