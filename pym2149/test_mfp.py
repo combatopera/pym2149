@@ -18,17 +18,16 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from mfp import MFPTimer, prescalers
+from mfp import MFPTimer
 
 class TestMFPTimer(unittest.TestCase):
 
     def test_setfreq(self):
         timer = MFPTimer()
-        rtoneperiod = lambda: prescalers[timer.control.value] * timer.data.value * timer.wavelength.value
         timer.freq.value = 1000
-        self.assertEqual(2460, rtoneperiod()) # Close.
+        self.assertEqual(2460, timer.getnormperiod()) # Close.
         timer.freq.value = 100
-        self.assertEqual(24576, rtoneperiod()) # Exact.
+        self.assertEqual(24576, timer.getnormperiod()) # Exact.
 
 if '__main__' == __name__:
     unittest.main()
