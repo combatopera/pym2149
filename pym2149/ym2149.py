@@ -114,7 +114,7 @@ class YM2149(Registers, Container, Chip):
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
     rtones = [RToneOsc(self.clock, self.timers[c]) for c in xrange(channels)]
-    # We don't add rtones to maskables as it is probably authentic to pause them when not in use:
+    # XXX: Add rtones to maskables?
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
     levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].effect) for c in xrange(channels)]
