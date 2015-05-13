@@ -40,6 +40,7 @@ class MFPTimer:
         self.control.link(lambda cd: cd[0], self.control_data)
         self.data.link(lambda cd: cd[1], self.control_data)
         self.freq = Reg()
+        # XXX: Should change of wavelength trigger this link?
         self.control_data.link(self.findtcrtdr, self.freq)
 
     def update(self, tcr, tdr):
