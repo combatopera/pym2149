@@ -53,8 +53,7 @@ class MFPTimer:
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
             if 1 <= etdr and etdr <= 0x100:
-                rtp = etdr * prescaler
-                d = abs(mfpclock / rtp - freq)
+                d = abs(mfpclock / (etdr * prescaler) - freq)
                 if diff is None or d < diff:
                     tcrtdr = tcr, etdr & 0xff
                     diff = d
