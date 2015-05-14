@@ -118,7 +118,7 @@ class RationalDiff(BinDiff):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize = self.timer.getstepsize() * self.chipimplclock
+        stepsize = Fraction(self.timer.getstepsize(), mfpclock) * self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:
