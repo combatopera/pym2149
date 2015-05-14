@@ -181,15 +181,15 @@ class TestRationalDiff(unittest.TestCase):
         d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(ToneOsc.diffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
-        self.assertEqual(5000, d.progress)
+        self.assertEqual(5000*mfpclock, d.progress)
         p.running = True
         p.value = Fraction(mfpclock, 50)
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
-        self.assertEqual(5, d.progress)
+        self.assertEqual(5*mfpclock, d.progress)
         p.running = False
         p.value = None
         self.assertEqual([0] * 25, diffblock(d, 25))
-        self.assertEqual(30, d.progress)
+        self.assertEqual(30*mfpclock, d.progress)
 
 class TestNoiseOsc(unittest.TestCase):
 
