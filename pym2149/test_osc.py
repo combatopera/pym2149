@@ -17,14 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 import unittest, time, sys, numpy as np
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc
 from mfp import mfpclock
 from nod import Block, BufNode
 from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
-from fractions import Fraction
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 
@@ -42,7 +40,7 @@ class Timer:
     def isrunning(self): return True
 
     def getstepsize(self):
-        return Fraction(self.xform(self.that.value), 2 * mfpclock)
+        return self.xform(self.that.value)
 
 class TestToneOsc(unittest.TestCase):
 
@@ -139,8 +137,8 @@ class TestRToneOsc(TestToneOsc):
 
     @staticmethod
     def createosc(scale, periodreg):
-        clock = 2000000
-        xform = lambda period: Fraction(scale * 2 * period * mfpclock, clock)
+        clock = 200
+        xform = lambda period: scale * period * mfpclock // clock
         return RToneOsc(clock, Timer(xform, periodreg))
 
 def diffblock(d, n):
@@ -159,10 +157,10 @@ class TestRationalDiff(unittest.TestCase):
         def isrunning(self): return self.running
 
         def getstepsize(self):
-            return self.value / (2 * mfpclock)
+            return self.value
 
     def test_works(self):
-        p = self.Timer(True, Fraction(mfpclock, 15))
+        p = self.Timer(True, 81920)
         d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -183,7 +181,7 @@ class TestRationalDiff(unittest.TestCase):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
         p.running = True
-        p.value = Fraction(mfpclock, 50)
+        p.value = 24576
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
         p.running = False
