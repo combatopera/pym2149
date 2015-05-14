@@ -21,6 +21,7 @@ from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
 from fractions import Fraction
+from mfp import mfpclock
 
 loopsize = 1024
 
@@ -112,20 +113,20 @@ class RationalDiff(BinDiff):
                 dc = self.ringcursor.currentdc()
                 self.ringcursor.put2(self.blockbuf, np.zeros(1, dtype = np.int32))
                 self.blockbuf.addtofirst(dc)
-                self.progress = self.block.framecount
+                self.progress = self.block.framecount * mfpclock
                 return self.integral
             else:
-                self.progress += self.block.framecount
+                self.progress += self.block.framecount * mfpclock
                 return self.hold
         stepsize = self.timer.getstepsize() * self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:
-            stepindex = fracsub(stepsize, self.progress)
+            stepindex = fracsub(stepsize, Fraction(self.progress, mfpclock))
             if fracceil(stepindex) < 0:
                 stepindex = 0
         if fracceil(stepindex) >= self.block.framecount:
-            self.progress += self.block.framecount
+            self.progress += self.block.framecount * mfpclock
             return self.hold
         else:
             self.blockbuf.fill(0)
@@ -136,8 +137,8 @@ class RationalDiff(BinDiff):
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracsub(self.block.framecount - (stepcount - 1) * stepsize, stepindex)
-            if self.progress == stepsize:
+            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * stepsize, stepindex), mfpclock)
+            if self.progress == stepsize * mfpclock:
                 self.progress = 0
             return self.integral
 
