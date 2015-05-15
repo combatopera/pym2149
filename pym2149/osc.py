@@ -118,11 +118,11 @@ class RationalDiff(BinDiff):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize = Fraction(self.timer.getstepsize(), mfpclock) * self.chipimplclock
+        stepsize = self.timer.getstepsize() * self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:
-            stepindex = fracsub(stepsize, Fraction(self.progress, mfpclock))
+            stepindex = Fraction(stepsize - self.progress, mfpclock)
             if fracceil(stepindex) < 0:
                 stepindex = 0
         if fracceil(stepindex) >= self.block.framecount:
@@ -130,15 +130,15 @@ class RationalDiff(BinDiff):
             return self.hold
         else:
             self.blockbuf.fill(0)
-            stepcount = fracfloor2(self.block.framecount - 1 - stepindex, stepsize) + 1
-            lcd = fraclcd(stepsize, stepindex)
-            indices = -((-fracint(stepindex, lcd) - np.arange(stepcount) * fracint(stepsize, lcd)) // lcd)
+            stepcount = fracfloor2(self.block.framecount - 1 - stepindex, Fraction(stepsize, mfpclock)) + 1
+            lcd = fraclcd(Fraction(stepsize, mfpclock), stepindex)
+            indices = -((-fracint(stepindex, lcd) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), lcd)) // lcd)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * stepsize, stepindex), mfpclock)
-            if self.progress == stepsize * mfpclock:
+            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * Fraction(stepsize, mfpclock), stepindex), mfpclock)
+            if self.progress == stepsize:
                 self.progress = 0
             return self.integral
 
