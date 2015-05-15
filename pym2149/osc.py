@@ -81,12 +81,6 @@ def fracint(f):
     com = fractions.gcd(f.denominator, mfpclock) # To prevent overflow, not as slow as it looks.
     return f.numerator * (mfpclock//com) // (f.denominator//com)
 
-def fracsub(f, g):
-    com = fractions.gcd(f.denominator, g.denominator)
-    fd = f.denominator // com
-    gd = g.denominator // com
-    return Fraction(f.numerator * gd - g.numerator * fd, fd * gd * com)
-
 class RationalDiff(BinDiff):
 
     def __init__(self, dtype, chipimplclock, timer):
@@ -124,7 +118,7 @@ class RationalDiff(BinDiff):
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracint(fracsub(Fraction(self.block.framecount * mfpclock - (stepcount - 1) * stepsize, mfpclock), Fraction(stepindex, mfpclock)))
+            self.progress = fracint(Fraction(self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex, mfpclock))
             if self.progress == stepsize:
                 self.progress = 0
             return self.integral
