@@ -77,9 +77,6 @@ class OscDiff(BinDiff):
 def fracceil(numerator, denominator):
     return -((-numerator) // denominator)
 
-def fracfloor(f):
-    return f.numerator // f.denominator
-
 def fraclcd(f, g): # The LCD is the LCM of the denominators.
     fd = f.denominator
     gd = g.denominator
