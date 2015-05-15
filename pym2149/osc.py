@@ -108,7 +108,7 @@ class RationalDiff(BinDiff):
         else:
             self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            indices = -((-stepindex - np.arange(stepcount) * stepsize) // mfpclock)
+            indices = fracceil(stepindex + np.arange(stepcount) * stepsize, mfpclock)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
