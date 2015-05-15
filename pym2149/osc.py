@@ -120,7 +120,7 @@ class RationalDiff(BinDiff):
             indices.mul(-1)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
-            self.ringcursor.put2(self.blockbuf, indices.buf)
+            self.ringcursor.put2(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
             self.blockbuf.addtofirst(dc)
             self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
             if self.progress == stepsize:
