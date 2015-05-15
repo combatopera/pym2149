@@ -16,11 +16,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import lfsr, itertools, math, numpy as np, fractions
+import lfsr, itertools, math, numpy as np
 from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor
-from fractions import Fraction
 from mfp import mfpclock
 
 loopsize = 1024
@@ -77,10 +76,6 @@ class OscDiff(BinDiff):
 def fracceil(numerator, denominator):
     return -((-numerator) // denominator)
 
-def fracint(f):
-    com = fractions.gcd(f.denominator, mfpclock) # To prevent overflow, not as slow as it looks.
-    return f.numerator * (mfpclock//com) // (f.denominator//com)
-
 class RationalDiff(BinDiff):
 
     def __init__(self, dtype, chipimplclock, timer):
@@ -113,12 +108,12 @@ class RationalDiff(BinDiff):
         else:
             self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            indices = -((-fracint(Fraction(stepindex, mfpclock)) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock))) // mfpclock)
+            indices = -((-stepindex - np.arange(stepcount) * stepsize) // mfpclock)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracint(Fraction(self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex, mfpclock))
+            self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
             if self.progress == stepsize:
                 self.progress = 0
             return self.integral
