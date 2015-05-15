@@ -130,7 +130,7 @@ class RationalDiff(BinDiff):
             return self.hold
         else:
             self.blockbuf.fill(0)
-            stepcount = fracfloor2(self.block.framecount - 1 - Fraction(stepindex, mfpclock), Fraction(stepsize, mfpclock)) + 1
+            stepcount = fracfloor2(Fraction((self.block.framecount - 1) * mfpclock - stepindex, mfpclock), Fraction(stepsize, mfpclock)) + 1
             lcd = fraclcd(Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock))
             indices = -((-fracint(Fraction(stepindex, mfpclock), lcd) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), lcd)) // lcd)
             dc = self.ringcursor.currentdc()
