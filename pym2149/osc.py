@@ -115,9 +115,9 @@ class RationalDiff(BinDiff):
             indices.fill(-stepsize)
             indices.buf[0] = 0
             np.cumsum(indices.buf, out = indices.buf)
-            indices.buf -= stepindex
+            indices.add(-stepindex)
             indices.buf //= mfpclock
-            indices.buf *= -1
+            indices.mul(-1)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices.buf)
