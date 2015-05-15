@@ -77,11 +77,6 @@ class OscDiff(BinDiff):
 def fracceil(numerator, denominator):
     return -((-numerator) // denominator)
 
-def fraclcd(f, g): # The LCD is the LCM of the denominators.
-    fd = f.denominator
-    gd = g.denominator
-    return fd * gd // fractions.gcd(fd, gd)
-
 def fracint(f, denominator):
     com = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
     return f.numerator * (denominator//com) // (f.denominator//com)
@@ -124,8 +119,7 @@ class RationalDiff(BinDiff):
         else:
             self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            lcd = fraclcd(Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock))
-            indices = -((-fracint(Fraction(stepindex, mfpclock), lcd) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), lcd)) // lcd)
+            indices = -((-fracint(Fraction(stepindex, mfpclock), mfpclock) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), mfpclock)) // mfpclock)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
