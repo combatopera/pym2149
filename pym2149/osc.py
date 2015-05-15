@@ -77,9 +77,9 @@ class OscDiff(BinDiff):
 def fracceil(numerator, denominator):
     return -((-numerator) // denominator)
 
-def fracint(f, denominator):
-    com = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
-    return f.numerator * (denominator//com) // (f.denominator//com)
+def fracint(f):
+    com = fractions.gcd(f.denominator, mfpclock) # To prevent overflow, not as slow as it looks.
+    return f.numerator * (mfpclock//com) // (f.denominator//com)
 
 def fracsub(f, g):
     com = fractions.gcd(f.denominator, g.denominator)
@@ -119,12 +119,12 @@ class RationalDiff(BinDiff):
         else:
             self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            indices = -((-fracint(Fraction(stepindex, mfpclock), mfpclock) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), mfpclock)) // mfpclock)
+            indices = -((-fracint(Fraction(stepindex, mfpclock)) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock))) // mfpclock)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock)), mfpclock)
+            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock)))
             if self.progress == stepsize:
                 self.progress = 0
             return self.integral
