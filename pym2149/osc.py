@@ -78,6 +78,8 @@ def fracceil(numerator, denominator):
 
 class RationalDiff(BinDiff):
 
+    singleton0 = np.zeros(1, dtype = np.int32)
+
     def __init__(self, dtype, chipimplclock, timer):
         BinDiff.__init__(self, dtype)
         self.chipimplclock = chipimplclock
@@ -88,7 +90,7 @@ class RationalDiff(BinDiff):
             if not self.progress:
                 self.blockbuf.fill(0)
                 dc = self.ringcursor.currentdc()
-                self.ringcursor.put2(self.blockbuf, np.zeros(1, dtype = np.int32))
+                self.ringcursor.put2(self.blockbuf, self.singleton0)
                 self.blockbuf.addtofirst(dc)
                 self.progress = self.block.framecount * mfpclock
                 return self.integral
