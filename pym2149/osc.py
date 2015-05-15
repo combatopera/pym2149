@@ -19,7 +19,7 @@ from __future__ import division
 import lfsr, itertools, math, numpy as np
 from nod import BufNode
 from dac import leveltoamp, amptolevel
-from buf import DiffRing, RingCursor
+from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
 
 loopsize = 1024
@@ -82,6 +82,7 @@ class RationalDiff(BinDiff):
 
     def __init__(self, dtype, chipimplclock, timer):
         BinDiff.__init__(self, dtype)
+        self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
         self.chipimplclock = chipimplclock
         self.timer = timer
 
@@ -110,10 +111,16 @@ class RationalDiff(BinDiff):
         else:
             self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            indices = fracceil(stepindex + np.arange(stepcount) * stepsize, mfpclock)
+            indices = self.indices.ensureandcrop(stepcount)
+            indices.fill(-stepsize)
+            indices.buf[0] = 0
+            np.cumsum(indices.buf, out = indices.buf)
+            indices.buf -= stepindex
+            indices.buf //= mfpclock
+            indices.buf *= -1
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
-            self.ringcursor.put2(self.blockbuf, indices)
+            self.ringcursor.put2(self.blockbuf, indices.buf)
             self.blockbuf.addtofirst(dc)
             self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
             if self.progress == stepsize:
