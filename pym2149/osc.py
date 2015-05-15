@@ -124,7 +124,7 @@ class RationalDiff(BinDiff):
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices)
             self.blockbuf.addtofirst(dc)
-            self.progress = fracint(fracsub(self.block.framecount - (stepcount - 1) * Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock)))
+            self.progress = fracint(fracsub(self.block.framecount - Fraction((stepcount - 1) * stepsize, mfpclock), Fraction(stepindex, mfpclock)))
             if self.progress == stepsize:
                 self.progress = 0
             return self.integral
