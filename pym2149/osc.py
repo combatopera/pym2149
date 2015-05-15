@@ -89,10 +89,6 @@ def fracint(f, denominator):
     com = fractions.gcd(f.denominator, denominator) # To prevent overflow, not as slow as it looks.
     return f.numerator * (denominator//com) // (f.denominator//com)
 
-def fracfloor2(f, g):
-    com = fractions.gcd(f.denominator, g.denominator)
-    return f.numerator * (g.denominator//com) // ((f.denominator//com) * g.numerator)
-
 def fracsub(f, g):
     com = fractions.gcd(f.denominator, g.denominator)
     fd = f.denominator // com
@@ -130,7 +126,7 @@ class RationalDiff(BinDiff):
             return self.hold
         else:
             self.blockbuf.fill(0)
-            stepcount = fracfloor2(Fraction((self.block.framecount - 1) * mfpclock - stepindex, mfpclock), Fraction(stepsize, mfpclock)) + 1
+            stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
             lcd = fraclcd(Fraction(stepsize, mfpclock), Fraction(stepindex, mfpclock))
             indices = -((-fracint(Fraction(stepindex, mfpclock), lcd) - np.arange(stepcount) * fracint(Fraction(stepsize, mfpclock), lcd)) // lcd)
             dc = self.ringcursor.currentdc()
