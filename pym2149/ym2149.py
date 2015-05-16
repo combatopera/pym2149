@@ -132,4 +132,4 @@ class YM2149(Registers, Container, Chip):
     self.levelmodes[chan].value = 0 # Effectively the envelope flag.
     self.toneflags[chan].value = False
     self.noiseflags[chan].value = False
-    self.timers[chan].effect.value = False
+    self.timers[chan].effect.value = None

@@ -17,6 +17,7 @@
 
 from __future__ import division
 from reg import Reg
+from dac import pwmeffect
 
 prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
 mfpclock = 2457600
@@ -34,7 +35,7 @@ class MFPTimer:
         self.control.value = 0
         self.data.value = 0
         self.effect = Reg()
-        self.effect.value = False
+        self.effect.value = None
         self.control_data = Reg()
         self.control.link(lambda cd: cd[0], self.control_data)
         self.data.link(lambda cd: cd[1], self.control_data)
@@ -44,7 +45,7 @@ class MFPTimer:
 
     def update(self, tcr, tdr):
         self.control_data.value = tcr, tdr
-        self.effect.value = True
+        self.effect.value = pwmeffect
 
     def findtcrtdr(self, freq):
         diff = None
@@ -64,7 +65,7 @@ class MFPTimer:
     def getnormperiod(self):
         return prescalers[self.control.value] * self.effectivedata.value * self.wavelength.value
 
-    def getfreq(self): # Currently only called when effect is True.
+    def getfreq(self): # Currently only called when effect is not None.
         return mfpclock / self.getnormperiod()
 
     def getstepsize(self):
