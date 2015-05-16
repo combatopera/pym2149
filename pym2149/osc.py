@@ -114,7 +114,7 @@ class RationalDiff(BinDiff):
             indices = self.indices.ensureandcrop(stepcount)
             indices.fill(-stepsize)
             indices.buf[0] = 0
-            np.cumsum(indices.buf, out = indices.buf)
+            indices.integrate(indices)
             indices.add(-stepindex)
             indices.buf //= mfpclock
             indices.mul(-1)
