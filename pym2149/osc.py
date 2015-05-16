@@ -113,7 +113,7 @@ class RationalDiff(BinDiff):
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
             indices = self.indices.ensureandcrop(stepcount)
             indices.fill(-stepsize)
-            indices.buf[0] = 0
+            indices.addtofirst(stepsize)
             indices.integrate(indices)
             indices.add(-stepindex)
             indices.buf //= mfpclock
