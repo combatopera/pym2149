@@ -40,30 +40,31 @@ class Level(BufNode):
     self.timereffectreg = timereffectreg
 
   def callimpl(self):
+    levelmode = self.levelmodereg.value
     timereffect = self.timereffectreg.value
     if timereffect is not None:
-      timereffect(self)
-    elif self.levelmodereg.value:
+      timereffect(levelmode, self.fixedreg, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
+    elif levelmode:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mulbuf(self.chain(self.env))
     else:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mul(self.to5bit(self.fixedreg.value))
 
-def pwmeffect(levelnode):
-    if levelnode.levelmodereg.value:
+def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
+    if levelmode:
         # TODO: Test this branch.
-        levelnode.blockbuf.copybuf(levelnode.chain(levelnode.env)) # Values in [0, 31].
-        levelnode.blockbuf.add(1) # Shift env values to [1, 32].
-        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.signal)) # Introduce 0.
-        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.rtone)) # Introduce more 0.
-        levelnode.blockbuf.mapbuf(levelnode.blockbuf, levelnode.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+        blockbuf.copybuf(chain(envnode)) # Values in [0, 31].
+        blockbuf.add(1) # Shift env values to [1, 32].
+        blockbuf.mulbuf(chain(signalnode)) # Introduce 0.
+        blockbuf.mulbuf(chain(rtonenode)) # Introduce more 0.
+        blockbuf.mapbuf(blockbuf, Level.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
     else:
-        levelnode.blockbuf.copybuf(levelnode.chain(levelnode.signal))
-        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.rtone))
+        blockbuf.copybuf(chain(signalnode))
+        blockbuf.mulbuf(chain(rtonenode))
         # Map 0 to pwmzero and 1 to fixed level:
-        levelnode.blockbuf.mul(levelnode.to5bit(levelnode.fixedreg.value) - levelnode.pwmzero5bit)
-        levelnode.blockbuf.add(levelnode.pwmzero5bit)
+        blockbuf.mul(Level.to5bit(fixedreg.value) - Level.pwmzero5bit)
+        blockbuf.add(Level.pwmzero5bit)
 
 log2 = math.log(2)
 
