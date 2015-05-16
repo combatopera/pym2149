@@ -17,7 +17,6 @@
 
 from __future__ import division
 from reg import Reg
-from dac import pwmeffect
 
 prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
 mfpclock = 2457600
@@ -43,9 +42,9 @@ class MFPTimer:
         # XXX: Should change of wavelength trigger this link?
         self.control_data.link(self.findtcrtdr, self.freq)
 
-    def update(self, tcr, tdr):
+    def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
-        self.effect.value = pwmeffect
+        self.effect.value = effect
 
     def findtcrtdr(self, freq):
         diff = None
