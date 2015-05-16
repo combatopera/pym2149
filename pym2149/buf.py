@@ -109,8 +109,6 @@ class NullBuf(AnyBuf):
 
     def fill(self, *args): pass
 
-    def subbuf(self, *args): pass
-
     def putstrided(self, *args): pass
 
     def putindexed(self, *args): pass
@@ -118,6 +116,8 @@ class NullBuf(AnyBuf):
     def addtofirst(self, *args): pass
 
     def integrate(self, *args): pass
+
+    def subbuf(self, *args): pass
 
 class Buf(AnyBuf):
 
