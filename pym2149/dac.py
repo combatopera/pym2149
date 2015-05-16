@@ -41,25 +41,28 @@ class Level(BufNode):
 
   def callimpl(self):
     if self.timereffectreg.value:
-      if self.levelmodereg.value:
-        # TODO: Test this branch.
-        self.blockbuf.copybuf(self.chain(self.env)) # Values in [0, 31].
-        self.blockbuf.add(1) # Shift env values to [1, 32].
-        self.blockbuf.mulbuf(self.chain(self.signal)) # Introduce 0.
-        self.blockbuf.mulbuf(self.chain(self.rtone)) # Introduce more 0.
-        self.blockbuf.mapbuf(self.blockbuf, self.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
-      else:
-        self.blockbuf.copybuf(self.chain(self.signal))
-        self.blockbuf.mulbuf(self.chain(self.rtone))
-        # Map 0 to pwmzero and 1 to fixed level:
-        self.blockbuf.mul(self.to5bit(self.fixedreg.value) - self.pwmzero5bit)
-        self.blockbuf.add(self.pwmzero5bit)
+      pwmeffect(self)
     elif self.levelmodereg.value:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mulbuf(self.chain(self.env))
     else:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mul(self.to5bit(self.fixedreg.value))
+
+def pwmeffect(levelnode):
+    if levelnode.levelmodereg.value:
+        # TODO: Test this branch.
+        levelnode.blockbuf.copybuf(levelnode.chain(levelnode.env)) # Values in [0, 31].
+        levelnode.blockbuf.add(1) # Shift env values to [1, 32].
+        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.signal)) # Introduce 0.
+        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.rtone)) # Introduce more 0.
+        levelnode.blockbuf.mapbuf(levelnode.blockbuf, levelnode.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+    else:
+        levelnode.blockbuf.copybuf(levelnode.chain(levelnode.signal))
+        levelnode.blockbuf.mulbuf(levelnode.chain(levelnode.rtone))
+        # Map 0 to pwmzero and 1 to fixed level:
+        levelnode.blockbuf.mul(levelnode.to5bit(levelnode.fixedreg.value) - levelnode.pwmzero5bit)
+        levelnode.blockbuf.add(levelnode.pwmzero5bit)
 
 log2 = math.log(2)
 
