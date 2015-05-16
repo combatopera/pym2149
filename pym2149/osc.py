@@ -128,9 +128,14 @@ class RToneOsc(BufNode):
 
     def __init__(self, chipimplclock, timer):
         BufNode.__init__(self, self.binarydtype)
-        self.diff = RationalDiff(self.bindiffdtype, chipimplclock, timer).reset(ToneOsc.diffs)
+        self.diff = RationalDiff(self.bindiffdtype, chipimplclock, timer)
+        self.effectversion = None
+        self.effectreg = timer.effect
 
     def callimpl(self):
+        if self.effectversion != self.effectreg.version:
+            self.diff.reset(ToneOsc.diffs)
+            self.effectversion = self.effectreg.version
         self.chain(self.diff)(self.blockbuf)
 
 class ToneOsc(BufNode):

@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from reg import Reg
+from reg import Reg, VersionReg
 
 prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
 mfpclock = 2457600
@@ -33,7 +33,7 @@ class MFPTimer:
         self.effectivedata.link(lambda tdr: tdr if tdr else 0x100, self.data)
         self.control.value = 0
         self.data.value = 0
-        self.effect = Reg()
+        self.effect = VersionReg()
         self.effect.value = None
         self.control_data = Reg()
         self.control.link(lambda cd: cd[0], self.control_data)
@@ -44,7 +44,8 @@ class MFPTimer:
 
     def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
-        self.effect.value = effect
+        if effect != self.effect.value:
+            self.effect.value = effect
 
     def findtcrtdr(self, freq):
         diff = None
