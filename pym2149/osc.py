@@ -116,8 +116,7 @@ class RationalDiff(BinDiff):
             indices.addtofirst(stepsize)
             indices.integrate(indices)
             indices.add(-stepindex)
-            indices.buf //= mfpclock
-            indices.mul(-1)
+            indices.ceildiv(mfpclock, alreadynegated = True)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
             self.ringcursor.put2(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?

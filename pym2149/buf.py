@@ -157,6 +157,12 @@ class Buf(AnyBuf):
     def integrate(self, that):
         np.cumsum(that.buf, out = self.buf)
 
+    def ceildiv(self, divisor, alreadynegated = False):
+        if not alreadynegated:
+            self.buf *= -1
+        self.buf //= divisor
+        self.buf *= -1
+
     def mulbuf(self, that):
         self.buf *= that.buf
 
