@@ -24,7 +24,7 @@ class Level(BufNode):
   def to5bit(level4bit):
     return level4bit * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
 
-  pwmzero4bit = 0 # TODO: Make this a register.
+  pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
   pwmzero5bit = to5bit(pwmzero4bit)
   lookup = np.fromiter([pwmzero5bit] + range(32), BufNode.zto255dtype)
 
