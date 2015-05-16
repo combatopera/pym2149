@@ -1,0 +1,12 @@
+^target$
+^observations$
+^ymfiles$
+^resources$
+[.]pyc$
+[.]O$
+[.]swp$
+[.]dsd$
+[.]c$
+[.]so$
+^pym2149/cpaste[0-9]+[.]pyx$
+^pym2149/MinBleps[(].*[)]$

@@ -1,0 +1,81 @@
+# Copyright 2014 Andrzej Cichocki
+
+# This file is part of pym2149.
+#
+# pym2149 is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pym2149 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys, errno
+import numpy as np
+
+class Wave16:
+
+  bytespersample = 2
+  hugefilesize = 0x80000000
+  dtype = np.int16
+
+  def __init__(self, path, rate, channels):
+    if '-' == path:
+      self.f = sys.stdout
+    else:
+      self.f = open(path, 'wb') # Binary.
+    self.f.write('RIFF')
+    self.riffsizeoff = 4
+    self.writeriffsize(self.hugefilesize)
+    self.f.write('WAVEfmt ') # Observe trailing space.
+    self.writen(16) # Chunk data size.
+    self.writen(1, 2) # PCM (uncompressed).
+    self.writen(channels, 2)
+    self.writen(rate)
+    bytesperframe = self.bytespersample * channels
+    self.writen(rate * bytesperframe) # Bytes per second.
+    self.writen(bytesperframe, 2)
+    self.writen(self.bytespersample * 8, 2) # Bits per sample.
+    self.f.write('data')
+    self.datasizeoff = 40
+    self.writedatasize(self.hugefilesize)
+    self.adjustsizes()
+
+  def writeriffsize(self, filesize):
+    self.writen(filesize - (self.riffsizeoff + 4))
+
+  def writedatasize(self, filesize):
+    self.writen(filesize - (self.datasizeoff + 4))
+
+  def writen(self, n, size = 4):
+    for _ in xrange(size):
+      self.f.write(chr(n & 0xff))
+      n >>= 8
+
+  def block(self, buf):
+    buf.tofile(self.f)
+    self.adjustsizes()
+
+  def adjustsizes(self):
+    try:
+      filesize = self.f.tell()
+    except IOError, e:
+      if errno.ESPIPE != e.errno:
+        raise
+      return # Leave huge sizes.
+    self.f.seek(self.riffsizeoff)
+    self.writeriffsize(filesize)
+    self.f.seek(self.datasizeoff)
+    self.writedatasize(filesize)
+    self.f.seek(filesize)
+
+  def flush(self):
+    self.f.flush()
+
+  def close(self):
+    self.f.close()
