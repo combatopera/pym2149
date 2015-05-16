@@ -224,8 +224,7 @@ class Frame6(Frame56):
 
     def __call__(self, chip):
         PlainFrame.__call__(self, chip)
-        for timer in chip.timers:
-            timer.effect.value = None
+        timerchans = set()
         for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
             if self.data[r] & 0x30:
                 chan = ((self.data[r] & 0x30) >> 4) - 1
@@ -235,6 +234,7 @@ class Frame6(Frame56):
                     if tcr:
                         tdr = self.data[rrr]
                         chip.timers[chan].update(tcr, tdr, pwmeffect)
+                        timerchans.add(chan)
                 if self.flags.logdigidrum and 0x40 == fx:
                     log.warn("Digi-drum at frame %s.", self.index)
                     self.flags.logdigidrum = False
@@ -243,9 +243,13 @@ class Frame6(Frame56):
                     if tcr:
                         tdr = self.data[rrr]
                         chip.timers[chan].update(tcr, tdr, sinuseffect)
+                        timerchans.add(chan)
                 if self.flags.logsyncbuzzer and 0xc0 == fx:
                     log.warn("Sync-buzzer at frame %s.", self.index)
                     self.flags.logsyncbuzzer = False
+        for chan, timer in enumerate(chip.timers):
+            if chan not in timerchans:
+                timer.effect.value = None
 
 class YM5(YM56):
 
