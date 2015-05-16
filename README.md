@@ -2,4 +2,5 @@ YM2149 emulator in Python, NumPy and a little Cython where it matters. The aims 
 
 Continuous integration: [![Build Status](https://drone.io/bitbucket.org/combatopera/pym2149/status.png)](https://drone.io/bitbucket.org/combatopera/pym2149)
 
-Main site: **[ym2149.org](http://ym2149.org/)**
+Main site: **[ym2149.org](http://ym2149.org/)**  
+If it redirects here, clear your browser cache (was HTTP 301).
