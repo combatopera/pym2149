@@ -47,7 +47,7 @@ class Roll:
       level = self.chip.fixedlevels[c].value
       newshape = (self.shapeversion != self.chip.envshape.version)
       self.shapeversion = self.chip.envshape.version
-      timereffect = self.chip.timers[c].effect.value
+      timereffect = self.chip.timers[c].effect.value is not None
       rhs = env or level
       if tone and rhs:
         vals.append(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock).pitch())

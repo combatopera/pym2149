@@ -40,8 +40,9 @@ class Level(BufNode):
     self.timereffectreg = timereffectreg
 
   def callimpl(self):
-    if self.timereffectreg.value:
-      pwmeffect(self)
+    timereffect = self.timereffectreg.value
+    if timereffect is not None:
+      timereffect(self)
     elif self.levelmodereg.value:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mulbuf(self.chain(self.env))
