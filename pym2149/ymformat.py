@@ -213,8 +213,8 @@ class Frame5(Frame56):
     if self.data[0x1] & 0x30:
       chan = ((self.data[0x1] & 0x30) >> 4) - 1
       tcr = (self.data[0x6] & 0xe0) >> 5
-      tdr = self.data[0xE]
-      if tcr and tdr:
+      if tcr:
+        tdr = self.data[0xE]
         chip.timers[chan].update(tcr, tdr, pwmeffect)
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
@@ -232,16 +232,16 @@ class Frame6(Frame56):
         fx = self.data[r] & 0xc0
         if 0x00 == fx:
           tcr = (self.data[rr] & 0xe0) >> 5
-          tdr = self.data[rrr]
-          if tcr and tdr:
+          if tcr:
+            tdr = self.data[rrr]
             chip.timers[chan].update(tcr, tdr, pwmeffect)
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
         if 0x80 == fx:
           tcr = (self.data[rr] & 0xe0) >> 5
-          tdr = self.data[rrr]
-          if tcr and tdr:
+          if tcr:
+            tdr = self.data[rrr]
             chip.timers[chan].update(tcr, tdr, sinuseffect)
         if self.flags.logsyncbuzzer and 0xc0 == fx:
           log.warn("Sync-buzzer at frame %s.", self.index)
