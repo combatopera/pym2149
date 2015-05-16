@@ -163,6 +163,11 @@ class Buf(AnyBuf):
         self.buf //= divisor
         self.buf *= -1
 
+    def arange(self, scale):
+        self.buf[0] = 0
+        self.buf[1:] = scale
+        np.cumsum(self.buf, out = self.buf)
+
     def mulbuf(self, that):
         self.buf *= that.buf
 
