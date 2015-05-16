@@ -66,6 +66,8 @@ def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, cha
         blockbuf.mul(Level.to5bit(fixedreg.value) - Level.pwmzero5bit)
         blockbuf.add(Level.pwmzero5bit)
 
+sinuseffect = pwmeffect # FIXME: Actually implement.
+
 log2 = math.log(2)
 
 def leveltoamp(level):
