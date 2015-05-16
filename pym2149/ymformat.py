@@ -19,7 +19,7 @@ import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from di import types
 from iface import YMFile, Config
-from dac import pwmeffect
+from dac import pwmeffect, sinuseffect
 
 log = logging.getLogger(__name__)
 
@@ -238,9 +238,11 @@ class Frame6(Frame56):
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
-        if self.flags.logsinussid and 0x80 == fx:
-          log.warn("Sinus-SID at frame %s.", self.index)
-          self.flags.logsinussid = False
+        if 0x80 == fx:
+          tcr = (self.data[rr] & 0xe0) >> 5
+          tdr = self.data[rrr]
+          if tcr and tdr:
+            chip.timers[chan].update(tcr, tdr, sinuseffect)
         if self.flags.logsyncbuzzer and 0xc0 == fx:
           log.warn("Sync-buzzer at frame %s.", self.index)
           self.flags.logsyncbuzzer = False
