@@ -19,6 +19,7 @@ import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
 from di import types
 from iface import YMFile, Config
+from dac import pwmeffect
 
 log = logging.getLogger(__name__)
 
@@ -214,7 +215,7 @@ class Frame5(Frame56):
       tcr = (self.data[0x6] & 0xe0) >> 5
       tdr = self.data[0xE]
       if tcr and tdr:
-        chip.timers[chan].update(tcr, tdr)
+        chip.timers[chan].update(tcr, tdr, pwmeffect)
     if self.flags.logdigidrum and (self.data[0x3] & 0x30):
       log.warn("Digi-drum at frame %s.", self.index)
       self.flags.logdigidrum = False
@@ -233,7 +234,7 @@ class Frame6(Frame56):
           tcr = (self.data[rr] & 0xe0) >> 5
           tdr = self.data[rrr]
           if tcr and tdr:
-            chip.timers[chan].update(tcr, tdr)
+            chip.timers[chan].update(tcr, tdr, pwmeffect)
         if self.flags.logdigidrum and 0x40 == fx:
           log.warn("Digi-drum at frame %s.", self.index)
           self.flags.logdigidrum = False
