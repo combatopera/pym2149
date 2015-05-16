@@ -73,7 +73,7 @@ class OscDiff(BinDiff):
             self.progress = (self.block.framecount - stepindex) % self.stepsize
             return self.integral
 
-def fracceil(numerator, denominator):
+def ceildiv(numerator, denominator):
     return -((-numerator) // denominator)
 
 class RationalDiff(BinDiff):
@@ -103,9 +103,9 @@ class RationalDiff(BinDiff):
             stepindex = 0
         else:
             stepindex = stepsize - self.progress
-            if fracceil(stepindex, mfpclock) < 0:
+            if ceildiv(stepindex, mfpclock) < 0:
                 stepindex = 0
-        if fracceil(stepindex, mfpclock) >= self.block.framecount:
+        if ceildiv(stepindex, mfpclock) >= self.block.framecount:
             self.progress += self.block.framecount * mfpclock
             return self.hold
         else:
