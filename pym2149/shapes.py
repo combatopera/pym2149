@@ -29,6 +29,9 @@ def level5toamp(level):
 def amptolevel5(amp):
   return 31 + 4 * math.log(amp) / log2
 
+def level4to5(level4):
+    return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
+
 def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
     unitsize = len(unit)
     if 0 != loopsize % unitsize:
