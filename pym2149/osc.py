@@ -21,8 +21,7 @@ from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
-
-loopsize = 1024
+from shapes import loopsize, tonediffs
 
 class BinDiff(BufNode):
 
@@ -134,18 +133,16 @@ class RToneOsc(BufNode):
 
     def callimpl(self):
         if self.effectversion != self.effectreg.version:
-            self.diff.reset(ToneOsc.diffs)
+            self.diff.reset(self.effectreg.value.diffs)
             self.effectversion = self.effectreg.version
         self.chain(self.diff)(self.blockbuf)
 
 class ToneOsc(BufNode):
 
-    diffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
-
     def __init__(self, scale, periodreg):
         BufNode.__init__(self, self.binarydtype)
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, True).reset(self.diffs)
+        self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, True).reset(tonediffs)
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)

@@ -25,6 +25,8 @@ from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
+from shapes import tonediffs
+from dac import pwmeffect
 
 def Reg(value):
     r = VersionReg()
@@ -36,6 +38,7 @@ class Timer:
     def __init__(self, xform, that):
         self.xform = xform
         self.that = that
+        self.effect = Reg(pwmeffect)
 
     def isrunning(self): return True
 
@@ -161,7 +164,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
         p = self.Timer(True, 81920)
-        d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(ToneOsc.diffs)
+        d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(tonediffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, diffblock(d, 80))
@@ -176,7 +179,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_notrunning(self):
         p = self.Timer(False, None)
-        d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(ToneOsc.diffs)
+        d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(tonediffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
