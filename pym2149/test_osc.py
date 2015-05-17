@@ -18,14 +18,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, loopsize, RationalDiff, RToneOsc
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDiff, RToneOsc
 from mfp import mfpclock
 from nod import Block, BufNode
 from reg import VersionReg
 from buf import DiffRing, RingCursor, Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
-from shapes import tonediffs
+from shapes import tonediffs, loopsize
 from dac import pwmeffect
 
 def Reg(value):

@@ -21,7 +21,7 @@ from nod import BufNode
 from dac import leveltoamp, amptolevel
 from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
-from shapes import loopsize, tonediffs
+from shapes import cycle, tonediffs
 
 class BinDiff(BufNode):
 
@@ -161,14 +161,6 @@ class NoiseOsc(BufNode):
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
-
-def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
-    unitsize = len(unit)
-    if 0 != loopsize % unitsize:
-        raise Exception("Unit size %s does not divide %s." % (unitsize, loopsize))
-    for _ in xrange(loopsize // unitsize):
-        for x in unit:
-            yield x
 
 def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
     unit = []
