@@ -17,19 +17,14 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import tonediffs, sinusdiffs, level5toamp
+from shapes import tonediffs, sinusdiffs, level5toamp, level4to5
 import numpy as np
 
 class Level(BufNode):
 
-  def to5bit(level4bit):
-    return level4bit * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
-
   pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
-  pwmzero5bit = to5bit(pwmzero4bit)
+  pwmzero5bit = level4to5(pwmzero4bit)
   lookup = np.fromiter([pwmzero5bit] + range(32), BufNode.zto255dtype)
-
-  to5bit = staticmethod(to5bit)
 
   def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
     BufNode.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
@@ -50,7 +45,7 @@ class Level(BufNode):
       self.blockbuf.mulbuf(self.chain(self.env))
     else:
       self.blockbuf.copybuf(self.chain(self.signal))
-      self.blockbuf.mul(self.to5bit(self.fixedreg.value))
+      self.blockbuf.mul(level4to5(self.fixedreg.value))
 
 def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
     if levelmode:
@@ -64,7 +59,7 @@ def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, cha
         blockbuf.copybuf(chain(signalnode))
         blockbuf.mulbuf(chain(rtonenode))
         # Map 0 to pwmzero and 1 to fixed level:
-        blockbuf.mul(Level.to5bit(fixedreg.value) - Level.pwmzero5bit)
+        blockbuf.mul(level4to5(fixedreg.value) - Level.pwmzero5bit)
         blockbuf.add(Level.pwmzero5bit)
 pwmeffect.diffs = tonediffs
 
