@@ -17,8 +17,8 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import tonediffs, sinusdiffs
-import numpy as np, math
+from shapes import tonediffs, sinusdiffs, level5toamp
+import numpy as np
 
 class Level(BufNode):
 
@@ -74,14 +74,6 @@ def sinuseffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, c
     blockbuf.mul(2)
     blockbuf.add(1)
 sinuseffect.diffs = sinusdiffs
-
-log2 = math.log(2)
-
-def level5toamp(level):
-  return 2 ** ((level - 31) / 4)
-
-def amptolevel5(amp):
-  return 31 + 4 * math.log(amp) / log2
 
 class Dac(BufNode):
 
