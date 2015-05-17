@@ -20,6 +20,14 @@ from buf import DiffRing
 
 loopsize = 1024
 
+def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
+    unitsize = len(unit)
+    if 0 != loopsize % unitsize:
+        raise Exception("Unit size %s does not divide %s." % (unitsize, loopsize))
+    for _ in xrange(loopsize // unitsize):
+        for x in unit:
+            yield x
+
 tonediffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
 
 # FIXME: Implement this properly.
