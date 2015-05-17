@@ -29,6 +29,9 @@ def level5toamp(level):
 def amptolevel5(amp):
   return 31 + 4 * math.log(amp) / log2
 
+def amptolevel4(amp):
+  return 15 + 2 * math.log(amp) / log2
+
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
 
@@ -42,13 +45,10 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
 
 tonediffs = DiffRing(cycle([1, 0]), 0, BufNode.bindiffdtype)
 
-def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
-    unit = []
-    minamp = level5toamp(0)
-    for i in xrange(steps):
-        amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
-        unit.append(round(amptolevel5(amp)))
+def sinering(steps, maxlevel4):
+    minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
+    steptoamp = lambda step: minamp + (maxamp - minamp) * (math.sin(2 * math.pi * step / steps) + 1) / 2
+    unit = [round(amptolevel4(steptoamp(step))) for step in xrange(steps)]
     return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
 
-# FIXME: Implement this properly.
-sinusdiffs = DiffRing([13, 14, 15, 14, 13, 11, 0, 11] * (loopsize // 8), 0, BufNode.zto127diffdtype)
+sinusdiffs = sinering(8, 15)
