@@ -17,7 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import tonediffs, sinusdiffs, level5toamp, level4to5
+from shapes import tonediffs, leveltosinusdiffs, level5toamp, level4to5
 import numpy as np
 
 class Level(BufNode):
@@ -64,11 +64,10 @@ def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, cha
 pwmeffect.diffs = tonediffs
 
 def sinuseffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
-    # XXX: Should this honour the fixedlevel?
     blockbuf.copybuf(chain(rtonenode))
     blockbuf.mul(2)
     blockbuf.add(1)
-sinuseffect.diffs = sinusdiffs
+sinuseffect.diffs = leveltosinusdiffs[15] # FIXME: Honour the fixedlevel.
 
 class Dac(BufNode):
 
