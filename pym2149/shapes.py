@@ -40,7 +40,7 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
         for x in unit:
             yield x
 
-tonediffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
+tonediffs = DiffRing(cycle([1, 0]), 0, BufNode.bindiffdtype)
 
 def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
     unit = []
