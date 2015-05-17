@@ -17,6 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
+from shapes import tonediffs, sinusdiffs
 import numpy as np, math
 
 class Level(BufNode):
@@ -65,8 +66,13 @@ def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, cha
         # Map 0 to pwmzero and 1 to fixed level:
         blockbuf.mul(Level.to5bit(fixedreg.value) - Level.pwmzero5bit)
         blockbuf.add(Level.pwmzero5bit)
+pwmeffect.diffs = tonediffs
 
-sinuseffect = pwmeffect # FIXME: Actually implement.
+def sinuseffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
+    blockbuf.copybuf(chain(rtonenode))
+    blockbuf.mul(2)
+    blockbuf.add(1)
+sinuseffect.diffs = sinusdiffs
 
 log2 = math.log(2)
 
