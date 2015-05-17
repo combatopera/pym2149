@@ -18,10 +18,9 @@
 from __future__ import division
 import lfsr, itertools, math, numpy as np
 from nod import BufNode
-from dac import level5toamp, amptolevel5
 from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
-from shapes import cycle, tonediffs
+from shapes import cycle, tonediffs, level5toamp, amptolevel5
 
 class BinDiff(BufNode):
 

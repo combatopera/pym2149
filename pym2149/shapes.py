@@ -15,10 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from nod import BufNode
 from buf import DiffRing
+import math
 
 loopsize = 1024
+log2 = math.log(2)
+
+def level5toamp(level):
+  return 2 ** ((level - 31) / 4)
+
+def amptolevel5(amp):
+  return 31 + 4 * math.log(amp) / log2
 
 def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
     unitsize = len(unit)
