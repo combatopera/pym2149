@@ -134,7 +134,7 @@ def cmptime(self, taken, strictlimit):
     sys.stderr.write("%s ... " % expression)
     self.assertTrue(eval(expression))
 
-class TestRToneOsc(TestToneOsc):
+class TestRToneOsc(TestToneOsc): # FIXME: MFP timers do not behave like YM2149 tones.
 
     performancelimit = .1
 
