@@ -39,5 +39,13 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
 
 tonediffs = DiffRing((1 - (i & 1) for i in xrange(loopsize)), 0, BufNode.bindiffdtype)
 
+def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
+    unit = []
+    minamp = level5toamp(0)
+    for i in xrange(steps):
+        amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
+        unit.append(round(amptolevel5(amp)))
+    return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
+
 # FIXME: Implement this properly.
 sinusdiffs = DiffRing([13, 14, 15, 14, 13, 11, 0, 11] * (loopsize // 8), 0, BufNode.zto127diffdtype)

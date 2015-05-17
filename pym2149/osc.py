@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-import lfsr, itertools, math, numpy as np
+import lfsr, itertools, numpy as np
 from nod import BufNode
 from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
-from shapes import cycle, tonediffs, level5toamp, amptolevel5
+from shapes import cycle, tonediffs
 
 class BinDiff(BufNode):
 
@@ -161,14 +160,6 @@ class NoiseOsc(BufNode):
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
 
-def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
-    unit = []
-    minamp = level5toamp(0)
-    for i in xrange(steps):
-        amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
-        unit.append(round(amptolevel5(amp)))
-    return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
-
 class EnvOsc(BufNode):
 
     steps = 32
@@ -180,7 +171,6 @@ class EnvOsc(BufNode):
     diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
     diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
     diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), 0, BufNode.bindiffdtype, steps)
-    diffs10 = sinering(steps)
 
     def __init__(self, scale, periodreg, shapereg):
         BufNode.__init__(self, self.zto255dtype)
