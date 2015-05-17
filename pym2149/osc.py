@@ -126,8 +126,8 @@ class RationalDiff(BinDiff):
 class RToneOsc(BufNode):
 
     def __init__(self, chipimplclock, timer):
-        BufNode.__init__(self, self.binarydtype)
-        self.diff = RationalDiff(self.bindiffdtype, chipimplclock, timer)
+        BufNode.__init__(self, self.zto255dtype) # Sinus effect is in [0, 15] so dtype must support that.
+        self.diff = RationalDiff(self.zto127diffdtype, chipimplclock, timer)
         self.effectversion = None
         self.effectreg = timer.effect
 
