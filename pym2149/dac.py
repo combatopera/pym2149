@@ -69,6 +69,7 @@ def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, cha
 pwmeffect.diffs = tonediffs
 
 def sinuseffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
+    # XXX: Should this honour the fixedlevel?
     blockbuf.copybuf(chain(rtonenode))
     blockbuf.mul(2)
     blockbuf.add(1)
