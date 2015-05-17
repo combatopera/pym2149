@@ -18,7 +18,7 @@
 from __future__ import division
 import lfsr, itertools, math, numpy as np
 from nod import BufNode
-from dac import leveltoamp, amptolevel
+from dac import level5toamp, amptolevel5
 from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
 from shapes import cycle, tonediffs
@@ -164,10 +164,10 @@ class NoiseOsc(BufNode):
 
 def sinering(steps): # Like saw but unlike triangular, we use steps for a full wave.
     unit = []
-    minamp = leveltoamp(0)
+    minamp = level5toamp(0)
     for i in xrange(steps):
         amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
-        unit.append(round(amptolevel(amp)))
+        unit.append(round(amptolevel5(amp)))
     return DiffRing(cycle(unit), 0, BufNode.bindiffdtype)
 
 class EnvOsc(BufNode):

@@ -77,10 +77,10 @@ sinuseffect.diffs = sinusdiffs
 
 log2 = math.log(2)
 
-def leveltoamp(level):
+def level5toamp(level):
   return 2 ** ((level - 31) / 4)
 
-def amptolevel(amp):
+def amptolevel5(amp):
   return 31 + 4 * math.log(amp) / log2
 
 class Dac(BufNode):
@@ -90,7 +90,7 @@ class Dac(BufNode):
     # We take off .5 so that the peak amplitude is about -3 dB:
     maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
     # Lookup of ideal amplitudes:
-    self.leveltopeaktopeak = np.fromiter((leveltoamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
+    self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
     self.level = level
 
   def callimpl(self):
