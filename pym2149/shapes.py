@@ -51,4 +51,4 @@ def sinering(steps, maxlevel4):
     unit = [round(amptolevel4(steptoamp(step))) for step in xrange(steps)]
     return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
 
-sinusdiffs = sinering(8, 15)
+leveltosinusdiffs = dict([level, sinering(8, level)] for level in xrange(16))
