@@ -54,7 +54,7 @@ class Level(BufNode):
 
 def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
     if levelmode:
-        # TODO: Test this branch.
+        # TODO: Test this branch, or override levelmode starting with first interrupt.
         blockbuf.copybuf(chain(envnode)) # Values in [0, 31].
         blockbuf.add(1) # Shift env values to [1, 32].
         blockbuf.mulbuf(chain(signalnode)) # Introduce 0.
