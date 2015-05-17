@@ -168,7 +168,7 @@ def sinering(steps): # Like saw but unlike triangular, we use steps for a full w
     for i in xrange(steps):
         amp = minamp + (1 - minamp) * (math.sin(2 * math.pi * i / steps) + 1) / 2
         unit.append(round(amptolevel5(amp)))
-    return DiffRing(cycle(unit), 0, BufNode.bindiffdtype)
+    return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
 
 class EnvOsc(BufNode):
 
