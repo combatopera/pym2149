@@ -28,7 +28,7 @@ from pym2149.boot import createdi
 from pym2149.iface import Stream, Config
 from pym2149.program import Note
 from pym2149.channels import Channels
-from pym2149.dac import PWMEffect
+from pym2149.dac import PWMEffect, SinusEffect
 from ymplayer import ChipTimer
 import os, subprocess, time
 
@@ -96,6 +96,13 @@ class PWM(Note):
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq
+
+class Sinus(Note):
+
+    def noteon(self):
+        self.timer.effect.value = SinusEffect(self.fixedlevel)
+        self.fixedlevel.value = 15
+        self.timer.freq.value = self.freq * 4 # FIXME: It should know wavelength from effect.
 
 class Frames(list): pass
 
@@ -191,7 +198,7 @@ def main():
             Both.__init__(self, *args)
             self.tfreq = self.nomclock // 16
     class Saw600(Env): freq, shape = 600, 0x08
-    class Sin600(Env): freq, shape = 600, 0x10
+    class Sin1k(Sinus): freq = 1000
     class Tri650(Env): freq, shape = 650, 0x0a
     class T2k(Tone): freq = 2000
     class T3k(Tone): freq = 3000
@@ -211,7 +218,7 @@ def main():
     target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
     target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
     target.dump(2, [Saw600, 0, 0], 'saw600')
-    target.dump(2, [Sin600, 0, 0], 'sin600')
+    target.dump(2, [Sin1k, 0, 0], 'sin1k')
     target.dump(2, [Tri650, 0, 0], 'tri650')
     target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
     target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
