@@ -45,11 +45,16 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
 
 tonediffs = DiffRing(cycle([1, 0]), 0, BufNode.bindiffdtype)
 
-# XXX: Aim for average amp in slice?
+def meansin(x1, x2):
+    return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
+
+def sinsliceamp(i, n, skew):
+    return (meansin(*(2 * math.pi * ((i + off) / n + skew) for off in [-.5, .5])) + 1) / 2
+
 def sinering(steps, maxlevel4):
     minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
-    steptoamp = lambda step: minamp + (maxamp - minamp) * (math.sin(2 * math.pi * step / steps) + 1) / 2
-    unit = [round(amptolevel4(steptoamp(step))) for step in xrange(steps)]
+    amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, 0) for step in xrange(steps)]
+    unit = [int(round(amptolevel4(amp))) for amp in amps]
     return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
 
-leveltosinusdiffs = dict([level, sinering(8, level)] for level in xrange(16))
+leveltosinusdiffs = dict([level4, sinering(8, level4)] for level4 in xrange(16))
