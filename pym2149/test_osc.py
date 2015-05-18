@@ -254,12 +254,12 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(1, v.loopstart)
         self.assertEqual(range(32) + range(32), list(np.cumsum(v.buf[:64])))
         v = EnvOsc.diffs08
-        self.assertEqual(loopsize, v.buf.shape[0])
-        self.assertEqual(0, v.loopstart)
+        self.assertEqual(1 + loopsize, v.buf.shape[0])
+        self.assertEqual(1, v.loopstart)
         self.assertEqual(range(31, -1, -1) + range(31, -1, -1), list(np.cumsum(v.buf[:64])))
         v = EnvOsc.diffs0e
-        self.assertEqual(loopsize, v.buf.shape[0])
-        self.assertEqual(0, v.loopstart)
+        self.assertEqual(1 + loopsize, v.buf.shape[0])
+        self.assertEqual(1, v.loopstart)
         self.assertEqual(range(32) + range(31, -1, -1) + range(32), list(np.cumsum(v.buf[:96])))
         v = EnvOsc.diffs0a
         self.assertEqual(1 + loopsize, v.buf.shape[0])
@@ -270,16 +270,16 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(33, v.loopstart)
         self.assertEqual(range(32) + [0] * 32, list(np.cumsum(v.buf[:64])))
         v = EnvOsc.diffs0d
-        self.assertEqual(32 + loopsize, v.buf.shape[0])
-        self.assertEqual(32, v.loopstart)
+        self.assertEqual(33 + loopsize, v.buf.shape[0])
+        self.assertEqual(33, v.loopstart)
         self.assertEqual(range(32) + [31] * 32, list(np.cumsum(v.buf[:64])))
         v = EnvOsc.diffs0b
         self.assertEqual(33 + loopsize, v.buf.shape[0])
         self.assertEqual(33, v.loopstart)
         self.assertEqual(range(31, -1, -1) + [31] * 32, list(np.cumsum(v.buf[:64])))
         v = EnvOsc.diffs09
-        self.assertEqual(32 + loopsize, v.buf.shape[0])
-        self.assertEqual(32, v.loopstart)
+        self.assertEqual(33 + loopsize, v.buf.shape[0])
+        self.assertEqual(33, v.loopstart)
         self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(v.buf[:64])))
 
     def test_reset(self):
