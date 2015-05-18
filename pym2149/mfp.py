@@ -44,7 +44,7 @@ class MFPTimer:
 
     def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
-        if effect != self.effect.value:
+        if effect.__class__ != self.effect.value.__class__:
             self.effect.value = effect
 
     def findtcrtdr(self, freq):
