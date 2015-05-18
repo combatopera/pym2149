@@ -39,7 +39,7 @@ class Level(BufNode):
     levelmode = self.levelmodereg.value
     timereffect = self.timereffectreg.value
     if timereffect is not None:
-      timereffect(levelmode, self.fixedreg, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
+      timereffect(levelmode, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
     elif levelmode:
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mulbuf(self.chain(self.env))
@@ -47,27 +47,38 @@ class Level(BufNode):
       self.blockbuf.copybuf(self.chain(self.signal))
       self.blockbuf.mul(level4to5(self.fixedreg.value))
 
-def pwmeffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
-    if levelmode:
-        # TODO: Test this branch, or override levelmode starting with first interrupt.
-        blockbuf.copybuf(chain(envnode)) # Values in [0, 31].
-        blockbuf.add(1) # Shift env values to [1, 32].
-        blockbuf.mulbuf(chain(signalnode)) # Introduce 0.
-        blockbuf.mulbuf(chain(rtonenode)) # Introduce more 0.
-        blockbuf.mapbuf(blockbuf, Level.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
-    else:
-        blockbuf.copybuf(chain(signalnode))
-        blockbuf.mulbuf(chain(rtonenode))
-        # Map 0 to pwmzero and 1 to fixed level:
-        blockbuf.mul(level4to5(fixedreg.value) - Level.pwmzero5bit)
-        blockbuf.add(Level.pwmzero5bit)
-pwmeffect.diffs = tonediffs
+class TimerEffect:
 
-def sinuseffect(levelmode, fixedreg, envnode, signalnode, rtonenode, blockbuf, chain):
-    blockbuf.copybuf(chain(rtonenode))
-    blockbuf.mul(2)
-    blockbuf.add(1)
-sinuseffect.diffs = leveltosinusdiffs[15] # FIXME: Honour the fixedlevel.
+    def __init__(self, fixedreg):
+        self.fixedreg = fixedreg
+
+class PWMEffect(TimerEffect):
+
+    diffs = tonediffs
+
+    def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
+        if levelmode:
+            # TODO: Test this branch, or override levelmode starting with first interrupt.
+            blockbuf.copybuf(chain(envnode)) # Values in [0, 31].
+            blockbuf.add(1) # Shift env values to [1, 32].
+            blockbuf.mulbuf(chain(signalnode)) # Introduce 0.
+            blockbuf.mulbuf(chain(rtonenode)) # Introduce more 0.
+            blockbuf.mapbuf(blockbuf, Level.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+        else:
+            blockbuf.copybuf(chain(signalnode))
+            blockbuf.mulbuf(chain(rtonenode))
+            # Map 0 to pwmzero and 1 to fixed level:
+            blockbuf.mul(level4to5(self.fixedreg.value) - Level.pwmzero5bit)
+            blockbuf.add(Level.pwmzero5bit)
+
+class SinusEffect(TimerEffect):
+
+    diffs = leveltosinusdiffs[15] # FIXME: Honour the fixedlevel.
+
+    def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
+        blockbuf.copybuf(chain(rtonenode))
+        blockbuf.mul(2)
+        blockbuf.add(1)
 
 class Dac(BufNode):
 
