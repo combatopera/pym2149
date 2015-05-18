@@ -28,7 +28,7 @@ from pym2149.boot import createdi
 from pym2149.iface import Stream, Config
 from pym2149.program import Note
 from pym2149.channels import Channels
-from pym2149.dac import pwmeffect
+from pym2149.dac import PWMEffect
 from ymplayer import ChipTimer
 import os, subprocess, time
 
@@ -92,7 +92,7 @@ class PWM(Note):
 
     def noteon(self):
         self.toneflag.value = True
-        self.timer.effect.value = pwmeffect
+        self.timer.effect.value = PWMEffect(self.fixedlevel)
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq

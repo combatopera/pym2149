@@ -26,7 +26,7 @@ from buf import DiffRing, RingCursor, Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 from shapes import tonediffs, loopsize
-from dac import pwmeffect
+from dac import PWMEffect
 
 def Reg(value):
     r = VersionReg()
@@ -38,7 +38,7 @@ class Timer:
     def __init__(self, xform, that):
         self.xform = xform
         self.that = that
-        self.effect = Reg(pwmeffect)
+        self.effect = Reg(PWMEffect(None))
 
     def isrunning(self): return True
 
