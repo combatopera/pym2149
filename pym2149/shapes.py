@@ -43,7 +43,7 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
         for x in unit:
             yield x
 
-tonediffs = DiffRing(cycle([1, 0]), 0, BufNode.bindiffdtype)
+tonediffs = DiffRing(cycle([1, 0]), BufNode.bindiffdtype)
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
@@ -55,6 +55,6 @@ def sinering(steps, maxlevel4):
     minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
     amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, 0) for step in xrange(steps)]
     unit = [int(round(amptolevel4(amp))) for amp in amps]
-    return DiffRing(cycle(unit), 0, BufNode.zto127diffdtype)
+    return DiffRing(cycle(unit), BufNode.zto127diffdtype)
 
 leveltosinusdiffs = dict([level4, sinering(8, level4)] for level4 in xrange(16))

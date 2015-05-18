@@ -148,7 +148,7 @@ class ToneOsc(BufNode):
 class NoiseDiffs(DiffRing):
 
     def __init__(self, nzdegrees):
-        DiffRing.__init__(self, lfsr.Lfsr(nzdegrees), 0, BufNode.bindiffdtype)
+        DiffRing.__init__(self, lfsr.Lfsr(nzdegrees), BufNode.bindiffdtype)
 
 class NoiseOsc(BufNode):
 
@@ -163,14 +163,14 @@ class NoiseOsc(BufNode):
 class EnvOsc(BufNode):
 
     steps = 32
-    diffs0c = DiffRing(cycle(range(steps)), 0, BufNode.bindiffdtype)
-    diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)), 0, BufNode.bindiffdtype)
-    diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)), 0, BufNode.bindiffdtype)
-    diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)), 0, BufNode.bindiffdtype)
-    diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), 0, BufNode.bindiffdtype, steps)
-    diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
-    diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), 0, BufNode.bindiffdtype, steps)
-    diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), 0, BufNode.bindiffdtype, steps)
+    diffs0c = DiffRing(cycle(range(steps)), BufNode.bindiffdtype)
+    diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)), BufNode.bindiffdtype)
+    diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)), BufNode.bindiffdtype)
+    diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)), BufNode.bindiffdtype)
+    diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), BufNode.bindiffdtype, steps)
+    diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), BufNode.bindiffdtype, steps)
+    diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), BufNode.bindiffdtype, steps)
+    diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), BufNode.bindiffdtype, steps)
 
     def __init__(self, scale, periodreg, shapereg):
         BufNode.__init__(self, self.zto255dtype)
