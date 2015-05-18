@@ -27,19 +27,18 @@ class Ring:
     def __len__(self):
         return len(self.buf)
 
-class DiffRing(Ring): # TODO: Inline 0 initial dc, always add one element.
+class DiffRing(Ring): # TODO: Always add one element.
 
-    def __init__(self, g, dc, dtype, prolog = 0):
+    def __init__(self, g, dtype, prolog = 0):
         self.dc = list(g)
-        jump = self.dc[-1] != (dc, self.dc[prolog - 1])[bool(prolog)]
+        jump = self.dc[-1] != (0, self.dc[prolog - 1])[bool(prolog)]
         if jump:
             self.dc.append(self.dc[prolog])
         def h():
-            yield self.dc[0] - dc
+            yield self.dc[0]
             for i in xrange(1, len(self.dc)):
                 yield self.dc[i] - self.dc[i - 1]
         Ring.__init__(self, dtype, h(), prolog + jump)
-        self.initialdc = dc
 
 class AnyBuf:
 
@@ -92,7 +91,7 @@ class RingCursor:
 
     def currentdc(self):
         # Observe this can break through loopstart, in which case value should be same as last:
-        return (self.ring.initialdc, self.ring.dc[self.index - 1])[bool(self.index)]
+        return (0, self.ring.dc[self.index - 1])[bool(self.index)]
 
 @singleton
 class NullBuf(AnyBuf):
