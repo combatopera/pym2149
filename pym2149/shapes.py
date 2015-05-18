@@ -45,6 +45,7 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
 
 tonediffs = DiffRing(cycle([1, 0]), 0, BufNode.bindiffdtype)
 
+# XXX: Aim for average amp in slice?
 def sinering(steps, maxlevel4):
     minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
     steptoamp = lambda step: minamp + (maxamp - minamp) * (math.sin(2 * math.pi * step / steps) + 1) / 2
