@@ -92,7 +92,7 @@ class PWM(Note):
 
     def noteon(self):
         self.toneflag.value = True
-        self.timer.effect.value = PWMEffect(self.fixedlevel)
+        self.timer.effect.value = PWMEffect(self.chip.fixedlevels[self.chipchan])
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq
@@ -100,9 +100,11 @@ class PWM(Note):
 class Sinus(Note):
 
     def noteon(self):
-        self.timer.effect.value = SinusEffect(self.fixedlevel)
-        self.fixedlevel.value = 15
+        self.timer.effect.value = SinusEffect(self.chip.fixedlevels[self.chipchan])
         self.timer.freq.value = self.freq * 4 # FIXME: It should know wavelength from effect.
+
+    def noteonframe(self, frame):
+        self.fixedlevel.value = 15 - frame // 5
 
 class Frames(list): pass
 
@@ -218,7 +220,7 @@ def main():
     target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
     target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
     target.dump(2, [Saw600, 0, 0], 'saw600')
-    target.dump(2, [Sin1k, 0, 0], 'sin1k')
+    target.dump(2, [Sin1k, 0, 0, 0], 'sin1k')
     target.dump(2, [Tri650, 0, 0], 'tri650')
     target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
     target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
