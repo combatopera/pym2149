@@ -49,7 +49,7 @@ def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
 
 def sinsliceamp(i, n, skew):
-    return (meansin(*(2 * math.pi * ((i + off) / n + skew) for off in [-.5, .5])) + 1) / 2
+    return (meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
 def sinering(steps, maxlevel4):
     minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
