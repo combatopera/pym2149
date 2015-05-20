@@ -27,6 +27,8 @@ class BinDiff(BufNode):
         BufNode.__init__(self, dtype)
 
     def reset(self, diffs):
+        if diffs.buf.dtype != self.dtype:
+            raise Exception('Ring must have same dtype as this.')
         self.ringcursor = RingCursor(diffs)
         self.progress = 0
         return self
