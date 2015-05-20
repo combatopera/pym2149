@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DiffRing, RingCursor, MasterBuf, zto255dtype, binarydtype
+from buf import DiffRing, RingCursor, MasterBuf
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -123,11 +123,16 @@ class RationalDiff(BinDiff):
                 self.progress = 0
             return self.integral
 
-class RToneOsc(BufNode):
+class IntegralNode(BufNode):
+
+    def __init__(self, derivative):
+        BufNode.__init__(self, np.uint8) # Sinus effect is in [0, 15] so dtype must support that.
+        self.diff = derivative
+
+class RToneOsc(IntegralNode):
 
     def __init__(self, chipimplclock, timer):
-        BufNode.__init__(self, zto255dtype) # Sinus effect is in [0, 15] so dtype must support that.
-        self.diff = RationalDiff(chipimplclock, timer)
+        IntegralNode.__init__(self, RationalDiff(chipimplclock, timer))
         self.effectversion = None
         self.effectreg = timer.effect
 
@@ -137,12 +142,11 @@ class RToneOsc(BufNode):
             self.effectversion = self.effectreg.version
         self.chain(self.diff)(self.blockbuf)
 
-class ToneOsc(BufNode):
+class ToneOsc(IntegralNode):
 
     def __init__(self, scale, periodreg):
-        BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        self.diff = OscDiff(scaleofstep, periodreg, True).reset(tonediffs)
+        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, True).reset(tonediffs))
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -152,17 +156,16 @@ class NoiseDiffs(DiffRing):
     def __init__(self, nzdegrees):
         DiffRing.__init__(self, lfsr.Lfsr(nzdegrees))
 
-class NoiseOsc(BufNode):
+class NoiseOsc(IntegralNode):
 
     def __init__(self, scale, periodreg, noisediffs):
-        BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        self.diff = OscDiff(scaleofstep, periodreg, False).reset(noisediffs)
+        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, False).reset(noisediffs))
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
 
-class EnvOsc(BufNode):
+class EnvOsc(IntegralNode):
 
     steps = 32
     diffs0c = DiffRing(cycle(range(steps)))
@@ -175,9 +178,8 @@ class EnvOsc(BufNode):
     diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps)
 
     def __init__(self, scale, periodreg, shapereg):
-        BufNode.__init__(self, zto255dtype)
         scaleofstep = scale * 32 // self.steps
-        self.diff = OscDiff(scaleofstep, periodreg, True)
+        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, True))
         self.shapeversion = None
         self.shapereg = shapereg
 
