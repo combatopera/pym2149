@@ -25,9 +25,7 @@ class AbstractRing:
 
     def __init__(self, npbuf):
         self.buf = npbuf
-
-    def __len__(self):
-        return len(self.buf)
+        self.limit = len(npbuf)
 
 class Ring(AbstractRing):
 
@@ -63,12 +61,11 @@ class AnyBuf:
 
     @staticmethod
     def putringops(ring, ringcursor, ringn):
-        limit = len(ring)
         ops = 0
         while ringn:
-            n = min(limit - ringcursor, ringn)
+            n = min(ring.limit - ringcursor, ringn)
             ops += 1
-            if ringcursor + n == limit:
+            if ringcursor + n == ring.limit:
                 ringcursor = ring.loopstart
             ringn -= n
         return ops
@@ -76,18 +73,17 @@ class AnyBuf:
 class RingCursor:
 
     def __init__(self, ring):
-        self.limit = len(ring)
         self.index = 0
         self.ring = ring
 
     def put(self, target, start, step, ringn):
         while ringn:
-            n = min(self.limit - self.index, ringn)
+            n = min(self.ring.limit - self.index, ringn)
             end = start + step * n
             ringend = self.index + n
             target.putstrided(start, end, step, self.ring.buf[self.index:ringend])
             start = end
-            if ringend == self.limit:
+            if ringend == self.ring.limit:
                 # Allow OnceRing to use one iteration of this method:
                 try:
                     self.index = self.ring.loopstart
@@ -99,10 +95,10 @@ class RingCursor:
 
     def put2(self, target, indices):
         while indices.shape[0]:
-            n = min(self.limit - self.index, indices.shape[0])
+            n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
             target.putindexed(indices[:n], self.ring.buf[self.index:ringend])
-            if ringend == self.limit:
+            if ringend == self.ring.limit:
                 self.index = self.ring.loopstart
             else:
                 self.index = ringend
