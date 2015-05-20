@@ -77,7 +77,7 @@ class RingCursor:
         self.index = 0
         self.ring = ring
 
-    def put(self, target, start, step, ringn):
+    def putstrided(self, target, start, step, ringn):
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
             end = start + step * n
