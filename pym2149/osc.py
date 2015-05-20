@@ -39,7 +39,7 @@ class DerivativeNode(BufNode):
     def integral(self, signalbuf):
         signalbuf.integrate(self.blockbuf)
 
-class OscDiff(DerivativeNode):
+class SimpleDerivative(DerivativeNode):
 
     def __init__(self, scaleofstep, periodreg, eagerstepsize):
         DerivativeNode.__init__(self)
@@ -146,7 +146,7 @@ class ToneOsc(IntegralNode):
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, True).reset(tonediffs))
+        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True).reset(tonediffs))
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -160,7 +160,7 @@ class NoiseOsc(IntegralNode):
 
     def __init__(self, scale, periodreg, noisediffs):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, False).reset(noisediffs))
+        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, False).reset(noisediffs))
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -179,7 +179,7 @@ class EnvOsc(IntegralNode):
 
     def __init__(self, scale, periodreg, shapereg):
         scaleofstep = scale * 32 // self.steps
-        IntegralNode.__init__(self, OscDiff(scaleofstep, periodreg, True))
+        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True))
         self.shapeversion = None
         self.shapereg = shapereg
 
