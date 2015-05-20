@@ -51,10 +51,11 @@ def meansin(x1, x2):
 def sinsliceamp(i, n, skew):
     return (meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
-def sinering(steps, maxlevel4):
+def sinusdiffring(steps, maxlevel4, skew):
     minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
-    amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, 0) for step in xrange(steps)]
+    amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, skew) for step in xrange(steps)]
+    # For each step, the level that's closest to its ideal mean amp:
     unit = [int(round(amptolevel4(amp))) for amp in amps]
     return DiffRing(cycle(unit), BufNode.zto127diffdtype)
 
-leveltosinusdiffs = dict([level4, sinering(8, level4)] for level4 in xrange(16))
+leveltosinusdiffs = dict([level4, sinusdiffring(8, level4, 0)] for level4 in xrange(16))
