@@ -56,7 +56,7 @@ class DerivativeRing(Ring):
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
-        Ring.__init__(self, np.int8, h(), introlen + 1)
+        Ring.__init__(self, derivativedtype, h(), introlen + 1)
 
 class AnyBuf:
 
