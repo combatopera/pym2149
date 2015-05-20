@@ -90,7 +90,7 @@ class RationalDerivative(DerivativeNode):
             if not self.progress:
                 self.blockbuf.fill(0)
                 dc = self.ringcursor.currentdc()
-                self.ringcursor.put2(self.blockbuf, self.singleton0)
+                self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.blockbuf.addtofirst(dc)
                 self.progress = self.block.framecount * mfpclock
                 return self.integral
@@ -116,7 +116,7 @@ class RationalDerivative(DerivativeNode):
             indices.ceildiv(mfpclock, alreadynegated = True)
             dc = self.ringcursor.currentdc()
             # Note values can integrate to 2 if there was an overflow earlier.
-            self.ringcursor.put2(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
+            self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
             self.blockbuf.addtofirst(dc)
             self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
             if self.progress == stepsize:

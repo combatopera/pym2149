@@ -94,7 +94,7 @@ class RingCursor:
                 self.index = ringend
             ringn -= n
 
-    def put2(self, target, indices):
+    def putindexed(self, target, indices):
         while indices.shape[0]:
             n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
