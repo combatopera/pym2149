@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DerivativeRing, RingCursor, MasterBuf, derivativedtype
+from buf import DerivativeRing, RingCursor, MasterBuf, derivativedtype, signaldtype
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -126,7 +126,7 @@ class RationalDiff(BinDiff):
 class IntegralNode(BufNode):
 
     def __init__(self, derivative):
-        BufNode.__init__(self, np.uint8) # Sinus effect is in [0, 15] so dtype must support that.
+        BufNode.__init__(self, signaldtype) # Sinus effect is in [0, 15] so dtype must support that.
         self.diff = derivative
 
 class RToneOsc(IntegralNode):
