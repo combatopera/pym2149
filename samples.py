@@ -97,6 +97,7 @@ class PWM(Note):
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq
 
+# TODO LATER: Find out why the result appears shifted a few samples to the right.
 class Sinus(Note):
 
     def noteon(self):
