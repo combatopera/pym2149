@@ -23,8 +23,8 @@ from shapes import cycle, tonediffs
 
 class BinDiff(BufNode):
 
-    def __init__(self, dtype):
-        BufNode.__init__(self, dtype)
+    def __init__(self):
+        BufNode.__init__(self, np.int8)
 
     def reset(self, diffs):
         if diffs.buf.dtype != self.dtype:
@@ -42,7 +42,7 @@ class BinDiff(BufNode):
 class OscDiff(BinDiff):
 
     def __init__(self, scaleofstep, periodreg, eagerstepsize):
-        BinDiff.__init__(self, np.int8)
+        BinDiff.__init__(self)
         self.scaleofstep = scaleofstep
         self.periodreg = periodreg
         self.eagerstepsize = eagerstepsize
@@ -80,7 +80,7 @@ class RationalDiff(BinDiff):
     singleton0 = np.zeros(1, dtype = np.int32)
 
     def __init__(self, chipimplclock, timer):
-        BinDiff.__init__(self, np.int8)
+        BinDiff.__init__(self)
         self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
         self.chipimplclock = chipimplclock
         self.timer = timer
