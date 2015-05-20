@@ -17,14 +17,14 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DerivativeRing, RingCursor, MasterBuf
+from buf import DerivativeRing, RingCursor, MasterBuf, derivativedtype
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
 class BinDiff(BufNode):
 
     def __init__(self):
-        BufNode.__init__(self, np.int8)
+        BufNode.__init__(self, derivativedtype)
 
     def reset(self, diffs):
         if diffs.buf.dtype != self.dtype:
