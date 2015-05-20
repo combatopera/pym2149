@@ -62,7 +62,7 @@ class Multiplexer(Node):
         # BufNode can't do this because size is not framecount:
         size = len(buf)
         multi = self.multi.ensureandcrop(size * self.channels)
-      RingCursor(OnceRing(buf)).put(multi, i, self.channels, size)
+      RingCursor(OnceRing(buf)).putstrided(multi, i, self.channels, size)
     return multi
 
 class IdealMixer(BufNode):
