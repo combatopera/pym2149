@@ -88,7 +88,7 @@ class RingCursor:
             target.putstrided(start, end, step, self.ring.buf[self.index:ringend])
             start = end
             if ringend == self.limit:
-                # Allow non-rings to use one iteration of this method:
+                # Allow OnceRing to use one iteration of this method:
                 try:
                     self.index = self.ring.loopstart
                 except AttributeError:
