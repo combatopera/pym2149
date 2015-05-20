@@ -18,17 +18,17 @@
 from __future__ import division
 from nod import BufNode
 from shapes import tonediffs, leveltosinusdiffs, level5toamp, level4to5
-from buf import zto255dtype, floatdtype
+from buf import signaldtype, floatdtype
 import numpy as np
 
 class Level(BufNode):
 
   pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
   pwmzero5bit = level4to5(pwmzero4bit)
-  lookup = np.fromiter([pwmzero5bit] + range(32), zto255dtype)
+  lookup = np.fromiter([pwmzero5bit] + range(32), signaldtype)
 
   def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
-    BufNode.__init__(self, zto255dtype) # Must be suitable for use as index downstream.
+    BufNode.__init__(self, signaldtype) # Must be suitable for use as index downstream.
     self.levelmodereg = levelmodereg
     self.fixedreg = fixedreg
     self.env = env

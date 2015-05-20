@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode, Node
-from buf import MasterBuf, RingCursor, binarydtype, floatdtype, OnceRing
+from buf import MasterBuf, RingCursor, signaldtype, floatdtype, OnceRing
 import logging
 
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 class BinMix(BufNode):
 
   def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-    BufNode.__init__(self, binarydtype)
+    BufNode.__init__(self, signaldtype)
     self.tone = tone
     self.noise = noise
     self.toneflagreg = toneflagreg
