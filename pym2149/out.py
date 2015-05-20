@@ -17,8 +17,8 @@
 
 from __future__ import division
 import numpy as np, logging
-from buf import MasterBuf
-from nod import Node, BufNode
+from buf import MasterBuf, floatdtype
+from nod import Node
 from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
@@ -147,16 +147,16 @@ class WavBuf(Node):
     if 1 == len(wavs):
       wav, = wavs
     else:
-      wav = Multiplexer(BufNode.floatdtype, wavs)
+      wav = Multiplexer(floatdtype, wavs)
     return wav
 
   def __init__(self, clockinfo, naive, minbleps):
     Node.__init__(self)
-    self.diffmaster = MasterBuf(dtype = BufNode.floatdtype)
-    self.outmaster = MasterBuf(dtype = BufNode.floatdtype)
+    self.diffmaster = MasterBuf(dtype = floatdtype)
+    self.outmaster = MasterBuf(dtype = floatdtype)
     # Need space for a whole mixin in case it is rooted at sample outcount:
     self.overflowsize = minbleps.mixinsize
-    self.carrybuf = MasterBuf(dtype = BufNode.floatdtype).ensureandcrop(self.overflowsize)
+    self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
     self.naivex = 0
     self.dc = 0 # Last naive value of previous block.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.

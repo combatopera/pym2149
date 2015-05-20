@@ -18,6 +18,10 @@
 import numpy as np
 from util import singleton
 
+zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
+zto127diffdtype = bindiffdtype = np.int8 # Suitable for derivative of [0, 127].
+floatdtype = np.float32 # Effectively about 24 bits.
+
 class Ring:
 
     def __init__(self, dtype, g, loopstart):

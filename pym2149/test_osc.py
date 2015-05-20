@@ -20,9 +20,9 @@
 import unittest, time, sys, numpy as np
 from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDiff, RToneOsc
 from mfp import mfpclock
-from nod import Block, BufNode
+from nod import Block
 from reg import VersionReg
-from buf import DiffRing, RingCursor, Buf
+from buf import DiffRing, RingCursor, Buf, bindiffdtype
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 from shapes import tonediffs, loopsize
@@ -164,7 +164,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
         p = self.Timer(True, 81920)
-        d = RationalDiff(RationalDiff.bindiffdtype, 100, p).reset(tonediffs)
+        d = RationalDiff(bindiffdtype, 100, p).reset(tonediffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, diffblock(d, 80))
@@ -179,7 +179,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_notrunning(self):
         p = self.Timer(False, None)
-        d = RationalDiff(RationalDiff.bindiffdtype, 1000, p).reset(tonediffs)
+        d = RationalDiff(bindiffdtype, 1000, p).reset(tonediffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
@@ -218,7 +218,7 @@ class TestNoiseOsc(unittest.TestCase):
     def test_increaseperiodonboundary(self):
         r = Reg(0x01)
         o = NoiseOsc(4, r, self.noisediffs)
-        o.diff.ringcursor = RingCursor(DiffRing([1, 0], BufNode.bindiffdtype))
+        o.diff.ringcursor = RingCursor(DiffRing([1, 0], bindiffdtype))
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -228,7 +228,7 @@ class TestNoiseOsc(unittest.TestCase):
     def test_decreaseperiodonboundary(self):
         r = Reg(0x03)
         o = NoiseOsc(4, r, self.noisediffs)
-        o.diff.ringcursor = RingCursor(DiffRing([1, 0], BufNode.bindiffdtype))
+        o.diff.ringcursor = RingCursor(DiffRing([1, 0], bindiffdtype))
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())

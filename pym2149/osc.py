@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DiffRing, RingCursor, MasterBuf
+from buf import DiffRing, RingCursor, MasterBuf, zto255dtype, binarydtype, zto127diffdtype, bindiffdtype
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -124,8 +124,8 @@ class RationalDiff(BinDiff):
 class RToneOsc(BufNode):
 
     def __init__(self, chipimplclock, timer):
-        BufNode.__init__(self, self.zto255dtype) # Sinus effect is in [0, 15] so dtype must support that.
-        self.diff = RationalDiff(self.zto127diffdtype, chipimplclock, timer)
+        BufNode.__init__(self, zto255dtype) # Sinus effect is in [0, 15] so dtype must support that.
+        self.diff = RationalDiff(zto127diffdtype, chipimplclock, timer)
         self.effectversion = None
         self.effectreg = timer.effect
 
@@ -138,9 +138,9 @@ class RToneOsc(BufNode):
 class ToneOsc(BufNode):
 
     def __init__(self, scale, periodreg):
-        BufNode.__init__(self, self.binarydtype)
+        BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, True).reset(tonediffs)
+        self.diff = OscDiff(bindiffdtype, scaleofstep, periodreg, True).reset(tonediffs)
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -148,14 +148,14 @@ class ToneOsc(BufNode):
 class NoiseDiffs(DiffRing):
 
     def __init__(self, nzdegrees):
-        DiffRing.__init__(self, lfsr.Lfsr(nzdegrees), BufNode.bindiffdtype)
+        DiffRing.__init__(self, lfsr.Lfsr(nzdegrees), bindiffdtype)
 
 class NoiseOsc(BufNode):
 
     def __init__(self, scale, periodreg, noisediffs):
-        BufNode.__init__(self, self.binarydtype)
+        BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        self.diff = OscDiff(self.bindiffdtype, scaleofstep, periodreg, False).reset(noisediffs)
+        self.diff = OscDiff(bindiffdtype, scaleofstep, periodreg, False).reset(noisediffs)
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -163,19 +163,19 @@ class NoiseOsc(BufNode):
 class EnvOsc(BufNode):
 
     steps = 32
-    diffs0c = DiffRing(cycle(range(steps)), BufNode.bindiffdtype)
-    diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)), BufNode.bindiffdtype)
-    diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)), BufNode.bindiffdtype)
-    diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)), BufNode.bindiffdtype)
-    diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), BufNode.bindiffdtype, steps)
-    diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), BufNode.bindiffdtype, steps)
-    diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), BufNode.bindiffdtype, steps)
-    diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), BufNode.bindiffdtype, steps)
+    diffs0c = DiffRing(cycle(range(steps)), bindiffdtype)
+    diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)), bindiffdtype)
+    diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)), bindiffdtype)
+    diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)), bindiffdtype)
+    diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), bindiffdtype, steps)
+    diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), bindiffdtype, steps)
+    diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), bindiffdtype, steps)
+    diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), bindiffdtype, steps)
 
     def __init__(self, scale, periodreg, shapereg):
-        BufNode.__init__(self, self.zto255dtype)
+        BufNode.__init__(self, zto255dtype)
         scaleofstep = scale * 32 // self.steps
-        self.diff = OscDiff(self.zto127diffdtype, scaleofstep, periodreg, True)
+        self.diff = OscDiff(zto127diffdtype, scaleofstep, periodreg, True)
         self.shapeversion = None
         self.shapereg = shapereg
 

@@ -16,8 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from nod import BufNode
-from buf import DiffRing
+from buf import DiffRing, zto127diffdtype, bindiffdtype
 import math
 
 loopsize = 1024
@@ -43,7 +42,7 @@ def cycle(unit): # Unlike itertools version, we assume unit can be iterated more
         for x in unit:
             yield x
 
-tonediffs = DiffRing(cycle([1, 0]), BufNode.bindiffdtype)
+tonediffs = DiffRing(cycle([1, 0]), bindiffdtype)
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
@@ -56,6 +55,6 @@ def sinusdiffring(steps, maxlevel4, skew):
     amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, skew) for step in xrange(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     unit = [int(round(amptolevel4(amp))) for amp in amps]
-    return DiffRing(cycle(unit), BufNode.zto127diffdtype)
+    return DiffRing(cycle(unit), zto127diffdtype)
 
 leveltosinusdiffs = dict([level4, sinusdiffring(8, level4, 0)] for level4 in xrange(16))

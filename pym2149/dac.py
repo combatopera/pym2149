@@ -18,16 +18,17 @@
 from __future__ import division
 from nod import BufNode
 from shapes import tonediffs, leveltosinusdiffs, level5toamp, level4to5
+from buf import zto255dtype, floatdtype
 import numpy as np
 
 class Level(BufNode):
 
   pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
   pwmzero5bit = level4to5(pwmzero4bit)
-  lookup = np.fromiter([pwmzero5bit] + range(32), BufNode.zto255dtype)
+  lookup = np.fromiter([pwmzero5bit] + range(32), zto255dtype)
 
   def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
-    BufNode.__init__(self, self.zto255dtype) # Must be suitable for use as index downstream.
+    BufNode.__init__(self, zto255dtype) # Must be suitable for use as index downstream.
     self.levelmodereg = levelmodereg
     self.fixedreg = fixedreg
     self.env = env
@@ -83,7 +84,7 @@ class SinusEffect(TimerEffect):
 class Dac(BufNode):
 
   def __init__(self, level, log2maxpeaktopeak, ampshare):
-    BufNode.__init__(self, self.floatdtype)
+    BufNode.__init__(self, floatdtype)
     # We take off .5 so that the peak amplitude is about -3 dB:
     maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
     # Lookup of ideal amplitudes:

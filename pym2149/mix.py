@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode, Node
-from buf import MasterBuf, RingCursor
+from buf import MasterBuf, RingCursor, binarydtype, floatdtype
 import logging
 
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 class BinMix(BufNode):
 
   def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-    BufNode.__init__(self, self.binarydtype)
+    BufNode.__init__(self, binarydtype)
     self.tone = tone
     self.noise = noise
     self.toneflagreg = toneflagreg
@@ -69,7 +69,7 @@ class IdealMixer(BufNode):
 
   def __init__(self, container, log2maxpeaktopeak, chipamps):
     log.debug("Mix is trivial: %s", not chipamps.nontrivial)
-    dtype = self.floatdtype
+    dtype = floatdtype
     if chipamps.nontrivial:
       if len(container) != chipamps.size():
         raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
