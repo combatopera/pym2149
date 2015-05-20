@@ -34,6 +34,10 @@ class DiffRing(Ring):
 
     def __init__(self, g, introlen = 0):
         self.dc = list(g)
+        mindc = min(self.dc)
+        maxdc = max(self.dc)
+        if mindc < 0 or maxdc > 255:
+            raise Exception("np.uint8 not wide enough for: [%s, %s]" % (mindc, maxdc))
         self.dc.append(self.dc[introlen])
         def h():
             yield self.dc[0]
