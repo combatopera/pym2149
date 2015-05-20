@@ -21,7 +21,7 @@ from buf import DerivativeRing, RingCursor, MasterBuf, derivativedtype, signaldt
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
-class BinDiff(BufNode):
+class DerivativeNode(BufNode):
 
     def __init__(self):
         BufNode.__init__(self, derivativedtype)
@@ -39,10 +39,10 @@ class BinDiff(BufNode):
     def integral(self, signalbuf):
         signalbuf.integrate(self.blockbuf)
 
-class OscDiff(BinDiff):
+class OscDiff(DerivativeNode):
 
     def __init__(self, scaleofstep, periodreg, eagerstepsize):
-        BinDiff.__init__(self)
+        DerivativeNode.__init__(self)
         self.scaleofstep = scaleofstep
         self.periodreg = periodreg
         self.eagerstepsize = eagerstepsize
@@ -75,12 +75,12 @@ class OscDiff(BinDiff):
 def ceildiv(numerator, denominator):
     return -((-numerator) // denominator)
 
-class RationalDiff(BinDiff):
+class RationalDiff(DerivativeNode):
 
     singleton0 = np.zeros(1, dtype = np.int32)
 
     def __init__(self, chipimplclock, timer):
-        BinDiff.__init__(self)
+        DerivativeNode.__init__(self)
         self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
         self.chipimplclock = chipimplclock
         self.timer = timer
