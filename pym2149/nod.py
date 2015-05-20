@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from buf import MasterBuf, NullBuf
-import numpy as np, logging
+import logging
 
 log = logging.getLogger(__name__)
 
@@ -62,10 +62,6 @@ class Container(Node):
     return len(self.nodes)
 
 class BufNode(Node):
-
-  zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
-  zto127diffdtype = bindiffdtype = np.int8 # Suitable for derivative of [0, 127].
-  floatdtype = np.float32 # Effectively about 24 bits.
 
   def __init__(self, dtype, channels = 1):
     Node.__init__(self)

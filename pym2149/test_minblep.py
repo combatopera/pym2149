@@ -19,8 +19,8 @@
 
 import unittest, numpy as np
 from minblep import MinBleps
-from nod import BufNode
 from collections import namedtuple
+from buf import floatdtype
 
 class TestMinBleps(unittest.TestCase):
 
@@ -32,7 +32,7 @@ class TestMinBleps(unittest.TestCase):
 
     def test_types(self):
         minbleps = MinBleps.create(500, 1, 500)
-        self.assertEqual(BufNode.floatdtype, minbleps.minblep.dtype)
+        self.assertEqual(floatdtype, minbleps.minblep.dtype)
 
     def test_xform(self):
         ctrlrate, outrate, scale = 10, 6, 5

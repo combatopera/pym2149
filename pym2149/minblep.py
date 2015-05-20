@@ -17,11 +17,11 @@
 
 from __future__ import division
 import numpy as np, fractions, logging, sys, os, cPickle as pickle
-from nod import BufNode
 from unroll import importunrolled
 from di import types
 from iface import Config
 from ym2149 import ClockInfo
+from buf import floatdtype
 
 log = logging.getLogger(__name__)
 
@@ -104,12 +104,12 @@ class MinBleps:
     realcepstrum[1:midpoint] *= 2
     realcepstrum[midpoint + 1:] = 0
     self.minbli = np.fft.ifft(np.exp(np.fft.fft(realcepstrum))).real
-    self.minblep = np.cumsum(self.minbli, dtype = BufNode.floatdtype)
+    self.minblep = np.cumsum(self.minbli, dtype = floatdtype)
     # Prepend zeros to simplify naivex2outx calc:
-    self.minblep = np.append(np.zeros(scale - 1, BufNode.floatdtype), self.minblep)
+    self.minblep = np.append(np.zeros(scale - 1, floatdtype), self.minblep)
     # Append ones so that all mixins have the same length:
     ones = (-len(self.minblep)) % scale
-    self.minblep = np.append(self.minblep, np.ones(ones, BufNode.floatdtype))
+    self.minblep = np.append(self.minblep, np.ones(ones, floatdtype))
     self.mixinsize = len(self.minblep) // scale
     # The naiverate and outrate will line up at 1 second:
     dualscale = outrate // fractions.gcd(naiverate, outrate)
