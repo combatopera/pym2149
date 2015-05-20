@@ -33,14 +33,18 @@ class Ring:
 
 class DiffRing(Ring):
 
-    def __init__(self, g, dtype, prolog = 0):
+    def __init__(self, g, introlen = 0):
         self.dc = list(g)
-        self.dc.append(self.dc[prolog])
+        self.dc.append(self.dc[introlen])
         def h():
             yield self.dc[0]
             for i in xrange(1, len(self.dc)):
                 yield self.dc[i] - self.dc[i - 1]
-        Ring.__init__(self, dtype, h(), prolog + 1)
+        mindiff = min(h())
+        maxdiff = max(h())
+        if mindiff < -128 or maxdiff > 127:
+            raise Exception("np.int8 not wide enough for: [%s, %s]" % (mindiff, maxdiff))
+        Ring.__init__(self, np.int8, h(), introlen + 1)
 
 class AnyBuf:
 
