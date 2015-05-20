@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DiffRing, RingCursor, MasterBuf
+from buf import DerivativeRing, RingCursor, MasterBuf
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -151,10 +151,10 @@ class ToneOsc(IntegralNode):
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
 
-class NoiseDiffs(DiffRing):
+class NoiseDiffs(DerivativeRing):
 
     def __init__(self, nzdegrees):
-        DiffRing.__init__(self, lfsr.Lfsr(nzdegrees))
+        DerivativeRing.__init__(self, lfsr.Lfsr(nzdegrees))
 
 class NoiseOsc(IntegralNode):
 
@@ -168,14 +168,14 @@ class NoiseOsc(IntegralNode):
 class EnvOsc(IntegralNode):
 
     steps = 32
-    diffs0c = DiffRing(cycle(range(steps)))
-    diffs08 = DiffRing(cycle(range(steps - 1, -1, -1)))
-    diffs0e = DiffRing(cycle(range(steps) + range(steps - 1, -1, -1)))
-    diffs0a = DiffRing(cycle(range(steps - 1, -1, -1) + range(steps)))
-    diffs0f = DiffRing(itertools.chain(xrange(steps), cycle([0])), steps)
-    diffs0d = DiffRing(itertools.chain(xrange(steps), cycle([steps - 1])), steps)
-    diffs0b = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps)
-    diffs09 = DiffRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps)
+    diffs0c = DerivativeRing(cycle(range(steps)))
+    diffs08 = DerivativeRing(cycle(range(steps - 1, -1, -1)))
+    diffs0e = DerivativeRing(cycle(range(steps) + range(steps - 1, -1, -1)))
+    diffs0a = DerivativeRing(cycle(range(steps - 1, -1, -1) + range(steps)))
+    diffs0f = DerivativeRing(itertools.chain(xrange(steps), cycle([0])), steps)
+    diffs0d = DerivativeRing(itertools.chain(xrange(steps), cycle([steps - 1])), steps)
+    diffs0b = DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps)
+    diffs09 = DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps)
 
     def __init__(self, scale, periodreg, shapereg):
         scaleofstep = scale * 32 // self.steps

@@ -35,7 +35,7 @@ class OnceRing(AbstractRing):
     def __init__(self, buf):
         AbstractRing.__init__(self, buf.buf)
 
-class DiffRing(Ring):
+class DerivativeRing(Ring):
 
     signaldtype = np.uint8 # Slightly faster than plain old int.
     derivativedtype = np.int8
@@ -57,7 +57,7 @@ class DiffRing(Ring):
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
         Ring.__init__(self, np.int8, h(), introlen + 1)
 
-zto255dtype = binarydtype = DiffRing.signaldtype
+zto255dtype = binarydtype = DerivativeRing.signaldtype
 floatdtype = np.float32 # Effectively about 24 bits.
 
 class AnyBuf:
