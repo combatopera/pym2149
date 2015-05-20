@@ -75,7 +75,7 @@ class SimpleDerivative(DerivativeNode):
 def ceildiv(numerator, denominator):
     return -((-numerator) // denominator)
 
-class RationalDiff(DerivativeNode):
+class RationalDerivative(DerivativeNode):
 
     singleton0 = np.zeros(1, dtype = np.int32)
 
@@ -132,7 +132,7 @@ class IntegralNode(BufNode):
 class RToneOsc(IntegralNode):
 
     def __init__(self, chipimplclock, timer):
-        IntegralNode.__init__(self, RationalDiff(chipimplclock, timer))
+        IntegralNode.__init__(self, RationalDerivative(chipimplclock, timer))
         self.effectversion = None
         self.effectreg = timer.effect
 

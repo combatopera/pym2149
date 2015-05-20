@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDiff, RToneOsc
+from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
 from mfp import mfpclock
 from nod import Block
 from reg import VersionReg
@@ -164,7 +164,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
         p = self.Timer(True, 81920)
-        d = RationalDiff(100, p).reset(tonediffs)
+        d = RationalDerivative(100, p).reset(tonediffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, diffblock(d, 80))
@@ -179,7 +179,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_notrunning(self):
         p = self.Timer(False, None)
-        d = RationalDiff(1000, p).reset(tonediffs)
+        d = RationalDerivative(1000, p).reset(tonediffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
