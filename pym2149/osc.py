@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DiffRing, RingCursor, MasterBuf, zto255dtype, binarydtype, zto127diffdtype, bindiffdtype
+from buf import DiffRing, RingCursor, MasterBuf, zto255dtype, binarydtype
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -79,8 +79,8 @@ class RationalDiff(BinDiff):
 
     singleton0 = np.zeros(1, dtype = np.int32)
 
-    def __init__(self, dtype, chipimplclock, timer):
-        BinDiff.__init__(self, dtype)
+    def __init__(self, chipimplclock, timer):
+        BinDiff.__init__(self, np.int8)
         self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
         self.chipimplclock = chipimplclock
         self.timer = timer
@@ -127,7 +127,7 @@ class RToneOsc(BufNode):
 
     def __init__(self, chipimplclock, timer):
         BufNode.__init__(self, zto255dtype) # Sinus effect is in [0, 15] so dtype must support that.
-        self.diff = RationalDiff(zto127diffdtype, chipimplclock, timer)
+        self.diff = RationalDiff(chipimplclock, timer)
         self.effectversion = None
         self.effectreg = timer.effect
 

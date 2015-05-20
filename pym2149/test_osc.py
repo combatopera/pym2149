@@ -22,7 +22,7 @@ from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDiff, RToneOsc
 from mfp import mfpclock
 from nod import Block
 from reg import VersionReg
-from buf import DiffRing, RingCursor, Buf, bindiffdtype
+from buf import DiffRing, RingCursor, Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 from shapes import tonediffs, loopsize
@@ -164,7 +164,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
         p = self.Timer(True, 81920)
-        d = RationalDiff(bindiffdtype, 100, p).reset(tonediffs)
+        d = RationalDiff(100, p).reset(tonediffs)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, diffblock(d, 80))
@@ -179,7 +179,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_notrunning(self):
         p = self.Timer(False, None)
-        d = RationalDiff(bindiffdtype, 1000, p).reset(tonediffs)
+        d = RationalDiff(1000, p).reset(tonediffs)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
