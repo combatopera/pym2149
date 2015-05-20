@@ -21,14 +21,24 @@ from util import singleton
 zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
 floatdtype = np.float32 # Effectively about 24 bits.
 
-class Ring:
+class AbstractRing:
 
-    def __init__(self, dtype, g, loopstart):
-        self.buf = np.fromiter(g, dtype)
-        self.loopstart = loopstart
+    def __init__(self, npbuf):
+        self.buf = npbuf
 
     def __len__(self):
         return len(self.buf)
+
+class Ring(AbstractRing):
+
+    def __init__(self, dtype, g, loopstart):
+        AbstractRing.__init__(self, np.fromiter(g, dtype))
+        self.loopstart = loopstart
+
+class OnceRing(AbstractRing):
+
+    def __init__(self, buf):
+        AbstractRing.__init__(self, buf.buf)
 
 class DiffRing(Ring):
 
