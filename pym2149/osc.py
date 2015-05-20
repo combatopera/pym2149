@@ -41,8 +41,8 @@ class BinDiff(BufNode):
 
 class OscDiff(BinDiff):
 
-    def __init__(self, dtype, scaleofstep, periodreg, eagerstepsize):
-        BinDiff.__init__(self, dtype)
+    def __init__(self, scaleofstep, periodreg, eagerstepsize):
+        BinDiff.__init__(self, np.int8)
         self.scaleofstep = scaleofstep
         self.periodreg = periodreg
         self.eagerstepsize = eagerstepsize
@@ -142,7 +142,7 @@ class ToneOsc(BufNode):
     def __init__(self, scale, periodreg):
         BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        self.diff = OscDiff(bindiffdtype, scaleofstep, periodreg, True).reset(tonediffs)
+        self.diff = OscDiff(scaleofstep, periodreg, True).reset(tonediffs)
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -157,7 +157,7 @@ class NoiseOsc(BufNode):
     def __init__(self, scale, periodreg, noisediffs):
         BufNode.__init__(self, binarydtype)
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        self.diff = OscDiff(bindiffdtype, scaleofstep, periodreg, False).reset(noisediffs)
+        self.diff = OscDiff(scaleofstep, periodreg, False).reset(noisediffs)
 
     def callimpl(self):
         self.chain(self.diff)(self.blockbuf)
@@ -177,7 +177,7 @@ class EnvOsc(BufNode):
     def __init__(self, scale, periodreg, shapereg):
         BufNode.__init__(self, zto255dtype)
         scaleofstep = scale * 32 // self.steps
-        self.diff = OscDiff(zto127diffdtype, scaleofstep, periodreg, True)
+        self.diff = OscDiff(scaleofstep, periodreg, True)
         self.shapeversion = None
         self.shapereg = shapereg
 
