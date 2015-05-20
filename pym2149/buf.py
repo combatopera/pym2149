@@ -18,9 +18,6 @@
 import numpy as np
 from util import singleton
 
-zto255dtype = binarydtype = np.uint8 # Slightly faster than plain old int.
-floatdtype = np.float32 # Effectively about 24 bits.
-
 class AbstractRing:
 
     def __init__(self, npbuf):
@@ -40,12 +37,15 @@ class OnceRing(AbstractRing):
 
 class DiffRing(Ring):
 
+    signaldtype = np.uint8 # Slightly faster than plain old int.
+    derivativedtype = np.int8
+
     def __init__(self, g, introlen = 0):
         self.dc = list(g)
         mindc = min(self.dc)
         maxdc = max(self.dc)
         if mindc < 0 or maxdc > 255:
-            raise Exception("np.uint8 not wide enough for: [%s, %s]" % (mindc, maxdc))
+            raise Exception("%s not wide enough for: [%s, %s]" % (self.signaldtype.__name__, mindc, maxdc))
         self.dc.append(self.dc[introlen])
         def h():
             yield self.dc[0]
@@ -54,8 +54,11 @@ class DiffRing(Ring):
         mindiff = min(h())
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
-            raise Exception("np.int8 not wide enough for: [%s, %s]" % (mindiff, maxdiff))
+            raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
         Ring.__init__(self, np.int8, h(), introlen + 1)
+
+zto255dtype = binarydtype = DiffRing.signaldtype
+floatdtype = np.float32 # Effectively about 24 bits.
 
 class AnyBuf:
 
