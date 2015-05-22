@@ -95,6 +95,7 @@ class RingCursor:
             ringn -= n
 
     def putindexed(self, target, indices):
+        dcadjust = self.currentdc()
         while indices.shape[0]:
             n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
@@ -104,6 +105,7 @@ class RingCursor:
             else:
                 self.index = ringend
             indices = indices[n:]
+        target.addtofirst(dcadjust)
 
     def currentdc(self):
         # Observe this can break through loopstart, in which case value should be same as last:
