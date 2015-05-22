@@ -17,7 +17,7 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DerivativeRing, RingCursor, MasterBuf, derivativedtype, signaldtype
+from buf import DerivativeRing, MasterBuf, derivativedtype, signaldtype
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 
@@ -29,7 +29,7 @@ class DerivativeNode(BufNode):
     def reset(self, derivativering):
         if derivativering.buf.dtype != self.dtype:
             raise Exception('Ring must have same dtype as this.')
-        self.ringcursor = RingCursor(derivativering)
+        self.ringcursor = derivativering.newcursor()
         self.progress = 0
         return self
 

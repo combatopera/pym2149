@@ -18,13 +18,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, numpy as np
-from buf import Buf, SimpleRing, DerivativeRing, RingCursor
+from buf import Buf, SimpleRing, DerivativeRing
 
 class TestBuf(unittest.TestCase):
 
     def test_putring(self):
         b = Buf(np.zeros(20))
-        r = RingCursor(SimpleRing.fromiter(int, xrange(5), 0))
+        r = SimpleRing.fromiter(int, xrange(5), 0).newcursor()
         r.index = 4
         r.putstridedimpl(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
@@ -36,7 +36,7 @@ class TestBuf(unittest.TestCase):
 
     def test_loop(self):
         b = Buf(np.zeros(20))
-        r = RingCursor(SimpleRing.fromiter(int, xrange(5), 2))
+        r = SimpleRing.fromiter(int, xrange(5), 2).newcursor()
         r.index = 1
         r.putstridedimpl(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
