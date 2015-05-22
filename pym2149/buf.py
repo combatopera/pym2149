@@ -39,6 +39,9 @@ class SimpleRing(AbstractRing):
     def wraponce(cls, buf):
         return cls(buf.buf, None)
 
+    def newcursor(self):
+        return RingCursor(self)
+
 class DerivativeRing(AbstractRing):
 
     def __init__(self, g, introlen = 0):
@@ -57,6 +60,9 @@ class DerivativeRing(AbstractRing):
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
         AbstractRing.__init__(self, np.fromiter(h(), derivativedtype), introlen + 1)
+
+    def newcursor(self):
+        return RingCursor(self)
 
 class AnyBuf:
 

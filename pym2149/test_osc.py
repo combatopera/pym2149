@@ -22,7 +22,7 @@ from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDerivative, RTone
 from mfp import mfpclock
 from nod import Block
 from reg import VersionReg
-from buf import DerivativeRing, RingCursor, Buf
+from buf import DerivativeRing, Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 from shapes import tonediffs, loopsize
@@ -218,7 +218,7 @@ class TestNoiseOsc(unittest.TestCase):
     def test_increaseperiodonboundary(self):
         r = Reg(0x01)
         o = NoiseOsc(4, r, self.noisediffs)
-        o.diff.ringcursor = RingCursor(DerivativeRing([1, 0]))
+        o.diff.ringcursor = DerivativeRing([1, 0]).newcursor()
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -228,7 +228,7 @@ class TestNoiseOsc(unittest.TestCase):
     def test_decreaseperiodonboundary(self):
         r = Reg(0x03)
         o = NoiseOsc(4, r, self.noisediffs)
-        o.diff.ringcursor = RingCursor(DerivativeRing([1, 0]))
+        o.diff.ringcursor = DerivativeRing([1, 0]).newcursor()
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())

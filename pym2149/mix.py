@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode, Node
-from buf import MasterBuf, RingCursor, signaldtype, floatdtype, SimpleRing
+from buf import MasterBuf, signaldtype, floatdtype, SimpleRing
 import logging
 
 log = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ class Multiplexer(Node):
                 # BufNode can't do this because size is not framecount:
                 size = len(buf)
                 multi = self.multi.ensureandcrop(size * self.channels)
-            RingCursor(SimpleRing.wraponce(buf)).putstridedimpl(multi, i, self.channels, size)
+            SimpleRing.wraponce(buf).newcursor().putstridedimpl(multi, i, self.channels, size)
         return multi
 
 class IdealMixer(BufNode):
