@@ -22,7 +22,8 @@ from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDerivative, RTone
 from mfp import mfpclock
 from nod import Block
 from reg import VersionReg
-from buf import DerivativeRing, Buf
+from ring import DerivativeRing
+from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
 from shapes import tonediffs, loopsize

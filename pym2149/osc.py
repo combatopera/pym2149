@@ -17,7 +17,8 @@
 
 import lfsr, itertools, numpy as np
 from nod import BufNode
-from buf import DerivativeRing, MasterBuf, derivativedtype, signaldtype
+from ring import DerivativeRing, derivativedtype, signaldtype
+from buf import MasterBuf
 from mfp import mfpclock
 from shapes import cycle, tonediffs
 

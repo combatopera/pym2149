@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from buf import DerivativeRing
+from ring import DerivativeRing
 import math
 
 loopsize = 1024
