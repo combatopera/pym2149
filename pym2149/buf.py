@@ -28,7 +28,7 @@ class AbstractRing:
         self.buf = npbuf
         self.limit = len(npbuf)
 
-class Ring(AbstractRing):
+class SimpleRing(AbstractRing):
 
     def __init__(self, dtype, g, loopstart):
         AbstractRing.__init__(self, np.fromiter(g, dtype))
@@ -40,7 +40,7 @@ class OnceRing(AbstractRing):
         AbstractRing.__init__(self, buf.buf)
         self.loopstart = None # For RingCursor.
 
-class DerivativeRing(Ring):
+class DerivativeRing(AbstractRing):
 
     def __init__(self, g, introlen = 0):
         self.dc = list(g)
@@ -57,7 +57,8 @@ class DerivativeRing(Ring):
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
-        Ring.__init__(self, derivativedtype, h(), introlen + 1)
+        AbstractRing.__init__(self, np.fromiter(h(), derivativedtype))
+        self.loopstart = introlen + 1
 
 class AnyBuf:
 
