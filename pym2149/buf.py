@@ -78,6 +78,11 @@ class RingCursor:
         self.ring = ring
 
     def putstrided(self, target, start, step, ringn):
+        dcadjust = self.currentdc()
+        self.putstridedimpl(target, start, step, ringn)
+        target.addtofirst(dcadjust) # Add last value of previous integral.
+
+    def putstridedimpl(self, target, start, step, ringn):
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
             end = start + step * n

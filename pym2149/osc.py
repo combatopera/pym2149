@@ -66,9 +66,7 @@ class SimpleDerivative(DerivativeNode):
             self.updatestepsize(False)
             self.blockbuf.fill(0)
             stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
-            dc = self.ringcursor.currentdc()
             self.ringcursor.putstrided(self.blockbuf, stepindex, self.stepsize, stepcount)
-            self.blockbuf.addtofirst(dc) # Add last value of previous integral.
             self.progress = (self.block.framecount - stepindex) % self.stepsize
             return self.integral
 
