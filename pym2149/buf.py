@@ -38,6 +38,7 @@ class OnceRing(AbstractRing):
 
     def __init__(self, buf):
         AbstractRing.__init__(self, buf.buf)
+        self.loopstart = None # For RingCursor.
 
 class DerivativeRing(Ring):
 
@@ -89,14 +90,7 @@ class RingCursor:
             ringend = self.index + n
             target.putstrided(start, end, step, self.ring.buf[self.index:ringend])
             start = end
-            if ringend == self.ring.limit:
-                # Allow OnceRing to use one iteration of this method:
-                try:
-                    self.index = self.ring.loopstart
-                except AttributeError:
-                    self.index = None
-            else:
-                self.index = ringend
+            self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             ringn -= n
 
     def putindexed(self, target, indices):
@@ -105,10 +99,7 @@ class RingCursor:
             n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
             target.putindexed(indices[:n], self.ring.buf[self.index:ringend])
-            if ringend == self.ring.limit:
-                self.index = self.ring.loopstart
-            else:
-                self.index = ringend
+            self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             indices = indices[n:]
         target.addtofirst(dcadjust)
 
