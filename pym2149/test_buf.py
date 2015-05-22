@@ -26,11 +26,11 @@ class TestBuf(unittest.TestCase):
         b = Buf(np.zeros(20))
         r = SimpleRing.fromiter(int, xrange(5), 0).newcursor()
         r.index = 4
-        r.putstridedimpl(b, 3, 2, 8)
+        r.putstrided(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
         self.assertEqual(2, r.index)
         r.index = 4
-        r.putstridedimpl(b, 4, 2, 8)
+        r.putstrided(b, 4, 2, 8)
         self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], b.tolist())
         self.assertEqual(2, r.index)
 
@@ -38,11 +38,11 @@ class TestBuf(unittest.TestCase):
         b = Buf(np.zeros(20))
         r = SimpleRing.fromiter(int, xrange(5), 2).newcursor()
         r.index = 1
-        r.putstridedimpl(b, 3, 2, 8)
+        r.putstrided(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
         self.assertEqual(3, r.index)
         r.index = 1
-        r.putstridedimpl(b, 4, 2, 8)
+        r.putstrided(b, 4, 2, 8)
         self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], b.tolist())
         self.assertEqual(3, r.index)
 

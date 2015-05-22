@@ -40,7 +40,9 @@ class SimpleRing(AbstractRing):
         return cls(buf.buf, None)
 
     def newcursor(self):
-        return RingCursor(self)
+        c = RingCursor(self)
+        c.putstrided = c.putstridedsimple
+        return c
 
 class DerivativeRing(AbstractRing):
 
@@ -62,7 +64,10 @@ class DerivativeRing(AbstractRing):
         AbstractRing.__init__(self, np.fromiter(h(), derivativedtype), introlen + 1)
 
     def newcursor(self):
-        return RingCursor(self)
+        c = RingCursor(self)
+        c.putstrided = c.putstridedderivative
+        c.putindexed = c.putindexedderivative
+        return c
 
 class AnyBuf:
 
@@ -83,12 +88,12 @@ class RingCursor:
         self.index = 0
         self.ring = ring
 
-    def putstrided(self, target, start, step, ringn):
-        dcadjust = self.currentdc()
-        self.putstridedimpl(target, start, step, ringn)
-        target.addtofirst(dcadjust) # Add last value of previous integral.
+    def putstridedderivative(self, target, start, step, ringn):
+        contextdc = self.contextdc()
+        self.putstridedsimple(target, start, step, ringn)
+        target.addtofirst(contextdc) # Add last value of previous integral.
 
-    def putstridedimpl(self, target, start, step, ringn):
+    def putstridedsimple(self, target, start, step, ringn):
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
             end = start + step * n
@@ -98,17 +103,17 @@ class RingCursor:
             self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             ringn -= n
 
-    def putindexed(self, target, indices):
-        dcadjust = self.currentdc()
+    def putindexedderivative(self, target, indices):
+        contextdc = self.contextdc()
         while indices.shape[0]:
             n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
             target.putindexed(indices[:n], self.ring.buf[self.index:ringend])
             self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             indices = indices[n:]
-        target.addtofirst(dcadjust)
+        target.addtofirst(contextdc)
 
-    def currentdc(self):
+    def contextdc(self):
         # Observe this can break through loopstart, in which case value should be same as last:
         return self.ring.dc[self.index - 1] if self.index else 0
 
