@@ -31,13 +31,13 @@ class AbstractRing:
 
 class SimpleRing(AbstractRing):
 
-    def __init__(self, dtype, g, loopstart):
-        AbstractRing.__init__(self, np.fromiter(g, dtype), loopstart)
+    @classmethod
+    def fromiter(cls, dtype, g, loopstart):
+        return cls(np.fromiter(g, dtype), loopstart)
 
-class OnceRing(AbstractRing):
-
-    def __init__(self, buf):
-        AbstractRing.__init__(self, buf.buf, None)
+    @classmethod
+    def wraponce(cls, buf):
+        return cls(buf.buf, None)
 
 class DerivativeRing(AbstractRing):
 

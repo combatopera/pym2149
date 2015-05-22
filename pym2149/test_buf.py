@@ -24,7 +24,7 @@ class TestBuf(unittest.TestCase):
 
     def test_putring(self):
         b = Buf(np.zeros(20))
-        r = RingCursor(SimpleRing(int, xrange(5), 0))
+        r = RingCursor(SimpleRing.fromiter(int, xrange(5), 0))
         r.index = 4
         r.putstridedimpl(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
@@ -36,7 +36,7 @@ class TestBuf(unittest.TestCase):
 
     def test_loop(self):
         b = Buf(np.zeros(20))
-        r = RingCursor(SimpleRing(int, xrange(5), 2))
+        r = RingCursor(SimpleRing.fromiter(int, xrange(5), 2))
         r.index = 1
         r.putstridedimpl(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
@@ -47,7 +47,7 @@ class TestBuf(unittest.TestCase):
         self.assertEqual(3, r.index)
 
     def test_putringops(self):
-        r = SimpleRing(int, [0] * 5, None)
+        r = SimpleRing.fromiter(int, [0] * 5, None)
         self.assertEqual(0, Buf.putringops(r, None, 0))
         self.assertEqual(1, Buf.putringops(r, 0, 1))
         self.assertEqual(1, Buf.putringops(r, 4, 1))
