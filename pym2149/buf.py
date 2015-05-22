@@ -18,21 +18,8 @@
 import numpy as np
 from util import singleton
 
-class AnyBuf:
-
-    @staticmethod
-    def putringops(ring, ringcursor, ringn):
-        ops = 0
-        while ringn:
-            n = min(ring.limit - ringcursor, ringn)
-            ops += 1
-            if ringcursor + n == ring.limit:
-                ringcursor = ring.loopstart
-            ringn -= n
-        return ops
-
 @singleton
-class NullBuf(AnyBuf):
+class NullBuf:
 
     def last(self, *args): pass
 
@@ -56,7 +43,7 @@ class NullBuf(AnyBuf):
 
     def subbuf(self, *args): pass
 
-class Buf(AnyBuf):
+class Buf:
 
     def __init__(self, buf):
         self.buf = buf

@@ -47,23 +47,6 @@ class TestRing(unittest.TestCase):
         self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], b.tolist())
         self.assertEqual(3, r.index)
 
-    def test_putringops(self):
-        r = SimpleRing.fromiter(int, [0] * 5, None)
-        self.assertEqual(0, Buf.putringops(r, None, 0))
-        self.assertEqual(1, Buf.putringops(r, 0, 1))
-        self.assertEqual(1, Buf.putringops(r, 4, 1))
-        self.assertEqual(1, Buf.putringops(r, 0, 5))
-        r.loopstart = 0
-        self.assertEqual(2, Buf.putringops(r, 0, 6))
-        self.assertEqual(2, Buf.putringops(r, 1, 5))
-        self.assertEqual(2, Buf.putringops(r, 0, 10))
-        r.loopstart = 1
-        self.assertEqual(2, Buf.putringops(r, 0, 9))
-        self.assertEqual(3, Buf.putringops(r, 0, 10))
-        r.loopstart = 2
-        self.assertEqual(3, Buf.putringops(r, 3, 8))
-        self.assertEqual(4, Buf.putringops(r, 3, 9))
-
     def test_todiffring(self):
         unit = [1, 0, 1, 0]
         r = DerivativeRing(unit)
