@@ -186,10 +186,7 @@ class YM56(YM):
                 self.skip(self.lword())
         self.info = tuple(self.ntstring() for _ in xrange(3))
         dataoffset = self.f.tell()
-        if interleaved:
-            self.readframe = self.interleavedframe
-        else:
-            self.readframe = self.simpleframe
+        self.readframe = self.interleavedframe if interleaved else self.simpleframe
         if once:
             self.logignoringloopinfo()
             self.loopinfo = None
