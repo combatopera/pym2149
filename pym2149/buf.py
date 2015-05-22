@@ -24,21 +24,20 @@ floatdtype = np.float32 # Effectively about 24 bits.
 
 class AbstractRing:
 
-    def __init__(self, npbuf):
+    def __init__(self, npbuf, loopstart):
         self.buf = npbuf
         self.limit = len(npbuf)
+        self.loopstart = loopstart
 
 class SimpleRing(AbstractRing):
 
     def __init__(self, dtype, g, loopstart):
-        AbstractRing.__init__(self, np.fromiter(g, dtype))
-        self.loopstart = loopstart
+        AbstractRing.__init__(self, np.fromiter(g, dtype), loopstart)
 
 class OnceRing(AbstractRing):
 
     def __init__(self, buf):
-        AbstractRing.__init__(self, buf.buf)
-        self.loopstart = None # For RingCursor.
+        AbstractRing.__init__(self, buf.buf, None)
 
 class DerivativeRing(AbstractRing):
 
@@ -57,8 +56,7 @@ class DerivativeRing(AbstractRing):
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
-        AbstractRing.__init__(self, np.fromiter(h(), derivativedtype))
-        self.loopstart = introlen + 1
+        AbstractRing.__init__(self, np.fromiter(h(), derivativedtype), introlen + 1)
 
 class AnyBuf:
 
