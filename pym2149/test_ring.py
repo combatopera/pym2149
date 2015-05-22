@@ -18,9 +18,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, numpy as np
-from buf import Buf, SimpleRing, DerivativeRing
+from buf import Buf
+from ring import SimpleRing, DerivativeRing
 
-class TestBuf(unittest.TestCase):
+class TestRing(unittest.TestCase):
 
     def test_putring(self):
         b = Buf(np.zeros(20))

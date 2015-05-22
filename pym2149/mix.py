@@ -16,7 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode, Node
-from buf import MasterBuf, signaldtype, floatdtype, SimpleRing
+from buf import MasterBuf
+from ring import signaldtype, floatdtype, SimpleRing
 import logging
 
 log = logging.getLogger(__name__)

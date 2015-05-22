@@ -21,7 +21,7 @@ from unroll import importunrolled
 from di import types
 from iface import Config
 from ym2149 import ClockInfo
-from buf import floatdtype
+from ring import floatdtype
 
 log = logging.getLogger(__name__)
 
