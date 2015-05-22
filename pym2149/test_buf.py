@@ -27,11 +27,11 @@ class TestBuf(unittest.TestCase):
         r = RingCursor(Ring(int, xrange(5), 0))
         r.index = 4
         r.putstridedimpl(b, 3, 2, 8)
-        self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], list(b.buf))
+        self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
         self.assertEqual(2, r.index)
         r.index = 4
         r.putstridedimpl(b, 4, 2, 8)
-        self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], list(b.buf))
+        self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], b.tolist())
         self.assertEqual(2, r.index)
 
     def test_loop(self):
@@ -39,11 +39,11 @@ class TestBuf(unittest.TestCase):
         r = RingCursor(Ring(int, xrange(5), 2))
         r.index = 1
         r.putstridedimpl(b, 3, 2, 8)
-        self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], list(b.buf))
+        self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
         self.assertEqual(3, r.index)
         r.index = 1
         r.putstridedimpl(b, 4, 2, 8)
-        self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], list(b.buf))
+        self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], b.tolist())
         self.assertEqual(3, r.index)
 
     def test_putringops(self):
