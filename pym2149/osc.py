@@ -34,7 +34,7 @@ class DerivativeNode(BufNode):
         return self
 
     def hold(self, signalbuf):
-        signalbuf.fill(self.ringcursor.currentdc())
+        signalbuf.fill(self.ringcursor.contextdc())
 
     def integral(self, signalbuf):
         signalbuf.integrate(self.blockbuf)
