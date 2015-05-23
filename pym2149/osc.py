@@ -117,7 +117,10 @@ class IntegralNode(BufNode):
 
     def __init__(self, derivative):
         BufNode.__init__(self, signaldtype) # Sinus effect is in [0, 15] so dtype must support that.
-        self.diff = derivative
+        self.derivative = derivative
+
+    def callimpl(self):
+        self.chain(self.derivative)(self.blockbuf)
 
 class RToneOsc(IntegralNode):
 
@@ -128,18 +131,15 @@ class RToneOsc(IntegralNode):
 
     def callimpl(self):
         if self.effectversion != self.effectreg.version:
-            self.diff.reset(self.effectreg.value.diffs)
+            self.derivative.reset(self.effectreg.value.diffs)
             self.effectversion = self.effectreg.version
-        self.chain(self.diff)(self.blockbuf)
+        IntegralNode.callimpl(self)
 
 class ToneOsc(IntegralNode):
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
         IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True).reset(tonediffs))
-
-    def callimpl(self):
-        self.chain(self.diff)(self.blockbuf)
 
 class NoiseDiffs(DerivativeRing):
 
@@ -151,9 +151,6 @@ class NoiseOsc(IntegralNode):
     def __init__(self, scale, periodreg, noisediffs):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
         IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, False).reset(noisediffs))
-
-    def callimpl(self):
-        self.chain(self.diff)(self.blockbuf)
 
 class EnvOsc(IntegralNode):
 
@@ -178,6 +175,6 @@ class EnvOsc(IntegralNode):
             shape = self.shapereg.value
             if shape == (shape & 0x07):
                 shape = (0x09, 0x0f)[bool(shape & 0x04)]
-            self.diff.reset(getattr(self, "diffs%02x" % shape))
+            self.derivative.reset(getattr(self, "diffs%02x" % shape))
             self.shapeversion = self.shapereg.version
-        self.chain(self.diff)(self.blockbuf)
+        IntegralNode.callimpl(self)
