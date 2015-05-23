@@ -312,7 +312,7 @@ class TestEnvOsc(unittest.TestCase):
     def test_09loop(self):
         o = EnvOsc(1, Reg(1), Reg(0x09))
         self.assertEqual(range(31, -1, -1), o.call(Block(32)).tolist())
-        self.assertEqual([0] * 10000, o.call(Block(10000)).tolist())
+        self.assertEqual(set([0]), set(o.call(Block(10000)).tolist()))
 
     def test_0a(self):
         shapereg = Reg(0x0a)

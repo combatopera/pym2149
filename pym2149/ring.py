@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
+import numpy as np, itertools
 from util import ceildiv
 
 signaldtype = np.uint8 # Slightly faster than plain old int.
@@ -35,7 +35,7 @@ class DerivativeRing:
         self.dc.append(self.dc[introlen]) # Necessary as the 2 jumps to this value needn't be equal.
         self.loopstart = introlen + 1
         unitlen = len(self.dc) - self.loopstart
-        self.dc += self.dc[self.loopstart:self.loopstart + unitlen] * ceildiv(self.minloopsize - unitlen, unitlen)
+        self.dc.extend(itertools.chain(*itertools.tee(itertools.islice(self.dc, self.loopstart, self.loopstart + unitlen), ceildiv(self.minloopsize - unitlen, unitlen))))
         self.limit = len(self.dc)
         def h():
             yield self.dc[0]
