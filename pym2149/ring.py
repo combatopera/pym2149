@@ -21,24 +21,7 @@ signaldtype = np.uint8 # Slightly faster than plain old int.
 derivativedtype = np.int8 # Suitable for any signal in [0, 127].
 floatdtype = np.float32 # Effectively about 24 bits.
 
-class AbstractRing:
-
-    def __init__(self, npbuf, loopstart):
-        self.buf = npbuf
-        self.limit = len(npbuf)
-        self.loopstart = loopstart
-
-class SimpleRing(AbstractRing):
-
-    def __init__(self, dtype, g, introlen):
-        AbstractRing.__init__(self, np.fromiter(g, dtype), introlen)
-
-    def newcursor(self):
-        c = RingCursor(self)
-        c.putstrided = c.putstridedsimple
-        return c
-
-class DerivativeRing(AbstractRing):
+class DerivativeRing:
 
     def __init__(self, g, introlen = 0):
         self.dc = list(g)
@@ -55,13 +38,15 @@ class DerivativeRing(AbstractRing):
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
-        AbstractRing.__init__(self, np.fromiter(h(), derivativedtype), introlen + 1)
+        self.npbuf = np.fromiter(h(), derivativedtype)
+        self.limit = len(self.npbuf)
+        self.loopstart = introlen + 1
+
+    def tolist(self): # For tests.
+        return list(self.npbuf)
 
     def newcursor(self):
-        c = RingCursor(self)
-        c.putstrided = c.putstridedderivative
-        c.putindexed = c.putindexedderivative
-        return c
+        return RingCursor(self)
 
 class RingCursor:
 
@@ -69,27 +54,24 @@ class RingCursor:
         self.index = 0
         self.ring = ring
 
-    def putstridedderivative(self, target, start, step, ringn):
+    def putstrided(self, target, start, step, ringn):
         contextdc = self.contextdc()
-        self.putstridedsimple(target, start, step, ringn)
-        target.addtofirst(contextdc) # Add last value of previous integral.
-
-    def putstridedsimple(self, target, start, step, ringn):
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
             end = start + step * n
             ringend = self.index + n
-            target.putstrided(start, end, step, self.ring.buf[self.index:ringend])
+            target.putstrided(start, end, step, self.ring.npbuf[self.index:ringend])
             start = end
             self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             ringn -= n
+        target.addtofirst(contextdc) # Add last value of previous integral.
 
-    def putindexedderivative(self, target, indices):
+    def putindexed(self, target, indices):
         contextdc = self.contextdc()
         while indices.shape[0]:
             n = min(self.ring.limit - self.index, indices.shape[0])
             ringend = self.index + n
-            target.putindexed(indices[:n], self.ring.buf[self.index:ringend])
+            target.putindexed(indices[:n], self.ring.npbuf[self.index:ringend])
             self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
             indices = indices[n:]
         target.addtofirst(contextdc)

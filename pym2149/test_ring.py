@@ -19,56 +19,52 @@
 
 import unittest, numpy as np
 from buf import Buf
-from ring import SimpleRing, DerivativeRing
+from ring import DerivativeRing
 
 class TestRing(unittest.TestCase):
 
     def test_putring(self):
         b = Buf(np.zeros(20))
-        r = SimpleRing(int, xrange(5), 0).newcursor()
-        r.index = 4
-        r.putstrided(b, 3, 2, 8)
-        self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
-        self.assertEqual(2, r.index)
-        r.index = 4
-        r.putstrided(b, 4, 2, 8)
-        self.assertEqual([0, 0, 0, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 0], b.tolist())
-        self.assertEqual(2, r.index)
+        c = DerivativeRing(xrange(5)).newcursor()
+        c.index = 4
+        c.putstrided(b, 3, 2, 8)
+        self.assertEqual([3, 0, 0, 1, 0, -4, 0, 1, 0, 1, 0, 1, 0, 1, 0, -4, 0, 1, 0, 0], b.tolist())
+        b.integrate(b)
+        self.assertEqual([3, 3, 3, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 1], b.tolist())
+        self.assertEqual(2, c.index)
 
     def test_loop(self):
         b = Buf(np.zeros(20))
-        r = SimpleRing(int, xrange(5), 2).newcursor()
-        r.index = 1
-        r.putstrided(b, 3, 2, 8)
-        self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
-        self.assertEqual(3, r.index)
-        r.index = 1
-        r.putstrided(b, 4, 2, 8)
-        self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 0], b.tolist())
-        self.assertEqual(3, r.index)
+        c = DerivativeRing(xrange(5), 2).newcursor()
+        c.index = 1
+        c.putstrided(b, 3, 2, 8)
+        self.assertEqual([0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, -2, 0, 1, 0, 1, 0, -2, 0, 0], b.tolist())
+        b.integrate(b)
+        self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 2], b.tolist())
+        self.assertEqual(3, c.index)
 
     def test_todiffring(self):
         unit = [1, 0, 1, 0]
         r = DerivativeRing(unit)
-        self.assertEqual([1, -1, 1, -1, 1], list(r.buf))
+        self.assertEqual([1, -1, 1, -1, 1], r.tolist())
         self.assertEqual(1, r.loopstart)
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         unit = [1, 0, 1, 3]
         r = DerivativeRing(unit)
-        self.assertEqual([1, -1, 1, 2, -2], list(r.buf))
+        self.assertEqual([1, -1, 1, 2, -2], r.tolist())
         self.assertEqual(1, r.loopstart)
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         unit = [1, 0, 1, 0, 1]
         r = DerivativeRing(unit)
-        self.assertEqual([1, -1, 1, -1, 1, 0], list(r.buf))
+        self.assertEqual([1, -1, 1, -1, 1, 0], r.tolist())
         self.assertEqual(1, r.loopstart)
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         unit = [2, 0, 1, 0, 1]
         r = DerivativeRing(unit)
-        self.assertEqual([2, -2, 1, -1, 1, 1], list(r.buf))
+        self.assertEqual([2, -2, 1, -1, 1, 1], r.tolist())
         self.assertEqual(1, r.loopstart)
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
@@ -77,39 +73,40 @@ class TestRing(unittest.TestCase):
         prolog = [1, 1, 0]
         unit = [0, 0]
         r = DerivativeRing(prolog + unit, len(prolog))
-        self.assertEqual([1, 0, -1, 0, 0, 0], list(r.buf))
+        self.assertEqual([1, 0, -1, 0, 0, 0], r.tolist())
         self.assertEqual(4, r.loopstart)
         self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         prolog = [1, 1]
         unit = [0, 0, 0]
         r = DerivativeRing(prolog + unit, len(prolog))
-        self.assertEqual([1, 0, -1, 0, 0, 0], list(r.buf))
+        self.assertEqual([1, 0, -1, 0, 0, 0], r.tolist())
         self.assertEqual(3, r.loopstart)
         self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         prolog = [1]
         unit = [1, 0, 0, 0]
         r = DerivativeRing(prolog + unit, len(prolog))
-        self.assertEqual([1, 0, -1, 0, 0, 1], list(r.buf))
+        self.assertEqual([1, 0, -1, 0, 0, 1], r.tolist())
         self.assertEqual(2, r.loopstart)
         self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
         prolog = [1]
         unit = [1, 0, 0, 1]
         r = DerivativeRing(prolog + unit, len(prolog))
-        self.assertEqual([1, 0, -1, 0, 1, 0], list(r.buf))
+        self.assertEqual([1, 0, -1, 0, 1, 0], r.tolist())
         self.assertEqual(2, r.loopstart)
         self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
 
 def integrateringthrice(r):
+    u = r.tolist()
     last = 0
     v = []
     index = 0
     for _ in xrange(3):
         while index < r.limit:
-            v.append(last + r.buf[index])
+            v.append(last + u[index])
             last = v[-1]
             index += 1
         index = r.loopstart
