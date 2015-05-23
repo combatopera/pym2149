@@ -19,7 +19,6 @@ from __future__ import division
 from ring import DerivativeRing
 import math
 
-loopsize = 1024
 log2 = math.log(2)
 
 def level5toamp(level):
@@ -34,15 +33,7 @@ def amptolevel4(amp):
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
 
-def cycle(unit): # Unlike itertools version, we assume unit can be iterated more than once.
-    unitsize = len(unit)
-    if 0 != loopsize % unitsize:
-        raise Exception("Unit size %s does not divide %s." % (unitsize, loopsize))
-    for _ in xrange(loopsize // unitsize):
-        for x in unit:
-            yield x
-
-tonediffs = DerivativeRing(cycle([1, 0]))
+tonediffs = DerivativeRing([1, 0])
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
@@ -55,6 +46,6 @@ def sinusdiffring(steps, maxlevel4, skew):
     amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, skew) for step in xrange(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     unit = [int(round(amptolevel4(amp))) for amp in amps]
-    return DerivativeRing(cycle(unit))
+    return DerivativeRing(unit)
 
 leveltosinusdiffs = dict([level4, sinusdiffring(8, level4, 0)] for level4 in xrange(16))

@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+from util import ceildiv
 
 signaldtype = np.uint8 # Slightly faster than plain old int.
 derivativedtype = np.int8 # Suitable for any signal in [0, 127].
@@ -23,13 +24,18 @@ floatdtype = np.float32 # Effectively about 24 bits.
 
 class DerivativeRing:
 
+    minloopsize = 1000
+
     def __init__(self, g, introlen = 0):
         self.dc = list(g)
         mindc = min(self.dc)
         maxdc = max(self.dc)
         if mindc < 0 or maxdc > 255:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.signaldtype.__name__, mindc, maxdc))
-        self.dc.append(self.dc[introlen])
+        self.dc.append(self.dc[introlen]) # Necessary as the 2 jumps to this value needn't be equal.
+        self.loopstart = introlen + 1
+        unitlen = len(self.dc) - self.loopstart
+        self.dc += self.dc[self.loopstart:self.loopstart + unitlen] * ceildiv(self.minloopsize - unitlen, unitlen)
         self.limit = len(self.dc)
         def h():
             yield self.dc[0]
@@ -40,7 +46,6 @@ class DerivativeRing:
         if mindiff < -128 or maxdiff > 127:
             raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
         self.npbuf = np.fromiter(h(), derivativedtype)
-        self.loopstart = introlen + 1
 
     def tolist(self): # For tests.
         return list(self.npbuf)

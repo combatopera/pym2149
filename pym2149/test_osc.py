@@ -26,7 +26,7 @@ from ring import DerivativeRing
 from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees
-from shapes import tonediffs, loopsize
+from shapes import tonediffs
 from dac import PWMEffect
 
 def Reg(value):
@@ -251,35 +251,35 @@ class TestEnvOsc(unittest.TestCase):
 
     def test_diffs(self):
         r = EnvOsc.shapes[0x0c]
-        self.assertEqual(1 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1025, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(32) + range(32), list(np.cumsum(r.npbuf[:64])))
         r = EnvOsc.shapes[0x08]
-        self.assertEqual(1 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1025, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(31, -1, -1) + range(31, -1, -1), list(np.cumsum(r.npbuf[:64])))
         r = EnvOsc.shapes[0x0e]
-        self.assertEqual(1 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1025, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(32) + range(31, -1, -1) + range(32), list(np.cumsum(r.npbuf[:96])))
         r = EnvOsc.shapes[0x0a]
-        self.assertEqual(1 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1025, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(31, -1, -1) + range(32) + range(31, -1, -1), list(np.cumsum(r.npbuf[:96])))
         r = EnvOsc.shapes[0x0f]
-        self.assertEqual(33 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1033, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(32) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
         r = EnvOsc.shapes[0x0d]
-        self.assertEqual(33 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1033, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(32) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
         r = EnvOsc.shapes[0x0b]
-        self.assertEqual(33 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1033, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(31, -1, -1) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
         r = EnvOsc.shapes[0x09]
-        self.assertEqual(33 + loopsize, r.npbuf.shape[0])
+        self.assertEqual(1033, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
 
@@ -312,9 +312,7 @@ class TestEnvOsc(unittest.TestCase):
     def test_09loop(self):
         o = EnvOsc(1, Reg(1), Reg(0x09))
         self.assertEqual(range(31, -1, -1), o.call(Block(32)).tolist())
-        m = loopsize - 10
-        self.assertEqual([0] * m, o.call(Block(m)).tolist())
-        self.assertEqual([0] * 20, o.call(Block(20)).tolist())
+        self.assertEqual([0] * 10000, o.call(Block(10000)).tolist())
 
     def test_0a(self):
         shapereg = Reg(0x0a)
