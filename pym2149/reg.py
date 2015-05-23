@@ -22,19 +22,19 @@ class Link:
         self.xform = xform
         self.upstream = upstream
 
-    def update(self, stack):
-        if self.reg not in stack:
+    def update(self):
+        if self.reg.idle:
             try:
                 upstreamvals = [r.value for r in self.upstream]
             except AttributeError:
                 return
-            self.reg.setimpl(self.xform(*upstreamvals), stack)
+            self.reg.setimpl(self.xform(*upstreamvals))
 
 class Reg(object):
 
     def __init__(self):
         self.links = []
-        self.stack = set() # In the hope that clearing is cheaper than creating.
+        self.idle = True
 
     def link(self, xform, *upstream):
         link = Link(self, xform, upstream)
@@ -52,16 +52,16 @@ class Reg(object):
             object.__setattr__(self, name, value)
 
     def set(self, value):
-        self.setimpl(value, self.stack)
+        self.setimpl(value)
 
-    def setimpl(self, value, stack):
+    def setimpl(self, value):
         object.__setattr__(self, 'value', value)
-        stack.add(self)
+        object.__setattr__(self, 'idle', False) # Significantly faster than going via __setattr__.
         try:
             for link in self.links:
-                link.update(stack)
+                link.update()
         finally:
-            stack.remove(self)
+            object.__setattr__(self, 'idle', True)
 
 class VersionReg(Reg):
 
@@ -69,6 +69,6 @@ class VersionReg(Reg):
         Reg.__init__(self)
         self.version = 0
 
-    def setimpl(self, *args):
-        Reg.setimpl(self, *args)
+    def setimpl(self, value):
+        Reg.setimpl(self, value)
         self.version += 1
