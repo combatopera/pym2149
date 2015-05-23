@@ -30,9 +30,8 @@ class AbstractRing:
 
 class SimpleRing(AbstractRing):
 
-    @classmethod
-    def fromiter(cls, dtype, g, loopstart):
-        return cls(np.fromiter(g, dtype), loopstart)
+    def __init__(self, dtype, g, introlen):
+        AbstractRing.__init__(self, np.fromiter(g, dtype), introlen)
 
     def newcursor(self):
         c = RingCursor(self)

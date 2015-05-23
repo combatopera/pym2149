@@ -25,7 +25,7 @@ class TestRing(unittest.TestCase):
 
     def test_putring(self):
         b = Buf(np.zeros(20))
-        r = SimpleRing.fromiter(int, xrange(5), 0).newcursor()
+        r = SimpleRing(int, xrange(5), 0).newcursor()
         r.index = 4
         r.putstrided(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 4, 0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 0, 0, 1, 0, 0], b.tolist())
@@ -37,7 +37,7 @@ class TestRing(unittest.TestCase):
 
     def test_loop(self):
         b = Buf(np.zeros(20))
-        r = SimpleRing.fromiter(int, xrange(5), 2).newcursor()
+        r = SimpleRing(int, xrange(5), 2).newcursor()
         r.index = 1
         r.putstrided(b, 3, 2, 8)
         self.assertEqual([0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 2, 0, 3, 0, 4, 0, 2, 0, 0], b.tolist())
