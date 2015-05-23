@@ -24,7 +24,7 @@ from ring import DerivativeRing
 class TestRing(unittest.TestCase):
 
     def test_putring(self):
-        b = Buf(np.zeros(20))
+        b = Buf(np.empty(20))
         c = DerivativeRing(xrange(5)).newcursor()
         c.index = 4
         c.putstrided(b, 3, 2, 8)
@@ -34,7 +34,7 @@ class TestRing(unittest.TestCase):
         self.assertEqual(2, c.index)
 
     def test_loop(self):
-        b = Buf(np.zeros(20))
+        b = Buf(np.empty(20))
         c = DerivativeRing(xrange(5), 2).newcursor()
         c.index = 1
         c.putstrided(b, 3, 2, 8)
