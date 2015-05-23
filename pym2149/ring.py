@@ -34,10 +34,6 @@ class SimpleRing(AbstractRing):
     def fromiter(cls, dtype, g, loopstart):
         return cls(np.fromiter(g, dtype), loopstart)
 
-    @classmethod
-    def wraponce(cls, buf):
-        return cls(buf.buf, None)
-
     def newcursor(self):
         c = RingCursor(self)
         c.putstrided = c.putstridedsimple
