@@ -16,13 +16,15 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from reg import Reg, VersionReg
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RToneOsc
+from osc import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from iface import AmpScale, Chip, YMFile, Config
 from di import types
 from mfp import MFPTimer
+from lfsr import Lfsr
+from ring import DerivativeRing
 import logging
 
 log = logging.getLogger(__name__)
@@ -101,6 +103,8 @@ class ClockInfo:
 
 class YM2149(Registers, Container, Chip):
 
+  noisering = DerivativeRing(Lfsr(ym2149nzdegrees))
+
   @types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
     self.scale = clockinfo.scale
@@ -109,7 +113,7 @@ class YM2149(Registers, Container, Chip):
     self.clock = clockinfo.implclock
     Registers.__init__(self, clockinfo, channels)
     # Chip-wide signals:
-    noise = NoiseOsc(self.scale, self.noiseperiod, NoiseDiffs(ym2149nzdegrees))
+    noise = NoiseOsc(self.scale, self.noiseperiod, self.noisering)
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
