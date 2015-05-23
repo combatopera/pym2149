@@ -45,3 +45,6 @@ class EMA:
     def __call__(self, instantaneous):
         self.value = self.alpha * instantaneous + (1 - self.alpha) * self.value
         return self.value
+
+def ceildiv(numerator, denominator):
+    return -((-numerator) // denominator)

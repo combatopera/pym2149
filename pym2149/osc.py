@@ -21,6 +21,7 @@ from ring import DerivativeRing, derivativedtype, signaldtype
 from buf import MasterBuf
 from mfp import mfpclock
 from shapes import cycle, tonediffs
+from util import ceildiv
 
 class DerivativeNode(BufNode):
 
@@ -67,9 +68,6 @@ class SimpleDerivative(DerivativeNode):
             self.ringcursor.putstrided(self.blockbuf, stepindex, self.stepsize, stepcount)
             self.progress = (self.block.framecount - stepindex) % self.stepsize
             return self.integral
-
-def ceildiv(numerator, denominator):
-    return -((-numerator) // denominator)
 
 class RationalDerivative(DerivativeNode):
 
