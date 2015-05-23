@@ -67,13 +67,17 @@ class RingCursor:
         target.addtofirst(contextdc) # Add last value of previous integral.
 
     def putindexed(self, target, indices):
+        start = 0
+        ringn = indices.shape[0]
         contextdc = self.contextdc()
-        while indices.shape[0]:
-            n = min(self.ring.limit - self.index, indices.shape[0])
+        while ringn:
+            n = min(self.ring.limit - self.index, ringn)
+            end = start + n
             ringend = self.index + n
-            target.putindexed(indices[:n], self.ring.npbuf[self.index:ringend])
+            target.putindexed(indices[start:end], self.ring.npbuf[self.index:ringend])
+            start = end
             self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
-            indices = indices[n:]
+            ringn -= n
         target.addtofirst(contextdc)
 
     def contextdc(self):
