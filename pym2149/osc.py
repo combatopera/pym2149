@@ -28,8 +28,6 @@ class DerivativeNode(BufNode):
         BufNode.__init__(self, derivativedtype)
 
     def reset(self, derivativering):
-        if derivativering.npbuf.dtype != self.dtype:
-            raise Exception('Ring must have same dtype as this.')
         self.ringcursor = derivativering.newcursor()
         self.progress = 0
         return self
