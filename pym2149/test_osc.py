@@ -18,14 +18,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseDiffs, NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
+from osc import ToneOsc, NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
 from mfp import mfpclock
 from nod import Block
 from reg import VersionReg
 from ring import DerivativeRing
 from buf import Buf
 from lfsr import Lfsr
-from ym2149 import ym2149nzdegrees
+from ym2149 import ym2149nzdegrees, YM2149
 from shapes import tonediffs
 from dac import PWMEffect
 
@@ -195,11 +195,9 @@ class TestRationalDiff(unittest.TestCase):
 
 class TestNoiseOsc(unittest.TestCase):
 
-    noisediffs = NoiseDiffs(ym2149nzdegrees)
-
     def test_works(self):
         n = 100
-        o = NoiseOsc(8, Reg(3), self.noisediffs)
+        o = NoiseOsc(8, Reg(3), YM2149.noisering)
         u = Lfsr(ym2149nzdegrees)
         for _ in xrange(2):
             v = o.call(Block(48 * n)).tolist()
@@ -209,16 +207,16 @@ class TestNoiseOsc(unittest.TestCase):
     def test_carry(self):
         r = Reg(0x01)
         size = 17 * 16 + 1
-        ref = NoiseOsc(8, r, self.noisediffs).call(Block(size)).tolist()
+        ref = NoiseOsc(8, r, YM2149.noisering).call(Block(size)).tolist()
         for n in xrange(size + 1):
-            o = NoiseOsc(8, r, self.noisediffs)
+            o = NoiseOsc(8, r, YM2149.noisering)
             v1 = o.call(Block(n)).tolist()
             v2 = o.call(Block(size - n)).tolist()
             self.assertEqual(ref, v1 + v2)
 
     def test_increaseperiodonboundary(self):
         r = Reg(0x01)
-        o = NoiseOsc(4, r, self.noisediffs)
+        o = NoiseOsc(4, r, YM2149.noisering)
         o.derivative.ringcursor = DerivativeRing([1, 0]).newcursor()
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
@@ -228,7 +226,7 @@ class TestNoiseOsc(unittest.TestCase):
 
     def test_decreaseperiodonboundary(self):
         r = Reg(0x03)
-        o = NoiseOsc(4, r, self.noisediffs)
+        o = NoiseOsc(4, r, YM2149.noisering)
         o.derivative.ringcursor = DerivativeRing([1, 0]).newcursor()
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
@@ -241,7 +239,7 @@ class TestNoiseOsc(unittest.TestCase):
         blocksize = 2000000 // blockrate
         for p in 0x01, 0x1f:
             r = Reg(p)
-            o = NoiseOsc(8, r, self.noisediffs)
+            o = NoiseOsc(8, r, YM2149.noisering)
             start = time.time()
             for _ in xrange(blockrate):
                 o.call(Block(blocksize))

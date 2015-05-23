@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import lfsr, itertools, numpy as np
+import itertools, numpy as np
 from nod import BufNode
 from ring import DerivativeRing, derivativedtype, signaldtype
 from buf import MasterBuf
@@ -138,11 +138,6 @@ class ToneOsc(IntegralNode):
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
         IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True).reset(tonediffs))
-
-class NoiseDiffs(DerivativeRing):
-
-    def __init__(self, nzdegrees):
-        DerivativeRing.__init__(self, lfsr.Lfsr(nzdegrees))
 
 class NoiseOsc(IntegralNode):
 
