@@ -20,7 +20,7 @@ from nod import BufNode
 from ring import DerivativeRing, derivativedtype, signaldtype
 from buf import MasterBuf
 from mfp import mfpclock
-from shapes import cycle, tonediffs
+from shapes import tonediffs
 from util import ceildiv
 
 class DerivativeNode(BufNode):
@@ -154,14 +154,14 @@ class EnvOsc(IntegralNode):
 
     steps = 32
     shapes = {
-        0x0c: DerivativeRing(cycle(range(steps))),
-        0x08: DerivativeRing(cycle(range(steps - 1, -1, -1))),
-        0x0e: DerivativeRing(cycle(range(steps) + range(steps - 1, -1, -1))),
-        0x0a: DerivativeRing(cycle(range(steps - 1, -1, -1) + range(steps))),
-        0x0f: DerivativeRing(itertools.chain(xrange(steps), cycle([0])), steps),
-        0x0d: DerivativeRing(itertools.chain(xrange(steps), cycle([steps - 1])), steps),
-        0x0b: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps),
-        0x09: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps),
+        0x0c: DerivativeRing(xrange(steps)),
+        0x08: DerivativeRing(xrange(steps - 1, -1, -1)),
+        0x0e: DerivativeRing(itertools.chain(xrange(steps), xrange(steps - 1, -1, -1))),
+        0x0a: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), xrange(steps))),
+        0x0f: DerivativeRing(itertools.chain(xrange(steps), [0]), steps),
+        0x0d: DerivativeRing(itertools.chain(xrange(steps), [steps - 1]), steps),
+        0x0b: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), [steps - 1]), steps),
+        0x09: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), [0]), steps),
     }
     for s in xrange(0x08):
         shapes[s] = shapes[0x0f if s & 0x04 else 0x09]

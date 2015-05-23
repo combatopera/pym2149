@@ -17,11 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np
+import unittest, numpy as np, ring
 from buf import Buf
-from ring import DerivativeRing
+
+class DerivativeRing(ring.DerivativeRing): minloopsize = 1
 
 class TestRing(unittest.TestCase):
+
+    def test_minloopsize(self):
+        class R(ring.DerivativeRing): pass
+        for minloopsize in 7, 8, 9:
+            R.minloopsize = minloopsize
+            r = R(xrange(1, 7), 3)
+            self.assertEqual(4, r.loopstart)
+            self.assertEqual([1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 4], r.dc)
+            self.assertEqual([1, 1, 1, 1, 1, 1, -2, 1, 1, -2, 1, 1, -2], r.tolist())
+        for minloopsize in 10, 11, 12:
+            R.minloopsize = minloopsize
+            r = R(xrange(1, 7), 3)
+            self.assertEqual(4, r.loopstart)
+            self.assertEqual([1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 4, 5, 6, 4], r.dc)
+            self.assertEqual([1, 1, 1, 1, 1, 1, -2, 1, 1, -2, 1, 1, -2, 1, 1, -2], r.tolist())
 
     def test_putring(self):
         b = Buf(np.empty(20))
