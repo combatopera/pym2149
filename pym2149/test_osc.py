@@ -250,35 +250,35 @@ class TestNoiseOsc(unittest.TestCase):
 class TestEnvOsc(unittest.TestCase):
 
     def test_diffs(self):
-        r = EnvOsc.diffs0c
+        r = EnvOsc.shapes[0x0c]
         self.assertEqual(1 + loopsize, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(32) + range(32), list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.diffs08
+        r = EnvOsc.shapes[0x08]
         self.assertEqual(1 + loopsize, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(31, -1, -1) + range(31, -1, -1), list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.diffs0e
+        r = EnvOsc.shapes[0x0e]
         self.assertEqual(1 + loopsize, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(32) + range(31, -1, -1) + range(32), list(np.cumsum(r.npbuf[:96])))
-        r = EnvOsc.diffs0a
+        r = EnvOsc.shapes[0x0a]
         self.assertEqual(1 + loopsize, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)
         self.assertEqual(range(31, -1, -1) + range(32) + range(31, -1, -1), list(np.cumsum(r.npbuf[:96])))
-        r = EnvOsc.diffs0f
+        r = EnvOsc.shapes[0x0f]
         self.assertEqual(33 + loopsize, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(32) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.diffs0d
+        r = EnvOsc.shapes[0x0d]
         self.assertEqual(33 + loopsize, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(32) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.diffs0b
+        r = EnvOsc.shapes[0x0b]
         self.assertEqual(33 + loopsize, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(31, -1, -1) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.diffs09
+        r = EnvOsc.shapes[0x09]
         self.assertEqual(33 + loopsize, r.npbuf.shape[0])
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(r.npbuf[:64])))

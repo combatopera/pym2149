@@ -155,14 +155,16 @@ class NoiseOsc(IntegralNode):
 class EnvOsc(IntegralNode):
 
     steps = 32
-    diffs0c = DerivativeRing(cycle(range(steps)))
-    diffs08 = DerivativeRing(cycle(range(steps - 1, -1, -1)))
-    diffs0e = DerivativeRing(cycle(range(steps) + range(steps - 1, -1, -1)))
-    diffs0a = DerivativeRing(cycle(range(steps - 1, -1, -1) + range(steps)))
-    diffs0f = DerivativeRing(itertools.chain(xrange(steps), cycle([0])), steps)
-    diffs0d = DerivativeRing(itertools.chain(xrange(steps), cycle([steps - 1])), steps)
-    diffs0b = DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps)
-    diffs09 = DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps)
+    shapes = {
+        0x0c: DerivativeRing(cycle(range(steps))),
+        0x08: DerivativeRing(cycle(range(steps - 1, -1, -1))),
+        0x0e: DerivativeRing(cycle(range(steps) + range(steps - 1, -1, -1))),
+        0x0a: DerivativeRing(cycle(range(steps - 1, -1, -1) + range(steps))),
+        0x0f: DerivativeRing(itertools.chain(xrange(steps), cycle([0])), steps),
+        0x0d: DerivativeRing(itertools.chain(xrange(steps), cycle([steps - 1])), steps),
+        0x0b: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps),
+        0x09: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps),
+    }
 
     def __init__(self, scale, periodreg, shapereg):
         scaleofstep = scale * 32 // self.steps
@@ -175,6 +177,6 @@ class EnvOsc(IntegralNode):
             shape = self.shapereg.value
             if shape == (shape & 0x07):
                 shape = (0x09, 0x0f)[bool(shape & 0x04)]
-            self.derivative.reset(getattr(self, "diffs%02x" % shape))
+            self.derivative.reset(self.shapes[shape])
             self.shapeversion = self.shapereg.version
         IntegralNode.callimpl(self)
