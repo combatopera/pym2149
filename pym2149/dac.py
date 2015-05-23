@@ -23,30 +23,30 @@ import numpy as np
 
 class Level(BufNode):
 
-  pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
-  pwmzero5bit = level4to5(pwmzero4bit)
-  lookup = np.fromiter([pwmzero5bit] + range(32), signaldtype)
+    pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
+    pwmzero5bit = level4to5(pwmzero4bit)
+    lookup = np.fromiter([pwmzero5bit] + range(32), signaldtype)
 
-  def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
-    BufNode.__init__(self, signaldtype) # Must be suitable for use as index downstream.
-    self.levelmodereg = levelmodereg
-    self.fixedreg = fixedreg
-    self.env = env
-    self.signal = signal
-    self.rtone = rtone
-    self.timereffectreg = timereffectreg
+    def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
+        BufNode.__init__(self, signaldtype) # Must be suitable for use as index downstream.
+        self.levelmodereg = levelmodereg
+        self.fixedreg = fixedreg
+        self.env = env
+        self.signal = signal
+        self.rtone = rtone
+        self.timereffectreg = timereffectreg
 
-  def callimpl(self):
-    levelmode = self.levelmodereg.value
-    timereffect = self.timereffectreg.value
-    if timereffect is not None:
-      timereffect(levelmode, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
-    elif levelmode:
-      self.blockbuf.copybuf(self.chain(self.signal))
-      self.blockbuf.mulbuf(self.chain(self.env))
-    else:
-      self.blockbuf.copybuf(self.chain(self.signal))
-      self.blockbuf.mul(level4to5(self.fixedreg.value))
+    def callimpl(self):
+        levelmode = self.levelmodereg.value
+        timereffect = self.timereffectreg.value
+        if timereffect is not None:
+            timereffect(levelmode, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
+        elif levelmode:
+            self.blockbuf.copybuf(self.chain(self.signal))
+            self.blockbuf.mulbuf(self.chain(self.env))
+        else:
+            self.blockbuf.copybuf(self.chain(self.signal))
+            self.blockbuf.mul(level4to5(self.fixedreg.value))
 
 class TimerEffect:
 
@@ -83,13 +83,13 @@ class SinusEffect(TimerEffect):
 
 class Dac(BufNode):
 
-  def __init__(self, level, log2maxpeaktopeak, ampshare):
-    BufNode.__init__(self, floatdtype)
-    # We take off .5 so that the peak amplitude is about -3 dB:
-    maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
-    # Lookup of ideal amplitudes:
-    self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
-    self.level = level
+    def __init__(self, level, log2maxpeaktopeak, ampshare):
+        BufNode.__init__(self, floatdtype)
+        # We take off .5 so that the peak amplitude is about -3 dB:
+        maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
+        # Lookup of ideal amplitudes:
+        self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
+        self.level = level
 
-  def callimpl(self):
-    self.blockbuf.mapbuf(self.chain(self.level), self.leveltopeaktopeak)
+    def callimpl(self):
+        self.blockbuf.mapbuf(self.chain(self.level), self.leveltopeaktopeak)
