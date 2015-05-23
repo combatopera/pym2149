@@ -165,6 +165,9 @@ class EnvOsc(IntegralNode):
         0x0b: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([steps - 1])), steps),
         0x09: DerivativeRing(itertools.chain(xrange(steps - 1, -1, -1), cycle([0])), steps),
     }
+    for s in xrange(0x08):
+        shapes[s] = shapes[0x0f if s & 0x04 else 0x09]
+    del s
 
     def __init__(self, scale, periodreg, shapereg):
         scaleofstep = scale * 32 // self.steps
@@ -174,9 +177,6 @@ class EnvOsc(IntegralNode):
 
     def callimpl(self):
         if self.shapeversion != self.shapereg.version:
-            shape = self.shapereg.value
-            if shape == (shape & 0x07):
-                shape = (0x09, 0x0f)[bool(shape & 0x04)]
-            self.derivative.reset(self.shapes[shape])
+            self.derivative.reset(self.shapes[self.shapereg.value])
             self.shapeversion = self.shapereg.version
         IntegralNode.callimpl(self)
