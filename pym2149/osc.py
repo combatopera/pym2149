@@ -65,7 +65,6 @@ class SimpleDerivative(DerivativeNode):
             return self.hold
         else:
             self.updatestepsize(False)
-            self.blockbuf.fill(0)
             stepcount = (self.block.framecount - stepindex + self.stepsize - 1) // self.stepsize
             self.ringcursor.putstrided(self.blockbuf, stepindex, self.stepsize, stepcount)
             self.progress = (self.block.framecount - stepindex) % self.stepsize
@@ -87,7 +86,6 @@ class RationalDerivative(DerivativeNode):
     def callimpl(self):
         if not self.timer.isrunning():
             if not self.progress:
-                self.blockbuf.fill(0)
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
                 return self.integral
@@ -105,7 +103,6 @@ class RationalDerivative(DerivativeNode):
             self.progress += self.block.framecount * mfpclock
             return self.hold
         else:
-            self.blockbuf.fill(0)
             stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
             indices = self.indices.ensureandcrop(stepcount)
             indices.arange(-stepsize)
