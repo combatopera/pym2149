@@ -42,8 +42,8 @@ class ConfigImpl(lazyconf.View, Config):
         else:
             confignames = [self.defaultconfigname]
             if os.path.exists(workspacepath):
-                confignames += sorted(os.listdir(workspacepath))
-            if 1 == len(confignames):
+                confignames += sorted(cn for cn in os.listdir(workspacepath) if os.path.exists(os.path.join(workspacepath, cn, 'chip.py')))
+            if 1 == len(confignames): # Just defaults.
                 configname, = confignames
             else:
                 for i, cn in enumerate(confignames):
@@ -51,7 +51,7 @@ class ConfigImpl(lazyconf.View, Config):
                 sys.stderr.write('#? ')
                 configname = confignames[int(raw_input())]
         if self.defaultconfigname != configname:
-            expressions.load(os.path.join(workspacepath, configname, configname + '.py'))
+            expressions.load(os.path.join(workspacepath, configname, 'chip.py'))
 
     def fork(self):
         return Fork(self)
