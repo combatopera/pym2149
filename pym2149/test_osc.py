@@ -216,8 +216,7 @@ class TestNoiseOsc(unittest.TestCase):
 
     def test_increaseperiodonboundary(self):
         r = Reg(0x01)
-        o = NoiseOsc(4, r, YM2149.noisering)
-        o.derivative.ringcursor = DerivativeRing([1, 0]).newcursor()
+        o = NoiseOsc(4, r, DerivativeRing([1, 0]))
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -226,8 +225,7 @@ class TestNoiseOsc(unittest.TestCase):
 
     def test_decreaseperiodonboundary(self):
         r = Reg(0x03)
-        o = NoiseOsc(4, r, YM2149.noisering)
-        o.derivative.ringcursor = DerivativeRing([1, 0]).newcursor()
+        o = NoiseOsc(4, r, DerivativeRing([1, 0]))
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
