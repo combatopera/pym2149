@@ -20,7 +20,7 @@
 import unittest
 from mix import IdealMixer, Multiplexer
 from nod import BufNode, Block, Container
-from buf import NullBuf
+from buf import nullbuf
 from out import TrivialOutChannel
 
 class Counter(BufNode):
@@ -54,9 +54,9 @@ class TestIdealMixer(unittest.TestCase):
         upstream = Counter(10), Counter()
         c = Container(upstream)
         m = IdealMixer(c, 16, TrivialOutChannel)
-        self.assertEqual(NullBuf, m(Block(5), True))
+        self.assertEqual(nullbuf, m(Block(5), True))
         for n in upstream:
-            self.assertEqual(NullBuf, n.result)
+            self.assertEqual(nullbuf, n.result)
 
 class TestMultiplexer(unittest.TestCase):
 
