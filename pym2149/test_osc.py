@@ -245,7 +245,7 @@ class TestNoiseOsc(unittest.TestCase):
 
 class TestEnvOsc(unittest.TestCase):
 
-    def test_diffs(self):
+    def test_shapes(self):
         r = EnvOsc.shapes[0x0c]
         self.assertEqual(1025, r.npbuf.shape[0])
         self.assertEqual(1, r.loopstart)

@@ -55,7 +55,7 @@ class TimerEffect:
 
 class PWMEffect(TimerEffect):
 
-    diffs = toneshape
+    shape = toneshape
 
     def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
         if levelmode:
@@ -74,7 +74,7 @@ class PWMEffect(TimerEffect):
 
 class SinusEffect(TimerEffect):
 
-    diffs = leveltosinusshape[15] # FIXME: Honour the fixedlevel.
+    shape = leveltosinusshape[15] # FIXME: Honour the fixedlevel.
 
     def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
         blockbuf.copybuf(chain(rtonenode))
