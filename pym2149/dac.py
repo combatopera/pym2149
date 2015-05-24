@@ -17,7 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import toneshape, leveltosinusdiffs, level5toamp, level4to5
+from shapes import toneshape, leveltosinusshape, level5toamp, level4to5
 from ring import signaldtype, floatdtype
 import numpy as np
 
@@ -74,7 +74,7 @@ class PWMEffect(TimerEffect):
 
 class SinusEffect(TimerEffect):
 
-    diffs = leveltosinusdiffs[15] # FIXME: Honour the fixedlevel.
+    diffs = leveltosinusshape[15] # FIXME: Honour the fixedlevel.
 
     def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
         blockbuf.copybuf(chain(rtonenode))
