@@ -42,8 +42,8 @@ def sinsliceamp(i, n, skew):
     return (meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
 def sinusdiffring(steps, maxlevel4, skew):
-    minamp, maxamp = (level5toamp(level4to5(l4)) for l4 in [0, maxlevel4])
-    amps = [minamp + (maxamp - minamp) * sinsliceamp(step, steps, skew) for step in xrange(steps)]
+    maxamp = level5toamp(level4to5(maxlevel4))
+    amps = [maxamp * sinsliceamp(step, steps, skew) for step in xrange(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     unit = [int(round(amptolevel4(amp))) for amp in amps]
     return DerivativeRing(unit)
