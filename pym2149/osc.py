@@ -129,7 +129,7 @@ class RToneOsc(IntegralNode):
 
     def callimpl(self):
         if self.effectversion != self.effectreg.version:
-            self.derivative.reset(self.effectreg.value.diffs)
+            self.derivative.reset(self.effectreg.value.shape)
             self.effectversion = self.effectreg.version
         IntegralNode.callimpl(self)
 
