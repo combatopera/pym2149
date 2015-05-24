@@ -17,7 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import tonediffs, leveltosinusdiffs, level5toamp, level4to5
+from shapes import toneshape, leveltosinusdiffs, level5toamp, level4to5
 from ring import signaldtype, floatdtype
 import numpy as np
 
@@ -55,7 +55,7 @@ class TimerEffect:
 
 class PWMEffect(TimerEffect):
 
-    diffs = tonediffs
+    diffs = toneshape
 
     def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
         if levelmode:

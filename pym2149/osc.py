@@ -20,7 +20,7 @@ from nod import BufNode
 from ring import DerivativeRing, derivativedtype, signaldtype
 from buf import MasterBuf
 from mfp import mfpclock
-from shapes import tonediffs
+from shapes import toneshape
 from util import ceildiv
 
 class DerivativeNode(BufNode):
@@ -137,7 +137,7 @@ class ToneOsc(IntegralNode):
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True).reset(tonediffs))
+        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, True).reset(toneshape))
 
 class NoiseOsc(IntegralNode):
 
