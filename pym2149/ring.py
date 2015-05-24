@@ -31,7 +31,7 @@ class DerivativeRing:
         mindc = min(self.dc)
         maxdc = max(self.dc)
         if mindc < 0 or maxdc > 255:
-            raise Exception("%s not wide enough for: [%s, %s]" % (self.signaldtype.__name__, mindc, maxdc))
+            raise Exception("%s not wide enough for: [%s, %s]" % (signaldtype.__name__, mindc, maxdc))
         self.dc.append(self.dc[introlen]) # Necessary as the 2 jumps to this value needn't be equal.
         self.loopstart = introlen + 1
         unitlen = len(self.dc) - self.loopstart
@@ -44,7 +44,7 @@ class DerivativeRing:
         mindiff = min(h())
         maxdiff = max(h())
         if mindiff < -128 or maxdiff > 127:
-            raise Exception("%s not wide enough for: [%s, %s]" % (self.derivativedtype.__name__, mindiff, maxdiff))
+            raise Exception("%s not wide enough for: [%s, %s]" % (derivativedtype.__name__, mindiff, maxdiff))
         self.npbuf = np.fromiter(h(), derivativedtype)
 
     def tolist(self): # For tests.
