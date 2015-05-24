@@ -48,4 +48,4 @@ def sinusdiffring(steps, maxlevel4, skew):
     unit = [max(0, int(round(amptolevel4(amp)))) for amp in amps]
     return DerivativeRing(unit)
 
-leveltosinusdiffs = dict([level4, sinusdiffring(8, level4, 0)] for level4 in xrange(16))
+leveltosinusshape = dict([level4, sinusdiffring(8, level4, 0)] for level4 in xrange(16))
