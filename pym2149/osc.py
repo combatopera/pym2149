@@ -28,10 +28,13 @@ class DerivativeNode(BufNode):
     def __init__(self):
         BufNode.__init__(self, derivativedtype)
 
-    def reset(self, derivativering):
-        self.ringcursor = derivativering.newcursor()
+    def reset(self, shape):
+        self.ringcursor = shape.newcursor()
         self.progress = 0
         return self
+
+    def swapring(self, shape):
+        self.ringcursor.swapring(shape)
 
     def hold(self, signalbuf):
         signalbuf.fill(self.ringcursor.contextdc())
@@ -129,8 +132,10 @@ class RToneOsc(IntegralNode):
 
     def callimpl(self):
         if self.effectversion != self.effectreg.version:
-            self.derivative.reset(self.effectreg.value.shape)
+            self.derivative.reset(self.effectreg.value.getshape())
             self.effectversion = self.effectreg.version
+        else:
+            self.derivative.swapring(self.effectreg.value.getshape())
         IntegralNode.callimpl(self)
 
 class ToneOsc(IntegralNode):

@@ -59,6 +59,11 @@ class RingCursor:
         self.index = 0
         self.ring = ring
 
+    def swapring(self, ring):
+        if ring.limit != self.ring.limit:
+            raise Exception("Expected limit %s but was: %s" % (self.ring.limit, ring.limit))
+        self.ring = ring
+
     def putstrided(self, target, start, step, ringn):
         target.fill(0)
         contextdc = self.contextdc()
