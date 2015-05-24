@@ -23,7 +23,8 @@ log = logging.getLogger(__name__)
 class Block:
 
   def __init__(self, framecount):
-    self.framecount = framecount
+    # If it's a numpy type it can cause overflow in osc module, so ensure arbitrary precision:
+    self.framecount = int(framecount)
 
   def __repr__(self):
     return "%s(%r)" % (self.__class__.__name__, self.framecount)
