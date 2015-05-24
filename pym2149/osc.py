@@ -141,9 +141,9 @@ class ToneOsc(IntegralNode):
 
 class NoiseOsc(IntegralNode):
 
-    def __init__(self, scale, periodreg, noisediffs):
+    def __init__(self, scale, periodreg, noiseshape):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, False).reset(noisediffs))
+        IntegralNode.__init__(self, SimpleDerivative(scaleofstep, periodreg, False).reset(noiseshape))
 
 class EnvOsc(IntegralNode):
 
