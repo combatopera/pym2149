@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from buf import MasterBuf, NullBuf
+from buf import MasterBuf, nullbuf
 import logging
 
 log = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class BufNode(Node):
 
   def makeresult(self):
     if self.masked:
-      self.blockbuf = NullBuf
+      self.blockbuf = nullbuf
     else:
       self.blockbuf = self.masterbuf.ensureandcrop(self.block.framecount * self.channels)
     resultornone = self.realcallimpl()

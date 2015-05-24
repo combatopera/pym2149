@@ -19,7 +19,7 @@ import numpy as np
 from util import singleton
 
 @singleton
-class NullBuf:
+class nullbuf:
 
     def last(self, *args): pass
 
