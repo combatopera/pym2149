@@ -26,7 +26,7 @@ from ring import DerivativeRing
 from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees, YM2149
-from shapes import tonediffs
+from shapes import toneshape
 from dac import PWMEffect
 
 def Reg(value):
@@ -165,7 +165,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_works(self):
         p = self.Timer(True, 81920)
-        d = RationalDerivative(100, p).reset(tonediffs)
+        d = RationalDerivative(100, p).reset(toneshape)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, diffblock(d, 80))
@@ -180,7 +180,7 @@ class TestRationalDiff(unittest.TestCase):
 
     def test_notrunning(self):
         p = self.Timer(False, None)
-        d = RationalDerivative(1000, p).reset(tonediffs)
+        d = RationalDerivative(1000, p).reset(toneshape)
         for _ in xrange(50):
             self.assertEqual([1] * 100, diffblock(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)

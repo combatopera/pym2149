@@ -33,7 +33,7 @@ def amptolevel4(amp):
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
 
-tonediffs = DerivativeRing([1, 0])
+toneshape = DerivativeRing([1, 0])
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
