@@ -65,8 +65,7 @@ class TestReg(unittest.TestCase):
         self.assertEqual(0xcd, value.value)
 
     def test_diamond(self):
-        self.spectator = Reg()
-        self.spectator.value = -1
+        self.spectator = Reg(value = -1)
         self.lhs = Reg()
         self.rhs = Reg()
         self.pair = Reg()
@@ -77,6 +76,10 @@ class TestReg(unittest.TestCase):
         self.assertEqual((1, 2, -1), self.leaf.value)
         self.pair.value = 3, 4
         self.assertEqual((3, 4, -1), self.leaf.value)
+
+    def test_initversionreg(self):
+        self.assertEqual(0, VersionReg().version)
+        self.assertEqual(1, VersionReg(value = 123).version)
 
 if '__main__' == __name__:
     unittest.main()

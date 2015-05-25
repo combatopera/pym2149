@@ -31,14 +31,10 @@ from dac import PWMEffect
 from collections import namedtuple
 
 def initreg(value):
-    r = Reg()
-    r.value = value
-    return r
+    return Reg(value = value)
 
 def initvreg(value):
-    r = VersionReg()
-    r.value = value
-    return r
+    return VersionReg(value = value)
 
 class AbstractTestOsc:
 
