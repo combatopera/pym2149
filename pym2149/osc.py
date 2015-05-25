@@ -79,10 +79,16 @@ class RationalDerivative(DerivativeNode):
     def __init__(self, chipimplclock, timer):
         DerivativeNode.__init__(self)
         self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
+        self.effectversion = None
         self.chipimplclock = chipimplclock
         self.timer = timer
 
     def callimpl(self):
+        if self.effectversion != self.timer.effect.version:
+            self.reset(self.timer.effect.value.getshape())
+            self.effectversion = self.timer.effect.version
+        else:
+            self.swapring(self.timer.effect.value.getshape())
         stepsize = self.timer.stepsize.value
         if stepsize is None:
             if not self.progress:
@@ -128,16 +134,6 @@ class RToneOsc(IntegralNode):
 
     def __init__(self, chipimplclock, timer):
         IntegralNode.__init__(self, RationalDerivative(chipimplclock, timer))
-        self.effectversion = None
-        self.effectreg = timer.effect
-
-    def callimpl(self):
-        if self.effectversion != self.effectreg.version:
-            self.derivative.reset(self.effectreg.value.getshape())
-            self.effectversion = self.effectreg.version
-        else:
-            self.derivative.swapring(self.effectreg.value.getshape())
-        IntegralNode.callimpl(self)
 
 class ToneOsc(IntegralNode):
 
