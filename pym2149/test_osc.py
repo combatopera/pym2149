@@ -219,13 +219,8 @@ class TestRationalDerivative(unittest.TestCase):
         d.call(Block(n))(v)
         return v.tolist()
 
-    class Timer:
-
-        def __init__(self, value):
-            self.stepsize = initreg(value)
-
     def test_works(self):
-        p = self.Timer(81920)
+        p = namedtuple('Timer', 'stepsize')(initreg(81920))
         d = RationalDerivative(100, p).reset(toneshape)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -240,7 +235,7 @@ class TestRationalDerivative(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_notrunning(self):
-        p = self.Timer(None)
+        p = namedtuple('Timer', 'stepsize')(initreg(None))
         d = RationalDerivative(1000, p).reset(toneshape)
         for _ in xrange(50):
             self.assertEqual([1] * 100, self.integrate(d, 100))
