@@ -61,9 +61,6 @@ class MFPTimer:
                     diff = d
         return tcrtdr
 
-    def isrunning(self):
-        return bool(self.control.value)
-
     def getnormperiod(self):
         return prescalers[self.control.value] * self.effectivedata.value * self.wavelength.value
 
