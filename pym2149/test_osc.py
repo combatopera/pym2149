@@ -210,8 +210,8 @@ class TestRationalDerivative(unittest.TestCase):
 
     def test_works(self):
         effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        p = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
-        d = RationalDerivative(100, p)
+        timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
+        d = RationalDerivative(100, timer)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, self.integrate(d, 80))
@@ -226,15 +226,15 @@ class TestRationalDerivative(unittest.TestCase):
 
     def test_notrunning(self):
         effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        p = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
-        d = RationalDerivative(1000, p)
+        timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
+        d = RationalDerivative(1000, timer)
         for _ in xrange(50):
             self.assertEqual([1] * 100, self.integrate(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
-        p.prescalerornone.value = 24576
+        timer.prescalerornone.value = 24576
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, self.integrate(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
-        p.prescalerornone.value = None
+        timer.prescalerornone.value = None
         self.assertEqual([0] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
 
