@@ -28,6 +28,7 @@ from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees, YM2149
 from shapes import toneshape
 from dac import PWMEffect
+from collections import namedtuple
 
 def initreg(value):
     r = Reg()
@@ -139,13 +140,11 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
     @staticmethod
     def createosc(scale, periodreg):
         clock = 200
-        class Timer:
-            def __init__(self):
-                self.effect = initvreg(PWMEffect(None))
-                self.stepsize = Reg()
-                self.stepsize.link(lambda p: scale*p*mfpclock//clock, periodreg)
-                periodreg.value = periodreg.value # Init stepsize.
-        return RToneOsc(clock, Timer())
+        effect = initvreg(PWMEffect(None))
+        stepsize = Reg()
+        stepsize.link(lambda p: scale*p*mfpclock//clock, periodreg)
+        periodreg.value = periodreg.value # Init stepsize.
+        return RToneOsc(clock, namedtuple('Timer', 'effect stepsize')(effect, stepsize))
 
     def test_works(self):
         o = self.createosc(8, initreg(3))
