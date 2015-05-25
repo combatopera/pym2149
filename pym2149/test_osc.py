@@ -137,7 +137,7 @@ def cmptime(self, taken, strictlimit):
     sys.stderr.write("%s ... " % expression)
     self.assertTrue(eval(expression))
 
-class TestRToneOsc(TestToneOsc): # FIXME: MFP timers do not behave like YM2149 tones.
+class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do not behave like YM2149 tones.
 
     performancelimit = .1
 
@@ -146,6 +146,71 @@ class TestRToneOsc(TestToneOsc): # FIXME: MFP timers do not behave like YM2149 t
         clock = 200
         xform = lambda period: scale * period * mfpclock // clock
         return RToneOsc(clock, Timer(xform, periodreg))
+
+    def test_works(self):
+        o = self.createosc(8, Reg(3))
+        v = o.call(Block(96)).tolist()
+        self.assertEqual([1] * 24, v[:24])
+        self.assertEqual([0] * 24, v[24:48])
+        self.assertEqual([1] * 24, v[48:72])
+        self.assertEqual([0] * 24, v[72:])
+        v = o.call(Block(48)).tolist()
+        self.assertEqual([1] * 24, v[:24])
+        self.assertEqual([0] * 24, v[24:])
+
+    def test_resume(self):
+        o = self.createosc(8, Reg(3))
+        v = o.call(Block(25)).tolist()
+        self.assertEqual([1] * 24, v[:24])
+        self.assertEqual([0], v[24:])
+        v = o.call(Block(24)).tolist()
+        self.assertEqual([0] * 23, v[:23])
+        self.assertEqual([1], v[23:])
+
+    def test_carry(self):
+        r = Reg(0x01)
+        size = 3 * 8 + 1
+        ref = self.createosc(8, r).call(Block(size)).tolist()
+        for n in xrange(size + 1):
+            o = self.createosc(8, r)
+            v1 = o.call(Block(n)).tolist()
+            v2 = o.call(Block(size - n)).tolist()
+            self.assertEqual(ref, v1 + v2)
+
+    def test_endexistingstepatendofblock(self):
+        r = Reg(0x01)
+        o = self.createosc(8, r)
+        self.assertEqual([1] * 4, o.call(Block(4)).tolist())
+        self.assertEqual([1] * 4, o.call(Block(4)).tolist())
+        self.assertEqual([0] * 4, o.call(Block(4)).tolist())
+
+    def test_increaseperiodonboundary(self):
+        r = Reg(0x01)
+        o = self.createosc(8, r)
+        self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
+        r.value = 0x02
+        self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
+        r.value = 0x03
+        self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
+
+    def test_decreaseperiodonboundary(self):
+        r = Reg(0x03)
+        o = self.createosc(8, r)
+        self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
+        r.value = 0x02
+        self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
+        r.value = 0x01
+        self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
+
+    def test_smallerblocksthanperiod(self):
+        r = Reg(0x05)
+        o = self.createosc(1, r)
+        self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
+        self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
+        self.assertEqual([0,0,1], o.call(Block(3)).tolist())
+        self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
+        self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
+        self.assertEqual([1], o.call(Block(1)).tolist())
 
 def diffblock(d, n):
     v = Buf(np.empty(n, dtype = int))
