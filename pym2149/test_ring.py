@@ -85,35 +85,35 @@ class TestRing(unittest.TestCase):
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
 
-    def test_todiffringwithprolog(self):
-        prolog = [1, 1, 0]
+    def test_todiffringwithintro(self):
+        intro = [1, 1, 0]
         unit = [0, 0]
-        r = DerivativeRing(prolog + unit, len(prolog))
+        r = DerivativeRing(intro + unit, len(intro))
         self.assertEqual([1, 0, -1, 0, 0, 0], r.tolist())
         self.assertEqual(4, r.loopstart)
-        self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
-        self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
-        prolog = [1, 1]
+        self.assertEqual(intro + unit * 3 + unit[:1], integrateringthrice(r))
+        self.assertEqual(intro + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
+        intro = [1, 1]
         unit = [0, 0, 0]
-        r = DerivativeRing(prolog + unit, len(prolog))
+        r = DerivativeRing(intro + unit, len(intro))
         self.assertEqual([1, 0, -1, 0, 0, 0], r.tolist())
         self.assertEqual(3, r.loopstart)
-        self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
-        self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
-        prolog = [1]
+        self.assertEqual(intro + unit * 3 + unit[:1], integrateringthrice(r))
+        self.assertEqual(intro + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
+        intro = [1]
         unit = [1, 0, 0, 0]
-        r = DerivativeRing(prolog + unit, len(prolog))
+        r = DerivativeRing(intro + unit, len(intro))
         self.assertEqual([1, 0, -1, 0, 0, 1], r.tolist())
         self.assertEqual(2, r.loopstart)
-        self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
-        self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
-        prolog = [1]
+        self.assertEqual(intro + unit * 3 + unit[:1], integrateringthrice(r))
+        self.assertEqual(intro + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
+        intro = [1]
         unit = [1, 0, 0, 1]
-        r = DerivativeRing(prolog + unit, len(prolog))
+        r = DerivativeRing(intro + unit, len(intro))
         self.assertEqual([1, 0, -1, 0, 1, 0], r.tolist())
         self.assertEqual(2, r.loopstart)
-        self.assertEqual(prolog + unit * 3 + unit[:1], integrateringthrice(r))
-        self.assertEqual(prolog + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
+        self.assertEqual(intro + unit * 3 + unit[:1], integrateringthrice(r))
+        self.assertEqual(intro + unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
 
 def integrateringthrice(r):
     u = r.tolist()
