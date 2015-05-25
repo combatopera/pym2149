@@ -22,7 +22,7 @@ from buf import Buf
 
 class DerivativeRing(ring.DerivativeRing): minloopsize = 1
 
-class TestRing(unittest.TestCase):
+class TestDerivativeRing(unittest.TestCase):
 
     def test_minloopsize(self):
         class R(ring.DerivativeRing): pass
@@ -39,7 +39,7 @@ class TestRing(unittest.TestCase):
             self.assertEqual([1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 4, 5, 6, 4], r.dc)
             self.assertEqual([1, 1, 1, 1, 1, 1, -2, 1, 1, -2, 1, 1, -2, 1, 1, -2], r.tolist())
 
-    def test_putring(self):
+    def test_putstrided(self):
         b = Buf(np.empty(20))
         c = DerivativeRing(xrange(5)).newcursor()
         c.index = 4
@@ -49,7 +49,7 @@ class TestRing(unittest.TestCase):
         self.assertEqual([3, 3, 3, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 1, 1, 1], b.tolist())
         self.assertEqual(2, c.index)
 
-    def test_loop(self):
+    def test_putstridedwithintro(self):
         b = Buf(np.empty(20))
         c = DerivativeRing(xrange(5), 2).newcursor()
         c.index = 1
@@ -59,7 +59,7 @@ class TestRing(unittest.TestCase):
         self.assertEqual([0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 4, 4, 2, 2, 2], b.tolist())
         self.assertEqual(3, c.index)
 
-    def test_todiffring(self):
+    def test_data(self):
         unit = [1, 0, 1, 0]
         r = DerivativeRing(unit)
         self.assertEqual([1, -1, 1, -1, 1], r.tolist())
@@ -85,7 +85,7 @@ class TestRing(unittest.TestCase):
         self.assertEqual(unit * 3 + unit[:1], integrateringthrice(r))
         self.assertEqual(unit + unit[:1], [r.dc[x] for x in xrange(r.limit)])
 
-    def test_todiffringwithintro(self):
+    def test_datawithintro(self):
         intro = [1, 1, 0]
         unit = [0, 0]
         r = DerivativeRing(intro + unit, len(intro))
