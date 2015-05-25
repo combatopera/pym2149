@@ -32,9 +32,11 @@ class Link:
 
 class Reg(object):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.links = []
         self.idle = True
+        if 'value' in kwargs:
+            self.value = kwargs['value']
 
     def link(self, xform, *upstream):
         link = Link(self, xform, upstream)
@@ -66,9 +68,9 @@ class Reg(object):
 
 class VersionReg(Reg):
 
-    def __init__(self):
-        Reg.__init__(self)
+    def __init__(self, **kwargs):
         self.version = 0
+        Reg.__init__(self, **kwargs)
 
     def setimpl(self, value):
         Reg.setimpl(self, value)
