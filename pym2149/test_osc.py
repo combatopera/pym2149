@@ -39,7 +39,7 @@ class AbstractTestOsc:
     def test_performance(self):
         blockrate = 50
         blocksize = 2000000 // blockrate
-        for p in 0x001, 0xfff:
+        for p in self.performanceperiods:
             r = Reg(p)
             o = self.createosc(8, r)
             start = time.time()
@@ -49,6 +49,7 @@ class AbstractTestOsc:
 
 class TestToneOsc(AbstractTestOsc, unittest.TestCase):
 
+    performanceperiods = 0x001, 0xfff
     performancelimit = .05
 
     @staticmethod
@@ -127,6 +128,7 @@ def cmptime(self, taken, strictlimit):
 
 class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do not behave like YM2149 tones.
 
+    performanceperiods = 0x001, 0xfff
     performancelimit = .1
 
     @staticmethod
@@ -255,7 +257,14 @@ class TestRationalDerivative(unittest.TestCase):
         self.assertEqual([0] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
 
-class TestNoiseOsc(unittest.TestCase):
+class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
+
+    performanceperiods = 0x01, 0x1f
+    performancelimit = .05
+
+    @staticmethod
+    def createosc(scale, periodreg):
+        return NoiseOsc(scale, periodreg, YM2149.noisering)
 
     def test_works(self):
         n = 100
@@ -293,17 +302,6 @@ class TestNoiseOsc(unittest.TestCase):
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
         r.value = 0x01
         self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
-
-    def test_performance(self):
-        blockrate = 50
-        blocksize = 2000000 // blockrate
-        for p in 0x01, 0x1f:
-            r = Reg(p)
-            o = NoiseOsc(8, r, YM2149.noisering)
-            start = time.time()
-            for _ in xrange(blockrate):
-                o.call(Block(blocksize))
-            cmptime(self, time.time() - start, .05)
 
 class TestEnvOsc(unittest.TestCase):
 
