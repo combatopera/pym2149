@@ -45,7 +45,12 @@ class AbstractTestOsc:
             start = time.time()
             for _ in xrange(blockrate):
                 o.call(Block(blocksize))
-            cmptime(self, time.time() - start, self.performancelimit)
+            self.cmptime(time.time() - start, self.performancelimit)
+
+    def cmptime(self, taken, strictlimit):
+        expression = "%.3f < %s" % (taken, strictlimit)
+        sys.stderr.write("%s ... " % expression)
+        self.assertTrue(eval(expression))
 
 class TestToneOsc(AbstractTestOsc, unittest.TestCase):
 
@@ -120,11 +125,6 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
         self.assertEqual([1], o.call(Block(1)).tolist())
-
-def cmptime(self, taken, strictlimit):
-    expression = "%.3f < %s" % (taken, strictlimit)
-    sys.stderr.write("%s ... " % expression)
-    self.assertTrue(eval(expression))
 
 class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do not behave like YM2149 tones.
 
