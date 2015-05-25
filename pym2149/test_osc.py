@@ -131,18 +131,16 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
 
     @staticmethod
     def createosc(scale, periodreg):
+        clock = 200
         class Timer:
-            def __init__(self, xform, that):
-                self.xform = xform
+            def __init__(self, that):
                 self.that = that
                 self.effect = Reg(PWMEffect(None))
             def isrunning(self):
                 return True
             def getstepsize(self):
-                return self.xform(self.that.value)
-        clock = 200
-        xform = lambda period: scale * period * mfpclock // clock
-        return RToneOsc(clock, Timer(xform, periodreg))
+                return scale * self.that.value * mfpclock // clock
+        return RToneOsc(clock, Timer(periodreg))
 
     def test_works(self):
         o = self.createosc(8, Reg(3))
