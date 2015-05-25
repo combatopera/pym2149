@@ -91,7 +91,7 @@ class RationalDerivative(DerivativeNode):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize = self.timer.getstepsize() * self.chipimplclock
+        stepsize = self.timer.stepsize.value * self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:

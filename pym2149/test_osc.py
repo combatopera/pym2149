@@ -142,10 +142,11 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         class Timer:
             def __init__(self):
                 self.effect = initvreg(PWMEffect(None))
+                self.stepsize = Reg()
+                self.stepsize.link(lambda p: scale*p*mfpclock//clock, periodreg)
+                periodreg.value = periodreg.value # Init stepsize.
             def isrunning(self):
                 return True
-            def getstepsize(self):
-                return scale * periodreg.value * mfpclock // clock
         return RToneOsc(clock, Timer())
 
     def test_works(self):
@@ -225,12 +226,9 @@ class TestRationalDerivative(unittest.TestCase):
 
         def __init__(self, running, value):
             self.running = running
-            self.value = value
+            self.stepsize = initreg(value)
 
         def isrunning(self): return self.running
-
-        def getstepsize(self):
-            return self.value
 
     def test_works(self):
         p = self.Timer(True, 81920)
@@ -254,11 +252,11 @@ class TestRationalDerivative(unittest.TestCase):
             self.assertEqual([1] * 100, self.integrate(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
         p.running = True
-        p.value = 24576
+        p.stepsize.value = 24576
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, self.integrate(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
         p.running = False
-        p.value = None
+        p.stepsize.value = None
         self.assertEqual([0] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
 
