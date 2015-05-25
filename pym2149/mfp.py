@@ -41,6 +41,8 @@ class MFPTimer:
         self.freq = Reg()
         # XXX: Should change of wavelength trigger this link?
         self.control_data.link(self.findtcrtdr, self.freq)
+        self.stepsize = Reg()
+        self.stepsize.link(lambda tcr, etdr: prescalers[tcr]*etdr if tcr else None, self.control, self.effectivedata)
 
     def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
@@ -67,6 +69,3 @@ class MFPTimer:
 
     def getfreq(self): # Currently only called when effect is not None.
         return mfpclock / self.getnormperiod()
-
-    def getstepsize(self):
-        return prescalers[self.control.value] * self.effectivedata.value
