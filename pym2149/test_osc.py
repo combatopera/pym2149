@@ -131,9 +131,9 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
     def createosc(scale, periodreg):
         clock = 200
         effect = VersionReg(value = PWMEffect(None))
-        stepsize = Reg().link(lambda p: scale*p*mfpclock//clock, periodreg)
-        periodreg.value = periodreg.value # Init stepsize.
-        return RToneOsc(clock, namedtuple('Timer', 'effect stepsize')(effect, stepsize))
+        effectivedata = Reg().link(lambda p: scale*p*mfpclock//clock, periodreg)
+        periodreg.value = periodreg.value # Init effectivedata.
+        return RToneOsc(clock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, Reg(value = 1), effectivedata))
 
     def test_works(self):
         o = self.createosc(8, Reg(value = 3))
@@ -210,7 +210,7 @@ class TestRationalDerivative(unittest.TestCase):
 
     def test_works(self):
         effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        p = namedtuple('Timer', 'effect stepsize')(VersionReg(value = effect), Reg(value = 81920))
+        p = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
         d = RationalDerivative(100, p)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
@@ -226,15 +226,15 @@ class TestRationalDerivative(unittest.TestCase):
 
     def test_notrunning(self):
         effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        p = namedtuple('Timer', 'effect stepsize')(VersionReg(value = effect), Reg(value = None))
+        p = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
         d = RationalDerivative(1000, p)
         for _ in xrange(50):
             self.assertEqual([1] * 100, self.integrate(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
-        p.stepsize.value = 24576
+        p.prescalerornone.value = 24576
         self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, self.integrate(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
-        p.stepsize.value = None
+        p.prescalerornone.value = None
         self.assertEqual([0] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
 

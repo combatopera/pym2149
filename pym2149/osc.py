@@ -89,8 +89,8 @@ class RationalDerivative(DerivativeNode):
             self.effectversion = self.timer.effect.version
         else:
             self.swapring(self.timer.effect.value.getshape())
-        stepsize = self.timer.stepsize.value
-        if stepsize is None:
+        prescaler = self.timer.prescalerornone.value
+        if prescaler is None:
             if not self.progress:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
@@ -98,7 +98,7 @@ class RationalDerivative(DerivativeNode):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize *= self.chipimplclock
+        stepsize = prescaler * self.timer.effectivedata.value * self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:
