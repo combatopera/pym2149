@@ -103,7 +103,7 @@ class ClockInfo:
 
 class YM2149(Registers, Container, Chip):
 
-  noisering = DerivativeRing(Lfsr(ym2149nzdegrees))
+  noiseshape = DerivativeRing(Lfsr(ym2149nzdegrees))
 
   @types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
@@ -113,7 +113,7 @@ class YM2149(Registers, Container, Chip):
     self.clock = clockinfo.implclock
     Registers.__init__(self, clockinfo, channels)
     # Chip-wide signals:
-    noise = NoiseOsc(self.scale, self.noiseperiod, self.noisering)
+    noise = NoiseOsc(self.scale, self.noiseperiod, self.noiseshape)
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
