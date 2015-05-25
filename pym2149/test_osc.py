@@ -46,7 +46,20 @@ class Timer:
     def getstepsize(self):
         return self.xform(self.that.value)
 
-class TestToneOsc(unittest.TestCase):
+class AbstractTestOsc:
+
+    def test_performance(self):
+        blockrate = 50
+        blocksize = 2000000 // blockrate
+        for p in 0x001, 0xfff:
+            r = Reg(p)
+            o = self.createosc(8, r)
+            start = time.time()
+            for _ in xrange(blockrate):
+                o.call(Block(blocksize))
+            cmptime(self, time.time() - start, self.performancelimit)
+
+class TestToneOsc(AbstractTestOsc, unittest.TestCase):
 
     performancelimit = .05
 
@@ -118,17 +131,6 @@ class TestToneOsc(unittest.TestCase):
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
         self.assertEqual([1], o.call(Block(1)).tolist())
-
-    def test_performance(self):
-        blockrate = 50
-        blocksize = 2000000 // blockrate
-        for p in 0x001, 0xfff:
-            r = Reg(p)
-            o = self.createosc(8, r)
-            start = time.time()
-            for _ in xrange(blockrate):
-                o.call(Block(blocksize))
-            cmptime(self, time.time() - start, self.performancelimit)
 
 def cmptime(self, taken, strictlimit):
     expression = "%.3f < %s" % (taken, strictlimit)
