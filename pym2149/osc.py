@@ -83,7 +83,8 @@ class RationalDerivative(DerivativeNode):
         self.timer = timer
 
     def callimpl(self):
-        if not self.timer.isrunning():
+        stepsize = self.timer.stepsize.value
+        if stepsize is None:
             if not self.progress:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
@@ -91,7 +92,7 @@ class RationalDerivative(DerivativeNode):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize = self.timer.stepsize.value * self.chipimplclock
+        stepsize *= self.chipimplclock
         if 0 == self.progress:
             stepindex = 0
         else:
