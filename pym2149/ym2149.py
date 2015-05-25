@@ -57,8 +57,7 @@ class Registers:
     self.toneperiods = [Reg() for _ in xrange(channels)]
     for c in xrange(channels):
       self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
-    self.noiseperiod = Reg()
-    self.noiseperiod.link(NP, self.R[0x6])
+    self.noiseperiod = Reg().link(NP, self.R[0x6])
     self.toneflags = [Reg() for _ in xrange(channels)]
     self.noiseflags = [Reg() for _ in xrange(channels)]
     self.fixedlevels = [Reg() for _ in xrange(channels)]
@@ -68,10 +67,8 @@ class Registers:
       self.noiseflags[c].link(MixerFlag(channels + c), self.R[0x7])
       self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
       self.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
-    self.envperiod = Reg()
-    self.envperiod.link(EP, self.R[0xB], self.R[0xC])
-    self.envshape = VersionReg()
-    self.envshape.link(lambda s: s & 0x0f, self.R[0xD])
+    self.envperiod = Reg().link(EP, self.R[0xB], self.R[0xC])
+    self.envshape = VersionReg().link(lambda s: s & 0x0f, self.R[0xD])
     for r in self.R:
       r.value = 0
     self.timers = tuple(MFPTimer() for _ in xrange(channels))
