@@ -200,6 +200,24 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
         self.assertEqual([1], o.call(Block(1)).tolist())
 
+    def test_writetdrwhilestopped(self):
+        pass # TODO: Implement.
+
+    def test_writetdrwhileenabled(self):
+        pass # TODO: Implement.
+
+    def test_stoptimer(self):
+        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: toneshape))
+        prescalerornone = Reg(value=3)
+        effectivedata = Reg(value=5)
+        chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
+        o = RToneOsc(chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
+        self.assertEqual([1]*30+[0]*11, o.call(Block(41)).tolist())
+        self.assertEqual(chipimplclock*11//2, o.derivative.progress)
+        self.assertEqual(4, o.derivative.maincounter())
+        self.assertEqual(chipimplclock//2, o.derivative.prescalercount())
+        # TODO: Not finished.
+
 class TestRationalDerivative(unittest.TestCase):
 
     @staticmethod
