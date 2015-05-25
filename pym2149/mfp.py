@@ -27,7 +27,7 @@ class MFPTimer:
         self.wavelength = Reg(value = 2) # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
-        # TODO: Verify that TDR 0 indeed behaves like 0x100.
+        # TODO LATER: Verify that TDR 0 indeed behaves like 0x100.
         self.effectivedata = Reg().link(lambda tdr: tdr if tdr else 0x100, self.data)
         self.control.value = 0
         self.data.value = 0
@@ -38,7 +38,7 @@ class MFPTimer:
         self.freq = Reg()
         # XXX: Should change of wavelength trigger this link?
         self.control_data.link(self.findtcrtdr, self.freq)
-        self.stepsize = Reg().link(lambda tcr, etdr: prescalers[tcr]*etdr if tcr else None, self.control, self.effectivedata)
+        self.prescalerornone = Reg().link(lambda tcr: prescalers.get(tcr), self.control)
 
     def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
