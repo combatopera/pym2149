@@ -264,11 +264,11 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
     @staticmethod
     def createosc(scale, periodreg):
-        return NoiseOsc(scale, periodreg, YM2149.noisering)
+        return NoiseOsc(scale, periodreg, YM2149.noiseshape)
 
     def test_works(self):
         n = 100
-        o = NoiseOsc(8, Reg(3), YM2149.noisering)
+        o = NoiseOsc(8, Reg(3), YM2149.noiseshape)
         u = Lfsr(ym2149nzdegrees)
         for _ in xrange(2):
             v = o.call(Block(48 * n)).tolist()
@@ -278,9 +278,9 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
     def test_carry(self):
         r = Reg(0x01)
         size = 17 * 16 + 1
-        ref = NoiseOsc(8, r, YM2149.noisering).call(Block(size)).tolist()
+        ref = NoiseOsc(8, r, YM2149.noiseshape).call(Block(size)).tolist()
         for n in xrange(size + 1):
-            o = NoiseOsc(8, r, YM2149.noisering)
+            o = NoiseOsc(8, r, YM2149.noiseshape)
             v1 = o.call(Block(n)).tolist()
             v2 = o.call(Block(size - n)).tolist()
             self.assertEqual(ref, v1 + v2)
