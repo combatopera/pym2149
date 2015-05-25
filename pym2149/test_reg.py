@@ -55,8 +55,7 @@ class TestReg(unittest.TestCase):
 
     def test_mlink(self):
         reg = Reg()
-        value = Reg()
-        value.link(lambda r: r & 0xf, reg)
+        value = Reg().link(lambda r: r & 0xf, reg)
         reg.mlink(0xf, lambda v: v, value) # Only affect the low nibble.
         reg.value = 0xab
         self.assertEqual(0xab, reg.value)
@@ -68,11 +67,10 @@ class TestReg(unittest.TestCase):
     def test_diamond(self):
         self.spectator = Reg()
         self.spectator.value = -1
-        self.leaf = Reg()
         self.lhs = Reg()
         self.rhs = Reg()
         self.pair = Reg()
-        self.leaf.link(lambda l, r, s: (l, r, s), self.lhs, self.rhs, self.spectator)
+        self.leaf = Reg().link(lambda l, r, s: (l, r, s), self.lhs, self.rhs, self.spectator)
         self.lhs.link(lambda p: p[0], self.pair)
         self.rhs.link(lambda p: p[1], self.pair)
         self.pair.value = 1, 2
