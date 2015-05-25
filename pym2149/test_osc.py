@@ -21,7 +21,7 @@ import unittest, time, sys, numpy as np
 from osc import ToneOsc, NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
 from mfp import mfpclock
 from nod import Block
-from reg import VersionReg
+from reg import Reg, VersionReg
 from ring import DerivativeRing
 from buf import Buf
 from lfsr import Lfsr
@@ -29,7 +29,12 @@ from ym2149 import ym2149nzdegrees, YM2149
 from shapes import toneshape
 from dac import PWMEffect
 
-def Reg(value):
+def initreg(value):
+    r = Reg()
+    r.value = value
+    return r
+
+def initvreg(value):
     r = VersionReg()
     r.value = value
     return r
@@ -40,7 +45,7 @@ class AbstractTestOsc:
         blockrate = 50
         blocksize = 2000000 // blockrate
         for p in self.performanceperiods:
-            r = Reg(p)
+            r = initreg(p)
             o = self.createosc(8, r)
             start = time.time()
             for _ in xrange(blockrate):
@@ -62,7 +67,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         return ToneOsc(scale, periodreg)
 
     def test_works(self):
-        o = self.createosc(8, Reg(3))
+        o = self.createosc(8, initreg(3))
         v = o.call(Block(96)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0] * 24, v[24:48])
@@ -73,7 +78,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([0] * 24, v[24:])
 
     def test_resume(self):
-        o = self.createosc(8, Reg(3))
+        o = self.createosc(8, initreg(3))
         v = o.call(Block(25)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0], v[24:])
@@ -82,7 +87,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([1], v[23:])
 
     def test_carry(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         size = 3 * 8 + 1
         ref = self.createosc(8, r).call(Block(size)).tolist()
         for n in xrange(size + 1):
@@ -92,14 +97,14 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
             self.assertEqual(ref, v1 + v2)
 
     def test_endexistingstepatendofblock(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         o = self.createosc(8, r)
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
     def test_increaseperiodonboundary(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         o = self.createosc(8, r)
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
@@ -108,7 +113,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
 
     def test_decreaseperiodonboundary(self):
-        r = Reg(0x03)
+        r = initreg(0x03)
         o = self.createosc(8, r)
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
@@ -117,7 +122,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
 
     def test_smallerblocksthanperiod(self):
-        r = Reg(0x05)
+        r = initreg(0x05)
         o = self.createosc(1, r)
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
@@ -136,7 +141,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         clock = 200
         class Timer:
             def __init__(self):
-                self.effect = Reg(PWMEffect(None))
+                self.effect = initvreg(PWMEffect(None))
             def isrunning(self):
                 return True
             def getstepsize(self):
@@ -144,7 +149,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         return RToneOsc(clock, Timer())
 
     def test_works(self):
-        o = self.createosc(8, Reg(3))
+        o = self.createosc(8, initreg(3))
         v = o.call(Block(96)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0] * 24, v[24:48])
@@ -155,7 +160,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0] * 24, v[24:])
 
     def test_resume(self):
-        o = self.createosc(8, Reg(3))
+        o = self.createosc(8, initreg(3))
         v = o.call(Block(25)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0], v[24:])
@@ -164,7 +169,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([1], v[23:])
 
     def test_carry(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         size = 3 * 8 + 1
         ref = self.createosc(8, r).call(Block(size)).tolist()
         for n in xrange(size + 1):
@@ -174,14 +179,14 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
             self.assertEqual(ref, v1 + v2)
 
     def test_endexistingstepatendofblock(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         o = self.createosc(8, r)
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
     def test_increaseperiodonboundary(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         o = self.createosc(8, r)
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
@@ -190,7 +195,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
 
     def test_decreaseperiodonboundary(self):
-        r = Reg(0x03)
+        r = initreg(0x03)
         o = self.createosc(8, r)
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
@@ -199,7 +204,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
 
     def test_smallerblocksthanperiod(self):
-        r = Reg(0x05)
+        r = initreg(0x05)
         o = self.createosc(1, r)
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
@@ -268,7 +273,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
     def test_works(self):
         n = 100
-        o = NoiseOsc(8, Reg(3), YM2149.noiseshape)
+        o = NoiseOsc(8, initreg(3), YM2149.noiseshape)
         u = Lfsr(ym2149nzdegrees)
         for _ in xrange(2):
             v = o.call(Block(48 * n)).tolist()
@@ -276,7 +281,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
                 self.assertEqual([u()] * 48, v[i * 48:(i + 1) * 48])
 
     def test_carry(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         size = 17 * 16 + 1
         ref = NoiseOsc(8, r, YM2149.noiseshape).call(Block(size)).tolist()
         for n in xrange(size + 1):
@@ -286,7 +291,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
             self.assertEqual(ref, v1 + v2)
 
     def test_increaseperiodonboundary(self):
-        r = Reg(0x01)
+        r = initreg(0x01)
         o = NoiseOsc(4, r, DerivativeRing([1, 0]))
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
@@ -295,7 +300,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([0] + [1] * 24 + [0], o.call(Block(26)).tolist())
 
     def test_decreaseperiodonboundary(self):
-        r = Reg(0x03)
+        r = initreg(0x03)
         o = NoiseOsc(4, r, DerivativeRing([1, 0]))
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
@@ -340,8 +345,8 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
 
     def test_reset(self):
-        shapereg = Reg(0x0c)
-        periodreg = Reg(0x0001)
+        shapereg = initvreg(0x0c)
+        periodreg = initreg(0x0001)
         o = EnvOsc(8, periodreg, shapereg)
         self.assertEqual(range(32) + range(16), o.call(Block(48 * 8)).tolist()[::8])
         self.assertEqual(range(16, 32) + range(16), o.call(Block(32 * 8)).tolist()[::8])
@@ -349,8 +354,8 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(range(32) + range(16), o.call(Block(48 * 8)).tolist()[::8])
 
     def test_08(self):
-        shapereg = Reg(0x08)
-        periodreg = Reg(3)
+        shapereg = initvreg(0x08)
+        periodreg = initreg(3)
         o = EnvOsc(8, periodreg, shapereg)
         for _ in xrange(2):
             v = o.call(Block(8 * 3 * 32)).tolist()
@@ -359,20 +364,20 @@ class TestEnvOsc(unittest.TestCase):
 
     def test_09(self):
         for shape in xrange(0x04):
-            o = EnvOsc(8, Reg(3), Reg(shape))
+            o = EnvOsc(8, initreg(3), initvreg(shape))
             v = o.call(Block(8 * 3 * 32)).tolist()
             for i in xrange(32):
                 self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
             self.assertEqual([0] * (8 * 3 * 34), o.call(Block(8 * 3 * 34)).tolist())
 
     def test_09loop(self):
-        o = EnvOsc(1, Reg(1), Reg(0x09))
+        o = EnvOsc(1, initreg(1), initvreg(0x09))
         self.assertEqual(range(31, -1, -1), o.call(Block(32)).tolist())
         self.assertEqual(set([0]), set(o.call(Block(10000)).tolist()))
 
     def test_0a(self):
-        shapereg = Reg(0x0a)
-        periodreg = Reg(3)
+        shapereg = initvreg(0x0a)
+        periodreg = initreg(3)
         o = EnvOsc(8, periodreg, shapereg)
         v = o.call(Block(8 * 3 * 32)).tolist()
         for i in xrange(32):
@@ -385,8 +390,8 @@ class TestEnvOsc(unittest.TestCase):
             self.assertEqual([31 - i] * 24, v[i * 24:(i + 1) * 24])
 
     def test_0c(self):
-        shapereg = Reg(0x0c)
-        periodreg = Reg(3)
+        shapereg = initvreg(0x0c)
+        periodreg = initreg(3)
         o = EnvOsc(8, periodreg, shapereg)
         for _ in xrange(2):
             v = o.call(Block(8 * 3 * 32)).tolist()
@@ -394,8 +399,8 @@ class TestEnvOsc(unittest.TestCase):
                 self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
 
     def test_0e(self):
-        shapereg = Reg(0x0e)
-        periodreg = Reg(3)
+        shapereg = initvreg(0x0e)
+        periodreg = initreg(3)
         o = EnvOsc(8,periodreg, shapereg)
         v = o.call(Block(8 * 3 * 32)).tolist()
         for i in xrange(32):
@@ -409,7 +414,7 @@ class TestEnvOsc(unittest.TestCase):
 
     def test_0f(self):
         for shape in xrange(0x04, 0x08):
-            o = EnvOsc(8, Reg(3), Reg(shape))
+            o = EnvOsc(8, initreg(3), initvreg(shape))
             v = o.call(Block(8 * 3 * 32)).tolist()
             for i in xrange(32):
                 self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
