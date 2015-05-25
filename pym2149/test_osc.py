@@ -206,12 +206,13 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
         self.assertEqual([1], o.call(Block(1)).tolist())
 
-def diffblock(d, n):
-    v = Buf(np.empty(n, dtype = int))
-    d.call(Block(n))(v)
-    return v.tolist()
+class TestRationalDerivative(unittest.TestCase):
 
-class TestRationalDiff(unittest.TestCase):
+    @staticmethod
+    def integrate(d, n):
+        v = Buf(np.empty(n, dtype = int))
+        d.call(Block(n))(v)
+        return v.tolist()
 
     class Timer:
 
@@ -229,11 +230,11 @@ class TestRationalDiff(unittest.TestCase):
         d = RationalDerivative(100, p).reset(toneshape)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
-            self.assertEqual(expected, diffblock(d, 80))
+            self.assertEqual(expected, self.integrate(d, 80))
         actual = []
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 5
         def block(n):
-            actual.extend(diffblock(d, n))
+            actual.extend(self.integrate(d, n))
         for _ in xrange(33):
             block(3)
         block(1)
@@ -243,15 +244,15 @@ class TestRationalDiff(unittest.TestCase):
         p = self.Timer(False, None)
         d = RationalDerivative(1000, p).reset(toneshape)
         for _ in xrange(50):
-            self.assertEqual([1] * 100, diffblock(d, 100))
+            self.assertEqual([1] * 100, self.integrate(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
         p.running = True
         p.value = 24576
-        self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, diffblock(d, 25))
+        self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, self.integrate(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
         p.running = False
         p.value = None
-        self.assertEqual([0] * 25, diffblock(d, 25))
+        self.assertEqual([0] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
 
 class TestNoiseOsc(unittest.TestCase):
