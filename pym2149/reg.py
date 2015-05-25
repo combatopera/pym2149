@@ -40,6 +40,7 @@ class Reg(object):
         link = Link(self, xform, upstream)
         for r in upstream:
             r.links.append(link)
+        return self
 
     def mlink(self, mask, xform, *upstream):
         negmask = ~mask

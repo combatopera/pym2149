@@ -25,12 +25,10 @@ class TestReg(unittest.TestCase):
     def test_bidi(self):
         high = Reg()
         low = Reg()
-        value = Reg()
-        vr = VersionReg()
-        value.link(lambda h, l: (h << 8) | l, high, low)
+        value = Reg().link(lambda h, l: (h << 8) | l, high, low)
         high.link(lambda v: (v >> 8), value)
         low.link(lambda v: v & 0xff, value)
-        vr.link(lambda v: v, value)
+        vr = VersionReg().link(lambda v: v, value)
         value.link(lambda v: v, vr)
         self.assertEqual(0, vr.version)
         high.value = 0x87

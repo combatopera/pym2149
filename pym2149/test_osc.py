@@ -141,8 +141,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
     def createosc(scale, periodreg):
         clock = 200
         effect = initvreg(PWMEffect(None))
-        stepsize = Reg()
-        stepsize.link(lambda p: scale*p*mfpclock//clock, periodreg)
+        stepsize = Reg().link(lambda p: scale*p*mfpclock//clock, periodreg)
         periodreg.value = periodreg.value # Init stepsize.
         return RToneOsc(clock, namedtuple('Timer', 'effect stepsize')(effect, stepsize))
 
