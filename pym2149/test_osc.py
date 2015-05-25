@@ -220,8 +220,9 @@ class TestRationalDerivative(unittest.TestCase):
         return v.tolist()
 
     def test_works(self):
-        p = namedtuple('Timer', 'stepsize')(initreg(81920))
-        d = RationalDerivative(100, p).reset(toneshape)
+        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
+        p = namedtuple('Timer', 'effect stepsize')(initvreg(effect), initreg(81920))
+        d = RationalDerivative(100, p)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
             self.assertEqual(expected, self.integrate(d, 80))
@@ -235,8 +236,9 @@ class TestRationalDerivative(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_notrunning(self):
-        p = namedtuple('Timer', 'stepsize')(initreg(None))
-        d = RationalDerivative(1000, p).reset(toneshape)
+        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
+        p = namedtuple('Timer', 'effect stepsize')(initvreg(effect), initreg(None))
+        d = RationalDerivative(1000, p)
         for _ in xrange(50):
             self.assertEqual([1] * 100, self.integrate(d, 100))
         self.assertEqual(5000*mfpclock, d.progress)
