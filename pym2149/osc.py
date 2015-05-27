@@ -98,28 +98,29 @@ class RationalDerivative(DerivativeNode):
             else:
                 self.progress += self.block.framecount * mfpclock
                 return self.hold
-        stepsize = prescaler * self.timer.effectivedata.value * self.chipimplclock
-        if 0 == self.progress:
-            stepindex = 0
         else:
-            stepindex = stepsize - self.progress
-            if ceildiv(stepindex, mfpclock) < 0:
+            stepsize = prescaler * self.timer.effectivedata.value * self.chipimplclock
+            if 0 == self.progress:
                 stepindex = 0
-        if ceildiv(stepindex, mfpclock) >= self.block.framecount:
-            self.progress += self.block.framecount * mfpclock
-            return self.hold
-        else:
-            stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
-            indices = self.indices.ensureandcrop(stepcount)
-            indices.arange(-stepsize)
-            indices.add(-stepindex)
-            indices.ceildiv(mfpclock, alreadynegated = True)
-            # Note values can integrate to 2 if there was an overflow earlier.
-            self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
-            self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
-            if self.progress == stepsize:
-                self.progress = 0
-            return self.integral
+            else:
+                stepindex = stepsize - self.progress
+                if ceildiv(stepindex, mfpclock) < 0:
+                    stepindex = 0
+            if ceildiv(stepindex, mfpclock) >= self.block.framecount:
+                self.progress += self.block.framecount * mfpclock
+                return self.hold
+            else:
+                stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
+                indices = self.indices.ensureandcrop(stepcount)
+                indices.arange(-stepsize)
+                indices.add(-stepindex)
+                indices.ceildiv(mfpclock, alreadynegated = True)
+                # Note values can integrate to 2 if there was an overflow earlier.
+                self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
+                self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
+                if self.progress == stepsize:
+                    self.progress = 0
+                return self.integral
 
     def prescalercount(self):
         tcr = self.timer.prescalerornone.value
