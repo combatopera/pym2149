@@ -94,10 +94,10 @@ class RationalDerivative(DerivativeNode):
             if not self.progress:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
-                return self.integral
+                action = self.integral
             else:
                 self.progress += self.block.framecount * mfpclock
-                return self.hold
+                action = self.hold
         else:
             stepsize = prescaler * self.timer.effectivedata.value * self.chipimplclock
             if 0 == self.progress:
@@ -108,7 +108,7 @@ class RationalDerivative(DerivativeNode):
                     stepindex = 0
             if ceildiv(stepindex, mfpclock) >= self.block.framecount:
                 self.progress += self.block.framecount * mfpclock
-                return self.hold
+                action = self.hold
             else:
                 stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
                 indices = self.indices.ensureandcrop(stepcount)
@@ -120,7 +120,8 @@ class RationalDerivative(DerivativeNode):
                 self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
                 if self.progress == stepsize:
                     self.progress = 0
-                return self.integral
+                action = self.integral
+        return action
 
     def prescalercount(self):
         maxprescaler = self.timer.prescalerornone.value*self.chipimplclock
