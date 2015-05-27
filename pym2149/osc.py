@@ -123,8 +123,8 @@ class RationalDerivative(DerivativeNode):
                 return self.integral
 
     def prescalercount(self):
-        tcr = self.timer.prescalerornone.value
-        return tcr*self.chipimplclock - self.progress % (tcr*self.chipimplclock)
+        maxprescaler = self.timer.prescalerornone.value*self.chipimplclock
+        return maxprescaler - self.progress % maxprescaler
 
     def maincounter(self):
         return self.timer.effectivedata.value - self.progress // (self.timer.prescalerornone.value*self.chipimplclock)
