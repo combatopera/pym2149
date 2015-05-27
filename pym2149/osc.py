@@ -92,6 +92,7 @@ class RationalDerivative(DerivativeNode):
         prescaler = self.timer.prescalerornone.value
         if prescaler is None:
             if not self.progress:
+                # There was an interrupt in the void:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
                 action = self.integral
