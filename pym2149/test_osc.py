@@ -214,8 +214,8 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         o = RToneOsc(chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
         self.assertEqual([1]*30+[0]*11, o.call(Block(41)).tolist())
         self.assertEqual(chipimplclock*11//2, o.derivative.progress)
-        self.assertEqual(4, o.derivative.maincounter())
-        self.assertEqual(chipimplclock//2, o.derivative.prescalercount())
+        self.assertEqual(4, o.derivative.maincounter)
+        self.assertEqual(chipimplclock//2, o.derivative.prescalercount)
         # TODO: Not finished.
 
 class TestRationalDerivative(unittest.TestCase):
