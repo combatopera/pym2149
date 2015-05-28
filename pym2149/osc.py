@@ -100,7 +100,9 @@ class RationalDerivative(DerivativeNode):
                 self.progress += self.block.framecount * mfpclock
                 action = self.hold
         else:
-            stepsize = prescaler * self.timer.effectivedata.value * self.chipimplclock
+            maxprescaler = prescaler * self.chipimplclock
+            etdr = self.timer.effectivedata.value
+            stepsize = maxprescaler * etdr
             if 0 == self.progress:
                 stepindex = 0
             else:
@@ -122,9 +124,8 @@ class RationalDerivative(DerivativeNode):
                 if self.progress == stepsize:
                     self.progress = 0
                 action = self.integral
-            maxprescaler = prescaler * self.chipimplclock
             self.prescalercount = maxprescaler - self.progress % maxprescaler
-            self.maincounter = self.timer.effectivedata.value - self.progress // maxprescaler
+            self.maincounter = etdr - self.progress // maxprescaler
         return action
 
 class IntegralNode(BufNode):
