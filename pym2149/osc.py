@@ -122,14 +122,10 @@ class RationalDerivative(DerivativeNode):
                 if self.progress == stepsize:
                     self.progress = 0
                 action = self.integral
+            maxprescaler = prescaler * self.chipimplclock
+            self.prescalercount = maxprescaler - self.progress % maxprescaler
+            self.maincounter = self.timer.effectivedata.value - self.progress // maxprescaler
         return action
-
-    def prescalercount(self):
-        maxprescaler = self.timer.prescalerornone.value*self.chipimplclock
-        return maxprescaler - self.progress % maxprescaler
-
-    def maincounter(self):
-        return self.timer.effectivedata.value - self.progress // (self.timer.prescalerornone.value*self.chipimplclock)
 
 class IntegralNode(BufNode):
 
