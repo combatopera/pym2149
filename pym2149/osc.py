@@ -30,7 +30,7 @@ class DerivativeNode(BufNode):
 
     def reset(self, shape):
         self.ringcursor = shape.newcursor()
-        self.progress = 0
+        self.resetprogress()
         return self
 
     def swapring(self, shape):
@@ -49,6 +49,9 @@ class SimpleDerivative(DerivativeNode):
         self.scaleofstep = scaleofstep
         self.periodreg = periodreg
         self.eagerstepsize = eagerstepsize
+
+    def resetprogress(self):
+        self.progress = 0
 
     def updatestepsize(self, eager):
         if eager == self.eagerstepsize:
@@ -82,6 +85,11 @@ class RationalDerivative(DerivativeNode):
         self.effectversion = None
         self.chipimplclock = chipimplclock
         self.timer = timer
+
+    def resetprogress(self):
+        self.progress = 0 # TODO: Eliminate.
+        self.prescalercount = None # Timer was stopped.
+        self.maincounter = 0 # Force reload.
 
     def callimpl(self):
         if self.effectversion != self.timer.effect.version:
