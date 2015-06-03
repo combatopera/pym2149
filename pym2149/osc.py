@@ -98,20 +98,24 @@ class RationalDerivative(DerivativeNode):
         else:
             self.swapring(self.timer.effect.value.getshape())
         prescaler = self.timer.prescalerornone.value
+        voidinterrupt = not self.progress
         if prescaler is None:
-            if not self.progress:
+            if voidinterrupt:
                 # There was an interrupt in the void:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
                 self.progress = self.block.framecount * mfpclock
                 action = self.integral
+                self.maincounter = 0 # Reload on restart.
             else:
                 self.progress += self.block.framecount * mfpclock
                 action = self.hold
+                # In this case we preserve maincounter value.
+            self.prescalercount = None
         else:
             maxprescaler = prescaler * self.chipimplclock
             etdr = self.timer.effectivedata.value
             stepsize = maxprescaler * etdr
-            if 0 == self.progress:
+            if voidinterrupt:
                 stepindex = 0
             else:
                 stepindex = stepsize - self.progress
