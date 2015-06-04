@@ -34,9 +34,10 @@ class MidiSchedule:
     maxdelay = .01
     targetlatency = .01 # Conservative?
 
-    def __init__(self, updaterate):
+    def __init__(self, updaterate, skipenabled):
         self.period = 1 / updaterate
         self.taketimeema = EMA(.1, time.time())
+        self.skipenabled = skipenabled
 
     def awaittaketime(self):
         skipped = 0
@@ -44,11 +45,11 @@ class MidiSchedule:
             now = time.time()
             if now < self.taketimeema.value:
                 time.sleep(self.taketimeema.value - now)
-            elif now > self.taketimeema.value + self.maxdelay:
+            elif self.skipenabled and now > self.taketimeema.value + self.maxdelay:
                 # Forget sync with current update, try the next one:
                 self.taketimeema.value += self.period
                 skipped += 1
-            else: # We're in the [0, maxdelay] window.
+            else: # We're in the [0, maxdelay] window (or late if skip disabled).
                 break
         if skipped:
             log.warn("Skipped sync with %s updates.", skipped)
@@ -187,6 +188,7 @@ class MidiPump(MainBackground):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
+        self.skipenabled = config.midiskipenabled
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
@@ -196,7 +198,7 @@ class MidiPump(MainBackground):
         self.pll = pll
 
     def __call__(self):
-        schedule = MidiSchedule(self.updaterate)
+        schedule = MidiSchedule(self.updaterate, self.skipenabled)
         speeddetector = SpeedDetector()
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
