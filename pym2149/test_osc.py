@@ -179,7 +179,8 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
         r.value = 0x03
-        self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
+        # Unlike tone, the existing countdown is not affected:
+        self.assertEqual([0] + [1] * 24 + [0] * 24 + [1], o.call(Block(50)).tolist())
 
     def test_decreaseperiodonboundary(self):
         r = Reg(value = 0x03)
@@ -188,7 +189,8 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
         r.value = 0x01
-        self.assertEqual([1] * 2 + [0] * 8 + [1] * 8 + [0], o.call(Block(19)).tolist())
+        # Unlike tone, the existing countdown is not affected:
+        self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
 
     def test_smallerblocksthanperiod(self):
         r = Reg(value = 0x05)

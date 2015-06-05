@@ -118,7 +118,9 @@ class RationalDerivative(DerivativeNode):
             if voidinterrupt:
                 stepindex = 0
             else:
-                stepindex = stepsize - self.progress
+                if self.prescalercount is None:
+                    self.prescalercount = maxprescaler
+                stepindex = self.prescalercount + (self.maincounter - 1) * maxprescaler
                 if ceildiv(stepindex, mfpclock) < 0:
                     stepindex = 0
             if ceildiv(stepindex, mfpclock) >= self.block.framecount:
