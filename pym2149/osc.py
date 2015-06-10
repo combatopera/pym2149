@@ -139,6 +139,8 @@ class RationalDerivative(DerivativeNode):
                     self.progress = 0
                 action = self.integral
             self.prescalercount = maxprescaler - self.progress % maxprescaler
+            if self.prescalercount == maxprescaler:
+                self.prescalercount = 0
             self.maincounter = etdr - self.progress // maxprescaler
         return action
 
