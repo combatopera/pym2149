@@ -214,10 +214,10 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         effectivedata = Reg(value=5)
         chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
         o = RToneOsc(chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
-        self.assertEqual([1]*30+[0]*11, o.call(Block(41)).tolist())
-        self.assertEqual(chipimplclock*11//2, o.derivative.progress)
+        self.assertEqual([1]*30 + [0]*11, o.call(Block(41)).tolist())
         self.assertEqual(4, o.derivative.maincounter)
         self.assertEqual(chipimplclock//2, o.derivative.prescalercount)
+        self.assertEqual([0]*19 + [1]*30 + [0], o.call(Block(50)).tolist())
         # TODO: Not finished.
 
 class TestRationalDerivative(unittest.TestCase):
@@ -250,21 +250,18 @@ class TestRationalDerivative(unittest.TestCase):
         d = RationalDerivative(1000, timer)
         for _ in xrange(50):
             self.assertEqual([0] * 100, self.integrate(d, 100)) # Expect no interrupts.
-        self.assertEqual(5000*mfpclock, d.progress)
         self.assertEqual(None, d.prescalercount)
         self.assertEqual(0, d.maincounter)
         timer.prescalerornone.value = 24576
         # The maincounter was 0, so that's an interrupt in the void:
         self.assertEqual([1] * 10 + [0] * 10 + [1] * 5, self.integrate(d, 25))
-        self.assertEqual(5*mfpclock, d.progress)
         self.assertEqual(5*mfpclock, d.prescalercount)
-        self.assertEqual(0, d.maincounter)
+        self.assertEqual(1, d.maincounter)
         timer.prescalerornone.value = None
-        # No more interrupts:
+        # No more interrupts, maincounter preserved:
         self.assertEqual([1] * 25, self.integrate(d, 25))
-        self.assertEqual(30*mfpclock, d.progress)
         self.assertEqual(None, d.prescalercount)
-        self.assertEqual(0, d.maincounter)
+        self.assertEqual(1, d.maincounter)
 
 class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 

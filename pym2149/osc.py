@@ -87,7 +87,6 @@ class RationalDerivative(DerivativeNode):
         self.timer = timer
 
     def resetprogress(self):
-        self.progress = 0 # TODO: Eliminate.
         self.prescalercount = None # Timer was stopped.
         self.maincounter = 0 # Force reload.
 
@@ -103,11 +102,9 @@ class RationalDerivative(DerivativeNode):
             if voidinterrupt:
                 # There was an interrupt in the void:
                 self.ringcursor.putindexed(self.blockbuf, self.singleton0)
-                self.progress = self.block.framecount * mfpclock
                 action = self.integral
                 self.maincounter = 0 # Reload on restart.
             else:
-                self.progress += self.block.framecount * mfpclock
                 action = self.hold
                 # In this case we preserve maincounter value.
             self.prescalercount = None
@@ -124,29 +121,22 @@ class RationalDerivative(DerivativeNode):
                 if ceildiv(stepindex, mfpclock) < 0:
                     stepindex = 0
             if ceildiv(stepindex, mfpclock) >= self.block.framecount:
-                self.progress += self.block.framecount * mfpclock
                 action = self.hold
                 remaining = self.prescalercount + (self.maincounter - 1) * maxprescaler - self.block.framecount * mfpclock
-                self.prescalercount = remaining % maxprescaler
-                self.maincounter = remaining // maxprescaler
             else:
                 stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
                 indices = self.indices.ensureandcrop(stepcount)
                 indices.arange(-stepsize)
                 indices.add(-stepindex)
+                lastindex = -indices.last()
                 indices.ceildiv(mfpclock, alreadynegated = True)
                 # Note values can integrate to 2 if there was an overflow earlier.
                 self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
-                self.progress = self.block.framecount * mfpclock - (stepcount - 1) * stepsize - stepindex
-                if self.progress == stepsize:
-                    self.progress = 0
                 action = self.integral
-                self.prescalercount = maxprescaler - self.progress % maxprescaler
-                if self.prescalercount == maxprescaler:
-                    self.prescalercount = 0
-                self.maincounter = etdr - self.progress // maxprescaler
-                if self.maincounter == etdr:
-                    self.maincounter = 0
+                remaining = etdr * maxprescaler - (self.block.framecount * mfpclock - lastindex)
+            self.prescalercount = remaining % maxprescaler
+            # TODO: Unit-test this is the correct logic.
+            self.maincounter = (remaining+maxprescaler-1) // maxprescaler
         return action
 
 class IntegralNode(BufNode):
