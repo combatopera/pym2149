@@ -126,6 +126,9 @@ class RationalDerivative(DerivativeNode):
             if ceildiv(stepindex, mfpclock) >= self.block.framecount:
                 self.progress += self.block.framecount * mfpclock
                 action = self.hold
+                remaining = self.prescalercount + (self.maincounter - 1) * maxprescaler - self.block.framecount * mfpclock
+                self.prescalercount = remaining % maxprescaler
+                self.maincounter = remaining // maxprescaler
             else:
                 stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
                 indices = self.indices.ensureandcrop(stepcount)
@@ -138,12 +141,12 @@ class RationalDerivative(DerivativeNode):
                 if self.progress == stepsize:
                     self.progress = 0
                 action = self.integral
-            self.prescalercount = maxprescaler - self.progress % maxprescaler
-            if self.prescalercount == maxprescaler:
-                self.prescalercount = 0
-            self.maincounter = etdr - self.progress // maxprescaler
-            if self.maincounter == etdr:
-                self.maincounter = 0
+                self.prescalercount = maxprescaler - self.progress % maxprescaler
+                if self.prescalercount == maxprescaler:
+                    self.prescalercount = 0
+                self.maincounter = etdr - self.progress // maxprescaler
+                if self.maincounter == etdr:
+                    self.maincounter = 0
         return action
 
 class IntegralNode(BufNode):
