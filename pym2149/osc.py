@@ -98,7 +98,7 @@ class RationalDerivative(DerivativeNode):
         else:
             self.swapring(self.timer.effect.value.getshape())
         prescaler = self.timer.prescalerornone.value
-        voidinterrupt = not self.progress
+        voidinterrupt = (0 == self.prescalercount) and not self.maincounter
         if prescaler is None:
             if voidinterrupt:
                 # There was an interrupt in the void:
@@ -142,6 +142,8 @@ class RationalDerivative(DerivativeNode):
             if self.prescalercount == maxprescaler:
                 self.prescalercount = 0
             self.maincounter = etdr - self.progress // maxprescaler
+            if self.maincounter == etdr:
+                self.maincounter = 0
         return action
 
 class IntegralNode(BufNode):
