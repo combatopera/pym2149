@@ -217,8 +217,18 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([1]*30 + [0]*11, o.call(Block(41)).tolist())
         self.assertEqual(4, o.derivative.maincounter)
         self.assertEqual(chipimplclock//2, o.derivative.prescalercount)
-        self.assertEqual([0]*19 + [1]*30 + [0], o.call(Block(50)).tolist())
-        # TODO: Not finished.
+        self.assertEqual([0]*19 + [1]*30 + [0]*10, o.call(Block(59)).tolist())
+        self.assertEqual(4, o.derivative.maincounter)
+        self.assertEqual(chipimplclock, o.derivative.prescalercount)
+        prescalerornone.value = None
+        self.assertEqual([0]*100, o.call(Block(100)).tolist())
+        self.assertEqual(4, o.derivative.maincounter)
+        self.assertEqual(None, o.derivative.prescalercount)
+        prescalerornone.value = 3
+        self.assertEqual([0]*24 + [1]*30 + [0], o.call(Block(55)).tolist())
+        self.assertEqual(5, o.derivative.maincounter)
+        self.assertEqual(chipimplclock*5//2, o.derivative.prescalercount)
+        # XXX: Finished?
 
 class TestRationalDerivative(unittest.TestCase):
 
