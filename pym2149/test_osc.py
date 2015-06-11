@@ -249,14 +249,22 @@ class TestRationalDerivative(unittest.TestCase):
         timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
         d = RationalDerivative(1000, timer)
         for _ in xrange(50):
-            self.assertEqual([1] * 100, self.integrate(d, 100))
+            self.assertEqual([0] * 100, self.integrate(d, 100)) # Expect no interrupts.
         self.assertEqual(5000*mfpclock, d.progress)
+        self.assertEqual(None, d.prescalercount)
+        self.assertEqual(0, d.maincounter)
         timer.prescalerornone.value = 24576
-        self.assertEqual([0] * 10 + [1] * 10 + [0] * 5, self.integrate(d, 25))
+        # The maincounter was 0, so that's an interrupt in the void:
+        self.assertEqual([1] * 10 + [0] * 10 + [1] * 5, self.integrate(d, 25))
         self.assertEqual(5*mfpclock, d.progress)
+        self.assertEqual(5*mfpclock, d.prescalercount)
+        self.assertEqual(0, d.maincounter)
         timer.prescalerornone.value = None
-        self.assertEqual([0] * 25, self.integrate(d, 25))
+        # No more interrupts:
+        self.assertEqual([1] * 25, self.integrate(d, 25))
         self.assertEqual(30*mfpclock, d.progress)
+        self.assertEqual(None, d.prescalercount)
+        self.assertEqual(0, d.maincounter)
 
 class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
