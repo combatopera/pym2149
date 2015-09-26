@@ -27,8 +27,9 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 wait
 
-pidof renoise || {
-    renoise &>/dev/null &
-}
+pidof renoise || (
+    cd - >/dev/null
+    renoise "$@" &>/dev/null
+) &
 
 ./midi2jack.py
