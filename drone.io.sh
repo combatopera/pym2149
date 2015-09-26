@@ -19,6 +19,8 @@
 
 set -ex
 
+condaversion=3.16.0
+
 pwd
 
 cd ..
@@ -29,9 +31,9 @@ cd -
 
 cd; pwd
 
-wget http://repo.continuum.io/miniconda/Miniconda-3.0.5-Linux-x86_64.sh
+wget http://repo.continuum.io/miniconda/Miniconda-$condaversion-Linux-x86_64.sh
 
-bash Miniconda-3.0.5-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
+bash Miniconda-$condaversion-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
 PATH="$PWD/miniconda/bin:$PATH"
 
