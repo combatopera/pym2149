@@ -19,6 +19,8 @@
 
 set -e
 
+[[ $# -ge 1 ]] && export PYM2149_CONFIG="$(basename "$(dirname "$PWD/$1")")"
+
 cd "$(dirname "$(readlink -f "$0")")"
 
 ./startjack.sh &
