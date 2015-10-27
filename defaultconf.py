@@ -28,7 +28,7 @@ freqclamp = True
 '''Whether inaudible tones are clamped to the lowest such tone. Setting this to True improves performance when very high frequency tones are used to attenuate the envelope. Quality may be degraded, particularly at lower outputrates.'''
 
 underclock = 8
-'''The number of nominal clock ticks until the chip state can next be updated, must be a factor of 8 i.e. in {1, 2, 4, 8}. Higher numbers improve performance but the authentic setting is currently unknown.'''
+'''The number of nominal clock ticks until the chip state can next be updated, must be a factor of 8 i.e. in {1, 2, 4, 8}. Higher numbers improve performance. I don't know which setting is authentic.'''
 
 oscpause = False
 '''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
@@ -82,6 +82,7 @@ pitchbendlimitcontroller = None
 
 pitchbendratecontrollershift = 0
 '''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
+# TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
 
 dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
@@ -108,6 +109,7 @@ jackcoupling = bool(config.di.all(YMFile))
 '''If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition.'''
 
 zerovelocityisnoteoffchannels = ()
+'''My AZ-1 appears to send Note On with zero velocity instead of Note Off, so its channel goes here.'''
 
 performancechannels = ()
 '''Bypass the PLL and speed detector.'''
