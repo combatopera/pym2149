@@ -78,6 +78,7 @@ class WavWriter(object, Node, Stream):
     Node.__init__(self)
     fclass = Wave16
     self.open = lambda: fclass(config.outpath, config.outputrate, stereoinfo.getoutchans.size)
+    self.roundmaster = MasterBuf(dtype = floatdtype)
     self.wavmaster = MasterBuf(dtype = fclass.dtype)
     self.wav = wav
 
@@ -86,8 +87,10 @@ class WavWriter(object, Node, Stream):
 
   def callimpl(self):
     outbuf = self.chain(self.wav)
+    roundbuf = self.roundmaster.ensureandcrop(len(outbuf))
     wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
-    np.around(outbuf.buf, out = wavbuf.buf, casting = 'unsafe')
+    np.around(outbuf.buf, out = roundbuf.buf)
+    wavbuf.buf[:] = roundbuf.buf
     self.f.block(wavbuf)
 
   def flush(self):
