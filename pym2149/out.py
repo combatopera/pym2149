@@ -87,7 +87,7 @@ class WavWriter(object, Node, Stream):
   def callimpl(self):
     outbuf = self.chain(self.wav)
     wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
-    np.around(outbuf.buf, out = wavbuf.buf)
+    np.around(outbuf.buf, out = wavbuf.buf, casting = 'unsafe')
     self.f.block(wavbuf)
 
   def flush(self):
