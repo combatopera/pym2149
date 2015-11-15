@@ -112,7 +112,7 @@ cdef class Payload:
         # Allow callback to see the data before releasing slot to the producer:
         if self.chunks[self.writecursor] != NULL:
             if not self.coupling:
-                fprintf(stderr, 'Overrun!\n') # The producer is too fast.
+                fprintf(stderr, "%s\n", <char*> 'Overrun!') # The producer is too fast.
             # There is only one consumer, but we use while to catch spurious wakeups:
             while self.chunks[self.writecursor] != NULL:
                 with nogil:
@@ -133,7 +133,7 @@ cdef class Payload:
             pthread_cond_signal(&(self.cond))
         else:
             # Unknown when send will run, so give up:
-            fprintf(stderr, 'Underrun!\n')
+            fprintf(stderr, "%s\n", <char*> 'Underrun!')
         pthread_mutex_unlock(&(self.mutex))
 
 cdef int callback(jack_nframes_t nframes, void* arg):
