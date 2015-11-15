@@ -211,6 +211,7 @@ class MidiPump(MainBackground):
                 speeddetector(False)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in update.events:
+                # TODO: It would be more useful to show frameindex modulo speed.
                 log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
