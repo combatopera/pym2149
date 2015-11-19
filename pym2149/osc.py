@@ -22,6 +22,7 @@ from buf import MasterBuf
 from mfp import mfpclock
 from shapes import toneshape
 from util import ceildiv
+from turbo import turbo
 
 class DerivativeNode(BufNode):
 
@@ -126,18 +127,23 @@ class RationalDerivative(DerivativeNode):
             else:
                 stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
                 indices = self.indices.ensureandcrop(stepcount)
-                indices.arange(-stepsize)
-                indices.add(-stepindex)
-                lastindex = -indices.last()
-                indices.ceildiv(mfpclock, alreadynegated = True)
+                self.prepareindices(stepcount, indices.buf, stepsize, stepindex, mfpclock)
                 # Note values can integrate to 2 if there was an overflow earlier.
                 self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
                 action = self.integral
+                lastindex = (stepcount - 1) * stepsize + stepindex
                 remaining = etdr * maxprescaler - (self.block.framecount * mfpclock - lastindex)
             self.prescalercount = remaining % maxprescaler
             # TODO: Unit-test this is the correct logic.
             self.maincounter = (remaining+maxprescaler-1) // maxprescaler
         return action
+
+    @turbo(i = np.uint32, n = np.uint32, indices = [np.int64], stepsize = np.int64, stepindex = np.int64, value = np.int64, mfpclock = np.int64)
+    def prepareindices(n, indices, stepsize, stepindex, mfpclock):
+        value = stepindex + mfpclock - 1
+        for i in xrange(n):
+            indices[i] = value // mfpclock
+            value += stepsize
 
 class IntegralNode(BufNode):
 
