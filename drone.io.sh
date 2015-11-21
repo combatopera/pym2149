@@ -45,6 +45,6 @@ export MINICONDA_HOME="$PWD/miniconda"
 
 cd -
 
-conda install openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
+"$MINICONDA_HOME/bin/conda" install openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
 
 ./tests
