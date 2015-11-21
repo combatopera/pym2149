@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyximport, numpy as np
-from native import iterlibraries
+import pyximport, numpy as np, native, os
 
 # Note -O3 is apparently the default:
-pyximport.install(setup_args = {'include_dirs': np.get_include(), 'libraries': list(iterlibraries())}, inplace = True)
+pyximport.install(setup_args = {'include_dirs': np.get_include()}, inplace = True)
+
+os.environ['PATH'] = "%s%s%s" % (os.path.join(os.path.dirname(native.__file__), 'bin'), os.pathsep, os.environ['PATH'])
