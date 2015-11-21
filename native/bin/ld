@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -15,3 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys, subprocess
+
+def main():
+    args = sys.argv[1:]
+    for i, arg in enumerate(args):
+        if '-o' == arg:
+            path = args[i + 1]
+            break
+    f = open(path[:-len('.so')] + '.libs')
+    try:
+        libs = f.read().splitlines()
+    finally:
+        f.close()
+    sys.exit(subprocess.call(['/usr/bin/ld'] + ["-l%s" % lib for lib in libs] + args))
+
+if '__main__' == __name__:
+    main()
