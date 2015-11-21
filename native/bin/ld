@@ -17,19 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, subprocess
+import sys, subprocess, os
 
 def main():
     args = sys.argv[1:]
     for i, arg in enumerate(args):
         if '-o' == arg:
-            path = args[i + 1]
+            libspath = args[i + 1][:-len('.so')] + '.libs'
             break
-    f = open(path[:-len('.so')] + '.libs')
-    try:
-        libs = f.read().splitlines()
-    finally:
-        f.close()
+    if os.path.exists(libspath):
+        f = open(libspath)
+        try:
+            libs = f.read().splitlines()
+        finally:
+            f.close()
+    else:
+        libs = []
     sys.exit(subprocess.call(['/usr/bin/ld'] + ["-l%s" % lib for lib in libs] + args))
 
 if '__main__' == __name__:
