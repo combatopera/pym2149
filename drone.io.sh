@@ -25,9 +25,13 @@ pwd
 
 cd ..
 
-hg clone https://bitbucket.org/combatopera/devutils
-hg clone https://bitbucket.org/combatopera/turbo
-export PYTHONPATH="$PWD"/turbo
+for p in devutils turbo runpy; do
+
+    hg clone https://bitbucket.org/combatopera/$p
+
+done
+
+PATH="$PWD/runpy:$PATH"
 
 cd -
 
@@ -37,7 +41,7 @@ wget http://repo.continuum.io/miniconda/Miniconda-$condaversion-Linux-x86_64.sh
 
 bash Miniconda-$condaversion-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
-PATH="$PWD/miniconda/bin:$PATH"
+MINICONDA_HOME="$PWD/miniconda"
 
 cd -
 
