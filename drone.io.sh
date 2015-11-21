@@ -26,6 +26,8 @@ pwd
 cd ..
 
 hg clone https://bitbucket.org/combatopera/devutils
+hg clone https://bitbucket.org/combatopera/turbo
+export PYTHONPATH="$PWD"/turbo
 
 cd -
 
