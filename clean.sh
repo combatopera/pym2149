@@ -27,6 +27,8 @@ find -name '*.dsd' -exec rm -fv '{}' +
 
 find -name '*.c' -exec rm -fv '{}' +
 
+find -name 'turbo_*.pyx' -exec rm -fv '{}' +
+
 rm -fv pym2149/cpaste?*.pyx
 
 rm -fv pym2149/'MinBleps('*')'
