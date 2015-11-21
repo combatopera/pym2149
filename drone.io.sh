@@ -41,7 +41,7 @@ wget http://repo.continuum.io/miniconda/Miniconda-$condaversion-Linux-x86_64.sh
 
 bash Miniconda-$condaversion-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
-MINICONDA_HOME="$PWD/miniconda"
+export MINICONDA_HOME="$PWD/miniconda"
 
 cd -
 
