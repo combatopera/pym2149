@@ -23,11 +23,7 @@ set -e
 
 cd "$(dirname "$(readlink -f "$0")")"
 
-./startjack.sh &
-
-. ./loadenv
-
-wait
+./startjack.sh
 
 pidof renoise || (
     cd - >/dev/null
