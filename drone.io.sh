@@ -31,11 +31,11 @@ done
 
 PATH="$PWD/runpy:$PATH"
 
-wget http://repo.continuum.io/miniconda/Miniconda-$condaversion-Linux-x86_64.sh
+wget --no-verbose http://repo.continuum.io/miniconda/Miniconda-$condaversion-Linux-x86_64.sh
 
 bash Miniconda-$condaversion-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
-miniconda/bin/conda install openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
+miniconda/bin/conda install -q openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
 
 export MINICONDA_HOME="$PWD/miniconda"
 
