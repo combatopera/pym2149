@@ -23,9 +23,9 @@ condaversion=3.16.0
 
 cd ..
 
-for p in turbo runpy; do
+for project in turbo runpy; do
 
-    hg clone https://bitbucket.org/combatopera/$p
+    hg clone https://bitbucket.org/combatopera/$project
 
 done
 
