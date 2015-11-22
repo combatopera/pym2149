@@ -25,7 +25,7 @@ pwd
 
 cd ..
 
-for p in devutils turbo runpy; do
+for p in turbo runpy; do
 
     hg clone https://bitbucket.org/combatopera/$p
 
@@ -47,4 +47,4 @@ cd -
 
 "$MINICONDA_HOME/bin/conda" install openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
 
-./tests
+tests
