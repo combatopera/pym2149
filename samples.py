@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from pym2149.config import getconfigloader
+from pym2149.config import getconfigloader, staticconfigloader
 from pym2149.di import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
@@ -144,20 +144,21 @@ class Player:
 
 class Target:
 
-    def __init__(self, config):
+    def __init__(self, configloader):
         self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
         if not os.path.exists(self.targetpath):
             os.mkdir(self.targetpath)
-        self.config = config
+        self.configloader = configloader
 
     def dump(self, beatsperbar, beats, name):
         path = os.path.join(self.targetpath, name)
         log.info(path)
-        config = self.config.fork()
+        config = self.configloader.load()
         config.midiprograms = {}
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
         di = createdi(config)
+        di.add(staticconfigloader)
         configure(di)
         di.add(Channels)
         di.add(ChipTimer)
@@ -212,7 +213,7 @@ def main():
     for p in xrange(1, 9):
         class t(BaseTone): period = p
         tones.append(t)
-    target = Target(getconfigloader().load())
+    target = Target(getconfigloader())
     target.dump(2, [T250, 0, 0], 'tone250')
     target.dump(2, [T1k, 0, 0], 'tone1k')
     target.dump(2, [T1k5, 0, 0], 'tone1k5')
