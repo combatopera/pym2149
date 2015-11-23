@@ -89,6 +89,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
                 return
             if os.stat(self.configpath).st_mtime == self.mtime:
                 continue
+            log.info("Reloading: %s", self.configpath)
             config = self.load()
             for consumer in self.consumers:
                 consumer(config)
