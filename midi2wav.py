@@ -30,8 +30,10 @@ from ymplayer import SimpleChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getconfigloader('outpath').load()
+    configloader = getconfigloader('outpath')
+    config = configloader.load()
     di = createdi(config)
+    di.add(configloader)
     di.add(PLL)
     configure(di)
     di.add(Channels)

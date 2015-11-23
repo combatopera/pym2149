@@ -32,8 +32,10 @@ from ymplayer import SyncTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getconfigloader().load()
+    configloader = getconfigloader()
+    config = configloader.load()
     di = createdi(config)
+    di.add(configloader)
     di.add(PLL)
     di.add(JackClient)
     di.start()

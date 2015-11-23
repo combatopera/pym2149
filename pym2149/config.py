@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, anchor, lazyconf
+import sys, logging, os, anchor, lazyconf, time
 from const import appconfigdir
 from iface import Config
+from bg import SimpleBackground
+from util import singleton
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +27,17 @@ def getconfigloader(*argnames, **kwargs):
     if 'PYM2149_CONFIG' in os.environ:
         kwargs = kwargs.copy()
         kwargs['configname'] = os.environ['PYM2149_CONFIG']
-    return ConfigLoader(argnames, sys.argv[1:], **kwargs)
+    return ConfigLoaderImpl(argnames, sys.argv[1:], **kwargs)
 
-class ConfigLoader:
+class ConfigLoader: pass
+
+@singleton
+class staticconfigloader(ConfigLoader):
+
+    def subscribe(self, consumer, config):
+        consumer(config)
+
+class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
 
     defaultconfigname = 'defaults'
     workspacepath = os.path.join(appconfigdir, 'workspace')
@@ -49,23 +59,41 @@ class ConfigLoader:
                 sys.stderr.write('#? ')
                 self.configname = confignames[int(raw_input())]
         self.entries = zip(argnames, args)
+        self.consumers = []
 
     def load(self):
         expressions = lazyconf.Expressions()
         expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
         if self.defaultconfigname != self.configname:
-            expressions.load(os.path.join(self.workspacepath, self.configname, 'chip.py'))
+            self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
+            self.mtime = os.stat(self.configpath).st_mtime
+            expressions.load(self.configpath)
         config = ConfigImpl(expressions)
         for argname, arg in self.entries:
             setattr(config, argname, arg)
         return config
 
+    def subscribe(self, consumer, config):
+        consumer(config)
+        self.consumers.append(consumer)
+
+    def __call__(self):
+        if not hasattr(self, 'configpath'):
+            return
+        while True:
+            for _ in xrange(10):
+                if self.quit:
+                    return
+                time.sleep(.1)
+            if self.quit:
+                return
+            if os.stat(self.configpath).st_mtime == self.mtime:
+                continue
+            config = self.load()
+            for consumer in self.consumers:
+                consumer(config)
+
 class ConfigImpl(lazyconf.View, Config):
 
     def __init__(self, expressions):
         lazyconf.View.__init__(self, expressions)
-
-    def fork(self):
-        return Fork(self)
-
-class Fork(lazyconf.Fork, Config): pass

@@ -22,6 +22,7 @@ from const import midichannelcount
 from mediation import Mediation
 from di import types
 from iface import Chip, Config
+from config import ConfigLoader
 
 log = logging.getLogger(__name__)
 
@@ -96,10 +97,10 @@ class ControlPair:
 
 class Channels:
 
-    @types(Config, Chip)
-    def __init__(self, config, chip):
+    @types(ConfigLoader, Config, Chip)
+    def __init__(self, configloader, config, chip):
         self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
-        self.midiprograms = config.midiprograms
+        configloader.subscribe(self.reconfigure, config)
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
@@ -122,6 +123,9 @@ class Channels:
             ControlPair(0x2000, flush, 0).install(self.controllers, config.pitchbendlimitcontroller)
         self.prevtext = None
         self.frameindex = 0
+
+    def reconfigure(self, config):
+        self.midiprograms = config.midiprograms
 
     def noteon(self, midichan, midinote, vel):
         if (not vel) and midichan in self.zerovelisnoteoffmidichans:
