@@ -22,7 +22,7 @@ from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
-from pym2149.config import getprocessconfig
+from pym2149.config import getconfigloader
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream
@@ -31,7 +31,7 @@ from ymplayer import ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getprocessconfig('inpath', 'srclabel', 'outpath')
+    config = getconfigloader('inpath', 'srclabel', 'outpath').load()
     f = open(config.inpath)
     try:
         bytecode = readbytecode(f, config.srclabel)

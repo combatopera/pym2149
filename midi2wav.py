@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.out import configure
 from pym2149.midi import MidiListen, MidiPump
-from pym2149.config import getprocessconfig
+from pym2149.config import getconfigloader
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
@@ -30,7 +30,7 @@ from ymplayer import SimpleChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getprocessconfig('outpath')
+    config = getconfigloader('outpath').load()
     di = createdi(config)
     di.add(PLL)
     configure(di)
