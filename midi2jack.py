@@ -21,7 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.midi import MidiListen, MidiPump
-from pym2149.config import getprocessconfig
+from pym2149.config import getconfigloader
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Stream
@@ -32,7 +32,7 @@ from ymplayer import SyncTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getprocessconfig()
+    config = getconfigloader().load()
     di = createdi(config)
     di.add(PLL)
     di.add(JackClient)

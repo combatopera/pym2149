@@ -21,11 +21,11 @@ from iface import Config
 
 log = logging.getLogger(__name__)
 
-def getprocessconfig(*argnames, **kwargs):
+def getconfigloader(*argnames, **kwargs):
     if 'PYM2149_CONFIG' in os.environ:
         kwargs = kwargs.copy()
         kwargs['configname'] = os.environ['PYM2149_CONFIG']
-    return ConfigLoader(argnames, sys.argv[1:], **kwargs).load()
+    return ConfigLoader(argnames, sys.argv[1:], **kwargs)
 
 class ConfigLoader:
 

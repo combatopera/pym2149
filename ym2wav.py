@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.ymformat import YMOpen
-from pym2149.config import getprocessconfig
+from pym2149.config import getconfigloader
 from pym2149.vis import Roll
 from pym2149.out import configure
 from pym2149.boot import createdi
@@ -29,7 +29,7 @@ from ymplayer import Player, ChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getprocessconfig('inpath', 'outpath')
+    config = getconfigloader('inpath', 'outpath').load()
     di = createdi(config)
     di.add(YMOpen)
     di.start()
