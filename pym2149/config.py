@@ -25,36 +25,45 @@ def getprocessconfig(*argnames, **kwargs):
     if 'PYM2149_CONFIG' in os.environ:
         kwargs = kwargs.copy()
         kwargs['configname'] = os.environ['PYM2149_CONFIG']
-    return ConfigImpl(argnames, sys.argv[1:], **kwargs)
+    return ConfigLoader(argnames, sys.argv[1:], **kwargs).load()
 
-class ConfigImpl(lazyconf.View, Config):
+class ConfigLoader:
 
     defaultconfigname = 'defaults'
+    workspacepath = os.path.join(appconfigdir, 'workspace')
 
     def __init__(self, argnames, args, **kwargs):
         if len(argnames) != len(args):
             raise Exception("Expected %s but got: %s" % (argnames, args))
-        expressions = lazyconf.Expressions()
-        lazyconf.View.__init__(self, expressions)
-        for argname, arg in zip(argnames, args):
-            setattr(self, argname, arg)
-        expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
-        workspacepath = os.path.join(appconfigdir, 'workspace')
         if 'configname' in kwargs:
-            configname = kwargs['configname']
+            self.configname = kwargs['configname']
         else:
             confignames = [self.defaultconfigname]
-            if os.path.exists(workspacepath):
-                confignames += sorted(cn for cn in os.listdir(workspacepath) if os.path.exists(os.path.join(workspacepath, cn, 'chip.py')))
+            if os.path.exists(self.workspacepath):
+                confignames += sorted(cn for cn in os.listdir(self.workspacepath) if os.path.exists(os.path.join(self.workspacepath, cn, 'chip.py')))
             if 1 == len(confignames): # Just defaults.
-                configname, = confignames
+                self.configname, = confignames
             else:
                 for i, cn in enumerate(confignames):
                     print >> sys.stderr, "%s) %s" % (i, cn)
                 sys.stderr.write('#? ')
-                configname = confignames[int(raw_input())]
-        if self.defaultconfigname != configname:
-            expressions.load(os.path.join(workspacepath, configname, 'chip.py'))
+                self.configname = confignames[int(raw_input())]
+        self.entries = zip(argnames, args)
+
+    def load(self):
+        expressions = lazyconf.Expressions()
+        expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
+        if self.defaultconfigname != self.configname:
+            expressions.load(os.path.join(self.workspacepath, self.configname, 'chip.py'))
+        config = ConfigImpl(expressions)
+        for argname, arg in self.entries:
+            setattr(config, argname, arg)
+        return config
+
+class ConfigImpl(lazyconf.View, Config):
+
+    def __init__(self, expressions):
+        lazyconf.View.__init__(self, expressions)
 
     def fork(self):
         return Fork(self)
