@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env runpy
 
 # Copyright 2014 Andrzej Cichocki
 
