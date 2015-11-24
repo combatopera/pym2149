@@ -34,9 +34,15 @@ class TestSpeedDetector(unittest.TestCase):
             self.d(ec)
         self.assertEqual([3], self.speeds)
 
-    def test_increase(self): pass
+    def test_increase(self):
+        for ec in 1, 0, 0, 1, 0, 0, 0, 1:
+            self.d(ec)
+        self.assertEqual([3, 4], self.speeds)
 
-    def test_decrease(self): pass
+    def test_decrease(self):
+        for ec in 1, 0, 0, 0, 1, 0, 0, 1:
+            self.d(ec)
+        self.assertEqual([4, 3], self.speeds)
 
     def test_multiply(self): pass
 
