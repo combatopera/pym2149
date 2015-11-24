@@ -19,23 +19,27 @@ import logging
 
 log = logging.getLogger(__name__)
 
+def defaultcallback(oldspeedornone, speed):
+    if oldspeedornone is None:
+        log.info("Speed detected: %s", speed)
+    else:
+        log.warn("Speed was %s but is now: %s", oldspeedornone, speed)
+
 class SpeedDetector:
 
-    def __init__(self):
+    def __init__(self, callback = defaultcallback):
         self.update = 0
         self.lastevent = None
         self.speed = None
+        self.callback = callback
 
-    def __call__(self, event):
-        if event:
+    def __call__(self, eventcount):
+        if eventcount:
             if self.lastevent is not None:
                 # FIXME LATER: When this goes to 1 it can't recover.
                 speed = self.update - self.lastevent
-                if self.speed is None:
-                    log.info("Speed detected: %s", speed)
-                    self.speed = speed
-                elif speed % self.speed:
-                    log.warn("Speed was %s but is now: %s", self.speed, speed)
+                if self.speed is None or speed % self.speed:
+                    self.callback(self.speed, speed)
                     self.speed = speed
                 else:
                     pass # Do nothing, multiples of current speed are fine.
