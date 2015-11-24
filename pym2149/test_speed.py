@@ -44,11 +44,20 @@ class TestSpeedDetector(unittest.TestCase):
             self.d(ec)
         self.assertEqual([4, 3], self.speeds)
 
-    def test_multiply(self): pass
+    def test_multiply(self):
+        for ec in 1, 0, 0, 1, 0, 0, 0, 0, 0, 1:
+            self.d(ec)
+        self.assertEqual([3, 6], self.speeds)
 
-    def test_divide(self): pass
+    def test_divide(self):
+        for ec in 1, 0, 0, 0, 0, 0, 1, 0, 0, 1:
+            self.d(ec)
+        self.assertEqual([6, 3], self.speeds)
 
-    def test_gracedivide(self): pass
+    def test_gracedivide(self):
+        for ec in 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1:
+            self.d(ec)
+        self.assertEqual([6], self.speeds)
 
 if '__main__' == __name__:
     unittest.main()
