@@ -20,4 +20,5 @@ import pyximport, native, os
 # Note -O3 is apparently the default:
 pyximport.install(inplace = True)
 
+# TODO LATER: Reinstate the non-hacky way of specifying headers and libs.
 os.environ['PATH'] = "%s%s%s" % (os.path.join(os.path.dirname(native.__file__), 'bin'), os.pathsep, os.environ['PATH'])
