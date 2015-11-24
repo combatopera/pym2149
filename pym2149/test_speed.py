@@ -54,8 +54,13 @@ class TestSpeedDetector(unittest.TestCase):
             self.d(ec)
         self.assertEqual([6, 3], self.speeds)
 
-    def test_gracedivide(self):
-        for ec in 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1:
+    def test_temporarydivide(self):
+        for ec in 5, 0, 0, 0, 0, 0, 5, 0, 0, 2, 0, 0, 5, 0, 0, 0, 0, 0, 5:
+            self.d(ec)
+        self.assertEqual([6], self.speeds)
+
+    def test_gracenotes(self):
+        for ec in 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 2, 5, 0, 0, 0, 0, 0, 5:
             self.d(ec)
         self.assertEqual([6], self.speeds)
 
