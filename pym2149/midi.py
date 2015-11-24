@@ -181,12 +181,11 @@ class MidiPump(MainBackground):
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
+            scheduledevents = 0
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
-                    speeddetector(True)
-                    break
-            else:
-                speeddetector(False)
+                    scheduledevents += 1
+            speeddetector(scheduledevents)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in update.events:
                 # TODO: It would be more useful to show frameindex modulo speed.
