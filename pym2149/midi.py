@@ -25,6 +25,7 @@ from channels import Channels
 from minblep import MinBleps
 from timer import Timer
 from util import EMA
+from speed import SpeedDetector
 import native.calsa as calsa, logging, time
 
 log = logging.getLogger(__name__)
@@ -59,29 +60,6 @@ class MidiSchedule:
         # TODO: Instead of EMA, improve sync with PLL.
         self.taketimeema.value += self.period
         self.taketimeema(idealtaketime + self.targetlatency)
-
-class SpeedDetector:
-
-    def __init__(self):
-        self.update = 0
-        self.lastevent = None
-        self.speed = None
-
-    def __call__(self, event):
-        if event:
-            if self.lastevent is not None:
-                # FIXME LATER: When this goes to 1 it can't recover.
-                speed = self.update - self.lastevent
-                if self.speed is None:
-                    log.info("Speed detected: %s", speed)
-                    self.speed = speed
-                elif speed % self.speed:
-                    log.warn("Speed was %s but is now: %s", self.speed, speed)
-                    self.speed = speed
-                else:
-                    pass # Do nothing, multiples of current speed are fine.
-            self.lastevent = self.update
-        self.update += 1
 
 class ChannelMessage:
 
