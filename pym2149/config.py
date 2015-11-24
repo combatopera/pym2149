@@ -75,6 +75,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
 
     def subscribe(self, consumer, config):
         consumer(config)
+        # Race right here where consumer could miss an update, not a big deal.
         self.consumers.append(consumer)
 
     def __call__(self):
