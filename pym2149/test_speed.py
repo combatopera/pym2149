@@ -30,26 +30,30 @@ class TestSpeedDetector(unittest.TestCase):
         self.assertEqual(expected, speeds)
 
     def test_works(self):
-        self.check([3], '1..1..1')
-        self.check([3], '1..1..1..1..1..1..1')
+        self.check([(3, 0)], '1..1..1')
+        self.check([(3, 1)], '.1..1..1')
+        self.check([(3, 2)], '..1..1..1')
+        self.check([(3, 0)], '1..1..1..1..1..1..1')
+        self.check([(3, 1)], '.1..1..1..1..1..1..1')
+        self.check([(3, 2)], '..1..1..1..1..1..1..1')
 
     def test_increase(self):
-        self.check([3, 4], '1..1..1...1...1')
+        self.check([(3, 0), (4, 2)], '1..1..1...1...1')
 
     def test_decrease(self):
-        self.check([4, 3], '1...1...1..1..1')
+        self.check([(4, 0), (3, 2)], '1...1...1..1..1')
 
     def test_multiply(self):
-        self.check([3, 6], '1..1..1.....1.....1')
+        self.check([(3, 0), (6, 0)], '1..1..1.....1.....1')
 
     def test_divide(self):
-        self.check([6, 3], '1.....1.....1..1..1')
+        self.check([(6, 0), (3, 0)], '1.....1.....1..1..1')
 
     def test_temporarydivide(self):
-        self.check([6], '5.....5.....5..2..5.....5.....5')
+        self.check([(6, 0)], '5.....5.....5..2..5.....5.....5')
 
     def test_gracenotes(self):
-        self.check([6], '5.....5.....5....25.....5.....5')
+        self.check([(6, 0)], '5.....5.....5....25.....5.....5')
 
 if '__main__' == __name__:
     unittest.main()
