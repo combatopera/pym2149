@@ -27,7 +27,7 @@ def defaultcallback(oldspeedornone, speed):
 
 periods = 2
 dtype = np.uint8
-clarity = 1.1
+clarity = 1.2
 
 class Shape:
 
@@ -39,7 +39,7 @@ class Shape:
         self.speed = speed
 
     def getscore(self, v):
-        return max((score, phase) for phase, score in enumerate(np.correlate(self.shape, v[:self.speed * (periods + 1)])))
+        return max((score, self.speed - 1 - phase) for phase, score in enumerate(np.correlate(self.shape, v[:self.speed * (periods + 1)])))
 
 class SpeedDetector:
 
@@ -48,6 +48,7 @@ class SpeedDetector:
         #for shape in self.shapes: print ''.join(chr(ord('0') + x) if x else '.' for x in shape.shape)
         self.history = np.zeros(maxspeed * (periods + 1), dtype = dtype)
         self.speed = None
+        self.index = 0
         self.callback = callback
 
     def __call__(self, eventcount):
@@ -55,14 +56,18 @@ class SpeedDetector:
         self.history[0] = eventcount # New newest value.
         #print ''.join(chr(ord('0') + x) if x else '.' for x in self.history)
         scores = sorted((shape.getscore(self.history), shape.speed) for shape in self.shapes)
-        (_, phase), newspeed = scores[-1]
+        scores = [(score, (speed, (self.index - phase) % speed)) for (score, phase), speed in scores]
+        newspeed = scores[-1][1]
+        #print self.history,newspeed
         #print ' '.join("%.3f=%s"%s for s in scores),
-        accept = scores[-1][0][0] >= scores[-2][0][0] * clarity
+        accept = scores[-1][0] and scores[-1][0] >= scores[-2][0] * clarity
         #if accept:
         #    print 'OK'
         #else:
         #    print
+        self.index += 1
         if newspeed != self.speed and accept:
+            print self.history, scores[-3:]
             oldspeed = self.speed
             self.speed = newspeed
             self.callback(oldspeed, self.speed)
