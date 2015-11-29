@@ -39,7 +39,7 @@ class Shape:
         self.speed = speed
 
     def getscore(self, v):
-        return max(np.correlate(self.shape, v[:self.speed*3]))
+        return max((score, phase) for phase, score in enumerate(np.correlate(self.shape, v[:self.speed * (periods + 1)])))
 
 class SpeedDetector:
 
@@ -55,14 +55,14 @@ class SpeedDetector:
         self.history[0] = eventcount # New newest value.
         #print ''.join(chr(ord('0') + x) if x else '.' for x in self.history)
         scores = sorted((shape.getscore(self.history), shape.speed) for shape in self.shapes)
-        bestscore,bestspeed=scores[-1]
+        (_, phase), newspeed = scores[-1]
         #print ' '.join("%.3f=%s"%s for s in scores),
-        accept = scores[-1][0] >= scores[-2][0] * clarity
+        accept = scores[-1][0][0] >= scores[-2][0][0] * clarity
         #if accept:
         #    print 'OK'
         #else:
         #    print
-        if bestspeed != self.speed and accept:
+        if newspeed != self.speed and accept:
             oldspeed = self.speed
-            self.speed = bestspeed
+            self.speed = newspeed
             self.callback(oldspeed, self.speed)
