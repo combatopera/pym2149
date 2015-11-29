@@ -22,52 +22,34 @@ from speed import SpeedDetector
 
 class TestSpeedDetector(unittest.TestCase):
 
-    def setUp(self):
-        self.speeds = []
-        self.impl = SpeedDetector(10, self.callback)
-
-    def d(self, c):
-        self.impl(0 if c == '.' else ord(c) - ord('0'))
-
-    def play(self, eventcounts):
-        #print eventcounts
-        for ec in eventcounts:
-            self.d(ec)
-
-    def callback(self, _, speed):
-        self.speeds.append(speed)
+    def check(self, expected, eventcounts):
+        speeds = []
+        detector = SpeedDetector(10, lambda _, speed: speeds.append(speed))
+        for eventcount in eventcounts:
+            detector(0 if eventcount == '.' else ord(eventcount) - ord('0'))
+        self.assertEqual(expected, speeds)
 
     def test_works(self):
-        self.play('1..1..1')
-        self.assertEqual([3], self.speeds)
-
-    def test_works2(self):
-        self.play('1..1..1..1..1..1..1')
-        self.assertEqual([3], self.speeds)
+        self.check([3], '1..1..1')
+        self.check([3], '1..1..1..1..1..1..1')
 
     def test_increase(self):
-        self.play('1..1..1...1...1')
-        self.assertEqual([3, 4], self.speeds)
+        self.check([3, 4], '1..1..1...1...1')
 
     def test_decrease(self):
-        self.play('1...1...1..1..1')
-        self.assertEqual([4, 3], self.speeds)
+        self.check([4, 3], '1...1...1..1..1')
 
     def test_multiply(self):
-        self.play('1..1..1.....1.....1')
-        self.assertEqual([3, 6], self.speeds)
+        self.check([3, 6], '1..1..1.....1.....1')
 
     def test_divide(self):
-        self.play('1.....1.....1..1..1')
-        self.assertEqual([6, 3], self.speeds)
+        self.check([6, 3], '1.....1.....1..1..1')
 
     def test_temporarydivide(self):
-        self.play('5.....5.....5..2..5.....5.....5')
-        self.assertEqual([6], self.speeds)
+        self.check([6], '5.....5.....5..2..5.....5.....5')
 
     def test_gracenotes(self):
-        self.play('5.....5.....5....25.....5.....5')
-        self.assertEqual([6], self.speeds)
+        self.check([6], '5.....5.....5....25.....5.....5')
 
 if '__main__' == __name__:
     unittest.main()
