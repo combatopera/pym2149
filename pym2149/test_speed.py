@@ -45,9 +45,13 @@ class TestSpeedDetector(unittest.TestCase):
 
     def test_multiply(self):
         self.check([(3, 0), (6, 0)], '1..1..1.....1.....1')
+        self.check([(3, 1), (6, 1)], '.1..1..1.....1.....1')
+        self.check([(3, 2), (6, 2)], '..1..1..1.....1.....1')
 
     def test_divide(self):
         self.check([(6, 0), (3, 0)], '1.....1.....1..1..1')
+        self.check([(6, 1), (3, 1)], '.1.....1.....1..1..1')
+        self.check([(6, 2), (3, 2)], '..1.....1.....1..1..1')
 
     def test_temporarydivide(self):
         self.check([(6, 0)], '5.....5.....5..2..5.....5.....5')
