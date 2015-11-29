@@ -177,7 +177,7 @@ class MidiPump(MainBackground):
 
     def __call__(self):
         schedule = MidiSchedule(self.updaterate, self.skipenabled)
-        speeddetector = SpeedDetector()
+        speeddetector = SpeedDetector(10)
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
