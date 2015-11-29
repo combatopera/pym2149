@@ -59,5 +59,8 @@ class TestSpeedDetector(unittest.TestCase):
     def test_gracenotes(self):
         self.check([(6, 0)], '5.....5.....5....25.....5.....5')
 
+    def test_sparse(self):
+        self.check([(3, 0), (9, 3), (3, 0)], '1..1.....1..1........1.....1..1..1')
+
 if '__main__' == __name__:
     unittest.main()
