@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+import logging, numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -25,23 +25,54 @@ def defaultcallback(oldspeedornone, speed):
     else:
         log.warn("Speed was %s but is now: %s", oldspeedornone, speed)
 
+class Window:
+
+    def __init__(self, maxspeed):
+        self.shapesize = 2 * maxspeed + 1
+        self.windowsize = 2 * maxspeed + 1
+
+    def apply(self, data):
+        return data[:self.windowsize]
+
+class Shape:
+
+    def __init__(self, window, speed):
+        def g():
+            for i in xrange(2*speed+1):
+                yield 0 if i % speed else 1
+        self.shape = np.fromiter(g(), dtype = np.int32)
+        self.window = window
+        self.speed = speed
+
+    def getscore(self, v):
+        return max(np.correlate(self.shape, v[:self.speed*3]))
+
 class SpeedDetector:
 
-    def __init__(self, callback = defaultcallback):
-        self.update = 0
-        self.lastevent = None
+    def __init__(self, maxspeed, callback = defaultcallback):
+        window = Window(maxspeed)
+        self.shapes = [Shape(window, speed) for speed in xrange(1, maxspeed + 1)]
+        #for shape in self.shapes: print ''.join(chr(ord('0') + x) if x else '.' for x in shape.shape)
+        self.history = np.zeros(maxspeed*3, dtype = np.int32)
         self.speed = None
         self.callback = callback
 
     def __call__(self, eventcount):
-        if eventcount:
-            if self.lastevent is not None:
-                # FIXME LATER: When this goes to 1 it can't recover.
-                speed = self.update - self.lastevent
-                if self.speed is None or speed % self.speed:
-                    self.callback(self.speed, speed)
-                    self.speed = speed
-                else:
-                    pass # Do nothing, multiples of current speed are fine.
-            self.lastevent = self.update
-        self.update += 1
+        self.history[1:] = self.history[:-1] # Lose the oldest value.
+        self.history[0] = eventcount # New newest value.
+        bestscore = -1 # Min legit score is 0.
+        scores = []
+        #print ''.join(chr(ord('0') + x) if x else '.' for x in self.history)
+        scores=[(shape.getscore(self.history), shape.speed) for shape in self.shapes]
+        scores.sort()
+        bestscore,bestspeed=scores[-1]
+        #print ' '.join("%.3f=%s"%s for s in scores),
+        accept=scores[-1][0] >= scores[-2][0]*1.1
+        #if accept:
+        #    print 'OK'
+        #else:
+        #    print
+        if bestspeed != self.speed and accept:
+            oldspeed = self.speed
+            self.speed = bestspeed
+            self.callback(oldspeed, self.speed)

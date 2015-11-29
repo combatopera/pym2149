@@ -24,44 +24,49 @@ class TestSpeedDetector(unittest.TestCase):
 
     def setUp(self):
         self.speeds = []
-        self.d = SpeedDetector(self.callback)
+        self.impl = SpeedDetector(10, self.callback)
+
+    def d(self, c):
+        self.impl(0 if c == '.' else ord(c) - ord('0'))
+
+    def play(self, eventcounts):
+        #print eventcounts
+        for ec in eventcounts:
+            self.d(ec)
 
     def callback(self, _, speed):
         self.speeds.append(speed)
 
     def test_works(self):
-        for ec in 1, 0, 0, 1:
-            self.d(ec)
+        self.play('1..1..1')
+        self.assertEqual([3], self.speeds)
+
+    def test_works2(self):
+        self.play('1..1..1..1..1..1..1')
         self.assertEqual([3], self.speeds)
 
     def test_increase(self):
-        for ec in 1, 0, 0, 1, 0, 0, 0, 1:
-            self.d(ec)
+        self.play('1..1..1...1...1')
         self.assertEqual([3, 4], self.speeds)
 
     def test_decrease(self):
-        for ec in 1, 0, 0, 0, 1, 0, 0, 1:
-            self.d(ec)
+        self.play('1...1...1..1..1')
         self.assertEqual([4, 3], self.speeds)
 
     def test_multiply(self):
-        for ec in 1, 0, 0, 1, 0, 0, 0, 0, 0, 1:
-            self.d(ec)
+        self.play('1..1..1.....1.....1')
         self.assertEqual([3, 6], self.speeds)
 
     def test_divide(self):
-        for ec in 1, 0, 0, 0, 0, 0, 1, 0, 0, 1:
-            self.d(ec)
+        self.play('1.....1.....1..1..1')
         self.assertEqual([6, 3], self.speeds)
 
     def test_temporarydivide(self):
-        for ec in 5, 0, 0, 0, 0, 0, 5, 0, 0, 2, 0, 0, 5, 0, 0, 0, 0, 0, 5:
-            self.d(ec)
+        self.play('5.....5.....5..2..5.....5.....5')
         self.assertEqual([6], self.speeds)
 
     def test_gracenotes(self):
-        for ec in 5, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 2, 5, 0, 0, 0, 0, 0, 5:
-            self.d(ec)
+        self.play('5.....5.....5....25.....5.....5')
         self.assertEqual([6], self.speeds)
 
 if '__main__' == __name__:
