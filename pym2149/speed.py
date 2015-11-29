@@ -25,23 +25,17 @@ def defaultcallback(oldspeedornone, speed):
     else:
         log.warn("Speed was %s but is now: %s", oldspeedornone, speed)
 
-class Window:
-
-    def __init__(self, maxspeed):
-        self.shapesize = 2 * maxspeed + 1
-        self.windowsize = 2 * maxspeed + 1
-
-    def apply(self, data):
-        return data[:self.windowsize]
+periods = 2
+dtype = np.uint8
+clarity = 1.1
 
 class Shape:
 
-    def __init__(self, window, speed):
+    def __init__(self, speed):
         def g():
-            for i in xrange(2*speed+1):
+            for i in xrange(periods * speed + 1):
                 yield 0 if i % speed else 1
-        self.shape = np.fromiter(g(), dtype = np.int32)
-        self.window = window
+        self.shape = np.fromiter(g(), dtype = dtype)
         self.speed = speed
 
     def getscore(self, v):
@@ -50,24 +44,20 @@ class Shape:
 class SpeedDetector:
 
     def __init__(self, maxspeed, callback = defaultcallback):
-        window = Window(maxspeed)
-        self.shapes = [Shape(window, speed) for speed in xrange(1, maxspeed + 1)]
+        self.shapes = [Shape(speed) for speed in xrange(1, maxspeed + 1)]
         #for shape in self.shapes: print ''.join(chr(ord('0') + x) if x else '.' for x in shape.shape)
-        self.history = np.zeros(maxspeed*3, dtype = np.int32)
+        self.history = np.zeros(maxspeed * (periods + 1), dtype = dtype)
         self.speed = None
         self.callback = callback
 
     def __call__(self, eventcount):
         self.history[1:] = self.history[:-1] # Lose the oldest value.
         self.history[0] = eventcount # New newest value.
-        bestscore = -1 # Min legit score is 0.
-        scores = []
         #print ''.join(chr(ord('0') + x) if x else '.' for x in self.history)
-        scores=[(shape.getscore(self.history), shape.speed) for shape in self.shapes]
-        scores.sort()
+        scores = sorted((shape.getscore(self.history), shape.speed) for shape in self.shapes)
         bestscore,bestspeed=scores[-1]
         #print ' '.join("%.3f=%s"%s for s in scores),
-        accept=scores[-1][0] >= scores[-2][0]*1.1
+        accept = scores[-1][0] >= scores[-2][0] * clarity
         #if accept:
         #    print 'OK'
         #else:
