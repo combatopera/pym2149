@@ -26,15 +26,15 @@ def defaultcallback(oldspeedornone, speed):
         log.warn("Speed was %s but is now: %s", oldspeedornone, speed)
 
 periods = 2
-dtype = np.uint8
-clarity = 1.2
+dtype = np.int32
+clarity = 1.1
 
 class Shape:
 
     def __init__(self, speed):
         def g():
             for i in xrange(periods * speed + 1):
-                yield 0 if i % speed else 1
+                yield -1 if i % speed else 1
         self.shape = np.fromiter(g(), dtype = dtype)
         self.speed = speed
 
