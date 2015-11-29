@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import logging, numpy as np
 from collections import namedtuple
 
 log = logging.getLogger(__name__)
 
-def defaultcallback(oldspeedornone, speed):
+def defaultcallback(oldspeedornone, speed, phase, clarity):
     if oldspeedornone is None:
         log.info("Speed detected: %s", speed)
     else:
@@ -28,7 +29,7 @@ def defaultcallback(oldspeedornone, speed):
 
 kernelperiods = 2
 dtype = np.int32 # Must be signed.
-clarity = 1.1
+minclarity = 1.1
 
 ScoreSpeedPhase = namedtuple('ScoreSpeedPhase', 'score speed phase')
 
@@ -51,7 +52,7 @@ class SpeedDetector:
     def __init__(self, maxspeed, callback = defaultcallback):
         self.shapes = [Shape(speed) for speed in xrange(1, maxspeed + 1)]
         self.history = np.zeros(maxspeed * (kernelperiods + 1), dtype = dtype)
-        self.speed = None
+        self.speedphase = None
         self.index = 0
         self.callback = callback
 
@@ -60,9 +61,10 @@ class SpeedDetector:
         self.history[0] = eventcount # New newest value.
         scorespeedphasetuples = sorted(shape.bestscorephase(self.history, self.index) for shape in self.shapes)
         self.index += 1
-        newspeed = scorespeedphasetuples[-1].speed, scorespeedphasetuples[-1].phase
-        accept = scorespeedphasetuples[-1].score and scorespeedphasetuples[-1].score >= scorespeedphasetuples[-2].score * clarity
-        if newspeed != self.speed and accept:
-            oldspeed = self.speed
-            self.speed = newspeed
-            self.callback(oldspeed, self.speed)
+        best = scorespeedphasetuples[-1]
+        if scorespeedphasetuples[-2].score:
+            clarity = scorespeedphasetuples[-1].score / scorespeedphasetuples[-2].score
+            if clarity >= minclarity and (best.speed, best.phase) != self.speedphase:
+                oldspeedphase = self.speedphase
+                self.speedphase = best.speed, best.phase
+                self.callback(oldspeedphase, best.speed, best.phase, clarity)
