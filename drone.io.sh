@@ -23,7 +23,7 @@ condaversion=3.16.0
 
 cd ..
 
-for project in turbo runpy; do
+for project in turbo runpy diapyr; do
 
     hg clone https://bitbucket.org/combatopera/$project
 
