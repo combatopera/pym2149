@@ -24,7 +24,7 @@ from wav import Wave16
 from mix import Multiplexer
 from ym2149 import ClockInfo, YM2149
 from iface import AmpScale, Multiplexed, Stream, JackConnection, Config
-from di import types
+from diapyr import types
 from mix import IdealMixer
 from minblep import MinBleps
 from channels import Channels

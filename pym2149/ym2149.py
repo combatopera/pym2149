@@ -21,7 +21,7 @@ from dac import Level, Dac
 from mix import BinMix
 from nod import Container
 from iface import AmpScale, Chip, YMFile, Config
-from di import types
+from diapyr import types
 from mfp import MFPTimer
 from lfsr import Lfsr
 from ring import DerivativeRing

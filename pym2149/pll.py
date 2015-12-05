@@ -17,7 +17,7 @@
 
 from __future__ import division
 from iface import Config
-from di import types
+from diapyr import types
 from util import EMA
 import time, logging
 

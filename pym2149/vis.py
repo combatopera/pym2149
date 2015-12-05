@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pitch import Period, Freq
-from di import types
+from diapyr import types
 from iface import Chip, Config
 import sys
 

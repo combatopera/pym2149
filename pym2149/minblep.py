@@ -18,7 +18,7 @@
 from __future__ import division
 import numpy as np, fractions, logging, sys, os, cPickle as pickle
 from unroll import importunrolled
-from di import types
+from diapyr import types
 from iface import Config
 from ym2149 import ClockInfo
 from ring import floatdtype
