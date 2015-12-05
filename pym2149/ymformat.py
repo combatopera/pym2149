@@ -17,7 +17,7 @@
 
 import struct, logging, os, tempfile, subprocess, shutil, sys
 from ym2149 import stclock
-from di import types
+from diapyr import types
 from iface import YMFile, Config
 from dac import PWMEffect, SinusEffect
 

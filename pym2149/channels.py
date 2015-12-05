@@ -20,7 +20,7 @@ from pitch import Pitch
 from program import FX
 from const import midichannelcount
 from mediation import Mediation
-from di import types
+from diapyr import types
 from iface import Chip, Config
 from config import ConfigLoader
 

@@ -17,7 +17,7 @@
 
 from __future__ import division
 from const import clientname
-from di import types
+from diapyr import types
 from iface import Config, Stream, Chip
 from pll import PLL
 from bg import SimpleBackground, MainBackground

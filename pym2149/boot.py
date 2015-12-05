@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from di import DI
+from diapyr import DI
 from ym2149 import ClockInfo, YM2149
 from out import StereoInfo, FloatStream
 import minblep

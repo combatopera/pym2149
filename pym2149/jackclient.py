@@ -20,7 +20,7 @@ from const import clientname
 from iface import AmpScale
 from out import FloatStream, StereoInfo
 from iface import Stream, JackConnection, Config
-from di import types
+from diapyr import types
 import native.cjack as cjack, logging
 
 log = logging.getLogger(__name__)
