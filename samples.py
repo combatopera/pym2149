@@ -21,7 +21,7 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import getconfigloader, staticconfigloader
-from pym2149.diapyr import types
+from diapyr import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
