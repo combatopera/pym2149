@@ -1,2 +1,4 @@
 author = 'Andrzej Cichocki'
 name = 'pym2149'
+path = ['$MINICONDA_HOME/bin']
+pythonpath = ['$WORKSPACE/turbo', '$WORKSPACE/diapyr']
