@@ -92,7 +92,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
                 continue
             log.info("Reloading: %s", self.configpath)
             config = self.load()
-            for consumer in self.consumers:
+            for consumer in self.consumers[:]: # Take snapshot of list.
                 consumer(config)
 
 class ConfigImpl(lazyconf.View, Config):
