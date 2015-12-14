@@ -95,7 +95,4 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
             for consumer in self.consumers[:]: # Take snapshot of list.
                 consumer(config)
 
-class ConfigImpl(lazyconf.View, Config):
-
-    def __init__(self, expressions):
-        lazyconf.View.__init__(self, expressions)
+class ConfigImpl(lazyconf.View, Config): pass
