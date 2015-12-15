@@ -61,11 +61,10 @@ class Shape:
             for i in xrange(self.kernelsize):
                 yield -1 if i % speed else 1
         self.kernel = np.fromiter(g(), dtype = dtype)
-        self.maxphase = speed * (kernelperiods + 1) - self.kernelsize
         self.speed = speed
 
     def bestscorephase(self, history, index):
-        phase, score = correlate(self.kernel, self.kernelsize, history, self.maxphase)
+        phase, score = correlate(self.kernel, self.kernelsize, history, self.speed - 1)
         return ScoreSpeedPhase(score, self.speed, (index + phase + 1) % self.speed)
 
 class SpeedDetector:
