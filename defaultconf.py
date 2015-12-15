@@ -118,3 +118,5 @@ monophonicchannels = ()
 
 midiskipenabled = True
 '''For real-time performance this should be True to minimise latency. For rendering this should be False to avoid unstable timing.'''
+
+speeddetector = True

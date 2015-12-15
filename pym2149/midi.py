@@ -167,6 +167,7 @@ class MidiPump(MainBackground):
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.midiskipenabled
+        self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
         self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
@@ -177,7 +178,6 @@ class MidiPump(MainBackground):
 
     def __call__(self):
         schedule = MidiSchedule(self.updaterate, self.skipenabled)
-        speeddetector = SpeedDetector(10)
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
@@ -185,7 +185,7 @@ class MidiPump(MainBackground):
             for _, e in update.events:
                 if e.midichan not in self.performancemidichans:
                     scheduledevents += 1
-            speeddetector(scheduledevents)
+            self.speeddetector(scheduledevents)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in update.events:
                 # TODO: It would be more useful to show frameindex modulo speed.
