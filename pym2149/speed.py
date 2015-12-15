@@ -18,6 +18,7 @@
 from __future__ import division
 import logging, numpy as np
 from collections import namedtuple
+from turbo import turbo
 
 log = logging.getLogger(__name__)
 
@@ -33,18 +34,29 @@ minclarity = 1.1
 
 ScoreSpeedPhase = namedtuple('ScoreSpeedPhase', 'score speed phase')
 
+@turbo(kernel = [dtype], kernelsize = np.uint32, history = [dtype], out = [dtype], outsize = np.uint32, i = np.uint32, off = np.uint32)
+def correlate(kernel, kernelsize, history, out, outsize):
+    for off in xrange(outsize - 1, -1, -1):
+        out[outsize - 1 - off] = 0
+        for i in xrange(kernelsize):
+            out[outsize - 1 - off] += kernel[i] * history[off + i]
+
 class Shape:
 
     def __init__(self, speed):
+        self.kernelsize = kernelperiods * speed + 1
         def g():
-            for i in xrange(kernelperiods * speed + 1):
+            for i in xrange(self.kernelsize):
                 yield -1 if i % speed else 1
         self.kernel = np.fromiter(g(), dtype = dtype)
-        self.window = speed * (kernelperiods + 1)
+        window = speed * (kernelperiods + 1)
+        self.outsize = window - self.kernelsize + 1
         self.speed = speed
 
     def bestscorephase(self, history, index):
-        score, phase = max((score, phase) for phase, score in enumerate(np.correlate(self.kernel, history[:self.window])))
+        out = np.empty(self.outsize, dtype = dtype)
+        correlate(self.kernel, self.kernelsize, history, out, self.outsize)
+        score, phase = max((score, phase) for phase, score in enumerate(out))
         return ScoreSpeedPhase(score, self.speed, (index + phase + 1) % self.speed)
 
 class SpeedDetector:
