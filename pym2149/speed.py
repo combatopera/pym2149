@@ -36,10 +36,10 @@ ScoreSpeedPhase = namedtuple('ScoreSpeedPhase', 'score speed phase')
 
 @turbo(kernel = [dtype], kernelsize = np.uint32, history = [dtype], out = [dtype], outsize = np.uint32, i = np.uint32, off = np.uint32)
 def correlate(kernel, kernelsize, history, out, outsize):
-    for off in xrange(outsize - 1, -1, -1):
-        out[outsize - 1 - off] = 0
+    for off in xrange(outsize):
+        out[off] = 0
         for i in xrange(kernelsize):
-            out[outsize - 1 - off] += kernel[i] * history[off + i]
+            out[off] += kernel[i] * history[outsize - 1 - off + i]
 
 class Shape:
 
