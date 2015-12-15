@@ -34,12 +34,24 @@ minclarity = 1.1
 
 ScoreSpeedPhase = namedtuple('ScoreSpeedPhase', 'score speed phase')
 
-@turbo(kernel = [dtype], kernelsize = np.uint32, history = [dtype], out = [dtype], outsize = np.uint32, i = np.uint32, off = np.uint32)
-def correlate(kernel, kernelsize, history, out, outsize):
-    for off in xrange(outsize):
-        out[off] = 0
+@turbo(kernel = [dtype], kernelsize = np.uint32, history = [dtype], maxphase = np.uint32, s = dtype, score = dtype, i = np.uint32, j = np.uint32, p = np.uint32, phase = np.uint32)
+def correlate(kernel, kernelsize, history, maxphase):
+    phase = 0
+    score = 0
+    j = maxphase
+    for i in xrange(kernelsize):
+        score += kernel[i] * history[j]
+        j += 1
+    for p in xrange(1, maxphase + 1):
+        s = 0
+        j = maxphase - p
         for i in xrange(kernelsize):
-            out[off] += kernel[i] * history[outsize - 1 - off + i]
+            s += kernel[i] * history[j]
+            j += 1
+        if s > score:
+            phase = p
+            score = s
+    return phase, score
 
 class Shape:
 
@@ -49,14 +61,11 @@ class Shape:
             for i in xrange(self.kernelsize):
                 yield -1 if i % speed else 1
         self.kernel = np.fromiter(g(), dtype = dtype)
-        window = speed * (kernelperiods + 1)
-        self.outsize = window - self.kernelsize + 1
+        self.maxphase = speed * (kernelperiods + 1) - self.kernelsize
         self.speed = speed
 
     def bestscorephase(self, history, index):
-        out = np.empty(self.outsize, dtype = dtype)
-        correlate(self.kernel, self.kernelsize, history, out, self.outsize)
-        score, phase = max((score, phase) for phase, score in enumerate(out))
+        phase, score = correlate(self.kernel, self.kernelsize, history, self.maxphase)
         return ScoreSpeedPhase(score, self.speed, (index + phase + 1) % self.speed)
 
 class SpeedDetector:
