@@ -27,6 +27,8 @@ def iterlibraries():
                 yield name, {}
 
 turboconf = {
-    'include_dirs': np.get_include(),
-    'libraries': list(iterlibraries()),
+    'setup_args': {
+        'include_dirs': np.get_include(),
+        'libraries': list(iterlibraries()),
+    },
 }
