@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -17,23 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, subprocess, os
+import subprocess, re, os, np
 
-def main():
-    args = sys.argv[1:]
-    for i, arg in enumerate(args):
-        if '-o' == arg:
-            libspath = args[i + 1][:-len('.so')] + '.libs'
-            break
-    if os.path.exists(libspath):
-        f = open(libspath)
-        try:
-            libs = f.read().splitlines()
-        finally:
-            f.close()
-    else:
-        libs = []
-    sys.exit(subprocess.call(['/usr/bin/ld'] + ["-l%s" % lib for lib in libs] + args))
+def iterlibraries():
+    ldconfigpath = '/sbin/ldconfig'
+    trylibs = 'jack', 'asound'
+    if os.path.exists(ldconfigpath):
+        installed = set(re.search(r'[^\s]+', line).group() for line in subprocess.check_output([ldconfigpath, '-p']).splitlines() if line.startswith('\t'))
+        for name in trylibs:
+            if "lib%s.so" % name in installed:
+                yield name, {}
 
-if '__main__' == __name__:
-    main()
+turboconf = {
+    'include_dirs': np.get_include(),
+    'libraries': list(iterlibraries()),
+}
