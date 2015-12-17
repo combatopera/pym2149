@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import subprocess, re, os, np
+import subprocess, re, os, numpy as np
 
 def iterlibraries():
     ldconfigpath = '/sbin/ldconfig'
