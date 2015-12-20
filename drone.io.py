@@ -28,7 +28,11 @@ def main():
         subprocess.check_call(['hg', 'clone', "https://bitbucket.org/combatopera/%s" % project])
     os.environ['PATH'] = "%s%s%s" % (os.path.join(os.getcwd(), 'runpy'), os.pathsep, os.environ['PATH'])
     subprocess.check_call(['wget', '--no-verbose', "http://repo.continuum.io/miniconda/Miniconda-%s-Linux-x86_64.sh" % condaversion])
-    subprocess.Popen(['bash', "Miniconda-%s-Linux-x86_64.sh" % condaversion]).check_communicate(input = '\nyes\nminiconda\nno\n')
+    installcommand = ['bash', "Miniconda-%s-Linux-x86_64.sh" % condaversion]
+    p = subprocess.Popen(installcommand)
+    p.communicate(input = '\nyes\nminiconda\nno\n')
+    if p.wait():
+        raise subprocess.CalledProcessError(p.returncode, installcommand)
     subprocess.check_call([os.path.join('miniconda', 'bin', 'conda'), 'install', '-q', 'pyflakes', 'nose'] + ['numpy', 'cython', 'mock'])
     os.environ['MINICONDA_HOME'] = os.path.join(os.getcwd(), 'miniconda')
     os.chdir(projectdir)
