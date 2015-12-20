@@ -23,7 +23,7 @@ condaversion = '3.16.0'
 
 def main():
     projectdir = os.getcwd()
-    os.setcwd(os.path.dirname(projectdir))
+    os.chdir(os.path.dirname(projectdir))
     for project in 'runpy', 'turbo', 'diapyr':
         subprocess.check_call(['hg', 'clone', "https://bitbucket.org/combatopera/%s" % project])
     os.environ['PATH'] = "%s%s%s" % (os.path.join(os.getcwd(), 'runpy'), os.pathsep, os.environ['PATH'])
@@ -31,7 +31,7 @@ def main():
     subprocess.Popen(['bash', "Miniconda-%s-Linux-x86_64.sh" % condaversion]).check_communicate(input = '\nyes\nminiconda\nno\n')
     subprocess.check_call([os.path.join('miniconda', 'bin', 'conda'), 'install', '-q', 'pyflakes', 'nose'] + ['numpy', 'cython', 'mock'])
     os.environ['MINICONDA_HOME'] = os.path.join(os.getcwd(), 'miniconda')
-    os.setcwd(projectdir)
+    os.chdir(projectdir)
     sys.exit(subprocess.call(['tests']))
 
 if '__main__' == __name__:
