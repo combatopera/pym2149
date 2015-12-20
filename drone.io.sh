@@ -23,7 +23,7 @@ condaversion=3.16.0
 
 cd ..
 
-for project in turbo runpy diapyr; do
+for project in runpy turbo diapyr; do
 
     hg clone https://bitbucket.org/combatopera/$project
 
@@ -35,7 +35,7 @@ wget --no-verbose http://repo.continuum.io/miniconda/Miniconda-$condaversion-Lin
 
 bash Miniconda-$condaversion-Linux-x86_64.sh <<<$'\nyes\nminiconda\nno\n'
 
-miniconda/bin/conda install -q openssl=1.0.1h numpy cython pyflakes nose mock python=2.7.9=1
+miniconda/bin/conda install -q pyflakes nose numpy cython openssl=1.0.1h mock
 
 export MINICONDA_HOME="$PWD/miniconda"
 
