@@ -29,7 +29,7 @@ def main():
     os.environ['PATH'] = "%s%s%s" % (os.path.join(os.getcwd(), 'runpy'), os.pathsep, os.environ['PATH'])
     subprocess.check_call(['wget', '--no-verbose', "http://repo.continuum.io/miniconda/Miniconda-%s-Linux-x86_64.sh" % condaversion])
     installcommand = ['bash', "Miniconda-%s-Linux-x86_64.sh" % condaversion]
-    p = subprocess.Popen(installcommand)
+    p = subprocess.Popen(installcommand, stdin = subprocess.PIPE)
     p.communicate(input = '\nyes\nminiconda\nno\n')
     if p.wait():
         raise subprocess.CalledProcessError(p.returncode, installcommand)
