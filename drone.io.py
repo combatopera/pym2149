@@ -26,7 +26,7 @@ def main():
     execfile('project.info', conf)
     projectdir = os.getcwd()
     os.chdir(os.path.dirname(projectdir))
-    for project in itertools.join(['runpy'], conf.projects):
+    for project in itertools.chain(['runpy'], conf.projects):
         subprocess.check_call(['hg', 'clone', "https://bitbucket.org/combatopera/%s" % project])
     os.environ['PATH'] = "%s%s%s" % (os.path.join(os.getcwd(), 'runpy'), os.pathsep, os.environ['PATH'])
     subprocess.check_call(['wget', '--no-verbose', "http://repo.continuum.io/miniconda/Miniconda-%s-Linux-x86_64.sh" % condaversion])
