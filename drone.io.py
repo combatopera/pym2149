@@ -17,14 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, subprocess
+import os, sys, subprocess, itertools
 
 condaversion = '3.16.0'
 
 def main():
+    conf = {}
+    execfile('project.info', conf)
     projectdir = os.getcwd()
     os.chdir(os.path.dirname(projectdir))
-    for project in 'runpy', 'turbo', 'diapyr':
+    for project in itertools.join(['runpy'], conf.projects):
         subprocess.check_call(['hg', 'clone', "https://bitbucket.org/combatopera/%s" % project])
     os.environ['PATH'] = "%s%s%s" % (os.path.join(os.getcwd(), 'runpy'), os.pathsep, os.environ['PATH'])
     subprocess.check_call(['wget', '--no-verbose', "http://repo.continuum.io/miniconda/Miniconda-%s-Linux-x86_64.sh" % condaversion])
