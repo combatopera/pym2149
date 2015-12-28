@@ -147,7 +147,8 @@ class MinBleps:
     fromfqname = ''.join(w + '.' for w in __name__.split('.')[:-1]) + 'cpaste'
     fqmodulename = fromfqname + str(self.mixinsize)
     if fqmodulename not in sys.modules:
-      importunrolled(fromfqname, fqmodulename, dict(gmixinsize = self.mixinsize))
+      rootdir = os.path.join(*([os.path.dirname(__file__)] + (len(__name__.split('.')) - 1) * ['..']))
+      importunrolled(rootdir, fromfqname, fqmodulename, dict(gmixinsize = self.mixinsize))
     self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
     return self
 
