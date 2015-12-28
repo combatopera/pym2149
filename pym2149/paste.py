@@ -15,26 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-cimport numpy as np
-import cython
+import numpy as np
+from turbo import turbo
 
-@cython.boundscheck(False)
-def pasteminbleps(unsigned int ampsize, np.ndarray[np.float32_t] out, np.ndarray[np.int32_t] naivex2outx, unsigned int outsize, np.ndarray[np.float32_t] demultiplexed, np.ndarray[np.int32_t] naivex2off, np.ndarray[np.float32_t] amp, unsigned int naivex, unsigned int naiverate, unsigned int outrate):
+@turbo(ampsize = np.uint32, outp = [np.float32], naivex2outxp = [np.int32], outsize = np.uint32, demultiplexedp = [np.float32], naivex2offp = [np.int32], ampp = [np.float32], naivex = np.uint32, naiverate = np.uint32, outrate = np.uint32, out0 = np.uint32, dclevel = np.float32, dcindex = np.uint32, ampchunk = np.uint32, a = np.float32, i = np.uint32, dccount = np.uint32, mixinp = [np.float32])
+def pasteminbleps(ampsize, outp, naivex2outxp, outsize, demultiplexedp, naivex2offp, ampp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   cdef unsigned int mixinsize = gmixinsize
-  cdef np.float32_t* outp = &out[0]
-  cdef np.float32_t* demultiplexedp = &demultiplexed[0]
-  cdef np.float32_t* ampp = &amp[0]
-  cdef np.int32_t* naivex2outxp = &naivex2outx[0]
-  cdef np.int32_t* naivex2offp = &naivex2off[0]
-  cdef unsigned int out0 = naivex2outxp[naivex]
-  cdef np.float32_t dclevel = 0
-  cdef unsigned int dcindex = 0
-  cdef unsigned int ampchunk
-  cdef np.float32_t a
-  cdef unsigned int i
-  cdef unsigned int dccount
-  cdef np.float32_t* mixinp
+  out0 = naivex2outxp[naivex]
+  dclevel = 0
+  dcindex = 0
   while ampsize:
     ampchunk = min(ampsize, naiverate - naivex)
     for naivex in xrange(naivex, naivex + ampchunk):
