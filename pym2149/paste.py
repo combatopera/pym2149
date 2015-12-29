@@ -16,12 +16,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from turbo import turbo
+from turbo import turbo, X
 
-@turbo(ampsize = np.uint32, outp = [np.float32], naivex2outxp = [np.int32], outsize = np.uint32, demultiplexedp = [np.float32], naivex2offp = [np.int32], ampp = [np.float32], naivex = np.uint32, naiverate = np.uint32, outrate = np.uint32, out0 = np.uint32, dclevel = np.float32, dcindex = np.uint32, ampchunk = np.uint32, a = np.float32, i = np.uint32, dccount = np.uint32, mixinp = [np.float32])
+mixinsize = None
+
+@turbo(ampsize = np.uint32, outp = [np.float32], naivex2outxp = [np.int32], outsize = np.uint32, demultiplexedp = [np.float32], naivex2offp = [np.int32], ampp = [np.float32], naivex = np.uint32, naiverate = np.uint32, outrate = np.uint32, out0 = np.uint32, dclevel = np.float32, dcindex = np.uint32, ampchunk = np.uint32, a = np.float32, i = np.uint32, dccount = np.uint32, mixinp = [np.float32], mixinsize = X)
 def pasteminbleps(ampsize, outp, naivex2outxp, outsize, demultiplexedp, naivex2offp, ampp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
-  cdef unsigned int mixinsize = gmixinsize
   out0 = naivex2outxp[naivex]
   dclevel = 0
   dcindex = 0
@@ -38,7 +39,7 @@ def pasteminbleps(ampsize, outp, naivex2outxp, outsize, demultiplexedp, naivex2o
           for UNROLL in xrange(dccount):
             outp[0] += dclevel
             outp += 1
-          for UNROLL in xrange(gmixinsize):
+          for UNROLL in xrange(mixinsize):
             outp[0] += mixinp[0] * a + dclevel
             outp += 1
             mixinp += 1
@@ -48,7 +49,7 @@ def pasteminbleps(ampsize, outp, naivex2outxp, outsize, demultiplexedp, naivex2o
             outp[0] += dclevel
             outp += 1
           outp -= mixinsize
-          for UNROLL in xrange(gmixinsize):
+          for UNROLL in xrange(mixinsize):
             outp[0] += mixinp[0] * a
             outp += 1
             mixinp += 1
