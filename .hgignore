@@ -10,4 +10,4 @@
 [.]so$
 ^pym2149/cpaste[0-9]+[.]pyx$
 ^pym2149/MinBleps[(].*[)]$
-^pym2149/turbo_.+[.]pyx$
+_turbo/
