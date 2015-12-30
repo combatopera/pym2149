@@ -144,7 +144,7 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def link(self):
-    self.pasteminbleps = pasteminbleps[self.mixinsize]
+    self.pasteminbleps = pasteminbleps(X = self.mixinsize)
     return self
 
   def paste(self, naivex, diffbuf, outbuf):
