@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-import numpy as np, fractions, logging, sys, os, cPickle as pickle
+import numpy as np, fractions, logging, os, cPickle as pickle
 from paste import pasteminbleps
 from diapyr import types
 from iface import Config
