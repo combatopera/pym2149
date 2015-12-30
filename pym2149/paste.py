@@ -16,11 +16,11 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from turbo import turbo, X
+from turbo import turbo, T
 
 mixinsize = None
 
-@turbo(ampsize = np.uint32, outp = [np.float32], naivex2outxp = [np.int32], outsize = np.uint32, demultiplexedp = [np.float32], naivex2offp = [np.int32], ampp = [np.float32], naivex = np.uint32, naiverate = np.uint32, outrate = np.uint32, out0 = np.uint32, dclevel = np.float32, dcindex = np.uint32, ampchunk = np.uint32, a = np.float32, i = np.uint32, dccount = np.uint32, mixinp = [np.float32], mixinsize = X)
+@turbo(ampsize = np.uint32, outp = [np.float32], naivex2outxp = [np.int32], outsize = np.uint32, demultiplexedp = [np.float32], naivex2offp = [np.int32], ampp = [np.float32], naivex = np.uint32, naiverate = np.uint32, outrate = np.uint32, out0 = np.uint32, dclevel = np.float32, dcindex = np.uint32, ampchunk = np.uint32, a = np.float32, i = np.uint32, dccount = np.uint32, mixinp = [np.float32], mixinsize = T)
 def pasteminbleps(ampsize, outp, naivex2outxp, outsize, demultiplexedp, naivex2offp, ampp, naivex, naiverate, outrate):
   # TODO: This code needs tests.
   out0 = naivex2outxp[naivex]
