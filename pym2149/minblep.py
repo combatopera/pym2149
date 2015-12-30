@@ -17,7 +17,7 @@
 
 from __future__ import division
 import numpy as np, fractions, logging, sys, os, cPickle as pickle
-from unroll import importunrolled
+from paste import pasteminbleps
 from diapyr import types
 from iface import Config
 from ym2149 import ClockInfo
@@ -144,12 +144,7 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def link(self):
-    fromfqname = ''.join(w + '.' for w in __name__.split('.')[:-1]) + 'cpaste'
-    fqmodulename = fromfqname + str(self.mixinsize)
-    if fqmodulename not in sys.modules:
-      rootdir = os.path.join(*([os.path.dirname(__file__)] + (len(__name__.split('.')) - 1) * ['..']))
-      importunrolled(rootdir, fromfqname, fqmodulename, dict(gmixinsize = self.mixinsize))
-    self.pasteminbleps = sys.modules[fqmodulename].pasteminbleps
+    self.pasteminbleps = pasteminbleps[self.mixinsize]
     return self
 
   def paste(self, naivex, diffbuf, outbuf):
