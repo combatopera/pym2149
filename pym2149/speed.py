@@ -18,7 +18,7 @@
 from __future__ import division
 import logging, numpy as np
 from collections import namedtuple
-from turbo import turbo
+from pyrbo import turbo
 
 log = logging.getLogger(__name__)
 

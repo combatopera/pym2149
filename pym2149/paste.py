@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from turbo import turbo, X
+from pyrbo import turbo, X
 
 mixinsize = None
 
