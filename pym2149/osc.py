@@ -22,7 +22,7 @@ from buf import MasterBuf
 from mfp import mfpclock
 from shapes import toneshape
 from util import ceildiv
-from turbo import turbo
+from pyrbo import turbo
 
 class DerivativeNode(BufNode):
 
