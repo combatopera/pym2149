@@ -1,4 +1,4 @@
 author = 'Andrzej Cichocki'
 name = 'pym2149'
-projects = 'turbo', 'diapyr'
+projects = 'pyrbo', 'diapyr'
 deps = 'numpy', 'cython', 'mock'
