@@ -129,11 +129,11 @@ cdef class Client:
     cdef snd_seq_t* handle
     cdef int portid
 
-    def __init__(self, const char* client_name):
+    def __init__(self, const char* client_name, const char* port_name):
         if snd_seq_open(&(self.handle), 'default', SND_SEQ_OPEN_INPUT | SND_SEQ_OPEN_OUTPUT, 0):
             raise Exception('Failed to open ALSA.')
         snd_seq_set_client_name(self.handle, client_name)
-        self.portid = snd_seq_create_simple_port(self.handle, 'IN', SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE, SND_SEQ_PORT_TYPE_SYNTHESIZER)
+        self.portid = snd_seq_create_simple_port(self.handle, port_name, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE, SND_SEQ_PORT_TYPE_SYNTHESIZER)
 
     def event_input(self):
         cdef snd_seq_event_t* event

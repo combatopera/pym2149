@@ -146,7 +146,7 @@ class MidiListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        self.client = calsa.Client(clientname)
+        self.client = calsa.Client(clientname, "%s IN" % clientname)
         SimpleBackground.start(self)
 
     def __call__(self):
