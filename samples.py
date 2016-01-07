@@ -190,6 +190,9 @@ class Target:
         subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
+    mainimpl(getconfigloader())
+
+def mainimpl(configloader):
     class T250(Tone): freq = 250
     class T1k(Tone): freq = 1000
     class T1k5(Tone): freq = 1500
@@ -213,7 +216,7 @@ def main():
     for p in xrange(1, 9):
         class t(BaseTone): period = p
         tones.append(t)
-    target = Target(getconfigloader())
+    target = Target(configloader)
     target.dump(2, [T250, 0, 0], 'tone250')
     target.dump(2, [T1k, 0, 0], 'tone1k')
     target.dump(2, [T1k5, 0, 0], 'tone1k5')
