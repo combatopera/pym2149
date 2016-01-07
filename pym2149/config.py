@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, anchor, lazyconf, time
+import sys, logging, os, imp, lazyconf, time
 from const import appconfigdir
 from iface import Config
 from bg import SimpleBackground
@@ -63,7 +63,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
 
     def load(self):
         expressions = lazyconf.Expressions()
-        expressions.load(os.path.join(os.path.dirname(anchor.__file__), 'defaultconf.py'))
+        expressions.load(imp.find_module('defaultconf')[1])
         if self.defaultconfigname != self.configname:
             self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
             self.mtime = os.stat(self.configpath).st_mtime
