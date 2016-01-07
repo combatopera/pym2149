@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, imp, lazyconf, time
+import sys, logging, os, imp, aridipy, time
 from const import appconfigdir
 from iface import Config
 from bg import SimpleBackground
@@ -62,7 +62,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
         self.consumers = []
 
     def load(self):
-        expressions = lazyconf.Expressions()
+        expressions = aridipy.Expressions()
         expressions.load(imp.find_module('defaultconf')[1])
         if self.defaultconfigname != self.configname:
             self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
@@ -95,4 +95,4 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
             for consumer in self.consumers[:]: # Take snapshot of list.
                 consumer(config)
 
-class ConfigImpl(lazyconf.View, Config): pass
+class ConfigImpl(aridipy.View, Config): pass
