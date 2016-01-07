@@ -144,6 +144,17 @@ class Player:
 
 class Target:
 
+    @classmethod
+    def sox(cls):
+        try:
+            return cls.soxflag
+        except AttributeError:
+            pass
+        cls.soxflag = not subprocess.call(['which', 'sox'])
+        if not cls.soxflag:
+            log.info("sox is not available, spectrograms won't be created.")
+        return cls.soxflag
+
     def __init__(self, configloader):
         self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
         if not os.path.exists(self.targetpath):
@@ -187,7 +198,8 @@ class Target:
         finally:
             di.stop()
         log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
-        subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
+        if self.sox():
+            subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
     mainimpl(getconfigloader())
