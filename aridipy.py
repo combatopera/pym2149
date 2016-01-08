@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, os
+import re, logging, os, imp
 
 log = logging.getLogger(__name__)
 
@@ -87,8 +87,9 @@ class Expressions:
                 return path
             path = os.path.join(os.path.dirname(path), link)
 
-    def __init__(self):
+    def __init__(self, defaultsmodulename):
         self.expressions = {}
+        self.loadpath(imp.find_module(defaultsmodulename)[1])
 
     def loadpath(self, path):
         f = open(path)
