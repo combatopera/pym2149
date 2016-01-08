@@ -63,11 +63,11 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
 
     def load(self):
         expressions = aridipy.Expressions()
-        expressions.load(imp.find_module('defaultconf')[1])
+        expressions.loadpath(imp.find_module('defaultconf')[1])
         if self.defaultconfigname != self.configname:
             self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
             self.mtime = os.stat(self.configpath).st_mtime
-            expressions.load(self.configpath)
+            expressions.loadpath(self.configpath)
         config = ConfigImpl(expressions)
         for argname, arg in self.entries:
             setattr(config, argname, arg)
