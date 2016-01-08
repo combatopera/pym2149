@@ -90,7 +90,7 @@ class Expressions:
     def __init__(self):
         self.expressions = {}
 
-    def load(self, path):
+    def loadpath(self, path):
         f = open(path)
         try:
             self.loadlines(path, f.readline)
