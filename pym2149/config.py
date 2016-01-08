@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, imp, aridipy, time
+import sys, logging, os, aridipy, time
 from const import appconfigdir
 from iface import Config
 from bg import SimpleBackground
@@ -62,8 +62,7 @@ class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
         self.consumers = []
 
     def load(self):
-        expressions = aridipy.Expressions()
-        expressions.loadpath(imp.find_module('defaultconf')[1])
+        expressions = aridipy.Expressions('defaultconf')
         if self.defaultconfigname != self.configname:
             self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
             self.mtime = os.stat(self.configpath).st_mtime
