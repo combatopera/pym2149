@@ -89,7 +89,8 @@ class Expressions:
 
     def __init__(self, defaultsmodulename):
         self.expressions = {}
-        self.loadpath(imp.find_module(defaultsmodulename)[1])
+        if defaultsmodulename is not None:
+            self.loadpath(imp.find_module(defaultsmodulename)[1])
 
     def loadpath(self, path):
         f = open(path)
