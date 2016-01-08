@@ -93,11 +93,11 @@ class Expressions:
     def load(self, path):
         f = open(path)
         try:
-            self.loadfile(path, f.readline)
+            self.loadlines(path, f.readline)
         finally:
             f.close()
 
-    def loadfile(self, path, readline):
+    def loadlines(self, path, readline):
         head = [
             "__file__ = %r\n" % self.canonicalize(path),
             'def sys_path_add(path):\n',

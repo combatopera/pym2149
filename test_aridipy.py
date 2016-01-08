@@ -26,7 +26,7 @@ class TestFork(unittest.TestCase):
         expressions = Expressions()
         lines = ['woo = config.yay\n', '']
         readline = lambda: lines.pop(0)
-        expressions.loadfile('whatever', readline)
+        expressions.loadlines('whatever', readline)
         view = View(expressions)
         fork = Fork(view)
         view.yay = 'viewyay'
