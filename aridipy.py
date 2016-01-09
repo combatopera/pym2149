@@ -34,7 +34,8 @@ class ConfigName:
     @classmethod
     def getnameornone(cls):
         try:
-            return os.environ[cls.envparam] # None is not supported by this mechanism.
+            name = os.environ[cls.envparam]
+            return name if name else None # Empty means defaults.
         except KeyError:
             if os.path.exists(cls.workspacepath):
                 confignames = sorted(name for name in os.listdir(cls.workspacepath) if os.path.exists(cls.pathofname(name)))
