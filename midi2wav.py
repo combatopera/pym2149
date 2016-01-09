@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env runpy
 
 # Copyright 2014 Andrzej Cichocki
 
@@ -20,7 +20,8 @@
 from pym2149.initlogging import logging
 from pym2149.out import configure
 from pym2149.midi import MidiListen, MidiPump
-from pym2149.config import getconfigloader
+from pym2149.config import ConfigName
+from pym2149.iface import Config
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
@@ -30,13 +31,10 @@ from ymplayer import SimpleChipTimer
 log = logging.getLogger(__name__)
 
 def main():
-    configloader = getconfigloader('outpath')
-    config = configloader.load()
-    di = createdi(config)
-    di.add(configloader)
+    di = createdi(ConfigName('outpath'))
     di.add(PLL)
     configure(di)
-    di.add(Channels)
+    Channels.addtodi(di)
     di.start()
     try:
         channels = di(Channels)
@@ -45,7 +43,7 @@ def main():
         di.add(MidiPump)
         di.add(MidiListen)
         di.start()
-        awaitinterrupt(config)
+        awaitinterrupt(di(Config))
     finally:
         di.stop()
 
