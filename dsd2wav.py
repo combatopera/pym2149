@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env runpy
 
 # Copyright 2014 Andrzej Cichocki
 
@@ -20,23 +20,23 @@
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
-from pym2149.config import getconfigloader
+from pym2149.config import ConfigName
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream
+from pym2149.iface import Chip, Stream, Config
 from ymplayer import ChipTimer
 
 log = logging.getLogger(__name__)
 
 def main():
-    config = getconfigloader('inpath', 'outpath').load()
+    di = createdi(ConfigName('inpath', 'outpath'))
+    config = di(Config)
     f = open(config.inpath, 'rb')
     try:
         log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
         bytecode = [ord(c) for c in f.read()]
     finally:
         f.close()
-    di = createdi(config)
     configure(di)
     chip = di(Chip)
     di.start()
