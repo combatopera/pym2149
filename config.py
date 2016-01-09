@@ -17,7 +17,6 @@
 
 import sys, logging, os, aridipy, time
 from const import appconfigdir
-from iface import Config
 from bg import SimpleBackground
 
 log = logging.getLogger(__name__)
@@ -73,9 +72,9 @@ class ConfigName:
         for name, value in self.additems:
             setattr(config, name, value)
 
-class ConfigImpl(aridipy.View, Config): pass
-
 class PathInfo:
+
+    configimpl = aridipy.View
 
     def __init__(self, configname):
         self.configname = configname
@@ -90,7 +89,7 @@ class PathInfo:
         expressions.loadmodule('defaultconf')
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
-        config = ConfigImpl(expressions)
+        config = self.configimpl(expressions)
         self.configname.applyitems(config)
         return config
 
@@ -102,12 +101,14 @@ class PathInfo:
 
 class ConfigSubscription(SimpleBackground):
 
+    pathinfoimpl = PathInfo
+
     def __init__(self, configname, consumer):
         self.configname = configname
         self.consumer = consumer
 
     def start(self):
-        self.pathinfo = PathInfo(self.configname)
+        self.pathinfo = self.pathinfoimpl(self.configname)
         self.consumer(self.pathinfo.load())
         SimpleBackground.start(self)
 
