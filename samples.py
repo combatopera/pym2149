@@ -20,7 +20,7 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
-from pym2149.config import getconfigloader, staticconfigloader
+from pym2149.config import ConfigName
 from diapyr import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
@@ -155,23 +155,22 @@ class Target:
             log.info("sox is not available, spectrograms won't be created.")
         return cls.soxflag
 
-    def __init__(self, configloader):
+    def __init__(self, configname):
         self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
         if not os.path.exists(self.targetpath):
             os.mkdir(self.targetpath)
-        self.configloader = configloader
+        self.configname = configname
 
     def dump(self, beatsperbar, beats, name):
         path = os.path.join(self.targetpath, name)
         log.info(path)
-        config = self.configloader.load()
+        di = createdi(self.configname)
+        config = di(Config)
         config.midiprograms = {}
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
-        di = createdi(config)
-        di.add(staticconfigloader)
         configure(di)
-        di.add(Channels)
+        Channels.addtodi(di)
         di.add(ChipTimer)
         di.add(Player)
         programids = ProgramIds()
@@ -202,9 +201,9 @@ class Target:
             subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
 
 def main():
-    mainimpl(getconfigloader())
+    mainimpl(ConfigName())
 
-def mainimpl(configloader):
+def mainimpl(configname):
     class T250(Tone): freq = 250
     class T1k(Tone): freq = 1000
     class T1k5(Tone): freq = 1500
@@ -228,7 +227,7 @@ def mainimpl(configloader):
     for p in xrange(1, 9):
         class t(BaseTone): period = p
         tones.append(t)
-    target = Target(configloader)
+    target = Target(configname)
     target.dump(2, [T250, 0, 0], 'tone250')
     target.dump(2, [T1k, 0, 0], 'tone1k')
     target.dump(2, [T1k5, 0, 0], 'tone1k5')
