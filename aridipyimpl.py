@@ -31,7 +31,7 @@ class Expression:
         exec (self.code, g)
         return g
 
-    def __call__(self, view):
+    def resolve(self, view):
         return self.run({'config': view})[self.name]
 
     def modify(self, view, objname, obj):
@@ -60,7 +60,7 @@ class View:
 
     def __getattr__(self, name):
         context = self.pRiVaTe.currentcontext()
-        obj = self.pRiVaTe.expressions.expression(name)(context)
+        obj = self.pRiVaTe.expressions.expression(name).resolve(context)
         for mod in self.pRiVaTe.expressions.modifiers(name):
             mod.modify(context, name, obj)
         return obj
