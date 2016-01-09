@@ -20,7 +20,7 @@ from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile, Config
 from diapyr import types
 from pym2149.ym2149 import ClockInfo
-from pym2149.bg import MainBackground
+from bg import MainBackground
 from pym2149.nod import Block
 from pym2149.minblep import MinBleps
 
