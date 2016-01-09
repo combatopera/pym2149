@@ -1,3 +1,4 @@
+#gclean
 ^target$
 [.]pyc$
 [.]O$
