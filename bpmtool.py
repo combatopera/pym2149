@@ -18,12 +18,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from pym2149.config import getconfigloader
+from pym2149.config import ConfigName
+from pym2149.iface import Config
 from pym2149.boot import createdi
 
 def main():
-    config = getconfigloader().load()
-    createdi(config)
+    config = createdi(ConfigName())(Config)
     ups = config.updaterate
     lpb = config.linesperbeat
     for upl in xrange(1, 21):
