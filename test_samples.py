@@ -18,12 +18,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, samples
-from pym2149.config import ConfigLoaderImpl
+from pym2149.config import ConfigName
 
 class TestSamples(unittest.TestCase):
 
     def test_samples(self):
-        samples.mainimpl(ConfigLoaderImpl([], [], configname = 'defaults'))
+        samples.mainimpl(ConfigName(nameornone = None, args = []))
 
 if '__main__' == __name__:
     unittest.main()
