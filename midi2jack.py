@@ -21,10 +21,10 @@ from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.midi import MidiListen, MidiPump
-from pym2149.config import getconfigloader
+from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import createdi
-from pym2149.iface import Stream
+from pym2149.iface import Stream, Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from ymplayer import SyncTimer
@@ -32,19 +32,17 @@ from ymplayer import SyncTimer
 log = logging.getLogger(__name__)
 
 def main():
-    configloader = getconfigloader()
-    config = configloader.load()
-    di = createdi(config)
-    di.add(configloader)
+    di = createdi(ConfigName())
     di.add(PLL)
     di.add(JackClient)
     di.start()
     try:
         configure(di)
-        di.add(Channels)
+        Channels.addtodi(di)
         di.start()
         log.info(di(Channels))
         stream = di(Stream)
+        config = di(Config)
         log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
         di.add(MidiPump)
