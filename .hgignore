@@ -1,7 +1,4 @@
 ^target$
-^observations$
-^ymfiles$
-^resources$
 [.]pyc$
 [.]O$
 [.]swp$
