@@ -166,18 +166,19 @@ class Target:
         log.info(path)
         di = createdi(self.configname)
         config = di(Config)
-        config.midiprograms = {}
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
         configure(di)
-        Channels.addtodi(di)
+        di.add(Channels)
+        channels = di(Channels)
+        channels.midiprograms = {}
         di.add(ChipTimer)
         di.add(Player)
         programids = ProgramIds()
         frames = Frames()
         def register(program):
             programid = config.midiprogrambase + len(programids)
-            config.midiprograms[programid] = program
+            channels.midiprograms[programid] = program
             programids[program] = programid
         register(Silence)
         lftimer = SimpleTimer(config.updaterate)
