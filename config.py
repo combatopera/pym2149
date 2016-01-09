@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 class ConfigName:
 
+    envparam = 'ARIDIPY_CONFIG'
     workspacepath = os.path.join(appconfigdir, 'workspace')
     defaultslabel = 'defaults'
 
@@ -33,7 +34,7 @@ class ConfigName:
     @classmethod
     def getnameornone(cls):
         try:
-            return os.environ['PYM2149_CONFIG'] # None is not supported by this mechanism.
+            return os.environ[self.envparam] # None is not supported by this mechanism.
         except KeyError:
             if os.path.exists(cls.workspacepath):
                 confignames = sorted(name for name in os.listdir(cls.workspacepath) if os.path.exists(cls.pathofname(name)))
