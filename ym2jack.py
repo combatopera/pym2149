@@ -20,7 +20,8 @@
 from pym2149.initlogging import logging
 from pym2149.ymformat import YMOpen
 from pym2149.jackclient import JackClient, configure
-from pym2149.config import getconfigloader
+from pym2149.config import ConfigName
+from pym2149.iface import Config
 from pym2149.vis import Roll
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
@@ -29,8 +30,7 @@ from ymplayer import Player, SyncTimer
 log = logging.getLogger(__name__)
 
 def main():
-    config = getconfigloader('inpath').load()
-    di = createdi(config)
+    di = createdi(ConfigName('inpath'))
     di.add(JackClient)
     di.add(YMOpen)
     di.start()
@@ -40,7 +40,7 @@ def main():
         di.add(SyncTimer)
         di.add(Player)
         di.start()
-        awaitinterrupt(config)
+        awaitinterrupt(di(Config))
     finally:
         di.stop()
 
