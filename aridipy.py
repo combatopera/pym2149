@@ -73,10 +73,12 @@ class ConfigName:
         for name, value in self.additems:
             setattr(config, name, value)
 
+Config = aridipyimpl.View
+
 class PathInfo:
 
     defaultsmodulename = 'defaultconf'
-    configimpl = aridipyimpl.View
+    configimpl = Config
 
     def __init__(self, configname):
         self.configname = configname
