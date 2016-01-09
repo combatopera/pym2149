@@ -19,79 +19,105 @@ import sys, logging, os, aridipy, time
 from const import appconfigdir
 from iface import Config
 from bg import SimpleBackground
-from util import singleton
 
 log = logging.getLogger(__name__)
 
-def getconfigloader(*argnames, **kwargs):
-    if 'PYM2149_CONFIG' in os.environ:
-        kwargs = kwargs.copy()
-        kwargs['configname'] = os.environ['PYM2149_CONFIG']
-    return ConfigLoaderImpl(argnames, sys.argv[1:], **kwargs)
+class ConfigName:
 
-class ConfigLoader: pass
-
-@singleton
-class staticconfigloader(ConfigLoader):
-
-    def subscribe(self, consumer, config):
-        consumer(config)
-
-class ConfigLoaderImpl(ConfigLoader, SimpleBackground):
-
-    defaultconfigname = 'defaults'
     workspacepath = os.path.join(appconfigdir, 'workspace')
+    defaultslabel = 'defaults'
 
-    def __init__(self, argnames, args, **kwargs):
-        if len(argnames) != len(args):
-            raise Exception("Expected %s but got: %s" % (argnames, args))
-        if 'configname' in kwargs:
-            self.configname = kwargs['configname']
-        else:
-            confignames = [self.defaultconfigname]
-            if os.path.exists(self.workspacepath):
-                confignames += sorted(cn for cn in os.listdir(self.workspacepath) if os.path.exists(os.path.join(self.workspacepath, cn, 'chip.py')))
-            if 1 == len(confignames): # Just defaults.
-                self.configname, = confignames
-            else:
-                for i, cn in enumerate(confignames):
-                    print >> sys.stderr, "%s) %s" % (i, cn)
+    @classmethod
+    def pathofname(cls, name):
+        return os.path.join(cls.workspacepath, name, 'chip.py')
+
+    @classmethod
+    def getnameornone(cls):
+        try:
+            return os.environ['PYM2149_CONFIG'] # None is not supported by this mechanism.
+        except KeyError:
+            if os.path.exists(cls.workspacepath):
+                confignames = sorted(name for name in os.listdir(cls.workspacepath) if os.path.exists(cls.pathofname(name)))
+                for i, name in enumerate([cls.defaultslabel] + confignames):
+                    print >> sys.stderr, "%s) %s" % (i, name)
                 sys.stderr.write('#? ')
-                self.configname = confignames[int(raw_input())]
-        self.entries = zip(argnames, args)
-        self.consumers = []
+                number = int(raw_input())
+                if number < 0:
+                    raise Exception(number)
+                if number:
+                    return confignames[number - 1]
 
-    def load(self):
-        expressions = aridipy.Expressions('defaultconf')
-        if self.defaultconfigname != self.configname:
-            self.configpath = os.path.join(self.workspacepath, self.configname, 'chip.py')
-            self.mtime = os.stat(self.configpath).st_mtime
-            expressions.loadpath(self.configpath)
-        config = ConfigImpl(expressions)
-        for argname, arg in self.entries:
-            setattr(config, argname, arg)
-        return config
+    def __init__(self, *params, **kwargs):
+        try:
+            args = kwargs['args']
+        except KeyError:
+            args = sys.argv[1:]
+        if len(args) != len(params):
+            raise Exception("Expected %s but got: %s" % (params, args))
+        try:
+            nameornone = kwargs['nameornone']
+        except KeyError:
+            nameornone = self.getnameornone()
+        self.pathornone = None if nameornone is None else self.pathofname(nameornone)
+        self.additems = zip(params, args)
 
-    def subscribe(self, consumer, config):
-        consumer(config)
-        # Race right here where consumer could miss an update, not a big deal.
-        self.consumers.append(consumer)
+    def isdefaults(self):
+        return self.pathornone is None
 
-    def __call__(self):
-        if not hasattr(self, 'configpath'):
-            return
-        while True:
-            for _ in xrange(10):
-                if self.quit:
-                    return
-                time.sleep(.1)
-            if self.quit:
-                return
-            if os.stat(self.configpath).st_mtime == self.mtime:
-                continue
-            log.info("Reloading: %s", self.configpath)
-            config = self.load()
-            for consumer in self.consumers[:]: # Take snapshot of list.
-                consumer(config)
+    def path(self):
+        if self.pathornone is None:
+            raise Exception("Using %s." % self.defaultslabel)
+        return self.pathornone
+
+    def applyitems(self, config):
+        for name, value in self.additems:
+            setattr(config, name, value)
 
 class ConfigImpl(aridipy.View, Config): pass
+
+class PathInfo:
+
+    def __init__(self, configname):
+        self.configname = configname
+
+    def mark(self):
+        path = self.configname.path()
+        self.mtime = os.stat(path).st_mtime
+        return path
+
+    def load(self):
+        expressions = aridipy.Expressions()
+        expressions.loadmodule('defaultconf')
+        if not self.configname.isdefaults():
+            expressions.loadpath(self.mark())
+        config = ConfigImpl(expressions)
+        self.configname.applyitems(config)
+        return config
+
+    def reloadornone(self):
+        path = self.configname.path()
+        if os.stat(path).st_mtime != self.mtime:
+            log.info("Reloading: %s", path)
+            return self.load()
+
+class ConfigSubscription(SimpleBackground):
+
+    def __init__(self, configname, consumer):
+        self.configname = configname
+        self.consumer = consumer
+
+    def start(self):
+        self.pathinfo = PathInfo(self.configname)
+        self.consumer(self.pathinfo.load())
+        SimpleBackground.start(self)
+
+    def __call__(self):
+        if not self.configname.isdefaults():
+            while True:
+                for _ in xrange(10):
+                    time.sleep(.1)
+                    if self.quit:
+                        return # Ideally break twice.
+                config = self.pathinfo.reloadornone()
+                if config is not None:
+                    self.consumer(config)
