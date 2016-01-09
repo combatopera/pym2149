@@ -22,7 +22,7 @@ from const import midichannelcount
 from mediation import Mediation
 from diapyr import types
 from iface import Chip, Config
-from config import ConfigLoader
+from config import ConfigSubscription, ConfigName
 
 log = logging.getLogger(__name__)
 
@@ -97,10 +97,14 @@ class ControlPair:
 
 class Channels:
 
-    @types(ConfigLoader, Config, Chip)
-    def __init__(self, configloader, config, chip):
+    @classmethod
+    def addtodi(cls, di):
+        di.add(cls)
+        di.add(ChannelsConfigSubscription)
+
+    @types(Config, Chip)
+    def __init__(self, config, chip):
         self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
-        configloader.subscribe(self.reconfigure, config)
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
@@ -175,3 +179,9 @@ class Channels:
 
     def __str__(self):
         return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.iteritems()))
+
+class ChannelsConfigSubscription(ConfigSubscription):
+
+    @types(ConfigName, Channels)
+    def __init__(self, configname, channels):
+        ConfigSubscription.__init__(self, configname, channels.reconfigure)
