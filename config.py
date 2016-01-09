@@ -16,7 +16,6 @@
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, logging, os, aridipy, time
-from const import appconfigdir
 from bg import SimpleBackground
 
 log = logging.getLogger(__name__)
@@ -24,12 +23,13 @@ log = logging.getLogger(__name__)
 class ConfigName:
 
     envparam = 'ARIDIPY_CONFIG'
-    workspacepath = os.path.join(appconfigdir, 'workspace')
+    workspacepath = os.path.join(os.path.expanduser('~'), 'workspace')
+    configfilename = 'config.py'
     defaultslabel = 'defaults'
 
     @classmethod
     def pathofname(cls, name):
-        return os.path.join(cls.workspacepath, name, 'chip.py')
+        return os.path.join(cls.workspacepath, name, cls.configfilename)
 
     @classmethod
     def getnameornone(cls):
