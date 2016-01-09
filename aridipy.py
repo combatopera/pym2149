@@ -87,10 +87,11 @@ class Expressions:
                 return path
             path = os.path.join(os.path.dirname(path), link)
 
-    def __init__(self, defaultsmodulename):
+    def __init__(self):
         self.expressions = {}
-        if defaultsmodulename is not None:
-            self.loadpath(imp.find_module(defaultsmodulename)[1])
+
+    def loadmodule(self, name):
+        self.loadpath(imp.find_module(name)[1])
 
     def loadpath(self, path):
         f = open(path)

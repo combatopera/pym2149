@@ -23,7 +23,7 @@ from aridipy import Expressions, View, Fork
 class TestFork(unittest.TestCase):
 
     def test_inheritedexpressionusescorrectcontext(self):
-        expressions = Expressions(None)
+        expressions = Expressions()
         lines = ['woo = config.yay\n', '']
         readline = lambda: lines.pop(0)
         expressions.loadlines('whatever', readline)
