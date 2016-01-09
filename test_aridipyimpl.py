@@ -18,7 +18,7 @@
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from aridipy import Expressions, View, Fork
+from aridipyimpl import Expressions, View, Fork
 
 class TestFork(unittest.TestCase):
 

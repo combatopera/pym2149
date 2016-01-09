@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, aridipy, time
+import sys, logging, os, aridipyimpl, time
 from bg import SimpleBackground
 
 log = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ class ConfigName:
 class PathInfo:
 
     defaultsmodulename = 'defaultconf'
-    configimpl = aridipy.View
+    configimpl = aridipyimpl.View
 
     def __init__(self, configname):
         self.configname = configname
@@ -87,7 +87,7 @@ class PathInfo:
         return path
 
     def load(self):
-        expressions = aridipy.Expressions()
+        expressions = aridipyimpl.Expressions()
         expressions.loadmodule(self.defaultsmodulename)
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
