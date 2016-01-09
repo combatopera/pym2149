@@ -74,6 +74,7 @@ class ConfigName:
 
 class PathInfo:
 
+    defaultsmodulename = 'defaultconf'
     configimpl = aridipy.View
 
     def __init__(self, configname):
@@ -86,7 +87,7 @@ class PathInfo:
 
     def load(self):
         expressions = aridipy.Expressions()
-        expressions.loadmodule('defaultconf')
+        expressions.loadmodule(self.defaultsmodulename)
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
         config = self.configimpl(expressions)
