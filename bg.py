@@ -27,7 +27,7 @@ class Quit:
 
     def fire(self):
         self.quit = True
-        for interrupt in self.interrupts():
+        for interrupt in self.interrupts:
             interrupt()
 
     def __nonzero__(self):
