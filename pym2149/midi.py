@@ -146,18 +146,14 @@ class MidiListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        self.client = calsa.Client(clientname, "%s IN" % clientname)
-        SimpleBackground.start(self, self.bg)
+        SimpleBackground.start(self, self.bg, calsa.Client(clientname, "%s IN" % clientname))
 
-    def bg(self):
+    def bg(self, client):
         while not self.quit:
-            event = self.client.event_input()
+            event = client.event_input()
             if event is not None:
                 eventobj = self.classes[event.type](self, event)
                 self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
-
-    def interrupt(self):
-        self.client.interrupt()
 
 class MidiPump(MainBackground):
 
