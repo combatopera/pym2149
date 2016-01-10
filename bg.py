@@ -21,15 +21,12 @@ log = logging.getLogger(__name__)
 
 class SimpleBackground:
 
-    def bg(self):
-        self()
-
     def interrupt(self):
         pass
 
-    def start(self):
+    def start(self, bg):
         self.quit = False
-        self.thread = threading.Thread(target = self.bg)
+        self.thread = threading.Thread(target = bg)
         self.thread.start()
 
     def stop(self):
@@ -47,6 +44,11 @@ class MainBackground(SimpleBackground):
             self.bg = self.profile
         elif config.trace:
             self.bg = self.trace
+        else:
+            self.bg = self
+
+    def start(self):
+        SimpleBackground.start(self, self.bg)
 
     def profile(self, *args, **kwargs):
         profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')

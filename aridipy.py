@@ -115,9 +115,9 @@ class ConfigSubscription(SimpleBackground):
     def start(self):
         self.pathinfo = self.pathinfoimpl(self.configname)
         self.consumer(self.pathinfo.load())
-        SimpleBackground.start(self)
+        SimpleBackground.start(self, self.bg)
 
-    def __call__(self):
+    def bg(self):
         if not self.configname.isdefaults():
             while True:
                 for _ in xrange(10):
