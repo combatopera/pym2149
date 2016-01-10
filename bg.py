@@ -1,5 +1,5 @@
 # Copyright 2014 Andrzej Cichocki
-
+ 
 # This file is part of aridipy.
 #
 # aridipy is free software: you can redistribute it and/or modify
