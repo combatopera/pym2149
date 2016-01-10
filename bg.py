@@ -19,19 +19,31 @@ import threading, logging, tempfile, shutil, os, time
 
 log = logging.getLogger(__name__)
 
+class Quit:
+
+    def __init__(self, sleeper):
+        self.quit = False
+        self.sleeper = sleeper
+
+    def fire(self):
+        self.quit = True
+        self.sleeper.interrupt()
+
+    def __nonzero__(self):
+        return self.quit
+
 class SimpleBackground:
 
     def interrupt(self):
         pass
 
     def start(self, bg):
-        self.quit = False
+        self.quit = Quit(self)
         self.thread = threading.Thread(target = bg)
         self.thread.start()
 
     def stop(self):
-        self.quit = True
-        self.interrupt()
+        self.quit.fire()
         self.thread.join()
 
 class MainBackground(SimpleBackground):
