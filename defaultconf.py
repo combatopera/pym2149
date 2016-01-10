@@ -37,12 +37,15 @@ nominalclock = config.di(YMFile).nominalclock if config.di.all(YMFile) else stcl
 '''You can specify your own clock here, which overrides any other value.'''
 
 midipan = False
+'''Pay attention to MIDI panning rather than having an automatic fixed pan per channel.'''
 
 stereo = config.midipan
 
 panlaw = 3
+# TODO: Document how this works.
 
 maxpan = .75
+'''The pan of the outermost channels when panning automatically.'''
 
 systemchannelcount = 2
 
@@ -68,8 +71,10 @@ neutralvelocity = 0x60
 velocityperlevel = 0x10
 
 midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(0x80))
+'''Program number to Note subclass.'''
 
 midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
+'''Initial assignment of programs to channels.'''
 
 pitchbendpersemitone = 0x200
 '''The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.'''
