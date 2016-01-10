@@ -147,9 +147,9 @@ class MidiListen(SimpleBackground):
 
     def start(self):
         self.client = calsa.Client(clientname, "%s IN" % clientname)
-        SimpleBackground.start(self)
+        SimpleBackground.start(self, self.bg)
 
-    def __call__(self):
+    def bg(self):
         while not self.quit:
             event = self.client.event_input()
             if event is not None:
