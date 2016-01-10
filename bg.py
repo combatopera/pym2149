@@ -21,25 +21,42 @@ log = logging.getLogger(__name__)
 
 class Quit:
 
-    def __init__(self, sleeper):
+    def __init__(self, interrupts):
         self.quit = False
-        self.sleeper = sleeper
+        self.interrupts = interrupts
 
     def fire(self):
         self.quit = True
-        self.sleeper.interrupt()
+        for interrupt in self.interrupts():
+            interrupt()
 
     def __nonzero__(self):
         return self.quit
 
 class SimpleBackground:
 
-    def interrupt(self):
-        pass
+    class Sleeper:
 
-    def start(self, bg):
-        self.quit = Quit(self)
-        self.thread = threading.Thread(target = bg)
+        def __init__(self):
+            self.cv = threading.Condition()
+
+        def sleep(self, t):
+            self.cv.acquire()
+            try:
+                self.cv.wait(t)
+            finally:
+                self.cv.release()
+
+        def interrupt(self):
+            self.cv.acquire()
+            try:
+                self.cv.notify() # There should be at most one.
+            finally:
+                self.cv.release()
+
+    def start(self, bg, *interruptibles):
+        self.quit = Quit([i.interrupt for i in interruptibles])
+        self.thread = threading.Thread(target = bg, args = interruptibles)
         self.thread.start()
 
     def stop(self):
@@ -59,8 +76,8 @@ class MainBackground(SimpleBackground):
         else:
             self.bg = self
 
-    def start(self):
-        SimpleBackground.start(self, self.bg)
+    def start(self, *interruptibles):
+        SimpleBackground.start(self, self.bg, *interruptibles)
 
     def profile(self, *args, **kwargs):
         profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')

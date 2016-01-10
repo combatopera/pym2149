@@ -115,15 +115,14 @@ class ConfigSubscription(SimpleBackground):
     def start(self):
         self.pathinfo = self.pathinfoimpl(self.configname)
         self.consumer(self.pathinfo.load())
-        SimpleBackground.start(self, self.bg)
+        SimpleBackground.start(self, self.bg, self.Sleeper())
 
-    def bg(self):
+    def bg(self, sleeper):
         if not self.configname.isdefaults():
             while True:
-                for _ in xrange(10):
-                    time.sleep(.1)
-                    if self.quit:
-                        return # Ideally break twice.
+                sleeper.sleep(1)
+                if self.quit:
+                    break
                 config = self.pathinfo.reloadornone()
                 if config is not None:
                     self.consumer(config)
