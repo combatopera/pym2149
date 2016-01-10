@@ -16,7 +16,7 @@
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
 import threading, logging, tempfile, shutil, os, time
- 
+
 log = logging.getLogger(__name__)
 
 class Quit:
