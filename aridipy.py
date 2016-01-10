@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with aridipy.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, aridipyimpl, time
+import sys, logging, os, aridipyimpl
 from bg import SimpleBackground
 
 log = logging.getLogger(__name__)
