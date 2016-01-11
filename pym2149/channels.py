@@ -106,26 +106,18 @@ class Channels:
     def __init__(self, config, chip):
         self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
-        self.midichantofx = dict([config.midichannelbase + i, FX(config)] for i in xrange(midichannelcount))
+        slidemidichans = set(config.slidechannels)
+        self.midichantofx = dict([c, FX(config, c in slidemidichans)] for c in xrange(config.midichannelbase, config.midichannelbase + midichannelcount))
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
-        self.slidemidichans = set(config.slidechannels)
         self.controllers = {}
         def flush(midichan, value):
-            self.midichantofx[midichan].modulation = value
+            self.midichantofx[midichan].modulation.set(value)
         ControlPair(0, flush, 0).install(self.controllers, 0x01)
         def flush(midichan, value):
-            self.midichantofx[midichan].pan = value
+            self.midichantofx[midichan].pan.set(value)
         ControlPair(0x2000, flush, 0).install(self.controllers, 0x0a)
-        if config.pitchbendratecontroller is not None:
-            def flush(midichan, value):
-                self.midichantofx[midichan].bendrate = value
-            ControlPair(0x2000, flush, config.pitchbendratecontrollershift).install(self.controllers, config.pitchbendratecontroller)
-        if config.pitchbendlimitcontroller is not None:
-            def flush(midichan, value):
-                self.midichantofx[midichan].bendlimit = value
-            ControlPair(0x2000, flush, 0).install(self.controllers, config.pitchbendlimitcontroller)
         self.prevtext = None
         self.frameindex = 0
 
@@ -152,7 +144,7 @@ class Channels:
             return channel
 
     def pitchbend(self, midichan, bend):
-        self.midichantofx[midichan].bend = bend
+        self.midichantofx[midichan].bend.set(bend)
 
     def controlchange(self, midichan, controller, value):
         if controller in self.controllers:

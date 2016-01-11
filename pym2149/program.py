@@ -21,6 +21,31 @@ from reg import Reg
 
 class FX:
 
+  class SimpleValue:
+
+    def __init__(self, value):
+      self.value = value
+
+    def set(self, value):
+      self.value = value
+
+    def step(self): pass
+
+  class SlideValue:
+
+    def __init__(self, value):
+      self.target = self.value = value
+
+    def set(self, value):
+      self.target = value & ~0x7f
+      self.rate = value & 0x7f
+
+    def step(self):
+      if self.value < self.target:
+        self.value = min(self.value + self.rate, self.target)
+      elif self.value > self.target:
+        self.value = max(self.value - self.rate, self.target)
+
   halfrange = 1 << 13 # Full range is 14 bits.
   minsigned = -halfrange
   maxsigned = halfrange - 1
@@ -29,29 +54,26 @@ class FX:
   def signum(n):
     return 1 if n > 0 else (-1 if n < 0 else 0)
 
-  def __init__(self, config):
+  def __init__(self, config, slide):
     self.bendpersemitone = config.pitchbendpersemitone
-    self.bend = 0
-    self.bendrate = 0
-    self.bendlimit = self.minsigned # Or 0 absolute.
-    self.modulation = self.halfrange
-    self.pan = 0
+    valueimpl = self.SlideValue if slide else self.SimpleValue
+    self.bend = valueimpl(0)
+    self.modulation = valueimpl(self.halfrange)
+    self.pan = valueimpl(0)
 
   def applyrates(self):
-    side = self.signum(self.bend - self.bendlimit)
-    self.bend = max(self.minsigned, min(self.maxsigned, self.bend + self.bendrate))
-    if side != self.signum(self.bend - self.bendlimit):
-      self.bend = self.bendlimit
+    for v in self.bend, self.modulation, self.pan:
+      v.step()
 
   def bendsemitones(self):
-    return self.bend / self.bendpersemitone
+    return self.bend.value / self.bendpersemitone
 
   def relmodulation(self):
-    return (max(1, self.modulation) - self.halfrange) / (self.halfrange - 1) / 2 + .5
+    return (max(1, self.modulation.value) - self.halfrange) / (self.halfrange - 1) / 2 + .5
 
   def normpan(self):
     # Observe we don't apply maxpan, which is only for the auto-stereo:
-    return max(self.minsigned + 1, self.pan) / (self.halfrange - 1)
+    return max(self.minsigned + 1, self.pan.value) / (self.halfrange - 1)
 
 class Note:
 
