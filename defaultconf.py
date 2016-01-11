@@ -120,8 +120,10 @@ performancechannels = ()
 '''Bypass the PLL and speed detector.'''
 
 monophonicchannels = ()
+'''In each of these MIDI channels the maximum number of 'on' notes is restricted to one. This is useful if you want your MIDI controller to affect just one chip channel, for example.'''
 
 midiskipenabled = True
 '''For real-time performance this should be True to minimise latency. For rendering this should be False to avoid unstable timing.'''
 
 speeddetector = True
+'''Set to False to turn off the speed detector and save some CPU.'''
