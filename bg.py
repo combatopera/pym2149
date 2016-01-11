@@ -63,13 +63,21 @@ class SimpleBackground:
         self.quit.fire()
         self.thread.join()
 
+class Profile:
+
+    def __init__(self, time, sort = 'time', path = 'profile'):
+        self.time = time
+        self.sort = sort
+        self.path = path
+
 class MainBackground(SimpleBackground):
 
     def __init__(self, config):
         if config.profile:
             if config.trace:
                 raise Exception
-            _, self.profilesort, self.profilepath = config.profile
+            self.profilesort = config.profile.sort
+            self.profilepath = config.profile.path
             self.bg = self.profile
         elif config.trace:
             self.bg = self.trace
