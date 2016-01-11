@@ -31,7 +31,7 @@ underclock = 8
 '''The number of nominal clock ticks until the chip state can next be updated, must be a factor of 8 i.e. in {1, 2, 4, 8}. Higher numbers improve performance. I don't know which setting is authentic.'''
 
 oscpause = False
-'''Whether an oscillator is paused when turned off in the mixer. This option doesn't significantly help performance so it's a bit useless.'''
+'''Whether an oscillator is paused when turned off in the mixer. Setting to True doesn't significantly help performance and is likely not authentic so this option is a bit useless.'''
 
 nominalclock = config.di(YMFile).nominalclock if config.di.all(YMFile) else stclock
 '''You can specify your own clock here, which overrides any other value.'''
@@ -40,6 +40,7 @@ midipan = False
 '''Pay attention to MIDI panning rather than having an automatic fixed pan per channel.'''
 
 stereo = config.midipan
+'''Stereo output.'''
 
 panlaw = 3
 '''The attenuation in decibels of each channel at central pan, to compensate for acoustic summing. Common choices are {3, 4.5, 6}.'''
@@ -48,11 +49,13 @@ maxpan = .75
 '''The pan of the outermost channels when panning automatically.'''
 
 systemchannelcount = 2
+'''The number of system output channels when using JACK.'''
 
 ignoreloop = hasattr(config, 'outpath')
 '''If True playback will not loop.'''
 
 updaterate = config.di(YMFile).updaterate if config.di.all(YMFile) else 50
+'''The rate at which chip params are updated.'''
 
 linesperbeat = 4
 '''bpmtool.py uses this.'''
@@ -67,8 +70,10 @@ midiprogrambase = 0
 '''Some synths use 1 for the first program.'''
 
 neutralvelocity = 0x60
+'''The velocity that does not adjust program level.'''
 
 velocityperlevel = 0x10
+'''Change of velocity required to adjust program level by 1.'''
 
 midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(0x80))
 '''Program number to Note subclass.'''
@@ -79,21 +84,20 @@ midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase 
 pitchbendpersemitone = 0x200
 '''The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.'''
 
-pitchbendratecontroller = None
+pitchbendratecontroller = None # FIXME: This (with pitchbendlimitcontroller) is too hard to use.
 '''If not None, the 0-based MIDI controller number for change of pitch bend per update.'''
 
 pitchbendlimitcontroller = None
 '''If not None, the 0-based MIDI controller number for the pitch bend value to stop at.'''
 
-pitchbendratecontrollershift = 0
+pitchbendratecontrollershift = 0 # TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
 '''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
-# TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
 
 dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
-chipchannels = 3
-'''The number of chip channels to implement.''' # TODO: Make values other than 3 work.
+chipchannels = 3 # TODO: Make values other than 3 work.
+'''The number of chip channels to implement.'''
 
 profile = None
 '''If not None, must be a bg.Profile object.'''
@@ -111,7 +115,7 @@ jackringsize = 2 if config.di.all(YMFile) else 10
 '''In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.'''
 
 jackcoupling = bool(config.di.all(YMFile))
-'''If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition.'''
+'''If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.'''
 
 zerovelocityisnoteoffchannels = ()
 '''My AZ-1 appears to send Note On with zero velocity instead of Note Off, so its channel goes here.'''
