@@ -84,12 +84,6 @@ midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase 
 pitchbendpersemitone = 0x200
 '''The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.'''
 
-pitchbendratecontroller = None # FIXME: This (with pitchbendlimitcontroller) is too hard to use.
-'''If not None, the 0-based MIDI controller number for change of pitch bend per update.'''
-
-pitchbendlimitcontroller = None
-'''If not None, the 0-based MIDI controller number for the pitch bend value to stop at.'''
-
 slidechannels = ()
 '''In these channels the coarse value of each controller is its target (with fine part 0), and the fine value is the unsigned targetwards adjustment per chip update (for a change of fine*updaterate per second).'''
 
