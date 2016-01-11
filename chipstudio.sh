@@ -25,9 +25,9 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 ./startjack.sh
 
-pidof tutka || (
+pidof renoise || (
     cd - >/dev/null
-    tutka "$@" &>/dev/null
+    renoise "$@" &>/dev/null
 ) &
 
 ./midi2jack.py
