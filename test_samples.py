@@ -1,4 +1,4 @@
-#!/usr/bin/env runpy
+#!/usr/bin/env pyrform
 
 # Copyright 2014 Andrzej Cichocki
 
