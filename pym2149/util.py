@@ -24,7 +24,7 @@ def singleton(f):
 
 def awaitinterrupt(config):
     if config.profile or config.trace:
-        sleeptime = config.profile[0] if config.profile else config.trace
+        sleeptime = config.profile.time if config.profile else config.trace
         log.debug("Continue for %.3f seconds.", sleeptime)
         time.sleep(sleeptime)
         log.debug('End of profile, shutting down.')
