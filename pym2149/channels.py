@@ -110,6 +110,7 @@ class Channels:
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
+        self.slidemidichans = set(config.slidechannels)
         self.controllers = {}
         def flush(midichan, value):
             self.midichantofx[midichan].modulation = value
