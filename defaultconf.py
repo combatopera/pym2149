@@ -42,7 +42,7 @@ midipan = False
 stereo = config.midipan
 
 panlaw = 3
-# TODO: Document how this works.
+'''The attenuation in decibels of each channel at central pan, to compensate for acoustic summing. Common choices are {3, 4.5, 6}.'''
 
 maxpan = .75
 '''The pan of the outermost channels when panning automatically.'''
