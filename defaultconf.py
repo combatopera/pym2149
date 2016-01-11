@@ -90,6 +90,9 @@ pitchbendratecontroller = None # FIXME: This (with pitchbendlimitcontroller) is 
 pitchbendlimitcontroller = None
 '''If not None, the 0-based MIDI controller number for the pitch bend value to stop at.'''
 
+slidechannels = ()
+'''In these channels the coarse value of each controller is its target (with fine part 0), and the fine value is the unsigned targetwards adjustment per chip update (for a change of fine*updaterate per second).'''
+
 pitchbendratecontrollershift = 0 # TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
 '''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
 
