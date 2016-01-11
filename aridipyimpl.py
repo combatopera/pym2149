@@ -77,6 +77,7 @@ class Expressions:
 
     # TODO LATER: Ideally inspect the AST as this can give false positives.
     toplevelassignment = re.compile(r'^([^\s]+)\s*=')
+    fromimport = re.compile(r'^from\s')
 
     @staticmethod
     def canonicalize(path):
@@ -101,7 +102,8 @@ class Expressions:
             f.close()
 
     def loadlines(self, path, readline):
-        head = [
+        head0 = []
+        head1 = [
             "__file__ = %r\n" % self.canonicalize(path),
             'def sys_path_add(path):\n',
             '    import sys\n',
@@ -110,9 +112,10 @@ class Expressions:
         ]
         line = readline()
         while line and self.toplevelassignment.search(line) is None:
-            head.append(line)
+            (head1 if self.fromimport.search(line) is None else head0).append(line)
             line = readline()
         tocode = lambda block: compile(block, '<string>', 'exec')
+        head = head0 + head1
         log.debug("[%s] Header is first %s lines.", path, len(head))
         head = tocode(''.join(head))
         while line:
