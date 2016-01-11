@@ -103,9 +103,11 @@ trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
 plltargetpos = operator.truediv(.5, config.updaterate)
+'''The target median shift in seconds between the start of a MIDI event processing window (of size 1/updaterate) and the events in that window. Higher values (i.e. MIDI events closer to end of window and thus our processing of them) improve latency at increased risk of unstable timing (we don't want any events to stray into the next window).'''
 # TODO: Make it possible to use slash here.
 
 pllalpha = .1
+'''The alpha value for the exponential moving average we use for convergence to plltargetpos.'''
 
 jackringsize = 2 if config.di.all(YMFile) else 10
 '''In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.'''
@@ -117,7 +119,7 @@ zerovelocityisnoteoffchannels = ()
 '''My AZ-1 appears to send Note On with zero velocity instead of Note Off, so its channel goes here.'''
 
 performancechannels = ()
-'''Bypass the PLL and speed detector.'''
+'''Events from these MIDI channels are treated as unscheduled, so contribute to neither the PLL nor speed detector.'''
 
 monophonicchannels = ()
 '''In each of these MIDI channels the maximum number of 'on' notes is restricted to one. This is useful if you want your MIDI controller to affect just one chip channel, for example.'''
