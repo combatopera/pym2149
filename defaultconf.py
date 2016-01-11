@@ -96,7 +96,7 @@ chipchannels = 3
 '''The number of chip channels to implement.''' # TODO: Make values other than 3 work.
 
 profile = None
-'''If not None, a tuple of (profiling time, sort column, output path).''' # TODO: Let's not use tuples.
+'''If not None, must be a bg.Profile object.'''
 
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
