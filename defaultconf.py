@@ -93,18 +93,16 @@ dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
 chipchannels = 3
-'''Eventually you will be able to choose as many channels as you like, doesn't quite work yet.'''
+'''The number of chip channels to implement.''' # TODO: Make values other than 3 work.
 
 profile = None
-'''If not None, a tuple of (profiling time, sort column, output path).'''
-# TODO: Let's not use tuples.
+'''If not None, a tuple of (profiling time, sort column, output path).''' # TODO: Let's not use tuples.
 
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
-plltargetpos = operator.truediv(.5, config.updaterate)
+plltargetpos = operator.truediv(.5, config.updaterate) # TODO: Make it possible to use slash here.
 '''The target median shift in seconds between the start of a MIDI event processing window (of size 1/updaterate) and the events in that window. Higher values (i.e. MIDI events closer to end of window and thus our processing of them) improve latency at increased risk of unstable timing (we don't want any events to stray into the next window).'''
-# TODO: Make it possible to use slash here.
 
 pllalpha = .1
 '''The alpha value for the exponential moving average we use for convergence to plltargetpos.'''
