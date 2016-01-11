@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
 from pym2149.iface import YMFile, JackConnection
-import operator
 
 outputrate = config.di(JackConnection).outputrate if config.di.all(JackConnection) else 44100
 '''Note this does not have the power to modify the JACK output rate, only pym2149's impression of it.'''
@@ -101,7 +101,7 @@ profile = None
 trace = None
 '''If not None, the number of seconds worth of trace data to collect.'''
 
-plltargetpos = operator.truediv(.5, config.updaterate) # TODO: Make it possible to use slash here.
+plltargetpos = .5 / config.updaterate
 '''The target median shift in seconds between the start of a MIDI event processing window (of size 1/updaterate) and the events in that window. Higher values (i.e. MIDI events closer to end of window and thus our processing of them) improve latency at increased risk of unstable timing (we don't want any events to stray into the next window).'''
 
 pllalpha = .1
