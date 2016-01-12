@@ -29,7 +29,6 @@ class Block:
   def __repr__(self):
     return "%s(%r)" % (self.__class__.__name__, self.framecount)
 
-# TODO: Automagic node graph compilation to limit height of call stack.
 class Node:
 
   def __init__(self):
