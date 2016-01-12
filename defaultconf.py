@@ -87,6 +87,9 @@ pitchbendpersemitone = 0x200
 slidechannels = ()
 '''In these channels the coarse value of each controller is its target (with fine part 0), and the fine value is the unsigned targetwards adjustment per chip update (for a change of fine*updaterate per second).'''
 
+slidespeed = 1
+'''In the slidechannels the adjustments are multiplied by this.'''
+
 pitchbendratecontrollershift = 0 # TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
 '''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
 

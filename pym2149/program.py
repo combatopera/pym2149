@@ -33,12 +33,13 @@ class FX:
 
   class SlideValue:
 
-    def __init__(self, value):
+    def __init__(self, slidespeed, value):
+      self.slidespeed = slidespeed
       self.target = self.value = value
 
     def set(self, value):
       self.target = value & ~0x7f
-      self.rate = value & 0x7f
+      self.rate = (value & 0x7f) * self.slidespeed
 
     def step(self):
       if self.value < self.target:
@@ -56,7 +57,11 @@ class FX:
 
   def __init__(self, config, slide):
     self.bendpersemitone = config.pitchbendpersemitone
-    valueimpl = self.SlideValue if slide else self.SimpleValue
+    if slide:
+      slidespeed = config.slidespeed
+      valueimpl = lambda v: self.SlideValue(slidespeed, v)
+    else:
+      valueimpl = self.SimpleValue
     self.bend = valueimpl(0)
     self.modulation = valueimpl(self.halfrange)
     self.pan = valueimpl(0)
