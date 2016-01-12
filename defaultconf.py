@@ -90,9 +90,6 @@ slidechannels = ()
 slidespeed = 1
 '''In the slidechannels the adjustments are multiplied by this.'''
 
-pitchbendratecontrollershift = 0 # TODO: Replace this and pitchbendpersemitone with a more general config for controller resolution.
-'''The number of least-significant bits to strip from the pitchbendratecontroller value. You can set this to 7 to forget about the fine byte and just use the coarse one.'''
-
 dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
