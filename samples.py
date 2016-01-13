@@ -25,7 +25,7 @@ from diapyr import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Stream, Config
+from pym2149.iface import Stream, Config, Chip
 from pym2149.program import Note
 from pym2149.channels import Channels
 from pym2149.dac import PWMEffect, SinusEffect
@@ -33,11 +33,6 @@ from ymplayer import ChipTimer
 import os, subprocess, time
 
 log = logging.getLogger(__name__)
-
-class Silence(Note):
-
-    def noteon(self):
-        self.fixedlevel.value = 13 # Neutral DC.
 
 class BaseTone(Note):
 
@@ -113,8 +108,8 @@ class ProgramIds(dict): pass
 
 class Player:
 
-    @types(Config, Timer, Stream, Channels, Frames, ProgramIds)
-    def __init__(self, config, timer, stream, channels, frames, programids):
+    @types(Config, Timer, Stream, Channels, Frames, ProgramIds, Chip)
+    def __init__(self, config, timer, stream, channels, frames, programids, chip):
         self.updaterate = config.updaterate
         self.neutralvel = config.neutralvelocity
         self.chipchannels = config.chipchannels
@@ -124,17 +119,17 @@ class Player:
         self.channels = channels
         self.frames = frames
         self.programids = programids
+        self.chip = chip
 
     def __call__(self):
-        self.channels.programchange(self.midichan, self.programids[Silence])
         # Play silence on all chip channels:
         for chan in xrange(self.chipchannels):
-            self.channels.noteon(self.midichan, 60 + chan, self.neutralvel)
-        for chan in xrange(self.chipchannels):
-            self.channels.noteoff(self.midichan, 60 + chan, self.neutralvel)
+            self.chip.flagsoff(chan)
+            self.chip.fixedlevels[chan].value = 13 # Neutral DC.
         for program in self.frames:
             if program:
                 self.channels.programchange(self.midichan, self.programids[program])
+                # This noteon should override any previous noteon for the same note:
                 self.channels.noteon(self.midichan, 60, self.neutralvel)
             self.channels.updateall()
             for b in self.timer.blocksforperiod(self.updaterate):
@@ -180,7 +175,6 @@ class Target:
             programid = config.midiprogrambase + len(programids)
             channels.midiprograms[programid] = program
             programids[program] = programid
-        register(Silence)
         lftimer = SimpleTimer(config.updaterate)
         for program in beats:
             if program and program not in programids:
