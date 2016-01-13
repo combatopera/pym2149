@@ -93,8 +93,8 @@ slidespeed = 1
 dosoundextraseconds = 3
 '''When playing a Dosound script, the amount of time to continue rendering after end of script.'''
 
-chipchannels = 3 # TODO: Make values other than 3 work.
-'''The number of chip channels to implement.'''
+chipchannels = 3
+'''The number of chip channels to implement. Note that only the first three will have YM2149 registers wired into them.'''
 
 profile = None
 '''If not None, must be a bg.Profile object.'''
