@@ -40,6 +40,8 @@ class FX:
     def set(self, value):
       self.target = value & ~0x7f
       self.rate = (value & 0x7f) * self.slidespeed
+      if not self.rate: # Simulate simple behaviour when fine part is 0.
+        self.value = self.target
 
     def step(self):
       if self.value < self.target:
