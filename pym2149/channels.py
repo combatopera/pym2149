@@ -134,7 +134,7 @@ class Channels:
         fx = self.midichantofx[midichan]
         channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, self.frameindex)]
         if midichan in self.slidemidichans:
-            fx.bend.value = 0 # Note race with midi instant pitch bend (fine part 0).
+            fx.bend.value = 0 # Leave target and rate as-is. Note race with midi instant pitch bend (fine part 0).
         channel.newnote(self.frameindex, program, midinote, vel, fx)
         return channel
 
