@@ -85,7 +85,7 @@ pitchbendpersemitone = 0x200
 '''The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.'''
 
 slidechannels = ()
-'''In these channels the coarse value of each controller is its target (with fine part 0), and the targetwards adjustment per chip update is the unsigned fine value multipled by slidespeed (for a change of slidespeed*fine*updaterate per second).'''
+'''In these channels the coarse value of each controller is its target (with fine part 0), and the targetwards adjustment per chip update is the unsigned fine value multipled by slidespeed (for a change of slidespeed*fine*updaterate per second). Additionally, the pitch bend of the channel is zeroed just before every note-on (without affecting the target or the adjustment rate).'''
 
 slidespeed = 1
 '''In the slidechannels the adjustments are multiplied by this.'''
