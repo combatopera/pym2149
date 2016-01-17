@@ -106,8 +106,8 @@ class Channels:
     def __init__(self, config, chip):
         self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
-        slidemidichans = set(config.slidechannels)
-        self.midichantofx = dict([c, FX(config, c in slidemidichans)] for c in xrange(config.midichannelbase, config.midichannelbase + midichannelcount))
+        self.slidemidichans = set(config.slidechannels)
+        self.midichantofx = dict([c, FX(config, c in self.slidemidichans)] for c in xrange(config.midichannelbase, config.midichannelbase + midichannelcount))
         self.mediation = Mediation(config.midichannelbase, config.chipchannels)
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
@@ -133,6 +133,8 @@ class Channels:
         program = self.midiprograms[self.midichantoprogram[midichan]]
         fx = self.midichantofx[midichan]
         channel = self.channels[self.mediation.acquirechipchan(midichan, midinote, self.frameindex)]
+        if midichan in self.slidemidichans:
+            fx.bend.value = 0 # Note race with midi instant pitch bend (fine part 0).
         channel.newnote(self.frameindex, program, midinote, vel, fx)
         return channel
 
