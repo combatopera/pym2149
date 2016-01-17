@@ -1,4 +1,4 @@
-#!/usr/bin/env pyrform
+#!/usr/bin/env pyven
 
 # Copyright 2014 Andrzej Cichocki
 
