@@ -144,6 +144,8 @@ cdef class Client:
             with nogil:
                 snd_seq_event_input(self.handle, &event)
                 ctime.gettimeofday(&now, NULL)
+            if event == NULL: # Renoise triggers this when it is closed.
+                continue
             # XXX: Can we turn these ifs into a lookup?
             if SND_SEQ_EVENT_NOTEON == event.type or SND_SEQ_EVENT_NOTEOFF == event.type:
                 note = Note.__new__(Note)
