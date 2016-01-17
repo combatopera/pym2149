@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np, time, sys
+import unittest, numpy as np, time, sys, os
 from nod import Node, Block
 from buf import Buf
 from out import WavWriter, WavBuf
@@ -46,7 +46,7 @@ class TestWavWriter(unittest.TestCase):
         tone = MinPeriodTone()
         outrate = 44100
         w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
-        config = namedtuple('Config', 'outputrate outpath')(outrate, '/dev/null')
+        config = namedtuple('Config', 'outputrate outpath')(outrate, os.devnull)
         w = WavWriter(config, w, namedtuple('StereoInfo', 'getoutchans')(namedtuple('getoutchansimpl', 'size')(1)))
         w.start()
         tone.cursor = 0

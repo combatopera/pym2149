@@ -145,7 +145,8 @@ class Target:
             return cls.soxflag
         except AttributeError:
             pass
-        cls.soxflag = not subprocess.call(['which', 'sox'])
+        with open(os.devnull, 'w') as devnull:
+            cls.soxflag = not subprocess.call(['which', 'sox'], stdout = devnull)
         if not cls.soxflag:
             log.info("sox is not available, spectrograms won't be created.")
         return cls.soxflag
