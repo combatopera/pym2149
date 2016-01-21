@@ -56,7 +56,12 @@ class Buf:
         return self.buf[-1]
 
     def copyasprefix(self, endframe, that):
-        self.buf[:endframe] = that.buf
+        self.copyasprefiximpl(T = self.buf.dtype)(self.buf, endframe, that.buf)
+
+    @turbo(buf = [T], endframe = np.uint32, that = [T], i = np.uint32)
+    def copyasprefiximpl(buf, endframe, that):
+        for i in xrange(endframe):
+            buf[i] = that[i]
 
     def copywindow(self, that, startframe, endframe):
         self.buf[:] = that.buf[startframe:endframe]
