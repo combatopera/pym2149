@@ -40,7 +40,7 @@ class MinPeriodTone(Node):
 
 class TestWavWriter(unittest.TestCase):
 
-    def minperiodperformance(self, bigblocks, strictlimit):
+    def minperiodperformance(self, bigblocks, strictlimitornone):
         clock = 250000
         blocksize = clock // (1000, 10)[bigblocks]
         tone = MinPeriodTone()
@@ -56,15 +56,18 @@ class TestWavWriter(unittest.TestCase):
             w.call(block)
             tone.cursor += block.framecount
         w.stop()
-        expression = "%.3f < %s" % (time.time() - start, strictlimit)
-        sys.stderr.write("%s ... " % expression)
-        self.assertTrue(eval(expression))
+        if strictlimitornone is not None:
+            expression = "%.3f < %s" % (time.time() - start, strictlimitornone)
+            sys.stderr.write("%s ... " % expression)
+            self.assertTrue(eval(expression))
 
     def test_minperiodperformancesmallblocks(self):
-        self.minperiodperformance(False, 1)
+        for strictlimitornone in None, 1:
+            self.minperiodperformance(False, strictlimitornone)
 
     def test_minperiodperformancebigblocks(self):
-        self.minperiodperformance(True, .1) # Wow!
+        for strictlimitornone in None, .1: # Wow!
+            self.minperiodperformance(True, strictlimitornone)
 
 if '__main__' == __name__:
     unittest.main()
