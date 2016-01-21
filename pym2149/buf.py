@@ -17,6 +17,7 @@
 
 import numpy as np
 from util import singleton
+from pyrbo import turbo, T
 
 @singleton
 class nullbuf:
@@ -70,7 +71,15 @@ class Buf:
         self.buf[:] = value
 
     def putstrided(self, start, end, step, data):
-        self.buf[start:end:step] = data
+        self.putstridedimpl(T = self.buf.dtype)(self.buf, start, end, step, data)
+
+    @turbo(buf = [T], i = np.uint32, end = np.uint32, step = np.uint32, data = [T], j = np.uint32)
+    def putstridedimpl(buf, i, end, step, data):
+        j = 0
+        while i < end:
+            buf[i] = data[j]
+            i += step
+            j += 1
 
     def putindexed(self, indices, data):
         self.buf[indices] = data
