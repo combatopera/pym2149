@@ -64,7 +64,13 @@ class Buf:
             buf[i] = that[i]
 
     def copywindow(self, that, startframe, endframe):
-        self.buf[:] = that.buf[startframe:endframe]
+        self.copywindowimpl(T = self.buf.dtype)(self.buf, that.buf, startframe, endframe - startframe)
+
+    @turbo(buf = [T], that = [T], j = np.uint32, n = np.uint32, i = np.uint32)
+    def copywindowimpl(buf, that, j, n):
+        for i in xrange(n):
+            buf[i] = that[j]
+            j += 1
 
     def fillpart(self, startframe, endframe, value):
         self.buf[startframe:endframe] = value
