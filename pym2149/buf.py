@@ -17,7 +17,7 @@
 
 import numpy as np
 from util import singleton
-from pyrbo import turbo, T
+from pyrbo import turbo, T, U
 
 @singleton
 class nullbuf:
@@ -99,7 +99,12 @@ class Buf:
             j += 1
 
     def putindexed(self, indices, data):
-        self.buf[indices] = data
+        self.putindexedimpl(T = self.buf.dtype, U = indices.dtype)(self.buf, indices, len(indices), data)
+
+    @turbo(buf = [T], indices = [U], n = np.uint32, data = [T], i = np.uint32)
+    def putindexedimpl(buf, indices, n, data):
+        for i in xrange(n):
+            buf[indices[i]] = data[i]
 
     def addtofirst(self, val):
         self.buf[0] += val
