@@ -91,7 +91,13 @@ class Buf:
             i += 1
 
     def fill(self, value):
-        self.buf[:] = value
+        self.fillimpl(T = self.buf.dtype)(self.buf, len(self.buf), value)
+
+    @turbo(buf = [T], n = np.uint32, value = T)
+    def fillimpl(buf, n, value):
+        while n:
+            n -= 1
+            buf[n] = value
 
     def putstrided(self, start, end, step, data):
         self.putstridedimpl(T = self.buf.dtype)(self.buf, start, end, step, data)
