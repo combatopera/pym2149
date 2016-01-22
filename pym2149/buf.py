@@ -134,7 +134,13 @@ class Buf:
         self.buf *= that.buf
 
     def mapbuf(self, that, lookup):
-        lookup.take(that.buf, out = self.buf)
+        self.mapbufimpl(T = self.buf.dtype, U = that.buf.dtype)(self.buf, that.buf, lookup, len(that))
+
+    @turbo(buf = [T], that = [U], lookup = [T], n = np.uint32)
+    def mapbufimpl(buf, that, lookup, n):
+        while n:
+            n -= 1
+            buf[n] = lookup[that[n]]
 
     def add(self, value):
         self.buf += value
