@@ -17,7 +17,7 @@
 
 from __future__ import division
 import numpy as np, fractions, logging, os, cPickle as pickle
-from paste import pasteminbleps
+from paste import pasteminbleps, X
 from diapyr import types
 from iface import Config
 from ym2149 import ClockInfo
@@ -144,7 +144,7 @@ class MinBleps:
     return self.outx2minnaivex[outx] - naivex
 
   def link(self):
-    self.pasteminbleps = pasteminbleps(X = self.mixinsize)
+    self.pasteminbleps = pasteminbleps[X, self.mixinsize].res()
     return self
 
   def paste(self, naivex, diffbuf, outbuf):
