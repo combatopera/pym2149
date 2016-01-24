@@ -73,7 +73,7 @@ class Buf:
             j += 1
 
     def fillpart(self, startframe, endframe, value):
-        self.fillpartimpl[T, self.buf.dtype.type](self.buf, startframe, endframe, value)
+        self.fillpartimpl(self.buf, startframe, endframe, self.buf.dtype.type(value))
 
     @turbo(buf = [T], i = np.uint32, endframe = np.uint32, value = T)
     def fillpartimpl(buf, i, endframe, value):
@@ -91,7 +91,7 @@ class Buf:
             i += 1
 
     def fill(self, value):
-        self.fillimpl[T, self.buf.dtype.type](self.buf, len(self.buf), value)
+        self.fillimpl(self.buf, len(self.buf), self.buf.dtype.type(value))
 
     @turbo(buf = [T], n = np.uint32, value = T)
     def fillimpl(buf, n, value):
