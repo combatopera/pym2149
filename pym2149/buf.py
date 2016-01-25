@@ -94,15 +94,12 @@ class Buf:
             n -= 1
             buf[n] = value
 
+    @turbo(self = dict(buf = [T]), start = index, end = index, step = index, data = [T], j = index)
     def putstrided(self, start, end, step, data):
-        self.putstridedimpl(self.buf, start, end, step, data)
-
-    @turbo(self = {}, buf = [T], i = np.uint32, end = np.uint32, step = np.uint32, data = [T], j = np.uint32)
-    def putstridedimpl(self, buf, i, end, step, data):
         j = 0
-        while i < end:
-            buf[i] = data[j]
-            i += step
+        while start < end:
+            self_buf[start] = data[j]
+            start += step
             j += 1
 
     def putindexed(self, indices, data):
