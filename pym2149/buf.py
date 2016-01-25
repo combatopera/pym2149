@@ -79,14 +79,11 @@ class Buf:
             buf[i] = value
             i += 1
 
+    @turbo(self = dict(buf = [T]), startframe = index, endframe = index, thatnp = [T], j = index)
     def partcopyintonp(self, startframe, endframe, thatnp):
-        self.partcopyintonpimpl(self.buf, startframe, endframe - startframe, thatnp)
-
-    @turbo(self = {}, buf = [T], i = np.uint32, n = np.uint32, that = [T], j = np.uint32)
-    def partcopyintonpimpl(self, buf, i, n, that):
-        for j in xrange(n):
-            that[j] = buf[i]
-            i += 1
+        for j in xrange(endframe - startframe):
+            that_buf[j] = self_buf[startframe]
+            startframe += 1
 
     def fill(self, value):
         self.fillimpl(self.buf, len(self.buf), self.buf.dtype.type(value))
