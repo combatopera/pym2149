@@ -44,7 +44,7 @@ class nullbuf:
 
     def subbuf(self, *args): pass
 
-self_buf = that_buf = py_indices = None
+self_buf = that_buf = py_indices = py_that_buf = None
 
 class Buf:
 
@@ -122,14 +122,10 @@ class Buf:
     def mulbuf(self, that):
         self.buf *= that.buf
 
+    @turbo(self = dict(buf = [T]), that = dict(buf = [U]), lookup = [T], i = index)
     def mapbuf(self, that, lookup):
-        self.mapbufimpl(self.buf, that.buf, lookup, len(that))
-
-    @turbo(self = {}, buf = [T], that = [U], lookup = [T], n = np.uint32)
-    def mapbufimpl(self, buf, that, lookup, n):
-        while n:
-            n -= 1
-            buf[n] = lookup[that[n]]
+        for i in xrange(py_that_buf.size):
+            self_buf[i] = lookup[that_buf[i]]
 
     def add(self, value):
         self.buf += value
