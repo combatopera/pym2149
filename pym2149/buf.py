@@ -48,6 +48,8 @@ self_buf = that_buf = None
 
 class Buf:
 
+    index = np.uint32
+
     def __init__(self, buf):
         self.buf = buf
 
@@ -57,19 +59,16 @@ class Buf:
     def last(self):
         return self.buf[-1]
 
-    @turbo(self = dict(buf = [T]), endframe = np.uint32, that = dict(buf = [T]), i = np.uint32)
+    @turbo(self = dict(buf = [T]), endframe = index, that = dict(buf = [T]), i = index)
     def copyasprefix(self, endframe, that):
         for i in xrange(endframe):
             self_buf[i] = that_buf[i]
 
+    @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = index, endframe = index, i = index)
     def copywindow(self, that, startframe, endframe):
-        self.copywindowimpl(self.buf, that.buf, startframe, endframe - startframe)
-
-    @turbo(self = {}, buf = [T], that = [T], j = np.uint32, n = np.uint32, i = np.uint32)
-    def copywindowimpl(self, buf, that, j, n):
-        for i in xrange(n):
-            buf[i] = that[j]
-            j += 1
+        for i in xrange(endframe - startframe):
+            self_buf[i] = that_buf[startframe]
+            startframe += 1
 
     def fillpart(self, startframe, endframe, value):
         self.fillpartimpl(self.buf, startframe, endframe, self.buf.dtype.type(value))
