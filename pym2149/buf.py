@@ -44,6 +44,8 @@ class nullbuf:
 
     def subbuf(self, *args): pass
 
+self_buf = that_buf = None
+
 class Buf:
 
     def __init__(self, buf):
@@ -55,13 +57,10 @@ class Buf:
     def last(self):
         return self.buf[-1]
 
+    @turbo(self = dict(buf = [T]), endframe = np.uint32, that = dict(buf = [T]), i = np.uint32)
     def copyasprefix(self, endframe, that):
-        self.copyasprefiximpl(self.buf, endframe, that.buf)
-
-    @turbo(self = {}, buf = [T], endframe = np.uint32, that = [T], i = np.uint32)
-    def copyasprefiximpl(self, buf, endframe, that):
         for i in xrange(endframe):
-            buf[i] = that[i]
+            self_buf[i] = that_buf[i]
 
     def copywindow(self, that, startframe, endframe):
         self.copywindowimpl(self.buf, that.buf, startframe, endframe - startframe)
