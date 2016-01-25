@@ -138,8 +138,8 @@ class RationalDerivative(DerivativeNode):
             self.maincounter = (remaining+maxprescaler-1) // maxprescaler
         return action
 
-    @turbo(i = np.uint32, n = np.uint32, indices = [np.int64], stepsize = np.int64, stepindex = np.int64, value = np.int64, mfpclock = np.int64)
-    def prepareindices(n, indices, stepsize, stepindex, mfpclock):
+    @turbo(self = {}, i = np.uint32, n = np.uint32, indices = [np.int64], stepsize = np.int64, stepindex = np.int64, value = np.int64, mfpclock = np.int64)
+    def prepareindices(self, n, indices, stepsize, stepindex, mfpclock):
         value = stepindex + mfpclock - 1
         for i in xrange(n):
             indices[i] = value // mfpclock
