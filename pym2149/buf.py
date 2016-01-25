@@ -44,7 +44,7 @@ class nullbuf:
 
     def subbuf(self, *args): pass
 
-self_buf = that_buf = None
+self_buf = that_buf = py_indices = None
 
 class Buf:
 
@@ -102,13 +102,10 @@ class Buf:
             start += step
             j += 1
 
+    @turbo(self = dict(buf = [T]), indices = [U], data = [T], i = index)
     def putindexed(self, indices, data):
-        self.putindexedimpl(self.buf, indices, len(indices), data)
-
-    @turbo(self = {}, buf = [T], indices = [U], n = np.uint32, data = [T], i = np.uint32)
-    def putindexedimpl(self, buf, indices, n, data):
-        for i in xrange(n):
-            buf[indices[i]] = data[i]
+        for i in xrange(py_indices.size):
+            self_buf[indices[i]] = data[i]
 
     def addtofirst(self, val):
         self.buf[0] += val
