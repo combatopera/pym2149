@@ -58,16 +58,16 @@ class Buf:
     def copyasprefix(self, endframe, that):
         self.copyasprefiximpl(self.buf, endframe, that.buf)
 
-    @turbo(buf = [T], endframe = np.uint32, that = [T], i = np.uint32)
-    def copyasprefiximpl(buf, endframe, that):
+    @turbo(self = {}, buf = [T], endframe = np.uint32, that = [T], i = np.uint32)
+    def copyasprefiximpl(self, buf, endframe, that):
         for i in xrange(endframe):
             buf[i] = that[i]
 
     def copywindow(self, that, startframe, endframe):
         self.copywindowimpl(self.buf, that.buf, startframe, endframe - startframe)
 
-    @turbo(buf = [T], that = [T], j = np.uint32, n = np.uint32, i = np.uint32)
-    def copywindowimpl(buf, that, j, n):
+    @turbo(self = {}, buf = [T], that = [T], j = np.uint32, n = np.uint32, i = np.uint32)
+    def copywindowimpl(self, buf, that, j, n):
         for i in xrange(n):
             buf[i] = that[j]
             j += 1
@@ -75,8 +75,8 @@ class Buf:
     def fillpart(self, startframe, endframe, value):
         self.fillpartimpl(self.buf, startframe, endframe, self.buf.dtype.type(value))
 
-    @turbo(buf = [T], i = np.uint32, endframe = np.uint32, value = T)
-    def fillpartimpl(buf, i, endframe, value):
+    @turbo(self = {}, buf = [T], i = np.uint32, endframe = np.uint32, value = T)
+    def fillpartimpl(self, buf, i, endframe, value):
         while i < endframe:
             buf[i] = value
             i += 1
@@ -84,8 +84,8 @@ class Buf:
     def partcopyintonp(self, startframe, endframe, thatnp):
         self.partcopyintonpimpl(self.buf, startframe, endframe - startframe, thatnp)
 
-    @turbo(buf = [T], i = np.uint32, n = np.uint32, that = [T], j = np.uint32)
-    def partcopyintonpimpl(buf, i, n, that):
+    @turbo(self = {}, buf = [T], i = np.uint32, n = np.uint32, that = [T], j = np.uint32)
+    def partcopyintonpimpl(self, buf, i, n, that):
         for j in xrange(n):
             that[j] = buf[i]
             i += 1
@@ -93,8 +93,8 @@ class Buf:
     def fill(self, value):
         self.fillimpl(self.buf, len(self.buf), self.buf.dtype.type(value))
 
-    @turbo(buf = [T], n = np.uint32, value = T)
-    def fillimpl(buf, n, value):
+    @turbo(self = {}, buf = [T], n = np.uint32, value = T)
+    def fillimpl(self, buf, n, value):
         while n:
             n -= 1
             buf[n] = value
@@ -102,8 +102,8 @@ class Buf:
     def putstrided(self, start, end, step, data):
         self.putstridedimpl(self.buf, start, end, step, data)
 
-    @turbo(buf = [T], i = np.uint32, end = np.uint32, step = np.uint32, data = [T], j = np.uint32)
-    def putstridedimpl(buf, i, end, step, data):
+    @turbo(self = {}, buf = [T], i = np.uint32, end = np.uint32, step = np.uint32, data = [T], j = np.uint32)
+    def putstridedimpl(self, buf, i, end, step, data):
         j = 0
         while i < end:
             buf[i] = data[j]
@@ -113,8 +113,8 @@ class Buf:
     def putindexed(self, indices, data):
         self.putindexedimpl(self.buf, indices, len(indices), data)
 
-    @turbo(buf = [T], indices = [U], n = np.uint32, data = [T], i = np.uint32)
-    def putindexedimpl(buf, indices, n, data):
+    @turbo(self = {}, buf = [T], indices = [U], n = np.uint32, data = [T], i = np.uint32)
+    def putindexedimpl(self, buf, indices, n, data):
         for i in xrange(n):
             buf[indices[i]] = data[i]
 
@@ -136,8 +136,8 @@ class Buf:
     def mapbuf(self, that, lookup):
         self.mapbufimpl(self.buf, that.buf, lookup, len(that))
 
-    @turbo(buf = [T], that = [U], lookup = [T], n = np.uint32)
-    def mapbufimpl(buf, that, lookup, n):
+    @turbo(self = {}, buf = [T], that = [U], lookup = [T], n = np.uint32)
+    def mapbufimpl(self, buf, that, lookup, n):
         while n:
             n -= 1
             buf[n] = lookup[that[n]]
