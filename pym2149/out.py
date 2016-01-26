@@ -162,7 +162,7 @@ class WavBuf(Node):
     self.overflowsize = minbleps.mixinsize
     self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
     self.naivex = 0
-    self.dc = 0 # Last naive value of previous block.
+    self.dc = floatdtype(0) # Last naive value of previous block.
     self.carrybuf.fill(self.dc) # Initial carry can be the initial dc level.
     self.naive = naive
     self.naiverate = clockinfo.implclock
