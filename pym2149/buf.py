@@ -48,7 +48,7 @@ self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None
 
 class Buf:
 
-    index = np.uint32
+    itype = np.uint32
 
     def __init__(self, buf):
         self.buf = buf
@@ -59,36 +59,36 @@ class Buf:
     def last(self):
         return self.buf[-1]
 
-    @turbo(self = dict(buf = [T]), endframe = index, that = dict(buf = [T]), i = index)
+    @turbo(self = dict(buf = [T]), endframe = itype, that = dict(buf = [T]), i = itype)
     def copyasprefix(self, endframe, that):
         for i in xrange(endframe):
             self_buf[i] = that_buf[i]
 
-    @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = index, endframe = index, i = index)
+    @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = itype, endframe = itype, i = itype)
     def copywindow(self, that, startframe, endframe):
         for i in xrange(endframe - startframe):
             self_buf[i] = that_buf[startframe]
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), startframe = index, endframe = index, value = T)
+    @turbo(self = dict(buf = [T]), startframe = itype, endframe = itype, value = T)
     def fillpart(self, startframe, endframe, value):
         while startframe < endframe:
             self_buf[startframe] = value
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), startframe = index, endframe = index, thatnp = [T], j = index)
+    @turbo(self = dict(buf = [T]), startframe = itype, endframe = itype, thatnp = [T], j = itype)
     def partcopyintonp(self, startframe, endframe, thatnp):
         for j in xrange(endframe - startframe):
             that_buf[j] = self_buf[startframe]
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), value = U, i = index, v = T)
+    @turbo(self = dict(buf = [T]), value = U, i = itype, v = T)
     def fill(self, value):
         v = value
         for i in xrange(py_self_buf.size):
             self_buf[i] = v
 
-    @turbo(self = dict(buf = [T]), start = index, end = index, step = index, data = [T], j = index)
+    @turbo(self = dict(buf = [T]), start = itype, end = itype, step = itype, data = [T], j = itype)
     def putstrided(self, start, end, step, data):
         j = 0
         while start < end:
@@ -96,7 +96,7 @@ class Buf:
             start += step
             j += 1
 
-    @turbo(self = dict(buf = [T]), indices = [U], data = [T], i = index)
+    @turbo(self = dict(buf = [T]), indices = [U], data = [T], i = itype)
     def putindexed(self, indices, data):
         for i in xrange(py_indices.size):
             self_buf[indices[i]] = data[i]
@@ -116,7 +116,7 @@ class Buf:
     def mulbuf(self, that):
         self.buf *= that.buf
 
-    @turbo(self = dict(buf = [T]), that = dict(buf = [U]), lookup = [T], i = index)
+    @turbo(self = dict(buf = [T]), that = dict(buf = [U]), lookup = [T], i = itype)
     def mapbuf(self, that, lookup):
         for i in xrange(py_that_buf.size):
             self_buf[i] = lookup[that_buf[i]]
