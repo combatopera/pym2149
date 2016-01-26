@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyven
 
 # Copyright 2014 Andrzej Cichocki
 
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import unittest, numpy as np
 from mix import IdealMixer, Multiplexer
 from nod import BufNode, Block, Container
 from buf import nullbuf
@@ -25,11 +25,11 @@ from out import TrivialOutChannel
 
 class Counter(BufNode):
 
-    dtype = int
+    dtype = np.int64 # Closest thing to int.
 
     def __init__(self, x = 0):
         BufNode.__init__(self, self.dtype)
-        self.x = x
+        self.x = self.dtype(x)
 
     def callimpl(self):
         for frameindex in xrange(self.block.framecount):
