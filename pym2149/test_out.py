@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyven
 
 # Copyright 2014 Andrzej Cichocki
 
@@ -20,7 +20,7 @@
 import unittest, numpy as np, time, sys, os
 from nod import Node, Block
 from buf import Buf
-from out import WavWriter, WavBuf
+from out import WavWriter, WavBuf, floatdtype
 from minblep import MinBleps
 from collections import namedtuple
 
@@ -31,7 +31,7 @@ class MinPeriodTone(Node):
     def __init__(self):
         Node.__init__(self)
         toneamp = .5 * 2 ** 15 # Half of full scale.
-        self.buf = np.empty(self.size)
+        self.buf = np.empty(self.size, dtype = floatdtype)
         self.buf[::2] = toneamp
         self.buf[1::2] = -toneamp
 
