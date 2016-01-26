@@ -17,18 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import unittest, numpy as np
 from dac import Dac
 from nod import BufNode, Block
 
 class Ramps(BufNode):
 
+    dtype = np.int64 # Closest to int.
+
     def __init__(self):
-        BufNode.__init__(self, int)
+        BufNode.__init__(self, self.dtype)
 
     def callimpl(self):
         for i in xrange(self.block.framecount):
-            self.blockbuf.fillpart(i, i + 1, i)
+            self.blockbuf.fillpart(i, i + 1, self.dtype(i))
 
 class TestDac(unittest.TestCase):
 
