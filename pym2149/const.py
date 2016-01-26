@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, numpy as np
 
 clientname = 'pym2149'
 appconfigdir = os.path.join(os.path.expanduser('~'), '.pym2149')
 midichannelcount = 16
+u4 = np.uint32

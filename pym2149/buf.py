@@ -18,6 +18,7 @@
 import numpy as np
 from util import singleton
 from pyrbo import turbo, T, U
+from const import u4
 
 @singleton
 class nullbuf:
@@ -47,8 +48,6 @@ class nullbuf:
 self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None
 
 class Buf:
-
-    u4 = np.uint32
 
     def __init__(self, buf):
         self.buf = buf
