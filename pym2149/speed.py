@@ -19,6 +19,7 @@ from __future__ import division
 import logging, numpy as np
 from collections import namedtuple
 from pyrbo import turbo
+from const import u4
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ minclarity = 1.1
 
 ScoreSpeedPhase = namedtuple('ScoreSpeedPhase', 'score speed phase')
 
-@turbo(kernel = [dtype], kernelsize = np.uint32, history = [dtype], maxphase = np.uint32, s = dtype, score = dtype, i = np.uint32, j = np.uint32, p = np.uint32, phase = np.uint32)
+@turbo(kernel = [dtype], kernelsize = u4, history = [dtype], maxphase = u4, s = dtype, score = dtype, i = u4, j = u4, p = u4, phase = u4)
 def correlate(kernel, kernelsize, history, maxphase):
     phase = 0
     score = 0
