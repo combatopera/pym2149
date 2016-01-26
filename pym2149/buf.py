@@ -44,7 +44,7 @@ class nullbuf:
 
     def subbuf(self, *args): pass
 
-self_buf = that_buf = py_indices = py_that_buf = None
+self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None
 
 class Buf:
 
@@ -82,14 +82,11 @@ class Buf:
             that_buf[j] = self_buf[startframe]
             startframe += 1
 
+    @turbo(self = dict(buf = [T]), value = U, i = index, v = T)
     def fill(self, value):
-        self.fillimpl(self.buf, len(self.buf), self.buf.dtype.type(value))
-
-    @turbo(self = {}, buf = [T], n = np.uint32, value = T)
-    def fillimpl(self, buf, n, value):
-        while n:
-            n -= 1
-            buf[n] = value
+        v = value
+        for i in xrange(py_self_buf.size):
+            self_buf[i] = v
 
     @turbo(self = dict(buf = [T]), start = index, end = index, step = index, data = [T], j = index)
     def putstrided(self, start, end, step, data):
