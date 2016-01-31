@@ -78,7 +78,7 @@ class Buf:
     @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, thatnp = [T], j = u4)
     def partcopyintonp(self, startframe, endframe, thatnp):
         for j in xrange(endframe - startframe):
-            that_buf[j] = self_buf[startframe]
+            thatnp[j] = self_buf[startframe]
             startframe += 1
 
     @turbo(self = dict(buf = [T]), value = U, i = u4, v = T)
