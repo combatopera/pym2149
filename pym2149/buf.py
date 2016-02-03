@@ -17,7 +17,7 @@
 
 import numpy as np
 from util import singleton
-from pyrbo import turbo, T, U
+from pyrbo import turbo, T, U, generic
 from const import u4
 
 @singleton
@@ -48,6 +48,8 @@ class nullbuf:
 self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None
 
 class Buf:
+
+    __metaclass__ = generic
 
     def __init__(self, buf):
         self.buf = buf
@@ -149,17 +151,18 @@ class Buf:
 class MasterBuf:
 
     def __init__(self, dtype):
+        self.bufcls = Buf[T, dtype]
         self.dtype = dtype
         self.setsize(0)
 
     def setsize(self, size):
         self.buf = np.empty(size, self.dtype)
-        self.bufobj = Buf(self.buf)
+        self.bufobj = self.bufcls(self.buf)
         self.size = size
 
     def ensureandcrop(self, framecount):
         if self.size > framecount:
-            return Buf(self.buf[:framecount])
+            return self.bufcls(self.buf[:framecount])
         if self.size < framecount:
             # Ideally we would resize in-place, but that can fall foul of numpy reference counting:
             self.setsize(framecount)
