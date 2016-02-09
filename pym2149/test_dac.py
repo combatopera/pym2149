@@ -17,13 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np
+import unittest
 from dac import Dac
 from nod import BufNode, Block
+from ring import signaldtype
 
 class Ramps(BufNode):
 
-    dtype = np.int64 # Closest to int.
+    dtype = signaldtype
 
     def __init__(self):
         BufNode.__init__(self, self.dtype)
