@@ -46,7 +46,7 @@ class BinMix(BufNode):
             self.blockbuf.copybuf(self.chain(self.noise))
         else:
             # Fixed and variable levels should work, see qanlgmix and qenvpbuf:
-            self.blockbuf.fill_int8(1)
+            self.blockbuf.fill_i1(1)
 
 class Multiplexer(Node):
 
