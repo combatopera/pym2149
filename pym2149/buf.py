@@ -17,7 +17,7 @@
 
 import numpy as np
 from util import singleton
-from pyrbo import turbo, T, U, generic
+from pyrbo import turbo, T, generic
 from const import u4
 from ring import signaldtype
 
@@ -105,7 +105,7 @@ class Buf:
             start += step
             j += 1
 
-    @turbo(self = dict(buf = [T]), indices = [U], data = [T], i = u4)
+    @turbo(self = dict(buf = [T]), indices = [np.int64], data = [T], i = u4)
     def putindexed(self, indices, data):
         for i in xrange(py_indices.size):
             self_buf[indices[i]] = data[i]
