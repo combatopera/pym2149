@@ -19,6 +19,7 @@ import numpy as np
 from util import singleton
 from pyrbo import turbo, T, U, generic
 from const import u4
+from ring import signaldtype
 
 @singleton
 class nullbuf:
@@ -124,7 +125,7 @@ class Buf:
     def mulbuf(self, that):
         self.buf *= that.buf
 
-    @turbo(self = dict(buf = [T]), that = dict(buf = [U]), lookup = [T], i = u4)
+    @turbo(self = dict(buf = [T]), that = dict(buf = [signaldtype]), lookup = [T], i = u4)
     def mapbuf(self, that, lookup):
         for i in xrange(py_that_buf.size):
             self_buf[i] = lookup[that_buf[i]]
