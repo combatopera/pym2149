@@ -34,7 +34,7 @@ class nullbuf:
 
     def partcopyintonp(self, *args): pass
 
-    def fill_int8(self, *args): pass
+    def fill_i1(self, *args): pass
 
     def fill_same(self, *args): pass
 
@@ -87,7 +87,7 @@ class Buf:
             startframe += 1
 
     @turbo(self = dict(buf = [T]), value = np.int8, i = u4, v = T)
-    def fill_int8(self, value):
+    def fill_i1(self, value):
         v = value # Cast once.
         for i in xrange(py_self_buf.size):
             self_buf[i] = v

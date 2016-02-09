@@ -35,7 +35,7 @@ class TestBuf(unittest.TestCase):
             buf = bufcls(v)
             buf.fillpart(4, 6, 5)
             self.assertEqual([0, 0, 0, 0, 5, 5, 0, 0, 0, 0], list(v))
-            buf.fill_int8(6)
+            buf.fill_i1(6)
             self.assertEqual([6] * 10, list(v))
         try:
             Buf[Z, None]
