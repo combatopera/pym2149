@@ -29,6 +29,7 @@ from ym2149 import ym2149nzdegrees, YM2149
 from shapes import toneshape
 from dac import PWMEffect
 from collections import namedtuple
+from pyrbo import T
 
 class AbstractTestOsc:
 
@@ -234,7 +235,8 @@ class TestRationalDerivative(unittest.TestCase):
 
     @staticmethod
     def integrate(d, n):
-        v = Buf(np.empty(n, dtype = int))
+        a = np.empty(n, dtype = int)
+        v = Buf[T, a.dtype.type](a)
         d.call(Block(n))(v)
         return v.tolist()
 
