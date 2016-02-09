@@ -35,6 +35,8 @@ class nullbuf:
 
     def fill(self, *args): pass
 
+    def fill_same(self, *args): pass
+
     def putstrided(self, *args): pass
 
     def putindexed(self, *args): pass
@@ -88,6 +90,11 @@ class Buf:
         v = value
         for i in xrange(py_self_buf.size):
             self_buf[i] = v
+
+    @turbo(self = dict(buf = [T]), value = T, i = u4)
+    def fill_same(self, value):
+        for i in xrange(py_self_buf.size):
+            self_buf[i] = value
 
     @turbo(self = dict(buf = [T]), start = u4, end = u4, step = u4, data = [T], j = u4)
     def putstrided(self, start, end, step, data):

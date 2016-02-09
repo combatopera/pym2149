@@ -84,7 +84,7 @@ class IdealMixer(BufNode):
         self.chipamps = chipamps
 
     def nontrivialcallimpl(self):
-        self.blockbuf.fill(self.datum)
+        self.blockbuf.fill_same(self.datum)
         contrib = self.contrib.ensureandcrop(self.block.framecount)
         for buf, amp in zip(self.chain(self.container), self.chain(self.chipamps)):
             if amp:
@@ -93,6 +93,6 @@ class IdealMixer(BufNode):
                 self.blockbuf.subbuf(contrib)
 
     def trivialcallimpl(self):
-        self.blockbuf.fill(self.datum)
+        self.blockbuf.fill_same(self.datum)
         for buf in self.chain(self.container):
             self.blockbuf.subbuf(buf)
