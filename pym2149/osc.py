@@ -79,11 +79,12 @@ class SimpleDerivative(DerivativeNode):
 
 class RationalDerivative(DerivativeNode):
 
-    singleton0 = np.zeros(1, dtype = np.int32)
+    indexdtype = np.int64 # Must be signed and this big, at least for the tests.
+    singleton0 = np.zeros(1, dtype = indexdtype)
 
     def __init__(self, chipimplclock, timer):
         DerivativeNode.__init__(self)
-        self.indices = MasterBuf(np.int64) # Must be signed and this big, at least for the tests.
+        self.indices = MasterBuf(self.indexdtype)
         self.effectversion = None
         self.chipimplclock = chipimplclock
         self.timer = timer
