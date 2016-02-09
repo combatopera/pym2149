@@ -39,7 +39,7 @@ class DerivativeNode(BufNode):
         self.ringcursor.swapring(shape)
 
     def hold(self, signalbuf):
-        signalbuf.fill(self.ringcursor.contextdc())
+        signalbuf.fill_same(self.ringcursor.contextdc())
 
     def integral(self, signalbuf):
         signalbuf.integrate(self.blockbuf)
