@@ -65,7 +65,7 @@ class RingCursor:
         self.ring = ring
 
     def putstrided(self, target, start, step, ringn):
-        target.fill(0)
+        target.fill_int8(0)
         contextdc = self.contextdc()
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
@@ -80,7 +80,7 @@ class RingCursor:
     def putindexed(self, target, indices):
         ifrom = 0
         ringn = indices.shape[0]
-        target.fill(0)
+        target.fill_int8(0)
         contextdc = self.contextdc()
         while ringn:
             n = min(self.ring.limit - self.index, ringn)
