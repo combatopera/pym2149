@@ -19,6 +19,10 @@
 
 import unittest, numpy as np, ring
 from buf import Buf
+from pyrbo import T
+
+def createbuf(v):
+    return Buf[T, v.dtype.type](v)
 
 class DerivativeRing(ring.DerivativeRing): minloopsize = 1
 
@@ -40,7 +44,7 @@ class TestDerivativeRing(unittest.TestCase):
             self.assertEqual([1, 1, 1, 1, 1, 1, -2, 1, 1, -2, 1, 1, -2, 1, 1, -2], r.tolist())
 
     def test_putstrided(self):
-        b = Buf(np.empty(20, dtype = ring.derivativedtype))
+        b = createbuf(np.empty(20, dtype = ring.derivativedtype))
         c = DerivativeRing(xrange(5)).newcursor()
         c.index = 4
         c.putstrided(b, 3, 2, 8)
@@ -50,7 +54,7 @@ class TestDerivativeRing(unittest.TestCase):
         self.assertEqual(2, c.index)
 
     def test_putstridedwithintro(self):
-        b = Buf(np.empty(20, dtype = ring.derivativedtype))
+        b = createbuf(np.empty(20, dtype = ring.derivativedtype))
         c = DerivativeRing(xrange(5), 2).newcursor()
         c.index = 1
         c.putstrided(b, 3, 2, 8)
