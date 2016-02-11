@@ -40,8 +40,6 @@ class nullbuf:
 
     def putstrided(self, *args): pass
 
-    def putindexed(self, *args): pass
-
     def addtofirst(self, *args): pass
 
     def integrate(self, *args): pass
@@ -104,11 +102,6 @@ class Buf:
             self_buf[start] = data[j]
             start += step
             j += 1
-
-    @turbo(self = dict(buf = [T]), indices = [np.int64], data = [T], i = u4)
-    def putindexed(self, indices, data):
-        for i in xrange(py_indices.size):
-            self_buf[indices[i]] = data[i]
 
     def addtofirst(self, val):
         self.buf[0] += val
