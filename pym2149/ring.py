@@ -17,6 +17,8 @@
 
 import numpy as np, itertools
 from util import ceildiv
+from pyrbo import turbo, LOCAL
+from const import u4
 
 signaldtype = np.uint8 # Slightly faster than plain old int.
 derivativedtype = np.int8 # Suitable for any signal in [0, 127].
@@ -77,20 +79,25 @@ class RingCursor:
             ringn -= n
         target.addtofirst(contextdc) # Add last value of previous integral.
 
+    @turbo(self = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4)), target = dict(buf = [derivativedtype]), indices = [np.int64], ifrom = u4, ringn = u4, contextdc = derivativedtype, n = u4, ito = u4, ringend = u4, i = u4)
     def putindexed(self, target, indices):
+        py_indices = target_buf = py_target_buf = self_ring_loopstart = self_ring_limit = self_ring_npbuf = self_index = LOCAL
         ifrom = 0
-        ringn = indices.shape[0]
-        target.fill_i1(0)
+        ringn = py_indices.size
+        for i in xrange(py_target_buf.size):
+            target_buf[i] = 0
         contextdc = self.contextdc()
         while ringn:
-            n = min(self.ring.limit - self.index, ringn)
+            n = min(self_ring_limit - self_index, ringn)
             ito = ifrom + n
-            ringend = self.index + n
-            target.putindexed(indices[ifrom:ito], self.ring.npbuf[self.index:ringend])
+            ringend = self_index + n
+            for i in xrange(n):
+                target_buf[indices[ifrom + i]] = self_ring_npbuf[self_index + i]
             ifrom = ito
-            self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
+            self_index = self_ring_loopstart if ringend == self_ring_limit else ringend
             ringn -= n
-        target.addtofirst(contextdc)
+        target_buf[0] += contextdc
+        self.index = self_index
 
     def contextdc(self):
         # Observe this can break through loopstart, in which case value should be same as last:
