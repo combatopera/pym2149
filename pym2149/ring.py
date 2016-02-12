@@ -66,18 +66,24 @@ class RingCursor:
             raise Exception("Expected limit %s but was: %s" % (self.ring.limit, ring.limit))
         self.ring = ring
 
+    @turbo(self = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4)), target = dict(buf = [derivativedtype]), start = u4, step = u4, ringn = u4, i = u4, contextdc = derivativedtype, end = u4, ringend = u4, n = u4)
     def putstrided(self, target, start, step, ringn):
-        target.fill_i1(0)
+        py_target_buf = target_buf = self_ring_limit = self_index = self_ring_npbuf = self_ring_loopstart = LOCAL
+        for i in xrange(py_target_buf.size):
+            target_buf[i] = 0
         contextdc = self.contextdc()
         while ringn:
-            n = min(self.ring.limit - self.index, ringn)
+            n = min(self_ring_limit - self_index, ringn)
             end = start + step * n
-            ringend = self.index + n
-            target.putstrided(start, end, step, self.ring.npbuf[self.index:ringend])
-            start = end
-            self.index = self.ring.loopstart if ringend == self.ring.limit else ringend
+            ringend = self_index + n
+            while start < end:
+                target_buf[start] = self_ring_npbuf[self_index]
+                start += step
+                self_index += 1
+            self_index = self_ring_loopstart if ringend == self_ring_limit else ringend
             ringn -= n
-        target.addtofirst(contextdc) # Add last value of previous integral.
+        target_buf[0] += contextdc # Add last value of previous integral.
+        self.index = self_index
 
     @turbo(self = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4)), target = dict(buf = [derivativedtype]), indices = [np.int64], ifrom = u4, ringn = u4, contextdc = derivativedtype, n = u4, ito = u4, ringend = u4, i = u4)
     def putindexed(self, target, indices):
