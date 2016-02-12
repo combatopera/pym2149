@@ -82,9 +82,6 @@ class Buf:
             start += step
             j += 1
 
-    def addtofirst(self, val):
-        self.buf[0] += val
-
     def integrate(self, that):
         np.cumsum(that.buf, out = self.buf)
 
