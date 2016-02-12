@@ -57,6 +57,8 @@ class DerivativeRing:
 
 class RingCursor:
 
+    turbotype = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4))
+
     def __init__(self, ring):
         self.index = 0
         self.ring = ring
@@ -66,7 +68,7 @@ class RingCursor:
             raise Exception("Expected limit %s but was: %s" % (self.ring.limit, ring.limit))
         self.ring = ring
 
-    @turbo(self = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4)), target = dict(buf = [derivativedtype]), start = u4, step = u4, ringn = u4, i = u4, contextdc = derivativedtype, end = u4, ringend = u4, n = u4)
+    @turbo(self = turbotype, target = dict(buf = [derivativedtype]), start = u4, step = u4, ringn = u4, i = u4, contextdc = derivativedtype, end = u4, ringend = u4, n = u4)
     def putstrided(self, target, start, step, ringn):
         py_target_buf = target_buf = self_ring_limit = self_index = self_ring_npbuf = self_ring_loopstart = LOCAL
         for i in xrange(py_target_buf.size):
@@ -85,7 +87,7 @@ class RingCursor:
         target_buf[0] += contextdc # Add last value of previous integral.
         self.index = self_index
 
-    @turbo(self = dict(index = u4, ring = dict(npbuf = [derivativedtype], limit = u4, loopstart = u4)), target = dict(buf = [derivativedtype]), indices = [np.int64], ifrom = u4, ringn = u4, contextdc = derivativedtype, n = u4, ito = u4, ringend = u4, i = u4)
+    @turbo(self = turbotype, target = dict(buf = [derivativedtype]), indices = [np.int64], ifrom = u4, ringn = u4, contextdc = derivativedtype, n = u4, ito = u4, ringend = u4, i = u4)
     def putindexed(self, target, indices):
         py_indices = target_buf = py_target_buf = self_ring_loopstart = self_ring_limit = self_ring_npbuf = self_index = LOCAL
         ifrom = 0
