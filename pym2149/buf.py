@@ -16,37 +16,11 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from util import singleton
 from pyrbo import turbo, T, generic
 from const import u4
 from ring import signaldtype
 
-@singleton
-class nullbuf:
-
-    def last(self, *args): pass
-
-    def copyasprefix(self, *args): pass
-
-    def copywindow(self, *args): pass
-
-    def fillpart(self, *args): pass
-
-    def partcopyintonp(self, *args): pass
-
-    def fill_i1(self, *args): pass
-
-    def fill_same(self, *args): pass
-
-    def putstrided(self, *args): pass
-
-    def addtofirst(self, *args): pass
-
-    def integrate(self, *args): pass
-
-    def subbuf(self, *args): pass
-
-self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None
+self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None # FIXME: Use LOCAL.
 
 class Buf:
 

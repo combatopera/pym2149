@@ -20,7 +20,6 @@
 import unittest, numpy as np
 from mix import IdealMixer, Multiplexer
 from nod import BufNode, Block, Container
-from buf import nullbuf
 from out import TrivialOutChannel
 
 class Counter(BufNode):
@@ -49,14 +48,6 @@ class TestIdealMixer(unittest.TestCase):
         self.expect(m, [10, 12, 14, 16, 18], m.call(Block(5)))
         # Check the buffer is actually cleared first:
         self.expect(m, [20, 22, 24, 26, 28], m.call(Block(5)))
-
-    def test_masked(self):
-        upstream = Counter(10), Counter()
-        c = Container(upstream)
-        m = IdealMixer(c, 16, TrivialOutChannel)
-        self.assertEqual(nullbuf, m(Block(5), True))
-        for n in upstream:
-            self.assertEqual(nullbuf, n.result)
 
 class TestMultiplexer(unittest.TestCase):
 
