@@ -16,11 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from pyrbo import turbo, T, generic
+from pyrbo import turbo, T, generic, LOCAL
 from const import u4
 from ring import signaldtype
-
-self_buf = that_buf = py_indices = py_that_buf = py_self_buf = None # FIXME: Use LOCAL.
 
 class Buf:
 
@@ -37,40 +35,47 @@ class Buf:
 
     @turbo(self = dict(buf = [T]), endframe = u4, that = dict(buf = [T]), i = u4)
     def copyasprefix(self, endframe, that):
+        self_buf = that_buf = LOCAL
         for i in xrange(endframe):
             self_buf[i] = that_buf[i]
 
     @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = u4, endframe = u4, i = u4)
     def copywindow(self, that, startframe, endframe):
+        self_buf = that_buf = LOCAL
         for i in xrange(endframe - startframe):
             self_buf[i] = that_buf[startframe]
             startframe += 1
 
     @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, value = T)
     def fillpart(self, startframe, endframe, value):
+        self_buf = LOCAL
         while startframe < endframe:
             self_buf[startframe] = value
             startframe += 1
 
     @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, thatnp = [T], j = u4)
     def partcopyintonp(self, startframe, endframe, thatnp):
+        self_buf = LOCAL
         for j in xrange(endframe - startframe):
             thatnp[j] = self_buf[startframe]
             startframe += 1
 
     @turbo(self = dict(buf = [T]), value = np.int8, i = u4, v = T)
     def fill_i1(self, value):
+        self_buf = py_self_buf = LOCAL
         v = value # Cast once.
         for i in xrange(py_self_buf.size):
             self_buf[i] = v
 
     @turbo(self = dict(buf = [T]), value = T, i = u4)
     def fill_same(self, value):
+        self_buf = py_self_buf = LOCAL
         for i in xrange(py_self_buf.size):
             self_buf[i] = value
 
     @turbo(self = dict(buf = [T]), start = u4, end = u4, step = u4, data = [T], j = u4)
     def putstrided(self, start, end, step, data):
+        self_buf = LOCAL
         j = 0
         while start < end:
             self_buf[start] = data[j]
@@ -94,6 +99,7 @@ class Buf:
 
     @turbo(self = dict(buf = [T]), that = dict(buf = [signaldtype]), lookup = [T], i = u4)
     def mapbuf(self, that, lookup):
+        self_buf = that_buf = py_that_buf = LOCAL
         for i in xrange(py_that_buf.size):
             self_buf[i] = lookup[that_buf[i]]
 
