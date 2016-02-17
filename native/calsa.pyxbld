@@ -1,0 +1,4 @@
+from distutils.extension import Extension
+
+def make_ext(name, source):
+    return Extension(name, [source], libraries = ['asound'])

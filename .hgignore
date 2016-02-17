@@ -1,6 +1,7 @@
 #gclean
 ^target$
 [.]pyc$
+[.]pyxbldc$
 [.]O$
 [.]swp$
 [.]dsd$
