@@ -81,5 +81,24 @@ class TestReg(unittest.TestCase):
         self.assertEqual(0, VersionReg().version)
         self.assertEqual(1, VersionReg(value = 123).version)
 
+    def test_minval(self):
+        r = Reg(minval = 1, value = 0)
+        self.assertEqual(1, r.value) # Check minval applied to passed-in value.
+        r.value = 2
+        self.assertEqual(2, r.value)
+        r.value = 0
+        self.assertEqual(1, r.value)
+
+    def test_minval2(self):
+        r = Reg(minval = 1, value = 2)
+        self.assertEqual(2, r.value) # Check it's not always minval.
+        that = Reg()
+        r.link(lambda x: x, that)
+        that.value = 5
+        self.assertEqual(5, r.value)
+        that.value = -1
+        self.assertEqual(-1, that.value)
+        self.assertEqual(1, r.value)
+
 if '__main__' == __name__:
     unittest.main()
