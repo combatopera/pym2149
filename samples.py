@@ -164,6 +164,7 @@ class Target:
         config = di(Config)
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
+        config.freqclamp = False # I want to see the very low periods.
         configure(di)
         di.add(Channels)
         channels = di(Channels)
