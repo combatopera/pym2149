@@ -53,14 +53,14 @@ class Registers:
     self.R = tuple(Reg() for _ in xrange(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-    TP = lambda f, r: max(clockinfo.mintoneperiod, (f & 0xff) | ((r & 0x0f) << 8))
-    NP = lambda p: max(1, p & 0x1f)
-    EP = lambda f, r: max(1, (f & 0xff) | ((r & 0xff) << 8))
-    self.toneperiods = [Reg() for _ in xrange(confchannels)]
+    TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
+    NP = lambda p: p & 0x1f
+    EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
+    self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in xrange(confchannels)]
     clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
     for c in xrange(clampedchannels):
       self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
-    self.noiseperiod = Reg().link(NP, self.R[0x6])
+    self.noiseperiod = Reg(minval = 1).link(NP, self.R[0x6])
     self.toneflags = [Reg() for _ in xrange(confchannels)]
     self.noiseflags = [Reg() for _ in xrange(confchannels)]
     self.fixedlevels = [Reg() for _ in xrange(confchannels)]
@@ -70,7 +70,7 @@ class Registers:
       self.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
       self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
       self.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
-    self.envperiod = Reg().link(EP, self.R[0xB], self.R[0xC])
+    self.envperiod = Reg(minval = 1).link(EP, self.R[0xB], self.R[0xC])
     self.envshape = VersionReg().link(lambda s: s & 0x0f, self.R[0xD])
     for r in self.R:
       r.value = 0
