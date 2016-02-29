@@ -35,6 +35,8 @@ class Reg(object):
     def __init__(self, **kwargs):
         self.links = []
         self.idle = True
+        self.minval = kwargs.get('minval', None)
+        self.maxval = kwargs.get('maxval', None)
         if 'value' in kwargs:
             self.value = kwargs['value']
 
@@ -58,6 +60,10 @@ class Reg(object):
         self.setimpl(value)
 
     def setimpl(self, value):
+        if self.minval is not None:
+            value = max(self.minval, value)
+        if self.maxval is not None:
+            value = min(self.maxval, value)
         object.__setattr__(self, 'value', value)
         object.__setattr__(self, 'idle', False) # Significantly faster than going via __setattr__.
         try:
