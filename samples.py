@@ -27,6 +27,7 @@ from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Stream, Config, Chip
 from pym2149.program import Note
+from pym2149.mediation import DynamicMediation
 from pym2149.channels import Channels
 from pym2149.dac import PWMEffect, SinusEffect
 from ymplayer import ChipTimer
@@ -166,6 +167,7 @@ class Target:
         config.outpath = path + '.wav'
         config.freqclamp = False # I want to see the very low periods.
         configure(di)
+        di.add(DynamicMediation) # TODO: Can be much simpler.
         di.add(Channels)
         channels = di(Channels)
         channels.midiprograms = {}

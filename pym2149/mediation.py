@@ -17,19 +17,26 @@
 
 import logging
 from const import midichannelcount
+from iface import Config
+from diapyr import types
 
 log = logging.getLogger(__name__)
 
-class Mediation:
+class Mediation: pass
+
+class DynamicMediation(Mediation):
 
     interruptingformat = "[%s] Interrupting note on channel."
 
-    def __init__(self, midichanbase, chipchancount, warn = log.warn):
+    @types(Config)
+    def __init__(self, config):
+        midichanbase = config.midichannelbase
+        chipchancount = config.chipchannels
         self.midichanandnotetochipchan = {}
         self.chipchantomidichanandnote = [(None, None)] * chipchancount
         self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(midichannelcount))
         self.chipchantoonframe = [None] * chipchancount
-        self.warn = warn
+        self.warn = log.warn
 
     def acquirechipchan(self, midichan, midinote, frame):
         if (midichan, midinote) in self.midichanandnotetochipchan:
