@@ -46,7 +46,7 @@ class DynamicMediation(Mediation):
 
     def acquirechipchan(self, midichan, midinote, frame):
         if (midichan, midinote) in self.midichanandnotetochipchan:
-            return self.midichanandnotetochipchan[midichan, midinote] # Spurious case.
+            return self.midichanandnotetochipchan[midichan, midinote], 0 # Spurious case.
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
             self.midichanandnotetochipchan[midichan, midinote] = chipchan
@@ -54,7 +54,7 @@ class DynamicMediation(Mediation):
             del chipchanhistory[i]
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
-            return chipchan
+            return chipchan, 0
         offchipchans = set()
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
             if midichanandnote[1] is None:
@@ -76,4 +76,4 @@ class DynamicMediation(Mediation):
         chipchan = self.midichanandnotetochipchan.pop((midichan, midinote), None)
         if chipchan is not None: # Non-spurious case.
             self.chipchantomidichanandnote[chipchan][1] = None
-            return chipchan
+            return chipchan, 0
