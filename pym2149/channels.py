@@ -41,7 +41,7 @@ class Channel:
     def programornone(self):
         return None if self.note is None else self.note.__class__
 
-    def newnote(self, frame, program, midinote, vel, fx):
+    def newnote(self, noteid, frame, program, midinote, vel, fx):
         self.onornone = True
         self.onframe = frame
         self.note = program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx)
@@ -136,7 +136,7 @@ class Channels:
         channel = self.channels[chipchan]
         if midichan in self.slidemidichans:
             fx.bend.value = 0 # Leave target and rate as-is. Note race with midi instant pitch bend (fine part 0).
-        channel.newnote(self.frameindex, program, midinote, vel, fx)
+        channel.newnote(noteid, self.frameindex, program, midinote, vel, fx)
         return channel
 
     def noteoff(self, midichan, midinote, vel):
