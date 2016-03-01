@@ -102,13 +102,13 @@ class Channels:
         di.add(cls)
         di.add(ChannelsConfigSubscription)
 
-    @types(Config, Chip)
-    def __init__(self, config, chip):
+    @types(Config, Chip, Mediation)
+    def __init__(self, config, chip, mediation):
         self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.slidemidichans = set(config.slidechannels)
         self.midichantofx = dict([c, FX(config, c in self.slidemidichans)] for c in xrange(config.midichannelbase, config.midichannelbase + midichannelcount))
-        self.mediation = Mediation(config.midichannelbase, config.chipchannels)
+        self.mediation = mediation
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
         self.controllers = {}

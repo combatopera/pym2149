@@ -18,13 +18,15 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, mock
-from mediation import Mediation
+from mediation import DynamicMediation
+from collections import namedtuple
 
 class TestMediation(unittest.TestCase):
 
     def setUp(self):
         self.warn = mock.Mock().warn
-        self.m = Mediation(1, 3, warn = self.warn)
+        self.m = DynamicMediation(namedtuple('Config', 'midichannelbase chipchannels')(1, 3))
+        self.m.warn = self.warn
 
     def tearDown(self):
         self.assertEquals(0, self.warn.call_count)
