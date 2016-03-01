@@ -140,8 +140,9 @@ class Channels:
         return channel
 
     def noteoff(self, midichan, midinote, vel):
-        chipchan, noteid = self.mediation.releasechipchan(midichan, midinote)
-        if chipchan is not None:
+        pair = self.mediation.releasechipchan(midichan, midinote)
+        if pair is not None:
+            chipchan, noteid = pair
             channel = self.channels[chipchan]
             channel.noteoff(self.frameindex)
             return channel
