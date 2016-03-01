@@ -22,7 +22,13 @@ from diapyr import types
 
 log = logging.getLogger(__name__)
 
-class Mediation: pass
+class Mediation:
+
+    def __init__(self, config):
+        self.chipchantomidichanandnote = [(None, None)] * config.chipchannels
+
+    def currentmidichanandnote(self, chipchan): # Only used for logging.
+        return self.chipchantomidichanandnote[chipchan]
 
 class DynamicMediation(Mediation):
 
@@ -30,10 +36,10 @@ class DynamicMediation(Mediation):
 
     @types(Config)
     def __init__(self, config):
+        Mediation.__init__(self, config)
         midichanbase = config.midichannelbase
         chipchancount = config.chipchannels
         self.midichanandnotetochipchan = {}
-        self.chipchantomidichanandnote = [(None, None)] * chipchancount
         self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(midichannelcount))
         self.chipchantoonframe = [None] * chipchancount
         self.warn = log.warn
@@ -71,6 +77,3 @@ class DynamicMediation(Mediation):
         if chipchan is not None: # Non-spurious case.
             self.chipchantomidichanandnote[chipchan][1] = None
             return chipchan
-
-    def currentmidichanandnote(self, chipchan):
-        return self.chipchantomidichanandnote[chipchan]
