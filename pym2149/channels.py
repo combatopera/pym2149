@@ -47,7 +47,7 @@ class Channel:
         self.note = program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx)
         self.voladj = self.tovoladj(vel)
 
-    def noteoff(self, frame):
+    def noteoff(self, noteid, frame):
         self.onornone = False
         self.offframe = frame
 
@@ -144,7 +144,7 @@ class Channels:
         if pair is not None:
             chipchan, noteid = pair
             channel = self.channels[chipchan]
-            channel.noteoff(self.frameindex)
+            channel.noteoff(noteid, self.frameindex)
             return channel
 
     def pitchbend(self, midichan, bend):
