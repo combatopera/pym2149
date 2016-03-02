@@ -34,16 +34,33 @@ class nullchannote:
 
     def getpan(self): return 0
 
+    def update(self, frame): pass
+
 class ChanNote:
 
     def __init__(self, onframe, note, voladj):
         self.onframe = onframe
         self.note = note
         self.voladj = voladj
+        self.offframe = None
 
     def programornone(self): return self.note.__class__
 
     def getpan(self): return self.note.fx.normpan()
+
+    def update(self, frame):
+        if self.offframe is None:
+            f = frame - self.onframe
+            if not f:
+                self.note.callnoteon(self.voladj)
+            self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
+        else:
+            if self.onframe == self.offframe:
+                self.note.callnoteon(self.voladj)
+            f = frame - self.offframe
+            if not f:
+                self.note.callnoteoff(self.offframe - self.onframe)
+            self.note.noteoffframe(f)
 
 class Channel:
 
@@ -52,7 +69,6 @@ class Channel:
         neutralvel = config.neutralvelocity
         velperlevel = config.velocityperlevel
         self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
-        self.onornone = None
         self.chipindex = chipindex
         self.chip = chip
         self.channote = nullchannote
@@ -61,29 +77,13 @@ class Channel:
         return self.channote.programornone()
 
     def newnote(self, noteid, frame, program, midinote, vel, fx):
-        self.onornone = True
         self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel))
 
     def noteoff(self, noteid, frame):
-        self.onornone = False
         self.channote.offframe = frame
 
     def update(self, frame):
-        if self.onornone:
-            f = frame - self.channote.onframe
-            if not f:
-                self.noteonimpl()
-            self.channote.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
-        elif self.onornone is not None: # It's False.
-            if self.channote.onframe == self.channote.offframe:
-                self.noteonimpl()
-            f = frame - self.channote.offframe
-            if not f:
-                self.channote.note.callnoteoff(self.channote.offframe - self.channote.onframe)
-            self.channote.note.noteoffframe(f)
-
-    def noteonimpl(self):
-        self.channote.note.callnoteon(self.channote.voladj)
+        self.channote.update(frame)
 
     def getpan(self):
         return self.channote.getpan()
