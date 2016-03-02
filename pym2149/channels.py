@@ -83,8 +83,6 @@ class Channel:
             self.channote.note.noteoffframe(f)
 
     def noteonimpl(self):
-        # Make it so that the note only has to switch things on:
-        self.chip.flagsoff(self.chipindex)
         self.channote.note.callnoteon(self.channote.voladj)
 
     def getpan(self):

@@ -104,6 +104,7 @@ class Note:
     self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitch)
 
   def callnoteon(self, voladj):
+    self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
     self.voladj = voladj
     self.noteon()
 
