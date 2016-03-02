@@ -23,8 +23,16 @@ from mediation import Mediation
 from diapyr import types
 from iface import Chip, Config
 from config import ConfigSubscription, ConfigName
+from util import singleton
 
 log = logging.getLogger(__name__)
+
+@singleton
+class nullchannote:
+
+    def programornone(self): pass
+
+    def getpan(self): return 0
 
 class ChanNote:
 
@@ -32,6 +40,10 @@ class ChanNote:
         self.onframe = onframe
         self.note = note
         self.voladj = voladj
+
+    def programornone(self): return self.note.__class__
+
+    def getpan(self): return self.note.fx.normpan()
 
 class Channel:
 
@@ -43,10 +55,10 @@ class Channel:
         self.onornone = None
         self.chipindex = chipindex
         self.chip = chip
-        self.channote = None
+        self.channote = nullchannote
 
     def programornone(self):
-        return None if self.channote is None else self.channote.note.__class__
+        return self.channote.programornone()
 
     def newnote(self, noteid, frame, program, midinote, vel, fx):
         self.onornone = True
@@ -76,7 +88,7 @@ class Channel:
         self.channote.note.callnoteon(self.channote.voladj)
 
     def getpan(self):
-        return 0 if self.channote is None else self.channote.note.fx.normpan()
+        return self.channote.getpan()
 
     def __str__(self):
         return chr(ord('A') + self.chipindex)
