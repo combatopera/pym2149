@@ -26,6 +26,13 @@ from config import ConfigSubscription, ConfigName
 
 log = logging.getLogger(__name__)
 
+class ChanNote:
+
+    def __init__(self, onframe, note, voladj):
+        self.onframe = onframe
+        self.note = note
+        self.voladj = voladj
+
 class Channel:
 
     def __init__(self, config, chipindex, chip):
@@ -36,16 +43,14 @@ class Channel:
         self.onornone = None
         self.chipindex = chipindex
         self.chip = chip
-        self.note = None
+        self.channote = None
 
     def programornone(self):
-        return None if self.note is None else self.note.__class__
+        return None if self.channote is None else self.channote.note.__class__
 
     def newnote(self, noteid, frame, program, midinote, vel, fx):
         self.onornone = True
-        self.onframe = frame
-        self.note = program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx)
-        self.voladj = self.tovoladj(vel)
+        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel))
 
     def noteoff(self, noteid, frame):
         self.onornone = False
@@ -53,25 +58,25 @@ class Channel:
 
     def update(self, frame):
         if self.onornone:
-            f = frame - self.onframe
+            f = frame - self.channote.onframe
             if not f:
                 self.noteonimpl()
-            self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
+            self.channote.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
         elif self.onornone is not None: # It's False.
-            if self.onframe == self.offframe:
+            if self.channote.onframe == self.offframe:
                 self.noteonimpl()
             f = frame - self.offframe
             if not f:
-                self.note.callnoteoff(self.offframe - self.onframe)
-            self.note.noteoffframe(f)
+                self.channote.note.callnoteoff(self.offframe - self.channote.onframe)
+            self.channote.note.noteoffframe(f)
 
     def noteonimpl(self):
         # Make it so that the note only has to switch things on:
         self.chip.flagsoff(self.chipindex)
-        self.note.callnoteon(self.voladj)
+        self.channote.note.callnoteon(self.channote.voladj)
 
     def getpan(self):
-        return 0 if self.note is None else self.note.fx.normpan()
+        return 0 if self.channote is None else self.channote.note.fx.normpan()
 
     def __str__(self):
         return chr(ord('A') + self.chipindex)
