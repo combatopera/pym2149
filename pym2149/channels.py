@@ -54,7 +54,7 @@ class Channel:
 
     def noteoff(self, noteid, frame):
         self.onornone = False
-        self.offframe = frame
+        self.channote.offframe = frame
 
     def update(self, frame):
         if self.onornone:
@@ -63,11 +63,11 @@ class Channel:
                 self.noteonimpl()
             self.channote.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
         elif self.onornone is not None: # It's False.
-            if self.channote.onframe == self.offframe:
+            if self.channote.onframe == self.channote.offframe:
                 self.noteonimpl()
-            f = frame - self.offframe
+            f = frame - self.channote.offframe
             if not f:
-                self.channote.note.callnoteoff(self.offframe - self.channote.onframe)
+                self.channote.note.callnoteoff(self.channote.offframe - self.channote.onframe)
             self.channote.note.noteoffframe(f)
 
     def noteonimpl(self):
