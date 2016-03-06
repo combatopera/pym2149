@@ -182,10 +182,14 @@ class MidiPump(MainBackground):
                 if e.midichan not in self.performancemidichans:
                     scheduledevents += 1
             self.speeddetector(scheduledevents)
+            if self.speeddetector.speedphase is None:
+                timecode = self.channels.frameindex
+            else:
+                speed = self.speeddetector.speedphase[0]
+                timecode = "%s*%s+%s" % (self.channels.frameindex // speed, speed, self.channels.frameindex % speed)
             # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
             for offset, event in update.events:
-                # TODO: It would be more useful to show frameindex modulo speed.
-                log.debug("%.6f %s @ %s -> %s", offset, event, self.channels.frameindex, event(self.channels))
+                log.debug("%.6f %s @ %s -> %s", offset, event, timecode, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
