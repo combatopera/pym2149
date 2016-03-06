@@ -66,7 +66,13 @@ class ChannelMessage:
     def __init__(self, midi, event):
         self.midichan = midi.chanbase + event.channel
 
+class ChannelStateMessage(ChannelMessage):
+
+    sortkey = 0
+
 class NoteOnOff(ChannelMessage):
+
+    sortkey = 1
 
     def __init__(self, midi, event):
         ChannelMessage.__init__(self, midi, event)
@@ -90,10 +96,10 @@ class NoteOff(NoteOnOff):
     def __call__(self, channels):
         return channels.noteoff(self.midichan, self.midinote, self.vel)
 
-class PitchBend(ChannelMessage):
+class PitchBend(ChannelStateMessage):
 
     def __init__(self, midi, event):
-        ChannelMessage.__init__(self, midi, event)
+        ChannelStateMessage.__init__(self, midi, event)
         self.bend = event.value # In [-0x2000, 0x2000).
 
     def __call__(self, channels):
@@ -102,10 +108,10 @@ class PitchBend(ChannelMessage):
     def __str__(self):
         return "B %2d %5d" % (self.midichan, self.bend)
 
-class ProgramChange(ChannelMessage):
+class ProgramChange(ChannelStateMessage):
 
     def __init__(self, midi, event):
-        ChannelMessage.__init__(self, midi, event)
+        ChannelStateMessage.__init__(self, midi, event)
         self.program = midi.programbase + event.value
 
     def __call__(self, channels):
@@ -114,10 +120,10 @@ class ProgramChange(ChannelMessage):
     def __str__(self):
         return "P %2d %3d" % (self.midichan, self.program)
 
-class ControlChange(ChannelMessage):
+class ControlChange(ChannelStateMessage):
 
     def __init__(self, midi, event):
-        ChannelMessage.__init__(self, midi, event)
+        ChannelStateMessage.__init__(self, midi, event)
         self.controller = event.param
         self.value = event.value
 
@@ -187,8 +193,8 @@ class MidiPump(MainBackground):
             else:
                 speed = self.speeddetector.speedphase[0]
                 timecode = "%s*%s+%s" % (self.channels.frameindex // speed, speed, self.channels.frameindex % speed)
-            # TODO: For best mediation, advance note-off events that would cause instantaneous polyphony.
-            for offset, event in update.events:
+            # TODO: Minimise instantaneous polyphony.
+            for offset, event in sorted(update.events, key = lambda (_, e): e.sortkey):
                 log.debug("%.6f %s @ %s -> %s", offset, event, timecode, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
