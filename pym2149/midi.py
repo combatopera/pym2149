@@ -188,11 +188,10 @@ class MidiPump(MainBackground):
                 if e.midichan not in self.performancemidichans:
                     scheduledevents += 1
             self.speeddetector(scheduledevents)
-            if self.speeddetector.speedphase is None:
-                timecode = self.channels.frameindex
-            else:
+            timecode = self.channels.frameindex
+            if self.speeddetector.speedphase is not None:
                 speed = self.speeddetector.speedphase[0]
-                timecode = "%s*%s+%s" % (self.channels.frameindex // speed, speed, self.channels.frameindex % speed)
+                timecode = "%s*%s+%s" % (timecode // speed, speed, timecode % speed)
             # TODO: Minimise instantaneous polyphony.
             for offset, event in sorted(update.events, key = lambda (_, e): e.sortkey):
                 log.debug("%.6f %s @ %s -> %s", offset, event, timecode, event(self.channels))
