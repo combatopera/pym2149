@@ -23,11 +23,11 @@ from const import u4
 
 log = logging.getLogger(__name__)
 
-def defaultcallback(oldspeedornone, speed, phase, clarity):
-    if oldspeedornone is None:
-        log.info("Speed detected: %s", speed)
+def defaultcallback(oldspeedphaseornone, speedphase, clarity):
+    if oldspeedphaseornone is None:
+        log.info("Speed detected: %s", speedphase)
     else:
-        log.warn("Speed was %s but is now: %s", oldspeedornone, speed)
+        log.warn("Speed was %s but is now: %s", oldspeedphaseornone, speedphase)
 
 kernelperiods = 2
 dtype = np.int32 # Must be signed.
@@ -88,4 +88,4 @@ class SpeedDetector:
             if clarity >= minclarity and (best.speed, best.phase) != self.speedphase:
                 oldspeedphase = self.speedphase
                 self.speedphase = best.speed, best.phase
-                self.callback(oldspeedphase, best.speed, best.phase, clarity)
+                self.callback(oldspeedphase, self.speedphase, clarity)

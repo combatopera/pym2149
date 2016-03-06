@@ -24,7 +24,7 @@ class TestSpeedDetector(unittest.TestCase):
 
     def check(self, expected, eventcounts):
         speeds = []
-        detector = SpeedDetector(10, lambda _, speed, phase, clarity: speeds.append((speed, phase)))
+        detector = SpeedDetector(10, lambda _, speedphase, clarity: speeds.append(speedphase))
         for eventcount in eventcounts:
             detector(0 if eventcount == '.' else ord(eventcount) - ord('0'))
         self.assertEqual(expected, speeds)
