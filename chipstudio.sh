@@ -19,7 +19,9 @@
 
 set -e
 
-[[ $# -ge 1 ]] && export PYM2149_CONFIG="$(basename "$(dirname "$PWD/$1")")"
+if [[ $# -ge 1 ]]; then
+    export PYM2149_CONFIG="$(python -c "import os; print os.path.basename(os.path.dirname(os.path.abspath('$1')))")"
+fi
 
 cd "$(dirname "$(readlink -f "$0")")"
 
