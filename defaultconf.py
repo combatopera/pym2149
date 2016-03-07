@@ -20,6 +20,7 @@ from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
 from pym2149.iface import YMFile, JackConnection
+from pym2149.mediation import DynamicMediation
 
 outputrate = config.di(JackConnection).outputrate if config.di.all(JackConnection) else 44100
 '''Note this does not have the power to modify the JACK output rate, only pym2149's impression of it.'''
@@ -128,3 +129,5 @@ midiskipenabled = True
 
 speeddetector = True
 '''Set to False to turn off the speed detector and save some CPU.'''
+
+mediation = DynamicMediation

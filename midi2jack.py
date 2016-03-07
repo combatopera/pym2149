@@ -22,7 +22,6 @@ from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.midi import MidiListen, MidiPump
 from pym2149.config import ConfigName
-from pym2149.mediation import DynamicMediation
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Stream, Config
@@ -39,12 +38,12 @@ def main():
     di.start()
     try:
         configure(di)
-        di.add(DynamicMediation)
+        config = di(Config)
+        di.add(config.mediation)
         Channels.addtodi(di)
         di.start()
         log.info(di(Channels))
         stream = di(Stream)
-        config = di(Config)
         log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
         di.add(MidiPump)

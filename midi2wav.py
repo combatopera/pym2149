@@ -22,7 +22,6 @@ from pym2149.out import configure
 from pym2149.midi import MidiListen, MidiPump
 from pym2149.config import ConfigName
 from pym2149.iface import Config
-from pym2149.mediation import DynamicMediation
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
@@ -35,7 +34,8 @@ def main():
     di = createdi(ConfigName('outpath'))
     di.add(PLL)
     configure(di)
-    di.add(DynamicMediation)
+    config = di(Config)
+    di.add(config.mediation)
     Channels.addtodi(di)
     di.start()
     try:
@@ -45,7 +45,7 @@ def main():
         di.add(MidiPump)
         di.add(MidiListen)
         di.start()
-        awaitinterrupt(di(Config))
+        awaitinterrupt(config)
     finally:
         di.stop()
 
