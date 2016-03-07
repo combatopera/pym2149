@@ -39,22 +39,24 @@ class DynamicMediation(Mediation):
         Mediation.__init__(self, config)
         midichanbase = config.midichannelbase
         chipchancount = config.chipchannels
-        self.midichanandnotetochipchan = {}
+        self.midichanandnotetochipchanandnoteid = {}
         self.midichantochipchanhistory = dict([midichanbase + i, range(chipchancount)] for i in xrange(midichannelcount))
         self.chipchantoonframe = [None] * chipchancount
         self.warn = log.warn
 
     def acquirechipchan(self, midichan, midinote, frame):
-        if (midichan, midinote) in self.midichanandnotetochipchan:
-            return self.midichanandnotetochipchan[midichan, midinote], 0 # Spurious case.
+        if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
+            return self.midichanandnotetochipchanandnoteid[midichan, midinote] # Spurious case.
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
-            self.midichanandnotetochipchan[midichan, midinote] = chipchan
-            self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
+            noteid = 0
+            self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
+            if not noteid:
+                self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
             del chipchanhistory[i]
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
-            return chipchan, 0
+            return chipchan, noteid
         offchipchans = set()
         for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
             if midichanandnote[1] is None:
@@ -73,10 +75,12 @@ class DynamicMediation(Mediation):
                     return acquire(chipchan)
 
     def releasechipchan(self, midichan, midinote):
-        chipchan = self.midichanandnotetochipchan.pop((midichan, midinote), None)
-        if chipchan is not None: # Non-spurious case.
-            self.chipchantomidichanandnote[chipchan][1] = None
-            return chipchan, 0
+        chipchanandnoteid = self.midichanandnotetochipchanandnoteid.pop((midichan, midinote), None)
+        if chipchanandnoteid is not None: # Non-spurious case.
+            chipchan, noteid = chipchanandnoteid
+            if not noteid:
+                self.chipchantomidichanandnote[chipchan][1] = None
+            return chipchanandnoteid
 
 class SimpleMediation(Mediation):
 
