@@ -66,13 +66,9 @@ class ChannelMessage:
     def __init__(self, midi, event):
         self.midichan = midi.chanbase + event.channel
 
-class ChannelStateMessage(ChannelMessage):
-
-    sortkey = 0
+class ChannelStateMessage(ChannelMessage): pass
 
 class NoteOnOff(ChannelMessage):
-
-    sortkey = 1
 
     def __init__(self, midi, event):
         ChannelMessage.__init__(self, midi, event)
@@ -184,17 +180,33 @@ class MidiPump(MainBackground):
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
             scheduledevents = 0
-            for _, e in update.events:
-                if e.midichan not in self.performancemidichans:
+            for event in update.events:
+                if event.midichan not in self.performancemidichans:
                     scheduledevents += 1
             self.speeddetector(scheduledevents)
             timecode = self.channels.frameindex
             if self.speeddetector.speedphase is not None:
                 speed = self.speeddetector.speedphase[0]
                 timecode = "%s*%s+%s" % (timecode // speed, speed, timecode % speed)
-            # TODO: Minimise instantaneous polyphony.
-            for offset, event in sorted(update.events, key = lambda (_, e): e.sortkey):
-                log.debug("%.6f %s @ %s -> %s", offset, event, timecode, event(self.channels))
+            chanandnotetoevents = {}
+            for event in update.events:
+                if isinstance(event, NoteOnOff):
+                    try:
+                        chanandnotetoevents[event.midichan, event.midinote].append(event)
+                    except KeyError:
+                        chanandnotetoevents[event.midichan, event.midinote] = [event]
+            # Apply all channel state events first:
+            sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)]
+            # Then all notes that end up off:
+            for noteevents in chanandnotetoevents.itervalues():
+                if NoteOff == noteevents[-1].__class__:
+                    sortedevents.extend(noteevents)
+            # Then all notes that end up on:
+            for noteevents in chanandnotetoevents.itervalues():
+                if NoteOn == noteevents[-1].__class__:
+                    sortedevents.extend(noteevents)
+            for event in sortedevents:
+                log.debug("%.6f %s @ %s -> %s", event.offset, event, timecode, event(self.channels))
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
