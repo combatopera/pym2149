@@ -67,7 +67,11 @@ class PLL:
                 shifts.append(self.medianshiftema.value + eventtime - targettime)
             # If eventtime < inclusivewindowstart we consume the event without harvesting its shift.
             i += 1
-        self.updates.append([(eventtime - inclusivewindowstart, event) for eventtime, event, _ in self.events[:i]])
+        update = []
+        for eventtime, event, _ in self.events[:i]:
+            event.offset = eventtime - inclusivewindowstart
+            update.append(event)
+        self.updates.append(update)
         del self.events[:i]
         if shifts:
             n = len(shifts)

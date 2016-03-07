@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyven
 
 # Copyright 2014 Andrzej Cichocki
 
@@ -53,7 +53,7 @@ class TestPLL(unittest.TestCase):
                 pll.event(event.eventtime, event, True)
         ewe = pll.exclusivewindowend
         updates.append(pll.takeupdateimpl(ewe).events)
-        self.assertEqual(eventlists, [[e for _, e in u] for u in updates])
+        self.assertEqual(eventlists, updates)
         self.assertEqual(positionshift, round(ewe - (pll.mark + self.updateperiod * len(eventlists)), dp))
 
     def test_0perfecttiming(self):
