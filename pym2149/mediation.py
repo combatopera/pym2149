@@ -77,3 +77,30 @@ class DynamicMediation(Mediation):
         if chipchan is not None: # Non-spurious case.
             self.chipchantomidichanandnote[chipchan][1] = None
             return chipchan, 0
+
+class SimpleMediation(Mediation):
+
+    @types(Config)
+    def __init__(self, config):
+        Mediation.__init__(self, config)
+        self.midichanbase = config.midichannelbase
+        self.chipchancount = config.chipchannels
+        self.midichanandnotetochipchanandnoteid = {}
+
+    def acquirechipchan(self, midichan, midinote, frame):
+        if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
+            return self.midichanandnotetochipchanandnoteid[midichan, midinote] # Spurious case.
+        chipchan = (midichan - self.midichanbase) % self.chipchancount
+        noteid = (midichan - self.midichanbase) // self.chipchancount
+        self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
+        if not noteid:
+            self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
+        return chipchan, noteid
+
+    def releasechipchan(self, midichan, midinote):
+        chipchanandnoteid = self.midichanandnotetochipchan.pop((midichan, midinote), None)
+        if chipchanandnoteid is not None: # Non-spurious case.
+            chipchan, noteid = chipchanandnoteid
+            if not noteid:
+                self.chipchantomidichanandnote[chipchan][1] = None
+            return chipchanandnoteid

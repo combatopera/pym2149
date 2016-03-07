@@ -21,7 +21,7 @@ import unittest, mock
 from mediation import DynamicMediation
 from collections import namedtuple
 
-class TestMediation(unittest.TestCase):
+class TestDynamicMediation(unittest.TestCase):
 
     def setUp(self):
         self.warn = mock.Mock().warn
