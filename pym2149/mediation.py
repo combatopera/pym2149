@@ -92,7 +92,6 @@ class SimpleMediation(Mediation):
         Mediation.__init__(self, config)
         self.midichanbase = config.midichannelbase
         self.chipchancount = config.chipchannels
-        self.midichanandnotetochipchanandnoteid = {}
 
     def tochipchanandnoteid(self, midichan, midinote, frame):
         chipchan = (midichan - self.midichanbase) % self.chipchancount
