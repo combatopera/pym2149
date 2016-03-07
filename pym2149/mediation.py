@@ -98,7 +98,7 @@ class SimpleMediation(Mediation):
         return chipchan, noteid
 
     def releasechipchan(self, midichan, midinote):
-        chipchanandnoteid = self.midichanandnotetochipchan.pop((midichan, midinote), None)
+        chipchanandnoteid = self.midichanandnotetochipchanandnoteid.pop((midichan, midinote), None)
         if chipchanandnoteid is not None: # Non-spurious case.
             chipchan, noteid = chipchanandnoteid
             if not noteid:
