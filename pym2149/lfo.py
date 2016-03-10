@@ -20,71 +20,71 @@ from decimal import Decimal, ROUND_HALF_DOWN, ROUND_HALF_UP
 
 class AbstractLFO:
 
-  def __init__(self, initial):
-    self.v = [initial]
-    self.looplenornone = 1
+    def __init__(self, initial):
+        self.v = [initial]
+        self.looplenornone = 1
 
-  def lin(self, n, target):
-    source = self.v[-1]
-    for i in xrange(1, n + 1):
-      self.v.append(source + (target - source) * i / n)
-    return self
+    def lin(self, n, target):
+        source = self.v[-1]
+        for i in xrange(1, n + 1):
+            self.v.append(source + (target - source) * i / n)
+        return self
 
-  def jump(self, target):
-    self.v[-1] = target
-    return self
+    def jump(self, target):
+        self.v[-1] = target
+        return self
 
-  def then(self, *vals):
-    self.v.extend(vals)
-    return self
+    def then(self, *vals):
+        self.v.extend(vals)
+        return self
 
-  def hold(self, n):
-    for _ in xrange(n):
-      self.v.append(self.v[-1])
-    return self
+    def hold(self, n):
+        for _ in xrange(n):
+            self.v.append(self.v[-1])
+        return self
 
-  def tri(self, trin, linn, target):
-    if 0 != trin % 4:
-      raise Exception("Expected a multiple of 4 but got: %s" % trin)
-    normn = trin // 4
-    if 0 != normn % linn:
-      raise Exception("Expected a factor of %s but got: %s" % (normn, linn))
-    source = self.v[-1]
-    for _ in xrange(normn // linn):
-      self.lin(linn, target)
-      self.lin(linn * 2, source * 2 - target)
-      self.lin(linn, source)
-    return self
+    def tri(self, trin, linn, target):
+        if 0 != trin % 4:
+            raise Exception("Expected a multiple of 4 but got: %s" % trin)
+        normn = trin // 4
+        if 0 != normn % linn:
+            raise Exception("Expected a factor of %s but got: %s" % (normn, linn))
+        source = self.v[-1]
+        for _ in xrange(normn // linn):
+            self.lin(linn, target)
+            self.lin(linn * 2, source * 2 - target)
+            self.lin(linn, source)
+        return self
 
-  def loop(self, n = None):
-    self.looplenornone = n
-    return self
+    def loop(self, n = None):
+        self.looplenornone = n
+        return self
 
-  def get(self, frame):
-    n = len(self.v)
-    if frame >= n:
-      looplen = n if self.looplenornone is None else self.looplenornone
-      start = n - looplen
-      frame = start + ((frame - start) % looplen)
-    return self.v[frame]
+    def get(self, frame):
+        n = len(self.v)
+        if frame >= n:
+            looplen = n if self.looplenornone is None else self.looplenornone
+            start = n - looplen
+            frame = start + ((frame - start) % looplen)
+        return self.v[frame]
 
-  def render(self, n = None):
-    if n is None:
-      n = len(self.v)
-    return [self(i) for i in xrange(n)] # Observe via the xform.
+    def render(self, n = None):
+        if n is None:
+            n = len(self.v)
+        return [self(i) for i in xrange(n)] # Observe via the xform.
 
 class LFO(AbstractLFO):
 
-  def __call__(self, frame):
-    current, next = self.get(frame), self.get(frame + 1)
-    if current < 0:
-      towards0 = (current < next) if (next < 0) else True
-    else:
-      towards0 = True if (next < 0) else (next < current)
-    rounding = ROUND_HALF_DOWN if towards0 else ROUND_HALF_UP
-    return int(Decimal(current).to_integral_value(rounding))
+    def __call__(self, frame):
+        current, next = self.get(frame), self.get(frame + 1)
+        if current < 0:
+            towards0 = (current < next) if (next < 0) else True
+        else:
+            towards0 = True if (next < 0) else (next < current)
+        rounding = ROUND_HALF_DOWN if towards0 else ROUND_HALF_UP
+        return int(Decimal(current).to_integral_value(rounding))
 
 class FloatLFO(AbstractLFO):
 
-  def __call__(self, frame):
-    return self.get(frame)
+    def __call__(self, frame):
+        return self.get(frame)
