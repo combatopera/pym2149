@@ -1,4 +1,5 @@
 author = 'Andrzej Cichocki'
 name = 'aridipy'
+years = 2016,
 projects = ()
 deps = ()

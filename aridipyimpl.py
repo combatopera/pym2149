@@ -1,4 +1,4 @@
-# Copyright 2014 Andrzej Cichocki
+# Copyright 2016 Andrzej Cichocki
 
 # This file is part of aridipy.
 #
