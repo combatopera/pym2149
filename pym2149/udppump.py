@@ -23,17 +23,17 @@ host = '127.0.0.1'
 bufsize = 1024 # XXX: Big enough?
 
 def main():
-    port1, port2, touchme, shutdown = sys.argv[1:]
+    port1, port2, ctrl = sys.argv[1:]
     port1 = int(port1)
     port2 = int(port2)
     sock1 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
     sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     def pollshutdown():
-        while os.path.exists(shutdown):
+        while os.path.exists(ctrl):
             time.sleep(.5)
         subprocess.check_call(['kill', str(os.getpid())])
     threading.Thread(target = pollshutdown).start()
-    os.utime(touchme, None)
+    os.utime(ctrl, (0, 0))
     while True:
         msg = sock1.recvfrom(bufsize)[0]
         port, = struct.unpack('!H', msg[22:24])

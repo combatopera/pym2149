@@ -39,14 +39,10 @@ class TidalClient:
             self.velocity = velocity
 
     def __init__(self):
-        self.shutdown = tempfile.NamedTemporaryFile()
-        with tempfile.NamedTemporaryFile() as f:
-            os.utime(f.name, (0, 0))
-            self.sniffer = subprocess.Popen(['sudo', '-S', sys.executable, udppump.__file__, str(scport), str(myport), f.name, self.shutdown.name], preexec_fn = os.setsid)
-            while True:
-                time.sleep(.1)
-                if os.stat(f.name).st_mtime:
-                    break
+        self.ctrl = tempfile.NamedTemporaryFile()
+        self.sniffer = subprocess.Popen(['sudo', '-S', sys.executable, udppump.__file__, str(scport), str(myport), self.ctrl.name], preexec_fn = os.setsid)
+        while os.stat(self.ctrl.name).st_mtime:
+            time.sleep(.1)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.5)
         self.sock.bind((udppump.host, myport))
@@ -62,7 +58,7 @@ class TidalClient:
                 print parse(v)
 
     def interrupt(self):
-        self.shutdown.close()
+        self.ctrl.close()
         self.open = False
 
 def parse(v):
