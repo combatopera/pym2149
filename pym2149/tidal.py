@@ -38,7 +38,14 @@ class TidalClient:
             self.note = note
             self.velocity = velocity
 
-    def __init__(self):
+    def __init__(self, samplespath):
+        self.keys = []
+        for bank in sorted(os.listdir(samplespath)):
+            bankpath = os.path.join(samplespath, bank)
+            if os.path.isdir(bankpath):
+                for i, name in enumerate(sorted(os.listdir(bankpath))):
+                    if name.lower().endswith('.wav'):
+                        self.keys.append((bank, i))
         self.ctrl = tempfile.NamedTemporaryFile()
         self.sniffer = subprocess.Popen(['sudo', '-S', sys.executable, udppump.__file__, str(scport), str(myport), self.ctrl.name], preexec_fn = os.setsid)
         while os.stat(self.ctrl.name).st_mtime:
@@ -48,11 +55,11 @@ class TidalClient:
         self.sock.bind((udppump.host, myport))
         self.open = True
 
-    bufnumtonote = {
-        348: 60,
-        1535: 61,
-        443: 62,
-        902: 64,
+    keytonote = {
+        ('bd', 0): 60,
+        ('sn', 1): 61,
+        ('can', 0): 62,
+        ('hh', 0): 64,
     }
 
     def read(self):
@@ -68,7 +75,7 @@ class TidalClient:
                 continue
             args = bundle.elements[1].args
             if args[0].startswith('dirt_sample_'):
-                note = self.bufnumtonote.get(args[args.index('bufnum') + 1])
+                note = self.keytonote.get(self.keys[args[args.index('bufnum') + 1]])
                 if note is not None:
                     return self.TidalEvent(bundle.timetag, 0, note, 0x7f)
 
@@ -156,7 +163,7 @@ class TidalListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, TidalClient())
+        SimpleBackground.start(self, self.bg, TidalClient(self.config.dirtsamplespath))
 
     def bg(self, client):
         while not self.quit:
