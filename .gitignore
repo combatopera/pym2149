@@ -4,3 +4,4 @@
 /native/*.c
 /native/*.pyxbldc
 /native/*.so
+/target
