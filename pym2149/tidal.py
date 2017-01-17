@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-from const import clientname
 from diapyr import types
 from iface import Config, Stream, Chip
 from pll import PLL
@@ -24,32 +22,38 @@ from bg import SimpleBackground, MainBackground
 from channels import Channels
 from minblep import MinBleps
 from timer import Timer
-from util import EMA
 from speed import SpeedDetector
 from midi import MidiSchedule
-import native.calsa as calsa, logging, time
+import logging, time
 
 log = logging.getLogger(__name__)
 
+class TidalClient:
+
+    def __init__(self):
+        self.open = True
+
+    def read(self):
+        while self.open:
+            time.sleep(1)
+
+    def interrupt(self):
+        self.open = False
+
 class TidalListen(SimpleBackground):
 
-    @types(Config, PLL)
-    def __init__(self, config, pll):
-        self.chanbase = config.midichannelbase
-        self.programbase = config.midiprogrambase
-        self.pllignoremidichans = set(config.performancechannels)
-        log.info("MIDI channels not significant for PLL: {%s}", ', '.join(str(c) for c in sorted(self.pllignoremidichans)))
+    @types(PLL)
+    def __init__(self, pll):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, calsa.Client(clientname, "%s IN" % clientname))
+        SimpleBackground.start(self, self.bg, TidalClient())
 
     def bg(self, client):
         while not self.quit:
-            event = client.event_input()
+            event = client.read()
             if event is not None:
-                eventobj = self.classes[event.type](self, event)
-                self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
+                self.pll.event(event.time, event, True)
 
 class TidalPump(MainBackground):
 
