@@ -46,16 +46,16 @@ class TidalClient:
                 if os.stat(f.name).st_mtime:
                     break
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.settimeout(.5)
         self.sock.bind((udppump.host, myport))
-        self.nextnote = 60
         self.open = True
 
     def read(self):
         while self.open:
-            time.sleep(1)
-            e = self.TidalEvent(time.time(), 0, self.nextnote, 0x7f)
-            self.nextnote += 1
-            return e
+            try:
+                print self.sock.recvfrom(udppump.bufsize)[0]
+            except socket.timeout:
+                pass
 
     def interrupt(self):
         subprocess.check_call(['sudo', 'kill', str(self.sniffer.pid)])
