@@ -20,7 +20,7 @@ from pll import PLL
 from bg import SimpleBackground
 from iface import Config
 from midi import NoteOn
-import logging, time, subprocess, os, tempfile
+import logging, time, subprocess, os, tempfile, socket, udppump, sys
 
 log = logging.getLogger(__name__)
 
@@ -40,11 +40,13 @@ class TidalClient:
     def __init__(self):
         with tempfile.NamedTemporaryFile() as f:
             os.utime(f.name, (0, 0))
-            self.sniffer = subprocess.Popen(['sudo', '-S', os.path.join(os.path.dirname(__file__), 'udppump.py'), str(scport), str(myport), f.name], preexec_fn = os.setsid)
+            self.sniffer = subprocess.Popen(['sudo', '-S', sys.executable, udppump.__file__, str(scport), str(myport), f.name], preexec_fn = os.setsid)
             while True:
                 time.sleep(.1)
                 if os.stat(f.name).st_mtime:
                     break
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind((udppump.host, myport))
         self.nextnote = 60
         self.open = True
 
