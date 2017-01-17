@@ -17,15 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import socket, sys, struct
+import socket, sys, struct, os
 
 host = '127.0.0.1'
 bufsize = 1024 # XXX: Big enough?
 
 def main():
-    port1, port2 = map(int, sys.argv[1:])
+    port1, port2, touchme = sys.argv[1:]
+    port1 = int(port1)
+    port2 = int(port2)
     sock1 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
     sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    os.utime(touchme, None)
     while True:
         msg = sock1.recvfrom(bufsize)[0]
         port, = struct.unpack('!H', msg[22:24])
