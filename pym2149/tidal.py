@@ -75,10 +75,7 @@ class TidalPump(MainBackground):
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
-            scheduledevents = 0
-            for event in update.events:
-                scheduledevents += 1
-            self.speeddetector(scheduledevents)
+            self.speeddetector(len(update.events))
             timecode = self.channels.frameindex
             if self.speeddetector.speedphase is not None:
                 speed = self.speeddetector.speedphase[0]
