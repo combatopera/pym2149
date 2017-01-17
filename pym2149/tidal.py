@@ -18,26 +18,41 @@
 from diapyr import types
 from pll import PLL
 from bg import SimpleBackground
+from iface import Config
+from midi import NoteOn
 import logging, time
 
 log = logging.getLogger(__name__)
 
 class TidalClient:
 
+    class TidalEvent:
+
+        def __init__(self, time, channel, note, velocity):
+            self.time = time
+            self.channel = channel
+            self.note = note
+            self.velocity = velocity
+
     def __init__(self):
+        self.nextnote = 60
         self.open = True
 
     def read(self):
         while self.open:
             time.sleep(1)
+            e = self.TidalEvent(time.time(), 0, self.nextnote, 0x7f)
+            self.nextnote += 1
+            return e
 
     def interrupt(self):
         self.open = False
 
 class TidalListen(SimpleBackground):
 
-    @types(PLL)
-    def __init__(self, pll):
+    @types(Config, PLL)
+    def __init__(self, config, pll):
+        self.config = config
         self.pll = pll
 
     def start(self):
@@ -47,4 +62,5 @@ class TidalListen(SimpleBackground):
         while not self.quit:
             event = client.read()
             if event is not None:
-                self.pll.event(event.time, event, True)
+                eventobj = NoteOn(self.config, event)
+                self.pll.event(event.time, eventobj, True)
