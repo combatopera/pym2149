@@ -33,19 +33,20 @@ log = logging.getLogger(__name__)
 
 def main():
     di = createdi(ConfigName())
-    di.add(PLL)
+    di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
     di.add(JackClient)
     di.start()
     try:
         configure(di)
         config = di(Config)
-        di.add(config.mediation)
+        di.add(config.mediation) # Surely we can always use tidal connection for this.
         Channels.addtodi(di)
         di.start()
         log.info(di(Channels))
         stream = di(Stream)
         log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
+        # TODO: Replace with tidal components.
         di.add(MidiPump)
         di.add(MidiListen)
         di.start()
