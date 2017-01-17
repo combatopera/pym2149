@@ -100,8 +100,7 @@ class Reader:
         return text
 
     def align(self):
-        while self.c % 4:
-            self.c += 1
+        self.c += (-self.c) % 4
 
     def float32(self):
         return struct.unpack('>f', self.consume(4))[0]

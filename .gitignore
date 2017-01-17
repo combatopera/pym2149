@@ -5,3 +5,4 @@
 /native/*.pyxbldc
 /native/*.so
 /target
+*.swp
