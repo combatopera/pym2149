@@ -157,7 +157,7 @@ class MidiListen(SimpleBackground):
                 eventobj = self.classes[event.type](self, event)
                 self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
 
-class MidiPump(MainBackground):
+class EventPump(MainBackground):
 
     @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
     def __init__(self, config, channels, minbleps, stream, chip, timer, pll):

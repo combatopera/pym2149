@@ -20,7 +20,8 @@
 from __future__ import division
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
-from pym2149.tidal import TidalListen, TidalPump
+from pym2149.tidal import TidalListen
+from pym2149.midi import EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import createdi
@@ -46,7 +47,7 @@ def main():
         stream = di(Stream)
         log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
-        di.add(TidalPump)
+        di.add(EventPump)
         di.add(TidalListen)
         di.start()
         awaitinterrupt(config)

@@ -16,14 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from diapyr import types
-from iface import Config, Stream, Chip
 from pll import PLL
-from bg import SimpleBackground, MainBackground
-from channels import Channels
-from minblep import MinBleps
-from timer import Timer
-from speed import SpeedDetector
-from midi import MidiSchedule
+from bg import SimpleBackground
 import logging, time
 
 log = logging.getLogger(__name__)
@@ -54,53 +48,3 @@ class TidalListen(SimpleBackground):
             event = client.read()
             if event is not None:
                 self.pll.event(event.time, event, True)
-
-class TidalPump(MainBackground):
-
-    @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
-    def __init__(self, config, channels, minbleps, stream, chip, timer, pll):
-        MainBackground.__init__(self, config)
-        self.updaterate = config.updaterate
-        self.skipenabled = config.midiskipenabled # Allow False in case we want to render.
-        self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
-        self.channels = channels
-        self.minbleps = minbleps
-        self.stream = stream
-        self.chip = chip
-        self.timer = timer
-        self.pll = pll
-
-    def __call__(self):
-        schedule = MidiSchedule(self.updaterate, self.skipenabled)
-        while not self.quit:
-            update = self.pll.takeupdateimpl(schedule.awaittaketime())
-            schedule.step(update.idealtaketime)
-            self.speeddetector(len(update.events))
-            timecode = self.channels.frameindex
-            if self.speeddetector.speedphase is not None:
-                speed = self.speeddetector.speedphase[0]
-                timecode = "%s*%s+%s" % (timecode // speed, speed, timecode % speed)
-            chanandnotetoevents = {}
-            for event in update.events:
-                if isinstance(event, NoteOnOff):
-                    try:
-                        chanandnotetoevents[event.midichan, event.midinote].append(event)
-                    except KeyError:
-                        chanandnotetoevents[event.midichan, event.midinote] = [event]
-            # Apply all channel state events first:
-            sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)]
-            # Then all notes that end up off:
-            for noteevents in chanandnotetoevents.itervalues():
-                if NoteOff == noteevents[-1].__class__:
-                    sortedevents.extend(noteevents)
-            # Then all notes that end up on:
-            for noteevents in chanandnotetoevents.itervalues():
-                if NoteOn == noteevents[-1].__class__:
-                    sortedevents.extend(noteevents)
-            for event in sortedevents:
-                log.debug("%.6f %s @ %s -> %s", event.offset, event, timecode, event(self.channels))
-            self.channels.updateall()
-            for block in self.timer.blocksforperiod(self.updaterate):
-                self.stream.call(block)
-            self.channels.closeframe()
-        self.stream.flush()

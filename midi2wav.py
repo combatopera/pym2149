@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.out import configure
-from pym2149.midi import MidiListen, MidiPump
+from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
 from pym2149.iface import Config
 from pym2149.channels import Channels
@@ -42,7 +42,7 @@ def main():
         channels = di(Channels)
         log.info(channels)
         di.add(SimpleChipTimer) # One block per update.
-        di.add(MidiPump)
+        di.add(EventPump)
         di.add(MidiListen)
         di.start()
         awaitinterrupt(config)
