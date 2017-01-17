@@ -48,14 +48,29 @@ class TidalClient:
         self.sock.bind((udppump.host, myport))
         self.open = True
 
+    bufnumtonote = {
+        348: 60,
+        1535: 61,
+        443: 62,
+        902: 64,
+    }
+
     def read(self):
         while self.open:
             try:
                 v = self.sock.recvfrom(udppump.bufsize)[0]
             except socket.timeout:
                 continue
-            if not v.startswith('/status\0'):
-                print parse(v)
+            if not v.startswith('#bundle\0'):
+                continue
+            bundle = parse(v)
+            if 3 != len(bundle.elements) or '/s_new' != bundle.elements[1].addrpattern:
+                continue
+            args = bundle.elements[1].args
+            if args[0].startswith('dirt_sample_'):
+                note = self.bufnumtonote.get(args[args.index('bufnum') + 1])
+                if note is not None:
+                    return self.TidalEvent(bundle.timetag, 0, note, 0x7f)
 
     def interrupt(self):
         self.ctrl.close()
