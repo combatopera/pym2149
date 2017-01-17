@@ -63,15 +63,15 @@ class MidiSchedule:
 
 class ChannelMessage:
 
-    def __init__(self, midi, event):
-        self.midichan = midi.chanbase + event.channel
+    def __init__(self, config, event):
+        self.midichan = config.midichannelbase + event.channel
 
 class ChannelStateMessage(ChannelMessage): pass
 
 class NoteOnOff(ChannelMessage):
 
-    def __init__(self, midi, event):
-        ChannelMessage.__init__(self, midi, event)
+    def __init__(self, config, event):
+        ChannelMessage.__init__(self, config, event)
         self.midinote = event.note
         self.vel = event.velocity
 
@@ -94,8 +94,8 @@ class NoteOff(NoteOnOff):
 
 class PitchBend(ChannelStateMessage):
 
-    def __init__(self, midi, event):
-        ChannelStateMessage.__init__(self, midi, event)
+    def __init__(self, config, event):
+        ChannelStateMessage.__init__(self, config, event)
         self.bend = event.value # In [-0x2000, 0x2000).
 
     def __call__(self, channels):
@@ -106,9 +106,9 @@ class PitchBend(ChannelStateMessage):
 
 class ProgramChange(ChannelStateMessage):
 
-    def __init__(self, midi, event):
-        ChannelStateMessage.__init__(self, midi, event)
-        self.program = midi.programbase + event.value
+    def __init__(self, config, event):
+        ChannelStateMessage.__init__(self, config, event)
+        self.program = config.midiprogrambase + event.value
 
     def __call__(self, channels):
         return channels.programchange(self.midichan, self.program)
@@ -118,8 +118,8 @@ class ProgramChange(ChannelStateMessage):
 
 class ControlChange(ChannelStateMessage):
 
-    def __init__(self, midi, event):
-        ChannelStateMessage.__init__(self, midi, event)
+    def __init__(self, config, event):
+        ChannelStateMessage.__init__(self, config, event)
         self.controller = event.param
         self.value = event.value
 
@@ -141,10 +141,9 @@ class MidiListen(SimpleBackground):
 
     @types(Config, PLL)
     def __init__(self, config, pll):
-        self.chanbase = config.midichannelbase
-        self.programbase = config.midiprogrambase
         self.pllignoremidichans = set(config.performancechannels)
         log.info("MIDI channels not significant for PLL: {%s}", ', '.join(str(c) for c in sorted(self.pllignoremidichans)))
+        self.config = config
         self.pll = pll
 
     def start(self):
@@ -154,7 +153,7 @@ class MidiListen(SimpleBackground):
         while not self.quit:
             event = client.event_input()
             if event is not None:
-                eventobj = self.classes[event.type](self, event)
+                eventobj = self.classes[event.type](self.config, event)
                 self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
 
 class EventPump(MainBackground):
