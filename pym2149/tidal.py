@@ -61,7 +61,7 @@ class TidalPump(MainBackground):
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
-        self.skipenabled = config.midiskipenabled
+        self.skipenabled = config.midiskipenabled # Allow False in case we want to render.
         self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
         self.midi = midi
         self.channels = channels
