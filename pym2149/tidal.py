@@ -61,7 +61,6 @@ class TidalPump(MainBackground):
     def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
-        self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.midiskipenabled
         self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
         self.midi = midi
@@ -79,8 +78,7 @@ class TidalPump(MainBackground):
             schedule.step(update.idealtaketime)
             scheduledevents = 0
             for event in update.events:
-                if event.midichan not in self.performancemidichans:
-                    scheduledevents += 1
+                scheduledevents += 1
             self.speeddetector(scheduledevents)
             timecode = self.channels.frameindex
             if self.speeddetector.speedphase is not None:
