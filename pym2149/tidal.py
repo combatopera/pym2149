@@ -57,13 +57,12 @@ class TidalListen(SimpleBackground):
 
 class TidalPump(MainBackground):
 
-    @types(Config, TidalListen, Channels, MinBleps, Stream, Chip, Timer, PLL)
-    def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
+    @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
+    def __init__(self, config, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.skipenabled = config.midiskipenabled # Allow False in case we want to render.
         self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
-        self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
         self.stream = stream

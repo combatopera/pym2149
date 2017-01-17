@@ -159,14 +159,13 @@ class MidiListen(SimpleBackground):
 
 class MidiPump(MainBackground):
 
-    @types(Config, MidiListen, Channels, MinBleps, Stream, Chip, Timer, PLL)
-    def __init__(self, config, midi, channels, minbleps, stream, chip, timer, pll):
+    @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
+    def __init__(self, config, channels, minbleps, stream, chip, timer, pll):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.midiskipenabled
         self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
-        self.midi = midi
         self.channels = channels
         self.minbleps = minbleps
         self.stream = stream
