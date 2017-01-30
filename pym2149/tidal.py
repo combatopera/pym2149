@@ -36,11 +36,12 @@ class TidalClient:
             self.note = note
             self.velocity = velocity
 
-    def __init__(self):
+    def __init__(self, chancount):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.5)
         self.sock.bind((udppump.host, tidalport))
         self.open = True
+        self.chancount = chancount
 
     keytonote = {
         ('bd', 0): 60,
@@ -65,7 +66,7 @@ class TidalClient:
             k = (args['s'], args.get('n', 0))
             note = self.keytonote.get(k)
             if note is not None:
-                return self.TidalEvent(bundle.timetag, 0, note, 0x7f)
+                return self.TidalEvent(bundle.timetag, (args['chan'] - 1) % self.chancount, note, 0x7f)
 
     def interrupt(self):
         self.open = False
@@ -78,7 +79,7 @@ class TidalListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, TidalClient())
+        SimpleBackground.start(self, self.bg, TidalClient(self.config.chipchannels))
 
     def bg(self, client):
         while not self.quit:
