@@ -132,5 +132,3 @@ speeddetector = True
 '''Set to False to turn off the speed detector and save some CPU.'''
 
 mediation = DynamicMediation
-
-dirtsamplespath = os.path.expanduser('~/.local/share/SuperCollider/downloaded-quarks/Dirt-Samples')
