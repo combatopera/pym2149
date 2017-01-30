@@ -15,18 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
 from diapyr import types
 from pll import PLL
 from bg import SimpleBackground
 from iface import Config
 from midi import NoteOn
-import logging, time, subprocess, os, tempfile, socket, udppump, sys, osctrl
+import logging, socket, udppump, osctrl
 
 log = logging.getLogger(__name__)
 
-scport = 57110
-myport = scport + 1
+tidalport = 57120
 
 class TidalClient:
 
@@ -38,21 +36,10 @@ class TidalClient:
             self.note = note
             self.velocity = velocity
 
-    def __init__(self, samplespath):
-        self.keys = []
-        for bank in sorted(os.listdir(samplespath)):
-            bankpath = os.path.join(samplespath, bank)
-            if os.path.isdir(bankpath):
-                for i, name in enumerate(sorted(os.listdir(bankpath))):
-                    if name.lower().endswith('.wav'):
-                        self.keys.append((bank, i))
-        self.ctrl = tempfile.NamedTemporaryFile()
-        self.sniffer = subprocess.Popen(['sudo', '-S', sys.executable, udppump.__file__, str(scport), str(myport), self.ctrl.name], preexec_fn = os.setsid)
-        while os.stat(self.ctrl.name).st_mtime:
-            time.sleep(.1)
+    def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.5)
-        self.sock.bind((udppump.host, myport))
+        self.sock.bind((udppump.host, tidalport))
         self.open = True
 
     keytonote = {
@@ -71,16 +58,16 @@ class TidalClient:
             if not v.startswith('#bundle\0'):
                 continue
             bundle = osctrl.parse(v)
-            if 3 != len(bundle.elements) or '/s_new' != bundle.elements[1].addrpattern:
+            if 1 != len(bundle.elements) or '/play2' != bundle.elements[0].addrpattern:
                 continue
-            args = bundle.elements[1].args
-            if args[0].startswith('dirt_sample_'):
-                note = self.keytonote.get(self.keys[args[args.index('bufnum') + 1]])
-                if note is not None:
-                    return self.TidalEvent(bundle.timetag, 0, note, 0x7f)
+            args = bundle.elements[0].args
+            args = dict([args[i:i + 2] for i in xrange(0, len(args), 2)])
+            k = (args['s'], args.get('n', 0))
+            note = self.keytonote.get(k)
+            if note is not None:
+                return self.TidalEvent(bundle.timetag, 0, note, 0x7f)
 
     def interrupt(self):
-        self.ctrl.close()
         self.open = False
 
 class TidalListen(SimpleBackground):
@@ -91,7 +78,7 @@ class TidalListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, TidalClient(self.config.dirtsamplespath))
+        SimpleBackground.start(self, self.bg, TidalClient())
 
     def bg(self, client):
         while not self.quit:
