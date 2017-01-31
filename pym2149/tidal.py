@@ -25,7 +25,7 @@ import logging, socket, udppump, osctrl
 log = logging.getLogger(__name__)
 
 tidalport = 57120
-relayport = tidalport + 1
+ourport = tidalport + 1
 
 class TidalClient:
 
@@ -40,7 +40,8 @@ class TidalClient:
     def __init__(self, chancount):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.5)
-        self.sock.bind((udppump.host, tidalport))
+        self.sock.bind((udppump.host, ourport))
+        self.relay = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.open = True
         self.chancount = chancount
 
@@ -66,6 +67,7 @@ class TidalClient:
                     note = self.keytonote.get(k)
                     if note is not None:
                         return self.TidalEvent(bundle.timetag, (args['chan'] - 1) % self.chancount, note, 0x7f)
+            self.relay.sendto(v, (udppump.host, tidalport))
 
     def interrupt(self):
         self.open = False
