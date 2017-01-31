@@ -1,8 +1,9 @@
-*.pyc
-*_turbo/
-/pym2149/MinBleps(*)
-/native/*.c
-/native/*.pyxbldc
-/native/*.so
+#gclean
 /target
+*.pyc
+/native/*.pyxbldc
 *.swp
+/native/*.c
+/native/*.so
+/pym2149/MinBleps(*)
+*_turbo/
