@@ -30,31 +30,18 @@ class Reader:
         self.c = 0
         self.v = v
 
+    def __nonzero__(self):
+        return self.c < len(self.v)
+
     def consume(self, n):
         self.c += n
         return self.v[self.c - n:self.c]
 
-    def timetag(self):
-        seconds1900, fraction = struct.unpack('>II', self.consume(8))
-        return seconds1900 - self.seconds1970 + fraction / self.fractionlimit
+    def align(self):
+        self.c += (-self.c) % 4
 
     def int32(self):
         return struct.unpack('>i', self.consume(4))[0]
-
-    def __nonzero__(self):
-        return self.c < len(self.v)
-
-    def element(self):
-        return parse(self.consume(self.int32()))
-
-    def string(self):
-        text = self.consume(self.v.index('\0', self.c) - self.c).decode('ascii')
-        self.c += 1 # Consume at least one null.
-        self.align()
-        return text
-
-    def align(self):
-        self.c += (-self.c) % 4
 
     def float32(self):
         return struct.unpack('>f', self.consume(4))[0]
@@ -63,6 +50,19 @@ class Reader:
         blob = self.consume(self.int32())
         self.align()
         return blob
+
+    def string(self):
+        text = self.consume(self.v.index('\0', self.c) - self.c).decode('ascii')
+        self.c += 1 # Consume at least one null.
+        self.align()
+        return text
+
+    def timetag(self):
+        seconds1900, fraction = struct.unpack('>II', self.consume(8))
+        return seconds1900 - self.seconds1970 + fraction / self.fractionlimit
+
+    def element(self):
+        return parse(self.consume(self.int32()))
 
 class Bundle:
 
@@ -78,9 +78,9 @@ class Message:
 
     types = {
         'i': Reader.int32,
-        's': Reader.string,
         'f': Reader.float32,
         'b': Reader.blob,
+        's': Reader.string,
     }
 
     def __init__(self, v):
