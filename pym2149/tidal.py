@@ -25,6 +25,7 @@ import logging, socket, udppump, osctrl
 log = logging.getLogger(__name__)
 
 tidalport = 57120
+relayport = tidalport + 1
 
 class TidalClient:
 
@@ -56,17 +57,15 @@ class TidalClient:
                 v = self.sock.recvfrom(udppump.bufsize)[0]
             except socket.timeout:
                 continue
-            if not v.startswith('#bundle\0'):
-                continue
-            bundle = osctrl.parse(v)
-            if 1 != len(bundle.elements) or '/play2' != bundle.elements[0].addrpattern:
-                continue
-            args = bundle.elements[0].args
-            args = dict([args[i:i + 2] for i in xrange(0, len(args), 2)])
-            k = (args['s'], args.get('n', 0))
-            note = self.keytonote.get(k)
-            if note is not None:
-                return self.TidalEvent(bundle.timetag, (args['chan'] - 1) % self.chancount, note, 0x7f)
+            if v.startswith(osctrl.bundlemagic):
+                bundle = osctrl.parse(v)
+                if 1 == len(bundle.elements) and '/play2' == bundle.elements[0].addrpattern:
+                    args = bundle.elements[0].args
+                    args = dict([args[i:i + 2] for i in xrange(0, len(args), 2)])
+                    k = (args['s'], args.get('n', 0))
+                    note = self.keytonote.get(k)
+                    if note is not None:
+                        return self.TidalEvent(bundle.timetag, (args['chan'] - 1) % self.chancount, note, 0x7f)
 
     def interrupt(self):
         self.open = False

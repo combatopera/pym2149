@@ -18,8 +18,10 @@
 from __future__ import division
 import struct
 
+bundlemagic = '#bundle\0'
+
 def parse(v):
-    return (Bundle if v.startswith('#bundle\0') else Message)(v)
+    return (Bundle if v.startswith(bundlemagic) else Message)(v)
 
 class Reader:
 
