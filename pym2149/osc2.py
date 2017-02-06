@@ -17,9 +17,8 @@
 
 from nod import BufNode
 from ring import signaldtype
-from pyrbo import turbo
+from pyrbo import turbo, LOCAL
 from const import u4
-import numpy as np
 
 class ToneOsc(BufNode):
 
@@ -35,6 +34,7 @@ class ToneOsc(BufNode):
 
     @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, progress = u4, scale = u4, periodreg = dict(value = u4)), stepsize = u4, i = u4)
     def callturbo(self):
+        self_periodreg_value = self_scale = self_block_framecount = self_progress = self_value = self_blockbuf_buf = LOCAL
         stepsize = self_periodreg_value * self_scale
         for i in xrange(self_block_framecount):
             if self_progress >= stepsize:
