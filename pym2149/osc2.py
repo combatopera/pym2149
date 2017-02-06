@@ -43,16 +43,16 @@ class ToneOsc(BufNode):
             while i < j:
                 self_blockbuf_buf[i] = self_value
                 i += 1
-        while i < self_block_framecount:
-            if self_progress >= stepsize:
-                self_value = 1 - self_value
-                self_progress = 0
-            j = min(i + stepsize - self_progress, self_block_framecount)
-            self_progress += j - i
-            while i < j:
-                self_blockbuf_buf[i] = self_value
-                i += 1
-        if self_progress == stepsize:
+        if i < self_block_framecount:
             self_value = 1 - self_value
             self_progress = 0
+            while i < self_block_framecount:
+                j = min(i + stepsize - self_progress, self_block_framecount)
+                self_progress += j - i
+                while i < j:
+                    self_blockbuf_buf[i] = self_value
+                    i += 1
+                if self_progress == stepsize:
+                    self_value = 1 - self_value
+                    self_progress = 0
         return self_value, self_progress
