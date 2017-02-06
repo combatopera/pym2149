@@ -16,7 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from reg import Reg, VersionReg
-from osc import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
+from osc import NoiseOsc, EnvOsc, RToneOsc
+from osc2 import ToneOsc
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container

@@ -18,7 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import ToneOsc, NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
+from osc import NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
+from osc2 import ToneOsc
 from mfp import mfpclock
 from nod import Block
 from reg import Reg, VersionReg
