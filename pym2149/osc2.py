@@ -23,20 +23,19 @@ import numpy as np
 
 class Shape:
 
-    def __init__(self, buf):
-        self.size = buf.size
-        self.buf = buf
+    def __init__(self, g):
+        self.buf = np.fromiter(g, signaldtype)
+        self.size = self.buf.size
 
-class ToneOsc(BufNode):
+class ShapeOsc(BufNode):
 
-    shape = Shape(np.array([1, 0], signaldtype))
-
-    def __init__(self, scale, periodreg):
+    def __init__(self, scale, periodreg, shape):
         BufNode.__init__(self, signaldtype)
         self.index = 0
         self.progress = 0
         self.scale = scale
         self.periodreg = periodreg
+        self.shape = shape
 
     def callimpl(self):
         self.index, self.progress = self.toneimpl()
@@ -72,17 +71,14 @@ class ToneOsc(BufNode):
                 i += 1
         return self_index, self_progress
 
-class NoiseOsc(BufNode):
+class ToneOsc(ShapeOsc):
 
-    def __init__(self, scale, periodreg, noiseshape):
-        BufNode.__init__(self, signaldtype)
-        self.scale = scale
-        self.periodreg = periodreg
-        self.noiseshape = noiseshape
+    shape = Shape([1, 0])
 
-    def callimpl(self):
-        self.noiseimpl()
+    def __init__(self, scale, periodreg):
+        ShapeOsc.__init__(self, scale, periodreg, self.shape)
 
-    @turbo(self = dict())
-    def noiseimpl(self):
-        pass
+class NoiseOsc(ShapeOsc):
+
+    def __init__(self, scale, periodreg, shape):
+        ShapeOsc.__init__(self, scale, periodreg, shape)
