@@ -42,4 +42,7 @@ class ToneOsc(BufNode):
                 self_progress = 0
             self_blockbuf_buf[i] = self_value
             self_progress += 1
+        if self_progress == stepsize:
+            self_value = 1 - self_value
+            self_progress = 0
         return self_value, self_progress
