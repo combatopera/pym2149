@@ -30,10 +30,10 @@ class ToneOsc(BufNode):
         self.periodreg = periodreg
 
     def callimpl(self):
-        self.value, self.progress = self.callturbo()
+        self.value, self.progress = self.toneimpl()
 
     @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, progress = u4, scale = u4, periodreg = dict(value = u4)), stepsize = u4, i = u4, j = u4, n = u4)
-    def callturbo(self):
+    def toneimpl(self):
         self_blockbuf_buf = self_block_framecount = self_value = self_progress = self_scale = self_periodreg_value = LOCAL
         stepsize = self_periodreg_value * self_scale
         i = 0
@@ -59,3 +59,18 @@ class ToneOsc(BufNode):
                 self_blockbuf_buf[i] = self_value
                 i += 1
         return self_value, self_progress
+
+class NoiseOsc(BufNode):
+
+    def __init__(self, scale, periodreg, noiseshape):
+        BufNode.__init__(self, signaldtype)
+        self.scale = scale
+        self.periodreg = periodreg
+        self.noiseshape = noiseshape
+
+    def callimpl(self):
+        self.noiseimpl()
+
+    @turbo(self = dict())
+    def noiseimpl(self):
+        pass
