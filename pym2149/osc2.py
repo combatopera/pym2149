@@ -37,7 +37,7 @@ class ToneOsc(BufNode):
     def callturbo(self):
         stepsize = self_periodreg_value * self_scale
         for i in xrange(self_block_framecount):
-            if self_progress == stepsize:
+            if self_progress >= stepsize:
                 self_value = 1 - self_value
                 self_progress = 0
             self_blockbuf_buf[i] = self_value
