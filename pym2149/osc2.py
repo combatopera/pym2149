@@ -33,11 +33,11 @@ class ToneOsc(BufNode):
     def callimpl(self):
         self.value, self.countdown = self.callturbo()
 
-    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, countdown = u4, periodreg = dict(value = u4)), i = u4)
+    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, countdown = u4, scale = u4, periodreg = dict(value = u4)), i = u4)
     def callturbo(self):
         for i in xrange(self_block_framecount):
             if not self_countdown:
-                self_countdown = self_periodreg_value * 8
+                self_countdown = self_periodreg_value * self_scale
                 self_value = 1 - self_value
             self_blockbuf_buf[i] = self_value
             self_countdown -= 1
