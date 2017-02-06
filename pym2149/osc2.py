@@ -34,18 +34,18 @@ class ToneOsc(BufNode):
 
     @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, progress = u4, scale = u4, periodreg = dict(value = u4)), stepsize = u4, i = u4, j = u4, n = u4)
     def callturbo(self):
-        self_periodreg_value = self_scale = self_block_framecount = self_progress = self_value = self_blockbuf_buf = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_value = self_progress = self_scale = self_periodreg_value = LOCAL
         stepsize = self_periodreg_value * self_scale
         i = 0
         if self_progress < stepsize:
-            j = min(i + stepsize - self_progress, self_block_framecount)
-            self_progress += j - i
+            j = min(stepsize - self_progress, self_block_framecount)
             while i < j:
                 self_blockbuf_buf[i] = self_value
                 i += 1
-        if i < self_block_framecount:
+        if i == self_block_framecount:
+            self_progress += self_block_framecount
+        else:
             self_value = 1 - self_value
-            self_progress = 0
             n = (self_block_framecount - i) // stepsize
             while n:
                 j = i + stepsize
@@ -53,15 +53,9 @@ class ToneOsc(BufNode):
                     self_blockbuf_buf[i] = self_value
                     i += 1
                 self_value = 1 - self_value
-                self_progress = 0
                 n -= 1
+            self_progress = self_block_framecount - i
             while i < self_block_framecount:
-                j = min(i + stepsize - self_progress, self_block_framecount)
-                self_progress += j - i
-                while i < j:
-                    self_blockbuf_buf[i] = self_value
-                    i += 1
-                if self_progress == stepsize:
-                    self_value = 1 - self_value
-                    self_progress = 0
+                self_blockbuf_buf[i] = self_value
+                i += 1
         return self_value, self_progress
