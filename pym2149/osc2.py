@@ -76,9 +76,11 @@ class ToneOsc(ShapeOsc):
     shape = Shape([1, 0])
 
     def __init__(self, scale, periodreg):
-        ShapeOsc.__init__(self, scale, periodreg, self.shape)
+        scaleofstep = scale * 2 // 2 # Normally half of 16.
+        ShapeOsc.__init__(self, scaleofstep, periodreg, self.shape)
 
 class NoiseOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg, shape):
-        ShapeOsc.__init__(self, scale, periodreg, shape)
+        scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
+        ShapeOsc.__init__(self, scaleofstep, periodreg, shape)
