@@ -33,6 +33,7 @@ class ShapeOsc(BufNode):
         BufNode.__init__(self, signaldtype)
         self.index = 0
         self.progress = 0
+        self.stepsize = 0
         self.scale = scale
         self.periodreg = periodreg
         self.shape = shape
@@ -40,14 +41,14 @@ class ShapeOsc(BufNode):
     def callimpl(self):
         self.index, self.progress = self.toneimpl()
 
-    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), index = u4, progress = u4, scale = u4, periodreg = dict(value = u4), shape = dict(size = u4, buf = [signaldtype])), stepsize = u4, i = u4, j = u4, n = u4, val = signaldtype)
+    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), index = u4, progress = u4, stepsize = u4, scale = u4, periodreg = dict(value = u4), shape = dict(size = u4, buf = [signaldtype])), i = u4, j = u4, n = u4, val = signaldtype)
     def toneimpl(self):
         self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_size = self_shape_buf = LOCAL
-        stepsize = self_periodreg_value * self_scale
+        self_stepsize = self_periodreg_value * self_scale
         i = 0
-        if self_progress < stepsize:
+        if self_progress < self_stepsize:
             val = self_shape_buf[self_index]
-            j = min(stepsize - self_progress, self_block_framecount)
+            j = min(self_stepsize - self_progress, self_block_framecount)
             while i < j:
                 self_blockbuf_buf[i] = val
                 i += 1
@@ -56,9 +57,9 @@ class ShapeOsc(BufNode):
         else:
             self_index = (self_index + 1) % self_shape_size
             val = self_shape_buf[self_index]
-            n = (self_block_framecount - i) // stepsize
+            n = (self_block_framecount - i) // self_stepsize
             while n:
-                j = i + stepsize
+                j = i + self_stepsize
                 while i < j:
                     self_blockbuf_buf[i] = val
                     i += 1
