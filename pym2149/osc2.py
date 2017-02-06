@@ -32,7 +32,7 @@ class ToneOsc(BufNode):
     def callimpl(self):
         self.value, self.progress = self.callturbo()
 
-    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, progress = u4, scale = u4, periodreg = dict(value = u4)), stepsize = u4, i = u4, j = u4)
+    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), value = signaldtype, progress = u4, scale = u4, periodreg = dict(value = u4)), stepsize = u4, i = u4, j = u4, n = u4)
     def callturbo(self):
         self_periodreg_value = self_scale = self_block_framecount = self_progress = self_value = self_blockbuf_buf = LOCAL
         stepsize = self_periodreg_value * self_scale
@@ -46,6 +46,15 @@ class ToneOsc(BufNode):
         if i < self_block_framecount:
             self_value = 1 - self_value
             self_progress = 0
+            n = (self_block_framecount - i) // stepsize
+            while n:
+                j = i + stepsize
+                while i < j:
+                    self_blockbuf_buf[i] = self_value
+                    i += 1
+                self_value = 1 - self_value
+                self_progress = 0
+                n -= 1
             while i < self_block_framecount:
                 j = min(i + stepsize - self_progress, self_block_framecount)
                 self_progress += j - i
