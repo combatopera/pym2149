@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyven
 
 # Copyright 2014 Andrzej Cichocki
 
