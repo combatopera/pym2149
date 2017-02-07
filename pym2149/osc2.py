@@ -23,6 +23,8 @@ import numpy as np
 
 class Shape:
 
+    pyrbotype = dict(buf = [signaldtype], size = u4)
+
     def __init__(self, g):
         self.buf = np.fromiter(g, signaldtype)
         self.size = self.buf.size
@@ -50,7 +52,7 @@ class ShapeOsc(BufNode):
             stepsize = u4,
             scale = u4,
             periodreg = dict(value = u4),
-            shape = dict(size = u4, buf = [signaldtype]),
+            shape = Shape.pyrbotype,
         ),
         i = u4,
         j = u4,
