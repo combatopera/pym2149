@@ -41,7 +41,22 @@ class ShapeOsc(BufNode):
     def callimpl(self):
         self.index, self.progress, self.stepsize = self.toneimpl()
 
-    @turbo(self = dict(blockbuf = dict(buf = [signaldtype]), block = dict(framecount = u4), index = u4, progress = u4, stepsize = u4, scale = u4, periodreg = dict(value = u4), shape = dict(size = u4, buf = [signaldtype])), i = u4, j = u4, n = u4, val = signaldtype)
+    @turbo(
+        self = dict(
+            blockbuf = dict(buf = [signaldtype]),
+            block = dict(framecount = u4),
+            index = u4,
+            progress = u4,
+            stepsize = u4,
+            scale = u4,
+            periodreg = dict(value = u4),
+            shape = dict(size = u4, buf = [signaldtype]),
+        ),
+        i = u4,
+        j = u4,
+        n = u4,
+        val = signaldtype,
+    )
     def toneimpl(self):
         self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_size = self_shape_buf = LOCAL
         self_stepsize = self_periodreg_value * self_scale
