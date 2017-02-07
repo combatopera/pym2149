@@ -33,8 +33,8 @@ class ShapeOsc(BufNode):
 
     def __init__(self, scale, periodreg, shape):
         BufNode.__init__(self, signaldtype)
-        self.index = 0
-        self.progress = 0
+        self.index = shape.size - 1
+        self.progress = np.iinfo(u4).max
         self.stepsize = 0
         self.scale = scale
         self.periodreg = periodreg
@@ -60,7 +60,7 @@ class ShapeOsc(BufNode):
         val = signaldtype,
     )
     def toneimpl(self):
-        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_size = self_shape_buf = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_buf = self_shape_size = LOCAL
         self_stepsize = self_periodreg_value * self_scale
         i = 0
         if self_progress < self_stepsize:
