@@ -74,21 +74,24 @@ class ShapeOsc(BufNode):
         if i == self_block_framecount:
             self_progress += self_block_framecount
         else:
-            self_index = (self_index + 1) % self_shape_size
-            val = self_shape_buf[self_index]
             n = (self_block_framecount - i) // self_stepsize
             while n:
+                self_index = (self_index + 1) % self_shape_size
+                val = self_shape_buf[self_index]
                 j = i + self_stepsize
                 while i < j:
                     self_blockbuf_buf[i] = val
                     i += 1
+                n -= 1
+            if i == self_block_framecount:
+                self_progress = self_stepsize
+            else:
                 self_index = (self_index + 1) % self_shape_size
                 val = self_shape_buf[self_index]
-                n -= 1
-            self_progress = self_block_framecount - i
-            while i < self_block_framecount:
-                self_blockbuf_buf[i] = val
-                i += 1
+                self_progress = self_block_framecount - i
+                while i < self_block_framecount:
+                    self_blockbuf_buf[i] = val
+                    i += 1
         return self_index, self_progress, self_stepsize
 
 class ToneOsc(ShapeOsc):
