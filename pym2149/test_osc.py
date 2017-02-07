@@ -23,7 +23,6 @@ from osc2 import ToneOsc, NoiseOsc, Shape
 from mfp import mfpclock
 from nod import Block
 from reg import Reg, VersionReg
-from ring import DerivativeRing
 from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees, YM2149

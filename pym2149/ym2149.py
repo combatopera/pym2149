@@ -25,7 +25,6 @@ from iface import AmpScale, Chip, YMFile, Config
 from diapyr import types
 from mfp import MFPTimer
 from lfsr import Lfsr
-from ring import DerivativeRing
 import logging
 
 log = logging.getLogger(__name__)
