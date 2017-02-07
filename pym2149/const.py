@@ -22,3 +22,4 @@ appconfigdir = os.path.join(os.path.expanduser('~'), '.pym2149')
 midichannelcount = 16
 u1 = np.uint8
 u4 = np.uint32
+i4 = np.int32

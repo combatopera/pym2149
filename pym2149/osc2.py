@@ -18,7 +18,7 @@
 from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
-from const import u1, u4
+from const import u1, u4, i4
 import numpy as np
 
 class Shape:
@@ -35,7 +35,7 @@ class ShapeOsc(BufNode):
 
     def __init__(self, scale, periodreg, shape):
         BufNode.__init__(self, signaldtype)
-        self.index = shape.size - 1
+        self.index = -1
         self.progress = np.iinfo(self.progresstype).max
         self.stepsize = 0
         self.scale = scale
@@ -49,7 +49,7 @@ class ShapeOsc(BufNode):
         self = dict(
             blockbuf = dict(buf = [signaldtype]),
             block = dict(framecount = u4),
-            index = u4,
+            index = i4,
             progress = progresstype,
             stepsize = u4,
             scale = u4,
