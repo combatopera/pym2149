@@ -31,10 +31,12 @@ class Shape:
 
 class ShapeOsc(BufNode):
 
+    progresstype = u4
+
     def __init__(self, scale, periodreg, shape):
         BufNode.__init__(self, signaldtype)
         self.index = shape.size - 1
-        self.progress = np.iinfo(u4).max
+        self.progress = np.iinfo(self.progresstype).max
         self.stepsize = 0
         self.scale = scale
         self.periodreg = periodreg
@@ -48,7 +50,7 @@ class ShapeOsc(BufNode):
             blockbuf = dict(buf = [signaldtype]),
             block = dict(framecount = u4),
             index = u4,
-            progress = u4,
+            progress = progresstype,
             stepsize = u4,
             scale = u4,
             periodreg = dict(value = u4),
