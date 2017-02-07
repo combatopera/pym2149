@@ -20,4 +20,5 @@ import os, numpy as np
 clientname = 'pym2149'
 appconfigdir = os.path.join(os.path.expanduser('~'), '.pym2149')
 midichannelcount = 16
+u1 = np.uint8
 u4 = np.uint32

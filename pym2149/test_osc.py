@@ -18,8 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import NoiseOsc, EnvOsc, RationalDerivative, RToneOsc
-from osc2 import ToneOsc
+from osc import EnvOsc, RationalDerivative, RToneOsc
+from osc2 import ToneOsc, NoiseOsc, Shape
 from mfp import mfpclock
 from nod import Block
 from reg import Reg, VersionReg
@@ -101,7 +101,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         o = self.createosc(8, r)
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
-        self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
+        self.assertEqual([0] * 8 + [1] * 16 + [0] * 15, o.call(Block(39)).tolist())
         r.value = 0x03
         self.assertEqual([0] * 9 + [1] * 24 + [0], o.call(Block(34)).tolist())
 
@@ -306,7 +306,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
     def test_increaseperiodonboundary(self):
         r = Reg(value = 0x01)
-        o = NoiseOsc(4, r, DerivativeRing([1, 0]))
+        o = NoiseOsc(4, r, Shape([1, 0]))
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -315,12 +315,20 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
     def test_decreaseperiodonboundary(self):
         r = Reg(value = 0x03)
-        o = NoiseOsc(4, r, DerivativeRing([1, 0]))
+        o = NoiseOsc(4, r, Shape([1, 0]))
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 0x02
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
-        r.value = 0x01
-        self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
+
+    def test_stepsizenotupdatedduringincompletestep(self):
+        r = Reg(value = 0x03)
+        o = NoiseOsc(4, r, Shape([1, 0]))
+        self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
+        self.assertEqual([1] * 7, o.call(Block(7)).tolist())
+        r.value = 0x02
+        self.assertEqual([1] * 7, o.call(Block(7)).tolist())
+        self.assertEqual([1] * 7, o.call(Block(7)).tolist())
+        self.assertEqual([1] * 3 + [0] * 16 + [1] * 1, o.call(Block(20)).tolist())
 
 class TestEnvOsc(unittest.TestCase):
 

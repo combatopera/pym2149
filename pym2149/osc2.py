@@ -18,7 +18,7 @@
 from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
-from const import u4
+from const import u1, u4
 import numpy as np
 
 class Shape:
@@ -43,7 +43,7 @@ class ShapeOsc(BufNode):
         self.shape = shape
 
     def callimpl(self):
-        self.index, self.progress, self.stepsize = self.toneimpl()
+        self.index, self.progress, self.stepsize = self.shapeimpl()
 
     @turbo(
         self = dict(
@@ -55,15 +55,17 @@ class ShapeOsc(BufNode):
             scale = u4,
             periodreg = dict(value = u4),
             shape = Shape.pyrbotype,
+            eager = u1,
         ),
         i = u4,
         j = u4,
         n = u4,
         val = signaldtype,
     )
-    def toneimpl(self):
-        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_buf = self_shape_size = LOCAL
-        self_stepsize = self_periodreg_value * self_scale
+    def shapeimpl(self):
+        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_buf = self_shape_size = self_eager = LOCAL
+        if self_eager:
+            self_stepsize = self_periodreg_value * self_scale
         i = 0
         if self_progress < self_stepsize:
             val = self_shape_buf[self_index]
@@ -74,6 +76,8 @@ class ShapeOsc(BufNode):
         if i == self_block_framecount:
             self_progress += self_block_framecount
         else:
+            if not self_eager:
+                self_stepsize = self_periodreg_value * self_scale
             n = (self_block_framecount - i) // self_stepsize
             while n:
                 self_index = (self_index + 1) % self_shape_size
@@ -96,6 +100,7 @@ class ShapeOsc(BufNode):
 
 class ToneOsc(ShapeOsc):
 
+    eager = True
     shape = Shape([1, 0])
 
     def __init__(self, scale, periodreg):
@@ -103,6 +108,8 @@ class ToneOsc(ShapeOsc):
         ShapeOsc.__init__(self, scaleofstep, periodreg, self.shape)
 
 class NoiseOsc(ShapeOsc):
+
+    eager = False
 
     def __init__(self, scale, periodreg, shape):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.

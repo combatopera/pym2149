@@ -17,7 +17,7 @@
 
 from reg import Reg, VersionReg
 from osc import NoiseOsc, EnvOsc, RToneOsc
-from osc2 import ToneOsc
+from osc2 import ToneOsc, Shape
 from dac import Level, Dac
 from mix import BinMix
 from nod import Container
@@ -111,7 +111,7 @@ class ClockInfo:
 
 class YM2149(Registers, Container, Chip):
 
-  noiseshape = DerivativeRing(Lfsr(ym2149nzdegrees))
+  noiseshape = Shape(Lfsr(ym2149nzdegrees))
 
   @types(Config, ClockInfo, AmpScale)
   def __init__(self, config, clockinfo, ampscale):
