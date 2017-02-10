@@ -18,8 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import EnvOsc, RationalDerivative, RToneOsc
-from osc2 import ToneOsc, NoiseOsc, Shape
+from osc import RationalDerivative, RToneOsc
+from osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc
 from mfp import mfpclock
 from nod import Block
 from reg import Reg, VersionReg
@@ -332,38 +332,38 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 class TestEnvOsc(unittest.TestCase):
 
     def test_shapes(self):
-        r = EnvOsc.shapes[0x0c]
-        self.assertEqual(1025, r.npbuf.shape[0])
-        self.assertEqual(1, r.loopstart)
-        self.assertEqual(range(32) + range(32), list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.shapes[0x08]
-        self.assertEqual(1025, r.npbuf.shape[0])
-        self.assertEqual(1, r.loopstart)
-        self.assertEqual(range(31, -1, -1) + range(31, -1, -1), list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.shapes[0x0e]
-        self.assertEqual(1025, r.npbuf.shape[0])
-        self.assertEqual(1, r.loopstart)
-        self.assertEqual(range(32) + range(31, -1, -1) + range(32), list(np.cumsum(r.npbuf[:96])))
-        r = EnvOsc.shapes[0x0a]
-        self.assertEqual(1025, r.npbuf.shape[0])
-        self.assertEqual(1, r.loopstart)
-        self.assertEqual(range(31, -1, -1) + range(32) + range(31, -1, -1), list(np.cumsum(r.npbuf[:96])))
-        r = EnvOsc.shapes[0x0f]
-        self.assertEqual(1033, r.npbuf.shape[0])
-        self.assertEqual(33, r.loopstart)
-        self.assertEqual(range(32) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.shapes[0x0d]
-        self.assertEqual(1033, r.npbuf.shape[0])
-        self.assertEqual(33, r.loopstart)
-        self.assertEqual(range(32) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.shapes[0x0b]
-        self.assertEqual(1033, r.npbuf.shape[0])
-        self.assertEqual(33, r.loopstart)
-        self.assertEqual(range(31, -1, -1) + [31] * 32, list(np.cumsum(r.npbuf[:64])))
-        r = EnvOsc.shapes[0x09]
-        self.assertEqual(1033, r.npbuf.shape[0])
-        self.assertEqual(33, r.loopstart)
-        self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
+        s = EnvOsc.shapes[0x0c]
+        self.assertEqual(32, s.size)
+        self.assertEqual(0, s.introlen)
+        self.assertEqual(range(32), list(s.buf))
+        s = EnvOsc.shapes[0x08]
+        self.assertEqual(32, s.size)
+        self.assertEqual(0, s.introlen)
+        self.assertEqual(range(31, -1, -1), list(s.buf))
+        s = EnvOsc.shapes[0x0e]
+        self.assertEqual(64, s.size)
+        self.assertEqual(0, s.introlen)
+        self.assertEqual(range(32) + range(31, -1, -1), list(s.buf))
+        s = EnvOsc.shapes[0x0a]
+        self.assertEqual(64, s.size)
+        self.assertEqual(0, s.introlen)
+        self.assertEqual(range(31, -1, -1) + range(32), list(s.buf))
+        s = EnvOsc.shapes[0x0f]
+        self.assertEqual(33, s.size)
+        self.assertEqual(32, s.introlen)
+        self.assertEqual(range(32) + [0], list(s.buf))
+        s = EnvOsc.shapes[0x0d]
+        self.assertEqual(33, s.size)
+        self.assertEqual(32, s.introlen)
+        self.assertEqual(range(32) + [31], list(s.buf))
+        s = EnvOsc.shapes[0x0b]
+        self.assertEqual(33, s.size)
+        self.assertEqual(32, s.introlen)
+        self.assertEqual(range(31, -1, -1) + [31], list(s.buf))
+        s = EnvOsc.shapes[0x09]
+        self.assertEqual(33, s.size)
+        self.assertEqual(32, s.introlen)
+        self.assertEqual(range(31, -1, -1) + [0], list(s.buf))
 
     def test_resetworks(self):
         shapereg = VersionReg(value = 0x0c)
