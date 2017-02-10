@@ -34,13 +34,15 @@ class ShapeOsc(BufNode):
 
     progresstype = u4
 
-    def __init__(self, scale, periodreg, shape):
+    def __init__(self, scale, periodreg):
         BufNode.__init__(self, signaldtype)
-        self.index = -1
-        self.progress = np.iinfo(self.progresstype).max
         self.stepsize = 0
         self.scale = scale
         self.periodreg = periodreg
+
+    def reset(self, shape):
+        self.index = -1
+        self.progress = np.iinfo(self.progresstype).max
         self.shape = shape
 
     def callimpl(self):
@@ -110,7 +112,8 @@ class ToneOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        ShapeOsc.__init__(self, scaleofstep, periodreg, self.shape)
+        ShapeOsc.__init__(self, scaleofstep, periodreg)
+        self.reset(self.shape)
 
 class NoiseOsc(ShapeOsc):
 
@@ -118,4 +121,5 @@ class NoiseOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg, shape):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        ShapeOsc.__init__(self, scaleofstep, periodreg, shape)
+        ShapeOsc.__init__(self, scaleofstep, periodreg)
+        self.reset(shape)
