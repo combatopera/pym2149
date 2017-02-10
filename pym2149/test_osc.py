@@ -376,8 +376,8 @@ class TestEnvOsc(unittest.TestCase):
 
     def test_resetdoesnotwaitforcurrentstep(self):
         shapereg = VersionReg(value = 0x0c)
-        periodreg = Reg(value = 0x0001)
-        o = EnvOsc(4, periodreg, shapereg)
+        periodreg = Reg(value = 0x0004)
+        o = EnvOsc(1, periodreg, shapereg)
         self.assertEqual([0, 0, 0, 0, 1, 1, 1, 1, 2, 2], o.call(Block(10)).tolist())
         self.assertEqual([2, 2, 3, 3, 3, 3, 4, 4], o.call(Block(8)).tolist())
         shapereg.value = 0x0c
