@@ -23,11 +23,12 @@ import numpy as np
 
 class Shape:
 
-    pyrbotype = dict(buf = [signaldtype], size = u4)
+    pyrbotype = dict(buf = [signaldtype], size = u4, introlen = u4)
 
-    def __init__(self, g):
+    def __init__(self, g, introlen = 0):
         self.buf = np.fromiter(g, signaldtype)
         self.size = self.buf.size
+        self.introlen = introlen
 
 class ShapeOsc(BufNode):
 
@@ -63,7 +64,7 @@ class ShapeOsc(BufNode):
         val = signaldtype,
     )
     def shapeimpl(self):
-        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_buf = self_shape_size = self_eager = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_index = self_progress = self_scale = self_periodreg_value = self_shape_buf = self_shape_size = self_shape_introlen = self_eager = LOCAL
         if self_eager:
             self_stepsize = self_periodreg_value * self_scale
         i = 0
@@ -80,7 +81,9 @@ class ShapeOsc(BufNode):
                 self_stepsize = self_periodreg_value * self_scale
             n = (self_block_framecount - i) // self_stepsize
             while n:
-                self_index = (self_index + 1) % self_shape_size
+                self_index += 1
+                if self_index == self_shape_size:
+                    self_index = self_shape_introlen
                 val = self_shape_buf[self_index]
                 j = i + self_stepsize
                 while i < j:
@@ -90,7 +93,9 @@ class ShapeOsc(BufNode):
             if i == self_block_framecount:
                 self_progress = self_stepsize
             else:
-                self_index = (self_index + 1) % self_shape_size
+                self_index += 1
+                if self_index == self_shape_size:
+                    self_index = self_shape_introlen
                 val = self_shape_buf[self_index]
                 self_progress = self_block_framecount - i
                 while i < self_block_framecount:
