@@ -365,7 +365,7 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(33, r.loopstart)
         self.assertEqual(range(31, -1, -1) + [0] * 32, list(np.cumsum(r.npbuf[:64])))
 
-    def test_reset(self):
+    def test_resetworks(self):
         shapereg = VersionReg(value = 0x0c)
         periodreg = Reg(value = 0x0001)
         o = EnvOsc(8, periodreg, shapereg)
@@ -373,6 +373,15 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(range(16, 32) + range(16), o.call(Block(32 * 8)).tolist()[::8])
         shapereg.value = 0x0c
         self.assertEqual(range(32) + range(16), o.call(Block(48 * 8)).tolist()[::8])
+
+    def test_resetdoesnotwaitforcurrentstep(self):
+        shapereg = VersionReg(value = 0x0c)
+        periodreg = Reg(value = 0x0001)
+        o = EnvOsc(4, periodreg, shapereg)
+        self.assertEqual([0, 0, 0, 0, 1, 1, 1, 1, 2, 2], o.call(Block(10)).tolist())
+        self.assertEqual([2, 2, 3, 3, 3, 3, 4, 4], o.call(Block(8)).tolist())
+        shapereg.value = 0x0c
+        self.assertEqual([0, 0, 0, 0, 1, 1], o.call(Block(6)).tolist())
 
     def test_08(self):
         shapereg = VersionReg(value = 0x08)
