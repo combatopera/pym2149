@@ -19,6 +19,7 @@ from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
 from const import u1, u4, i4
+from mfp import mfpclock
 import numpy as np, itertools
 
 class Shape:
@@ -113,19 +114,36 @@ class RToneOsc(BufNode):
         self.timer = timer
 
     def callimpl(self):
-        self.rtoneimpl()
+        prescalerornone = self.timer.prescalerornone.value
+        self.rtoneimpl(mfpclock, 0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
             blockbuf = dict(buf = [signaldtype]),
             block = dict(framecount = u4),
+            chipimplclock = u4,
         ),
+        mfpclock = u4,
+        prescaleror0 = u4,
+        etdr = u4,
+        maxprescaler = u4,
+        stepsize = u4,
         i = u4,
+        j = u4,
+        val = signaldtype,
     )
-    def rtoneimpl(self):
+    def rtoneimpl(self, mfpclock, prescaleror0, etdr):
         self_blockbuf_buf = self_block_framecount = LOCAL
-        for i in xrange(self_block_framecount):
-            self_blockbuf_buf[i] = 1
+        maxprescaler = prescaleror0 * self_chipimplclock
+        stepsize = maxprescaler * etdr // mfpclock # FIXME: Crude.
+        i = 0
+        val = 1
+        while i < self_block_framecount:
+            j = min(i + stepsize, self_block_framecount)
+            while i < j:
+                self_blockbuf_buf[i] = val
+                i += 1
+            val = 1 - val
 
 class ToneOsc(ShapeOsc):
 
