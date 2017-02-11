@@ -130,18 +130,18 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
 
     @classmethod
     def createosc(cls, scale, periodreg):
-        return cls.creatertoneosc(scale, Reg(value = 1), periodreg)
-
-    @staticmethod
-    def creatertoneosc(scale, prescalerornone, periodreg):
         clock = 200
-        effect = VersionReg(value = PWMEffect(None))
         effectivedata = Reg().link(lambda p: scale*p*mfpclock//clock, periodreg)
         periodreg.value = periodreg.value # Init effectivedata.
+        return cls.creatertoneosc(clock, Reg(value = 1), effectivedata)
+
+    @staticmethod
+    def creatertoneosc(clock, prescalerornone, effectivedata):
+        effect = VersionReg(value = PWMEffect(None))
         return RToneOsc(clock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
 
     def test_works(self):
-        o = self.creatertoneosc(8, Reg(value = 1), Reg(value = 3))
+        o = self.creatertoneosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(96)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0] * 24, v[24:48])
@@ -152,7 +152,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0] * 24, v[24:])
 
     def test_resume(self):
-        o = self.creatertoneosc(8, Reg(value = 1), Reg(value = 3))
+        o = self.creatertoneosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(25)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0], v[24:])
@@ -161,45 +161,45 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([1], v[23:])
 
     def test_carry(self):
-        r = Reg(value = 0x01)
+        r = Reg(value = 8*0x01*mfpclock//200)
         size = 3 * 8 + 1
-        ref = self.creatertoneosc(8, Reg(value = 1), r).call(Block(size)).tolist()
+        ref = self.creatertoneosc(200, Reg(value = 1), r).call(Block(size)).tolist()
         for n in xrange(size + 1):
-            o = self.creatertoneosc(8, Reg(value = 1), r)
+            o = self.creatertoneosc(200, Reg(value = 1), r)
             v1 = o.call(Block(n)).tolist()
             v2 = o.call(Block(size - n)).tolist()
             self.assertEqual(ref, v1 + v2)
 
     def test_endexistingstepatendofblock(self):
-        r = Reg(value = 0x01)
-        o = self.creatertoneosc(8, Reg(value = 1), r)
+        r = Reg(value = 8*0x01*mfpclock//200)
+        o = self.creatertoneosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
     def test_increaseperiodonboundary(self):
-        r = Reg(value = 0x01)
-        o = self.creatertoneosc(8, Reg(value = 1), r)
+        r = Reg(value = 8*0x01*mfpclock//200)
+        o = self.creatertoneosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
-        r.value = 0x02
+        r.value = 8*0x02*mfpclock//200
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
-        r.value = 0x03
+        r.value = 8*0x03*mfpclock//200
         # Unlike tone, the existing countdown is not affected:
         self.assertEqual([0] + [1] * 24 + [0] * 24 + [1], o.call(Block(50)).tolist())
 
     def test_decreaseperiodonboundary(self):
-        r = Reg(value = 0x03)
-        o = self.creatertoneosc(8, Reg(value = 1), r)
+        r = Reg(value = 8*0x03*mfpclock//200)
+        o = self.creatertoneosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
-        r.value = 0x02
+        r.value = 8*0x02*mfpclock//200
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
-        r.value = 0x01
+        r.value = 8*0x01*mfpclock//200
         # Unlike tone, the existing countdown is not affected:
         self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
 
     def test_smallerblocksthanperiod(self):
-        r = Reg(value = 0x05)
-        o = self.creatertoneosc(1, Reg(value = 1), r)
+        r = Reg(value = 1*0x05*mfpclock//200)
+        o = self.creatertoneosc(200, Reg(value = 1), r)
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
         self.assertEqual([0,0,1], o.call(Block(3)).tolist())
