@@ -133,7 +133,7 @@ class RToneOsc(BufNode):
         val = signaldtype,
     )
     def rtoneimpl(self, mfpclock, prescaleror0, etdr):
-        self_blockbuf_buf = self_block_framecount = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_chipimplclock = LOCAL
         maxprescaler = prescaleror0 * self_chipimplclock
         stepsize = maxprescaler * etdr // mfpclock # FIXME: Crude.
         i = 0
