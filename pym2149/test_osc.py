@@ -37,8 +37,7 @@ class AbstractTestOsc:
         blockrate = 50
         blocksize = 2000000 // blockrate
         for p in self.performanceperiods:
-            r = Reg(value = p)
-            o = self.createosc(8, r)
+            o = self.createperfosc(8, p)
             start = time.time()
             for _ in xrange(blockrate):
                 o.call(Block(blocksize))
@@ -53,6 +52,10 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
 
     performanceperiods = 0x001, 0xfff
     performancelimit = .05
+
+    @classmethod
+    def createperfosc(cls, scale, period):
+        return cls.createosc(scale, Reg(value = period))
 
     @staticmethod
     def createosc(scale, periodreg):
@@ -129,19 +132,18 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
     performancelimit = .1
 
     @classmethod
-    def createosc(cls, scale, periodreg):
+    def createperfosc(cls, scale, period):
         clock = 200
-        effectivedata = Reg().link(lambda p: scale*p*mfpclock//clock, periodreg)
-        periodreg.value = periodreg.value # Init effectivedata.
-        return cls.creatertoneosc(clock, Reg(value = 1), effectivedata)
+        effectivedata = scale*period*mfpclock//clock
+        return cls.createosc(clock, Reg(value = 1), Reg(value = effectivedata))
 
     @staticmethod
-    def creatertoneosc(clock, prescalerornone, effectivedata):
+    def createosc(clock, prescalerornone, effectivedata):
         effect = VersionReg(value = PWMEffect(None))
         return RToneOsc(clock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
 
     def test_works(self):
-        o = self.creatertoneosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
+        o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(96)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0] * 24, v[24:48])
@@ -152,7 +154,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([0] * 24, v[24:])
 
     def test_resume(self):
-        o = self.creatertoneosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
+        o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(25)).tolist()
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0], v[24:])
@@ -163,23 +165,23 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
     def test_carry(self):
         r = Reg(value = 8*0x01*mfpclock//200)
         size = 3 * 8 + 1
-        ref = self.creatertoneosc(200, Reg(value = 1), r).call(Block(size)).tolist()
+        ref = self.createosc(200, Reg(value = 1), r).call(Block(size)).tolist()
         for n in xrange(size + 1):
-            o = self.creatertoneosc(200, Reg(value = 1), r)
+            o = self.createosc(200, Reg(value = 1), r)
             v1 = o.call(Block(n)).tolist()
             v2 = o.call(Block(size - n)).tolist()
             self.assertEqual(ref, v1 + v2)
 
     def test_endexistingstepatendofblock(self):
         r = Reg(value = 8*0x01*mfpclock//200)
-        o = self.creatertoneosc(200, Reg(value = 1), r)
+        o = self.createosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
         self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
     def test_increaseperiodonboundary(self):
         r = Reg(value = 8*0x01*mfpclock//200)
-        o = self.creatertoneosc(200, Reg(value = 1), r)
+        o = self.createosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
         r.value = 8*0x02*mfpclock//200
         self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
@@ -189,7 +191,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
 
     def test_decreaseperiodonboundary(self):
         r = Reg(value = 8*0x03*mfpclock//200)
-        o = self.creatertoneosc(200, Reg(value = 1), r)
+        o = self.createosc(200, Reg(value = 1), r)
         self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
         r.value = 8*0x02*mfpclock//200
         self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
@@ -199,7 +201,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
 
     def test_smallerblocksthanperiod(self):
         r = Reg(value = 1*0x05*mfpclock//200)
-        o = self.creatertoneosc(200, Reg(value = 1), r)
+        o = self.createosc(200, Reg(value = 1), r)
         self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
         self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
         self.assertEqual([0,0,1], o.call(Block(3)).tolist())
@@ -283,6 +285,10 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
 
     performanceperiods = 0x01, 0x1f
     performancelimit = .05
+
+    @classmethod
+    def createperfosc(cls, scale, period):
+        return cls.createosc(scale, Reg(value = period))
 
     @staticmethod
     def createosc(scale, periodreg):
