@@ -105,6 +105,28 @@ class ShapeOsc(BufNode):
                     i += 1
         return self_index, self_progress, self_stepsize
 
+class RToneOsc(BufNode):
+
+    def __init__(self, chipimplclock, timer):
+        BufNode.__init__(self, signaldtype)
+        self.chipimplclock = chipimplclock
+        self.timer = timer
+
+    def callimpl(self):
+        self.rtoneimpl()
+
+    @turbo(
+        self = dict(
+            blockbuf = dict(buf = [signaldtype]),
+            block = dict(framecount = u4),
+        ),
+        i = u4,
+    )
+    def rtoneimpl(self):
+        self_blockbuf_buf = self_block_framecount = LOCAL
+        for i in xrange(self_block_framecount):
+            self_blockbuf_buf[i] = 1
+
 class ToneOsc(ShapeOsc):
 
     eager = True
