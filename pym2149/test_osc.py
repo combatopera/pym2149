@@ -153,6 +153,18 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual([1] * 24, v[:24])
         self.assertEqual([0] * 24, v[24:])
 
+    def test_works2(self):
+        o = self.createosc(2000000, Reg(value = 1), Reg(value = 29))
+        v = o.call(Block(95)).tolist()
+        self.assertEqual([1] * 24, v[:24])
+        self.assertEqual([0] * 24, v[24:48])
+        self.assertEqual([1] * 23, v[48:71])
+        self.assertEqual([0] * 24, v[71:])
+        v = o.call(Block(48)).tolist()
+        self.assertEqual([1] * 24, v[:24])
+        self.assertEqual([0] * 23, v[24:47])
+        self.assertEqual([1], v[47:])
+
     def test_resume(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(25)).tolist()
