@@ -108,34 +108,33 @@ class ShapeOsc(BufNode):
 
 class RToneOsc(BufNode):
 
-    def __init__(self, chipimplclock, timer):
+    def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
+        self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
 
     def callimpl(self):
         prescalerornone = self.timer.prescalerornone.value
-        self.rtoneimpl(mfpclock, 0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
+        self.rtoneimpl(0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
             blockbuf = dict(buf = [signaldtype]),
             block = dict(framecount = u4),
+            mfpclock = u4,
             chipimplclock = u4,
         ),
-        mfpclock = u4,
         prescaleror0 = u4,
         etdr = u4,
-        maxprescaler = u4,
         stepsize = u4,
         i = u4,
         j = u4,
         val = signaldtype,
     )
-    def rtoneimpl(self, mfpclock, prescaleror0, etdr):
-        self_blockbuf_buf = self_block_framecount = self_chipimplclock = LOCAL
-        maxprescaler = prescaleror0 * self_chipimplclock
-        stepsize = maxprescaler * etdr // mfpclock # FIXME: Crude.
+    def rtoneimpl(self, prescaleror0, etdr):
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = LOCAL
+        stepsize = prescaleror0 * self_chipimplclock * etdr // self_mfpclock # FIXME: Crude.
         i = 0
         val = 1
         while i < self_block_framecount:
