@@ -18,7 +18,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import RationalDerivative
 from osc2 import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
 from mfp import mfpclock
 from nod import Block
@@ -26,7 +25,7 @@ from reg import Reg, VersionReg
 from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees, YM2149
-from shapes import tonederivative, toneshape
+from shapes import toneshape
 from dac import PWMEffect
 from collections import namedtuple
 from pyrbo import T
@@ -234,62 +233,53 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
         o = RToneOsc(mfpclock, chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
         self.assertEqual([1]*30 + [0]*11, o.call(Block(41)).tolist())
-        self.assertEqual(4, o.derivative.maincounter)
-        self.assertEqual(chipimplclock//2, o.derivative.prescalercount)
+        self.assertEqual(4, o.maincounter)
+        self.assertEqual(chipimplclock//2, o.prescalercount)
         self.assertEqual([0]*19 + [1]*30 + [0]*10, o.call(Block(59)).tolist())
-        self.assertEqual(4, o.derivative.maincounter)
-        self.assertEqual(chipimplclock, o.derivative.prescalercount)
+        self.assertEqual(4, o.maincounter)
+        self.assertEqual(chipimplclock, o.prescalercount)
         prescalerornone.value = None
         self.assertEqual([0]*100, o.call(Block(100)).tolist())
-        self.assertEqual(4, o.derivative.maincounter)
-        self.assertEqual(None, o.derivative.prescalercount)
+        self.assertEqual(4, o.maincounter)
+        self.assertEqual(None, o.prescalercount)
         prescalerornone.value = 3
         self.assertEqual([0]*24 + [1]*30 + [0], o.call(Block(55)).tolist())
-        self.assertEqual(5, o.derivative.maincounter)
-        self.assertEqual(chipimplclock*5//2, o.derivative.prescalercount)
+        self.assertEqual(5, o.maincounter)
+        self.assertEqual(chipimplclock*5//2, o.prescalercount)
         # XXX: Finished?
 
-class TestRationalDerivative(unittest.TestCase):
-
-    @staticmethod
-    def integrate(d, n):
-        a = np.empty(n, dtype = int)
-        v = Buf[T, a.dtype.type](a)
-        d.call(Block(n))(v)
-        return v.tolist()
-
-    def test_works(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: tonederivative)
+    def test_works3(self):
+        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
         timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
-        d = RationalDerivative(mfpclock, 100, timer)
+        d = RToneOsc(mfpclock, 100, timer)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in xrange(13):
-            self.assertEqual(expected, self.integrate(d, 80))
+            self.assertEqual(expected, d.call(Block(80)).tolist())
         actual = []
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 5
         def block(n):
-            actual.extend(self.integrate(d, n))
+            actual.extend(d.call(Block(n)).tolist())
         for _ in xrange(33):
             block(3)
         block(1)
         self.assertEqual(expected, actual)
 
     def test_notrunning(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: tonederivative)
+        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
         timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
-        d = RationalDerivative(mfpclock, 1000, timer)
+        d = RToneOsc(mfpclock, 1000, timer)
         for _ in xrange(50):
-            self.assertEqual([0] * 100, self.integrate(d, 100)) # Expect no interrupts.
+            self.assertEqual([0] * 100, d.call(Block(100)).tolist()) # Expect no interrupts.
         self.assertEqual(None, d.prescalercount)
         self.assertEqual(0, d.maincounter)
         timer.prescalerornone.value = 24576
         # The maincounter was 0, so that's an interrupt in the void:
-        self.assertEqual([1] * 10 + [0] * 10 + [1] * 5, self.integrate(d, 25))
+        self.assertEqual([1] * 10 + [0] * 10 + [1] * 5, d.call(Block(25)).tolist())
         self.assertEqual(5*mfpclock, d.prescalercount)
         self.assertEqual(1, d.maincounter)
         timer.prescalerornone.value = None
         # No more interrupts, maincounter preserved:
-        self.assertEqual([1] * 25, self.integrate(d, 25))
+        self.assertEqual([1] * 25, d.call(Block(25)).tolist())
         self.assertEqual(None, d.prescalercount)
         self.assertEqual(1, d.maincounter)
 

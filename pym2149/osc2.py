@@ -99,15 +99,8 @@ class ShapeOsc(BufNode):
 
 class RToneOsc(BufNode):
 
-    class Derivative:
-
-        def reset(self):
-            self.maincounter = 0
-            self.prescalercount = None
-
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
-        self.derivative = self.Derivative()
         self.effectversion = None
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
@@ -116,7 +109,8 @@ class RToneOsc(BufNode):
 
     def reset(self, shape):
         self.index = -1
-        self.derivative.reset()
+        self.maincounter = 0
+        self.prescalercount = None
         self.shape = shape
 
     def callimpl(self):
@@ -131,11 +125,11 @@ class RToneOsc(BufNode):
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
             self.blockbuf.fill_same(self.shape.buf[self.index])
-            self.derivative.prescalercount = None
+            self.prescalercount = None
         else:
-            if self.derivative.prescalercount is None:
-                self.derivative.prescalercount = prescalerornone * self.chipimplclock
-            self.index, self.derivative.maincounter, self.derivative.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
+            if self.prescalercount is None:
+                self.prescalercount = prescalerornone * self.chipimplclock
+            self.index, self.maincounter, self.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
@@ -144,7 +138,8 @@ class RToneOsc(BufNode):
             mfpclock = u8,
             chipimplclock = u8,
             index = i4,
-            derivative = dict(maincounter = u8, prescalercount = u4),
+            maincounter = u8,
+            prescalercount = u4,
             shape = Shape.pyrbotype,
         ),
         prescaler = u4,
@@ -157,10 +152,10 @@ class RToneOsc(BufNode):
         val = signaldtype,
     )
     def rtoneimpl(self, prescaler, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_derivative_maincounter = self_derivative_prescalercount = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_maincounter = self_prescalercount = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
-        nextstepxmfp = chunksizexmfp * self_derivative_maincounter + self_derivative_prescalercount - chunksizexmfp
+        nextstepxmfp = chunksizexmfp * self_maincounter + self_prescalercount - chunksizexmfp
         i = 0
         while True:
             j = (nextstepxmfp + self_mfpclock - 1) // self_mfpclock
