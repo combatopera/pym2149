@@ -110,7 +110,7 @@ class RToneOsc(BufNode):
     class Derivative:
 
         def __init__(self):
-            self.maincounter = 0
+            self.maincounter = 1
             self.prescalercount = 0
 
     def __init__(self, mfpclock, chipimplclock, timer):
@@ -138,6 +138,7 @@ class RToneOsc(BufNode):
             chipimplclock = u8,
             nextstepxmfp = i8,
             val = signaldtype,
+            derivative = dict(maincounter = u4, prescalercount = u4),
         ),
         prescaler = u4,
         etdr = u4,
@@ -150,6 +151,7 @@ class RToneOsc(BufNode):
         self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
+        self_nextstepxmfp = chunksizexmfp * self_derivative_maincounter + self_derivative_prescalercount - chunksizexmfp
         i = 0
         while True:
             j = (self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock
