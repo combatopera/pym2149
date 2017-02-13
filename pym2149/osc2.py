@@ -110,8 +110,8 @@ class RToneOsc(BufNode):
     class Derivative:
 
         def __init__(self):
-            self.maincounter = 1
-            self.prescalercount = 0
+            self.maincounter = 0
+            self.prescalercount = None
 
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
