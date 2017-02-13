@@ -26,7 +26,7 @@ from reg import Reg, VersionReg
 from buf import Buf
 from lfsr import Lfsr
 from ym2149 import ym2149nzdegrees, YM2149
-from shapes import toneshape
+from shapes import tonederivative
 from dac import PWMEffect
 from collections import namedtuple
 from pyrbo import T
@@ -228,7 +228,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         pass # TODO: Implement.
 
     def test_stoptimer(self):
-        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: toneshape))
+        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: tonederivative))
         prescalerornone = Reg(value=3)
         effectivedata = Reg(value=5)
         chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
@@ -259,7 +259,7 @@ class TestRationalDerivative(unittest.TestCase):
         return v.tolist()
 
     def test_works(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
+        effect = namedtuple('Effect', 'getshape')(lambda: tonederivative)
         timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
         d = RationalDerivative(mfpclock, 100, timer)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
@@ -275,7 +275,7 @@ class TestRationalDerivative(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_notrunning(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
+        effect = namedtuple('Effect', 'getshape')(lambda: tonederivative)
         timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
         d = RationalDerivative(mfpclock, 1000, timer)
         for _ in xrange(50):

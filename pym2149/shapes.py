@@ -43,7 +43,7 @@ class Shape:
         self.size = self.buf.size
         self.introlen = introlen
 
-toneshape = DerivativeRing([1, 0])
+tonederivative = DerivativeRing([1, 0])
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
