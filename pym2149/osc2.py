@@ -19,16 +19,8 @@ from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
 from const import u1, u4, i4, u8, i8
+from shapes import Shape
 import numpy as np, itertools
-
-class Shape:
-
-    pyrbotype = dict(buf = [signaldtype], size = u4, introlen = u4)
-
-    def __init__(self, g, introlen = 0):
-        self.buf = np.fromiter(g, signaldtype)
-        self.size = self.buf.size
-        self.introlen = introlen
 
 class ShapeOsc(BufNode):
 

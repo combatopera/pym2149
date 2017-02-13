@@ -16,8 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from ring import DerivativeRing
-import math
+from ring import DerivativeRing, signaldtype
+from const import u4
+import math, numpy as np
 
 log2 = math.log(2)
 
@@ -32,6 +33,15 @@ def amptolevel4(amp):
 
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
+
+class Shape:
+
+    pyrbotype = dict(buf = [signaldtype], size = u4, introlen = u4)
+
+    def __init__(self, g, introlen = 0):
+        self.buf = np.fromiter(g, signaldtype)
+        self.size = self.buf.size
+        self.introlen = introlen
 
 toneshape = DerivativeRing([1, 0])
 
