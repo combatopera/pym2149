@@ -18,7 +18,7 @@
 from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
-from const import u1, u4, i4
+from const import u1, u4, i4, u8
 import numpy as np, itertools
 
 class Shape:
@@ -125,18 +125,20 @@ class RToneOsc(BufNode):
             block = dict(framecount = u4),
             mfpclock = u4,
             chipimplclock = u4,
-            nextstepxmfp = u4,
+            nextstepxmfp = u8,
             val = signaldtype,
         ),
         prescaleror0 = u4,
         etdr = u4,
-        stepsizexmfp = u4,
+        stepsizexmfp = u8,
         i = u4,
         j = u4,
+        tmpu8 = u8,
     )
     def rtoneimpl(self, prescaleror0, etdr):
         self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
-        stepsizexmfp = prescaleror0 * self_chipimplclock * etdr
+        stepsizexmfp = prescaleror0 * etdr
+        stepsizexmfp *= self_chipimplclock
         i = 0
         while True:
             j = (self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock
@@ -151,7 +153,9 @@ class RToneOsc(BufNode):
                     self_blockbuf_buf[i] = self_val
                     i += 1
                 break
-        return self_nextstepxmfp - self_block_framecount * self_mfpclock, self_val
+        tmpu8 = self_block_framecount
+        tmpu8 *= self_mfpclock
+        return self_nextstepxmfp - tmpu8, self_val
 
 class ToneOsc(ShapeOsc):
 
