@@ -24,3 +24,4 @@ u1 = np.uint8
 u4 = np.uint32
 u8 = np.uint64
 i4 = np.int32
+i8 = np.int64

@@ -18,7 +18,7 @@
 from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
-from const import u1, u4, i4, u8
+from const import u1, u4, i4, u8, i8
 import numpy as np, itertools
 
 class Shape:
@@ -136,7 +136,7 @@ class RToneOsc(BufNode):
             block = dict(framecount = u4),
             mfpclock = u8,
             chipimplclock = u8,
-            nextstepxmfp = u8,
+            nextstepxmfp = i8,
             val = signaldtype,
         ),
         prescaler = u4,
