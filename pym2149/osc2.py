@@ -115,7 +115,6 @@ class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
-        self.nextstepxmfp = 0
         self.val = 0
         self.derivative = self.Derivative()
         self.mfpclock = mfpclock
@@ -128,7 +127,7 @@ class RToneOsc(BufNode):
             self.blockbuf.fill_same(self.val)
             self.derivative.prescalercount = None
         else:
-            self.nextstepxmfp, self.val, self.derivative.maincounter, self.derivative.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
+            self.val, self.derivative.maincounter, self.derivative.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
@@ -136,7 +135,6 @@ class RToneOsc(BufNode):
             block = dict(framecount = u4),
             mfpclock = u8,
             chipimplclock = u8,
-            nextstepxmfp = i8,
             val = signaldtype,
             derivative = dict(maincounter = u4, prescalercount = u4),
         ),
@@ -144,30 +142,31 @@ class RToneOsc(BufNode):
         etdr = u4,
         chunksizexmfp = u8,
         stepsizexmfp = u8,
+        nextstepxmfp = i8,
         i = u4,
         j = u4,
     )
     def rtoneimpl(self, prescaler, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_val = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
-        self_nextstepxmfp = chunksizexmfp * self_derivative_maincounter + self_derivative_prescalercount - chunksizexmfp
+        nextstepxmfp = chunksizexmfp * self_derivative_maincounter + self_derivative_prescalercount - chunksizexmfp
         i = 0
         while True:
-            j = (self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock
+            j = (nextstepxmfp + self_mfpclock - 1) // self_mfpclock
             if j < self_block_framecount:
                 while i < j:
                     self_blockbuf_buf[i] = self_val
                     i += 1
-                self_nextstepxmfp += stepsizexmfp
+                nextstepxmfp += stepsizexmfp
                 self_val = 1 - self_val
             else:
                 while i < self_block_framecount:
                     self_blockbuf_buf[i] = self_val
                     i += 1
                 break
-        self_nextstepxmfp -= self_mfpclock * self_block_framecount
-        return self_nextstepxmfp, self_val, (self_nextstepxmfp + chunksizexmfp) // chunksizexmfp, (self_nextstepxmfp + chunksizexmfp) % chunksizexmfp
+        nextstepxmfp = nextstepxmfp + chunksizexmfp - self_mfpclock * self_block_framecount
+        return self_val, nextstepxmfp // chunksizexmfp, nextstepxmfp % chunksizexmfp
 
 class ToneOsc(ShapeOsc):
 
