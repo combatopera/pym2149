@@ -147,7 +147,7 @@ class RToneOsc(BufNode):
         j = u4,
     )
     def rtoneimpl(self, prescaler, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_val = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_val = self_derivative_maincounter = self_derivative_prescalercount = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
         nextstepxmfp = chunksizexmfp * self_derivative_maincounter + self_derivative_prescalercount - chunksizexmfp
