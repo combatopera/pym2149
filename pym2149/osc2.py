@@ -107,6 +107,12 @@ class ShapeOsc(BufNode):
 
 class RToneOsc(BufNode):
 
+    class Derivative:
+
+        def __init__(self):
+            self.maincounter = 0
+            self.prescalercount = 0
+
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
         self.mfpclock = mfpclock
@@ -114,10 +120,15 @@ class RToneOsc(BufNode):
         self.timer = timer
         self.nextstepxmfp = 0
         self.val = 0
+        self.derivative = self.Derivative()
 
     def callimpl(self):
         prescalerornone = self.timer.prescalerornone.value
-        self.nextstepxmfp, self.val = self.rtoneimpl(0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
+        if prescalerornone is None:
+            self.blockbuf.fill_same(self.val)
+            self.derivative.prescalercount = None
+        else:
+            self.nextstepxmfp, self.val, self.derivative.maincounter, self.derivative.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
@@ -155,7 +166,8 @@ class RToneOsc(BufNode):
                 break
         tmpu8 = self_block_framecount
         tmpu8 *= self_mfpclock
-        return self_nextstepxmfp - tmpu8, self_val
+        self_nextstepxmfp -= tmpu8
+        return self_nextstepxmfp, self_val, self_nextstepxmfp // (prescaleror0 * self_chipimplclock) + 1, self_nextstepxmfp % (prescaleror0 * self_chipimplclock)
 
 class ToneOsc(ShapeOsc):
 
