@@ -19,7 +19,6 @@ from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
 from const import u1, u4, i4
-from mfp import mfpclock
 import numpy as np, itertools
 
 class Shape:

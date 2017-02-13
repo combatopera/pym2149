@@ -47,4 +47,4 @@ class EMA:
         return self.value
 
 def ceildiv(numerator, denominator):
-    return -((-numerator) // denominator)
+    return (numerator + denominator - 1) // denominator
