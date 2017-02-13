@@ -108,6 +108,7 @@ class RToneOsc(BufNode):
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
         self.derivative = self.Derivative()
+        self.effectversion = None
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
@@ -119,9 +120,17 @@ class RToneOsc(BufNode):
         self.shape = shape
 
     def callimpl(self):
+        if self.effectversion != self.timer.effect.version:
+            self.reset(self.timer.effect.value.getshape())
+            self.effectversion = self.timer.effect.version
+        else:
+            shape = self.timer.effect.value.getshape()
+            if shape.size != self.shape.size:
+                raise Exception("Expected size %s but was: %s" % (self.shape.size, shape.size))
+            self.shape = shape
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
-            self.blockbuf.fill_same(self.val)
+            self.blockbuf.fill_same(self.shape.buf[self.index])
             self.derivative.prescalercount = None
         else:
             if self.derivative.prescalercount is None:
