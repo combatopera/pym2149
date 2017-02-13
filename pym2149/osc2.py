@@ -144,7 +144,7 @@ class RToneOsc(BufNode):
             mfpclock = u8,
             chipimplclock = u8,
             index = i4,
-            derivative = dict(maincounter = u4, prescalercount = u4),
+            derivative = dict(maincounter = u8, prescalercount = u4),
             shape = Shape.pyrbotype,
         ),
         prescaler = u4,
