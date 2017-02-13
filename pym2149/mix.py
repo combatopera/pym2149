@@ -17,7 +17,7 @@
 
 from nod import BufNode, Node
 from buf import MasterBuf
-from ring import signaldtype, floatdtype
+from shapes import signaldtype, floatdtype
 import logging
 
 log = logging.getLogger(__name__)

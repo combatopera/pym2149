@@ -17,8 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import toneshape, leveltosinusshape, level5toamp, level4to5
-from ring import signaldtype, floatdtype
+from shapes import toneshape, leveltosinusshape, level5toamp, level4to5, signaldtype, floatdtype
 import numpy as np
 
 class Level(BufNode):

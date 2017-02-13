@@ -21,7 +21,7 @@ from paste import pasteminbleps, X
 from diapyr import types
 from iface import Config
 from ym2149 import ClockInfo
-from ring import floatdtype
+from shapes import floatdtype
 
 log = logging.getLogger(__name__)
 

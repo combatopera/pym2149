@@ -18,7 +18,7 @@
 from __future__ import division
 import numpy as np, logging
 from buf import MasterBuf
-from ring import floatdtype
+from shapes import floatdtype
 from nod import Node
 from wav import Wave16
 from mix import Multiplexer

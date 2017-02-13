@@ -20,7 +20,7 @@
 import unittest
 from dac import Dac
 from nod import BufNode, Block
-from ring import signaldtype
+from shapes import signaldtype
 
 class Ramps(BufNode):
 

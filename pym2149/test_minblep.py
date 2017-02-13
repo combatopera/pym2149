@@ -20,7 +20,7 @@
 import unittest, numpy as np
 from minblep import MinBleps
 from collections import namedtuple
-from ring import floatdtype
+from shapes import floatdtype
 
 class TestMinBleps(unittest.TestCase):
 

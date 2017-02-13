@@ -16,10 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from nod import BufNode
-from ring import signaldtype
 from pyrbo import turbo, LOCAL
 from const import u1, u4, i4, u8, i8
-from shapes import Shape, toneshape
+from shapes import Shape, toneshape, signaldtype
 import numpy as np, itertools
 
 class ShapeOsc(BufNode):

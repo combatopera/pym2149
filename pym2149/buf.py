@@ -18,7 +18,7 @@
 import numpy as np
 from pyrbo import turbo, T, generic, LOCAL
 from const import u4
-from ring import signaldtype
+from shapes import signaldtype
 
 class Buf:
 

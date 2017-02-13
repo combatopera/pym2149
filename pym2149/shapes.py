@@ -16,10 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from ring import signaldtype
 from const import u4
 import math, numpy as np
 
+signaldtype = np.uint8 # Slightly faster than plain old int.
+derivativedtype = np.int8 # Suitable for any signal in [0, 127].
+floatdtype = np.float32 # Effectively about 24 bits.
 log2 = math.log(2)
 
 def level5toamp(level):
