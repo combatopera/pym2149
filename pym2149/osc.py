@@ -19,9 +19,8 @@ import numpy as np
 from nod import BufNode
 from ring import derivativedtype, signaldtype
 from buf import MasterBuf
-from mfp import mfpclock
 from util import ceildiv
-from pyrbo import turbo
+from pyrbo import turbo, LOCAL
 from const import u4
 
 class DerivativeNode(BufNode):
@@ -48,10 +47,11 @@ class RationalDerivative(DerivativeNode):
     indexdtype = np.int64 # Must be signed and this big, at least for the tests.
     singleton0 = np.zeros(1, dtype = indexdtype)
 
-    def __init__(self, chipimplclock, timer):
+    def __init__(self, mfpclock, chipimplclock, timer):
         DerivativeNode.__init__(self)
         self.indices = MasterBuf(self.indexdtype)
         self.effectversion = None
+        self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
 
@@ -87,30 +87,31 @@ class RationalDerivative(DerivativeNode):
                 if self.prescalercount is None:
                     self.prescalercount = maxprescaler
                 stepindex = self.prescalercount + (self.maincounter - 1) * maxprescaler
-                if ceildiv(stepindex, mfpclock) < 0:
+                if ceildiv(stepindex, self.mfpclock) < 0:
                     stepindex = 0
-            if ceildiv(stepindex, mfpclock) >= self.block.framecount:
+            if ceildiv(stepindex, self.mfpclock) >= self.block.framecount:
                 action = self.hold
-                remaining = self.prescalercount + (self.maincounter - 1) * maxprescaler - self.block.framecount * mfpclock
+                remaining = self.prescalercount + (self.maincounter - 1) * maxprescaler - self.block.framecount * self.mfpclock
             else:
-                stepcount = ((self.block.framecount - 1) * mfpclock - stepindex) // stepsize + 1
+                stepcount = ((self.block.framecount - 1) * self.mfpclock - stepindex) // stepsize + 1
                 indices = self.indices.ensureandcrop(stepcount)
-                self.prepareindices(stepcount, indices.buf, stepsize, stepindex, mfpclock)
+                self.prepareindices(stepcount, indices.buf, stepsize, stepindex)
                 # Note values can integrate to 2 if there was an overflow earlier.
                 self.ringcursor.putindexed(self.blockbuf, indices.buf) # XXX: Copy to int32 for the indexing?
                 action = self.integral
                 lastindex = (stepcount - 1) * stepsize + stepindex
-                remaining = etdr * maxprescaler - (self.block.framecount * mfpclock - lastindex)
+                remaining = etdr * maxprescaler - (self.block.framecount * self.mfpclock - lastindex)
             self.prescalercount = remaining % maxprescaler
             # TODO: Unit-test this is the correct logic.
             self.maincounter = (remaining+maxprescaler-1) // maxprescaler
         return action
 
-    @turbo(self = {}, i = u4, n = u4, indices = [np.int64], stepsize = np.int64, stepindex = np.int64, value = np.int64, mfpclock = np.int64)
-    def prepareindices(self, n, indices, stepsize, stepindex, mfpclock):
-        value = stepindex + mfpclock - 1
+    @turbo(self = dict(mfpclock = np.int64), i = u4, n = u4, indices = [np.int64], stepsize = np.int64, stepindex = np.int64, value = np.int64)
+    def prepareindices(self, n, indices, stepsize, stepindex):
+        self_mfpclock = LOCAL
+        value = stepindex + self_mfpclock - 1
         for i in xrange(n):
-            indices[i] = value // mfpclock
+            indices[i] = value // self_mfpclock
             value += stepsize
 
 class IntegralNode(BufNode):
@@ -124,5 +125,5 @@ class IntegralNode(BufNode):
 
 class RToneOsc(IntegralNode):
 
-    def __init__(self, chipimplclock, timer):
-        IntegralNode.__init__(self, RationalDerivative(chipimplclock, timer))
+    def __init__(self, mfpclock, chipimplclock, timer):
+        IntegralNode.__init__(self, RationalDerivative(mfpclock, chipimplclock, timer))

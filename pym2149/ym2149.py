@@ -23,7 +23,7 @@ from mix import BinMix
 from nod import Container
 from iface import AmpScale, Chip, YMFile, Config
 from diapyr import types
-from mfp import MFPTimer
+from mfp import MFPTimer, mfpclock
 from lfsr import Lfsr
 import logging
 
@@ -124,7 +124,7 @@ class YM2149(Registers, Container, Chip):
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
-    rtones = [RToneOsc(self.clock, self.timers[c]) for c in xrange(channels)]
+    rtones = [RToneOsc(mfpclock, self.clock, self.timers[c]) for c in xrange(channels)]
     # XXX: Add rtones to maskables?
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
     binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
