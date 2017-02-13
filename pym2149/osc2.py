@@ -115,12 +115,12 @@ class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
         BufNode.__init__(self, signaldtype)
-        self.mfpclock = mfpclock
-        self.chipimplclock = chipimplclock
-        self.timer = timer
         self.nextstepxmfp = 0
         self.val = 0
         self.derivative = self.Derivative()
+        self.mfpclock = mfpclock
+        self.chipimplclock = chipimplclock
+        self.timer = timer
 
     def callimpl(self):
         prescalerornone = self.timer.prescalerornone.value
@@ -141,10 +141,10 @@ class RToneOsc(BufNode):
         ),
         prescaler = u4,
         etdr = u4,
+        chunksizexmfp = u8,
         stepsizexmfp = u8,
         i = u4,
         j = u4,
-        chunksizexmfp = u8,
     )
     def rtoneimpl(self, prescaler, etdr):
         self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
