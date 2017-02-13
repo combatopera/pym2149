@@ -134,7 +134,7 @@ class RToneOsc(BufNode):
         self = dict(
             blockbuf = dict(buf = [signaldtype]),
             block = dict(framecount = u4),
-            mfpclock = u4,
+            mfpclock = u8,
             chipimplclock = u4,
             nextstepxmfp = u8,
             val = signaldtype,
@@ -144,7 +144,6 @@ class RToneOsc(BufNode):
         stepsizexmfp = u8,
         i = u4,
         j = u4,
-        tmpu8 = u8,
         chunksizexmfp = u8,
     )
     def rtoneimpl(self, prescaler, etdr):
@@ -166,9 +165,7 @@ class RToneOsc(BufNode):
                     self_blockbuf_buf[i] = self_val
                     i += 1
                 break
-        tmpu8 = self_block_framecount
-        tmpu8 *= self_mfpclock
-        self_nextstepxmfp -= tmpu8
+        self_nextstepxmfp -= self_mfpclock * self_block_framecount
         return self_nextstepxmfp, self_val, self_nextstepxmfp // chunksizexmfp + 1, self_nextstepxmfp % chunksizexmfp
 
 class ToneOsc(ShapeOsc):
