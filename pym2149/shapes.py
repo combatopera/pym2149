@@ -44,6 +44,7 @@ class Shape:
         self.introlen = introlen
 
 tonederivative = DerivativeRing([1, 0])
+toneshape = Shape([1, 0])
 
 def meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)

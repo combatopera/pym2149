@@ -19,7 +19,7 @@ from nod import BufNode
 from ring import signaldtype
 from pyrbo import turbo, LOCAL
 from const import u1, u4, i4, u8, i8
-from shapes import Shape
+from shapes import Shape, toneshape
 import numpy as np, itertools
 
 class ShapeOsc(BufNode):
@@ -165,12 +165,11 @@ class RToneOsc(BufNode):
 class ToneOsc(ShapeOsc):
 
     eager = True
-    shape = Shape([1, 0])
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
         ShapeOsc.__init__(self, scaleofstep, periodreg)
-        self.reset(self.shape)
+        self.reset(toneshape)
 
 class NoiseOsc(ShapeOsc):
 
