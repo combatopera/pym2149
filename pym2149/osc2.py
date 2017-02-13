@@ -127,6 +127,8 @@ class RToneOsc(BufNode):
             self.blockbuf.fill_same(self.val)
             self.derivative.prescalercount = None
         else:
+            if self.derivative.prescalercount is None:
+                self.derivative.prescalercount = prescalerornone * self.chipimplclock
             self.val, self.derivative.maincounter, self.derivative.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
