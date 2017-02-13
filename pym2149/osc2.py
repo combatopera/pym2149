@@ -165,7 +165,7 @@ class RToneOsc(BufNode):
                     i += 1
                 break
         self_nextstepxmfp -= self_mfpclock * self_block_framecount
-        return self_nextstepxmfp, self_val, self_nextstepxmfp // chunksizexmfp + 1, self_nextstepxmfp % chunksizexmfp
+        return self_nextstepxmfp, self_val, (self_nextstepxmfp + chunksizexmfp) // chunksizexmfp, self_nextstepxmfp % chunksizexmfp
 
 class ToneOsc(ShapeOsc):
 
