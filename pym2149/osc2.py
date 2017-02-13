@@ -112,10 +112,12 @@ class RToneOsc(BufNode):
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
+        self.nextstepxmfp = 0
+        self.val = 0
 
     def callimpl(self):
         prescalerornone = self.timer.prescalerornone.value
-        self.rtoneimpl(0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
+        self.nextstepxmfp, self.val = self.rtoneimpl(0 if prescalerornone is None else prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
@@ -123,25 +125,27 @@ class RToneOsc(BufNode):
             block = dict(framecount = u4),
             mfpclock = u4,
             chipimplclock = u4,
+            nextstepxmfp = u4,
+            val = signaldtype,
         ),
         prescaleror0 = u4,
         etdr = u4,
-        stepsize = u4,
+        stepsizexmfp = u4,
         i = u4,
         j = u4,
-        val = signaldtype,
     )
     def rtoneimpl(self, prescaleror0, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = LOCAL
-        stepsize = prescaleror0 * self_chipimplclock * etdr // self_mfpclock # FIXME: Crude.
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
+        stepsizexmfp = prescaleror0 * self_chipimplclock * etdr
         i = 0
-        val = 1
         while i < self_block_framecount:
-            j = min(i + stepsize, self_block_framecount)
+            j = min((self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock, self_block_framecount)
             while i < j:
-                self_blockbuf_buf[i] = val
+                self_blockbuf_buf[i] = self_val
                 i += 1
-            val = 1 - val
+            self_nextstepxmfp += stepsizexmfp
+            self_val = 1 - self_val
+        return self_nextstepxmfp - self_block_framecount * self_mfpclock, self_val
 
 class ToneOsc(ShapeOsc):
 
