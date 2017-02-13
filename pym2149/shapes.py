@@ -57,6 +57,6 @@ def makesinusshape(steps, maxlevel4, skew):
     amps = [maxamp * sinsliceamp(step, steps, skew) for step in xrange(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     unit = [max(0, int(round(amptolevel4(amp)))) for amp in amps]
-    return DerivativeRing(unit)
+    return Shape(unit)
 
 leveltosinusshape = dict([level4, makesinusshape(8, level4, 0)] for level4 in xrange(16))

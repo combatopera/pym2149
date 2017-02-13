@@ -17,7 +17,7 @@
 
 from __future__ import division
 from nod import BufNode
-from shapes import tonederivative, leveltosinusshape, level5toamp, level4to5
+from shapes import toneshape, leveltosinusshape, level5toamp, level4to5
 from ring import signaldtype, floatdtype
 import numpy as np
 
@@ -56,7 +56,7 @@ class TimerEffect:
 class PWMEffect(TimerEffect):
 
     def getshape(self):
-        return tonederivative
+        return toneshape
 
     def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
         if levelmode:

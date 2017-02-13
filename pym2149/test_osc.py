@@ -18,8 +18,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys, numpy as np
-from osc import RationalDerivative, RToneOsc
-from osc2 import ToneOsc, NoiseOsc, EnvOsc
+from osc import RationalDerivative
+from osc2 import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
 from mfp import mfpclock
 from nod import Block
 from reg import Reg, VersionReg
@@ -228,7 +228,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         pass # TODO: Implement.
 
     def test_stoptimer(self):
-        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: tonederivative))
+        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: toneshape))
         prescalerornone = Reg(value=3)
         effectivedata = Reg(value=5)
         chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
