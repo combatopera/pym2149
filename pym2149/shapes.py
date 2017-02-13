@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from ring import DerivativeRing, signaldtype
+from ring import signaldtype
 from const import u4
 import math, numpy as np
 
@@ -43,7 +43,6 @@ class Shape:
         self.size = self.buf.size
         self.introlen = introlen
 
-tonederivative = DerivativeRing([1, 0])
 toneshape = Shape([1, 0])
 
 def meansin(x1, x2):
