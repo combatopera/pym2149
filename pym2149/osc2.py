@@ -138,13 +138,19 @@ class RToneOsc(BufNode):
         self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_nextstepxmfp = self_val = LOCAL
         stepsizexmfp = prescaleror0 * self_chipimplclock * etdr
         i = 0
-        while i < self_block_framecount:
-            j = min((self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock, self_block_framecount)
-            while i < j:
-                self_blockbuf_buf[i] = self_val
-                i += 1
-            self_nextstepxmfp += stepsizexmfp
-            self_val = 1 - self_val
+        while True:
+            j = (self_nextstepxmfp + self_mfpclock - 1) // self_mfpclock
+            if j < self_block_framecount:
+                while i < j:
+                    self_blockbuf_buf[i] = self_val
+                    i += 1
+                self_nextstepxmfp += stepsizexmfp
+                self_val = 1 - self_val
+            else:
+                while i < self_block_framecount:
+                    self_blockbuf_buf[i] = self_val
+                    i += 1
+                break
         return self_nextstepxmfp - self_block_framecount * self_mfpclock, self_val
 
 class ToneOsc(ShapeOsc):
