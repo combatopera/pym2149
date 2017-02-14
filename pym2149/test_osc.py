@@ -359,21 +359,21 @@ class TestEnvOsc(unittest.TestCase):
         self.assertEqual(0, s.introlen)
         self.assertEqual(range(31, -1, -1) + range(32), list(s.buf))
         s = EnvOsc.shapes[0x0f]
-        self.assertEqual(33, s.size)
+        self.assertEqual(64, s.size)
         self.assertEqual(32, s.introlen)
-        self.assertEqual(range(32) + [0], list(s.buf))
+        self.assertEqual(range(32) + [0]*32, list(s.buf))
         s = EnvOsc.shapes[0x0d]
-        self.assertEqual(33, s.size)
+        self.assertEqual(64, s.size)
         self.assertEqual(32, s.introlen)
-        self.assertEqual(range(32) + [31], list(s.buf))
+        self.assertEqual(range(32) + [31]*32, list(s.buf))
         s = EnvOsc.shapes[0x0b]
-        self.assertEqual(33, s.size)
+        self.assertEqual(64, s.size)
         self.assertEqual(32, s.introlen)
-        self.assertEqual(range(31, -1, -1) + [31], list(s.buf))
+        self.assertEqual(range(31, -1, -1) + [31]*32, list(s.buf))
         s = EnvOsc.shapes[0x09]
-        self.assertEqual(33, s.size)
+        self.assertEqual(64, s.size)
         self.assertEqual(32, s.introlen)
-        self.assertEqual(range(31, -1, -1) + [0], list(s.buf))
+        self.assertEqual(range(31, -1, -1) + [0]*32, list(s.buf))
 
     def test_resetworks(self):
         shapereg = VersionReg(value = 0x0c)

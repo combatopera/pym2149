@@ -34,7 +34,7 @@ class ShapeOsc(BufNode):
 
     def __init__(self, scale, periodreg):
         BufNode.__init__(self, signaldtype)
-        self.stepsize = 0
+        self.stepsize = 0 # XXX: Move to reset?
         self.scale = scale
         self.periodreg = periodreg
 
@@ -209,10 +209,10 @@ class EnvOsc(ShapeOsc):
         0x08: Shape(xrange(steps - 1, -1, -1)),
         0x0e: Shape(itertools.chain(xrange(steps), xrange(steps - 1, -1, -1))),
         0x0a: Shape(itertools.chain(xrange(steps - 1, -1, -1), xrange(steps))),
-        0x0f: Shape(itertools.chain(xrange(steps), [0]), steps),
-        0x0d: Shape(itertools.chain(xrange(steps), [steps - 1]), steps),
-        0x0b: Shape(itertools.chain(xrange(steps - 1, -1, -1), [steps - 1]), steps),
-        0x09: Shape(itertools.chain(xrange(steps - 1, -1, -1), [0]), steps),
+        0x0f: Shape(itertools.chain(xrange(steps), steps * [0]), steps),
+        0x0d: Shape(itertools.chain(xrange(steps), steps * [steps - 1]), steps),
+        0x0b: Shape(itertools.chain(xrange(steps - 1, -1, -1), steps * [steps - 1]), steps),
+        0x09: Shape(itertools.chain(xrange(steps - 1, -1, -1), steps * [0]), steps),
     }
     for s in xrange(0x08):
         shapes[s] = shapes[0x0f if s & 0x04 else 0x09]
