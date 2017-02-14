@@ -137,7 +137,7 @@ class RToneOsc(BufNode):
             mfpclock = u8,
             chipimplclock = u8,
             index = i4,
-            maincounter = u8,
+            maincounter = i4,
             prescalercount = u4,
             shape = Shape.pyrbotype,
         ),
@@ -172,8 +172,13 @@ class RToneOsc(BufNode):
                     self_blockbuf_buf[i] = val
                     i += 1
                 break
-        nextstepxmfp = nextstepxmfp + chunksizexmfp - self_mfpclock * self_block_framecount
-        return self_index, nextstepxmfp // chunksizexmfp, nextstepxmfp % chunksizexmfp
+        nextstepxmfp = nextstepxmfp - self_mfpclock * self_block_framecount
+        self_maincounter = 1
+        while nextstepxmfp < 0:
+            nextstepxmfp += chunksizexmfp
+            self_maincounter -= 1
+        self_maincounter += nextstepxmfp // chunksizexmfp
+        return self_index, self_maincounter, nextstepxmfp % chunksizexmfp
 
 class ToneOsc(ShapeOsc):
 
