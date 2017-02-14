@@ -106,7 +106,6 @@ class RToneOsc(BufNode):
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
-        self.reset(toneshape)
 
     def reset(self, shape):
         self.index = -1
