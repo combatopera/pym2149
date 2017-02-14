@@ -159,21 +159,17 @@ class RToneOsc(BufNode):
         nextstepxmfp = chunksizexmfp * self_maincounter + self_prescalercount - chunksizexmfp
         i = 0
         while True:
-            j = (nextstepxmfp + self_mfpclock - 1) // self_mfpclock
+            j = min((nextstepxmfp + self_mfpclock - 1) // self_mfpclock, self_block_framecount)
             val = self_shape_buf[self_index]
-            if j < self_block_framecount:
-                while i < j:
-                    self_blockbuf_buf[i] = val
-                    i += 1
-                nextstepxmfp += stepsizexmfp
-                self_index += 1
-                if self_index == self_shape_size:
-                    self_index = self_shape_introlen
-            else:
-                while i < self_block_framecount:
-                    self_blockbuf_buf[i] = val
-                    i += 1
+            while i < j:
+                self_blockbuf_buf[i] = val
+                i += 1
+            if j == self_block_framecount:
                 break
+            nextstepxmfp += stepsizexmfp
+            self_index += 1
+            if self_index == self_shape_size:
+                self_index = self_shape_introlen
         nextstepxmfp = nextstepxmfp - self_mfpclock * self_block_framecount
         self_maincounter = 1
         while nextstepxmfp < 0:
