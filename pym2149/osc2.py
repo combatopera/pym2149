@@ -24,6 +24,8 @@ import numpy as np, itertools
 oscnodepyrbotype = dict(
     blockbuf = dict(buf = [signaldtype]),
     block = dict(framecount = u4),
+    index = i4,
+    shape = Shape.pyrbotype,
 )
 
 class ShapeOsc(BufNode):
@@ -47,12 +49,10 @@ class ShapeOsc(BufNode):
     @turbo(
         self = dict(
             oscnodepyrbotype,
-            index = i4,
             progress = progressdtype,
             stepsize = u4,
             scale = u4,
             periodreg = dict(value = u4),
-            shape = Shape.pyrbotype,
             eager = u1,
         ),
         i = u4,
@@ -140,10 +140,8 @@ class RToneOsc(BufNode):
             oscnodepyrbotype,
             mfpclock = u8,
             chipimplclock = u8,
-            index = i4,
             maincounter = i4,
             prescalercount = u4,
-            shape = Shape.pyrbotype,
         ),
         prescaler = u4,
         etdr = u4,
