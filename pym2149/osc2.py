@@ -96,6 +96,8 @@ class ShapeOsc(BufNode):
                     i += 1
         return self_index, self_progress, self_stepsize
 
+class IncompatibleShapeException(Exception): pass
+
 class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
@@ -118,8 +120,8 @@ class RToneOsc(BufNode):
             self.effectversion = self.timer.effect.version
         else:
             shape = self.timer.effect.value.getshape()
-            if shape.size != self.shape.size:
-                raise Exception("Expected size %s but was: %s" % (self.shape.size, shape.size))
+            if shape.size != self.shape.size or shape.introlen != self.shape.introlen:
+                raise IncompatibleShapeException
             self.shape = shape
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
