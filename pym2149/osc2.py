@@ -21,9 +21,14 @@ from const import u1, u4, i4, u8, i8
 from shapes import Shape, toneshape, signaldtype
 import numpy as np, itertools
 
+oscnodepyrbotype = dict(
+    blockbuf = dict(buf = [signaldtype]),
+    block = dict(framecount = u4),
+)
+
 class ShapeOsc(BufNode):
 
-    progresstype = u4
+    progressdtype = u4
 
     def __init__(self, scale, periodreg):
         BufNode.__init__(self, signaldtype)
@@ -33,7 +38,7 @@ class ShapeOsc(BufNode):
 
     def reset(self, shape):
         self.index = -1
-        self.progress = np.iinfo(self.progresstype).max
+        self.progress = np.iinfo(self.progressdtype).max
         self.shape = shape
 
     def callimpl(self):
@@ -41,10 +46,9 @@ class ShapeOsc(BufNode):
 
     @turbo(
         self = dict(
-            blockbuf = dict(buf = [signaldtype]),
-            block = dict(framecount = u4),
+            oscnodepyrbotype,
             index = i4,
-            progress = progresstype,
+            progress = progressdtype,
             stepsize = u4,
             scale = u4,
             periodreg = dict(value = u4),
@@ -133,8 +137,7 @@ class RToneOsc(BufNode):
 
     @turbo(
         self = dict(
-            blockbuf = dict(buf = [signaldtype]),
-            block = dict(framecount = u4),
+            oscnodepyrbotype,
             mfpclock = u8,
             chipimplclock = u8,
             index = i4,
