@@ -260,7 +260,6 @@ class YM6(YM56):
 
     def __init__(self, *args, **kwargs):
         YM56.__init__(self, *args, **kwargs)
-        self.logsinussid = True
         self.logsyncbuzzer = True
 
 impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
