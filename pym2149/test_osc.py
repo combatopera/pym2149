@@ -232,18 +232,18 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         o = RToneOsc(mfpclock, chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
         self.assertEqual([1]*30 + [0]*11, o.call(Block(41)).tolist())
         self.assertEqual(4, o.maincounter)
-        self.assertEqual(chipimplclock//2, o.prescalercount)
+        self.assertEqual(chipimplclock//2, o.precounterxmfp)
         self.assertEqual([0]*19 + [1]*30 + [0]*10, o.call(Block(59)).tolist())
         self.assertEqual(4, o.maincounter)
-        self.assertEqual(chipimplclock, o.prescalercount)
+        self.assertEqual(chipimplclock, o.precounterxmfp)
         prescalerornone.value = None
         self.assertEqual([0]*100, o.call(Block(100)).tolist())
         self.assertEqual(4, o.maincounter)
-        self.assertEqual(None, o.prescalercount)
+        self.assertEqual(None, o.precounterxmfp)
         prescalerornone.value = 3
         self.assertEqual([0]*24 + [1]*30 + [0], o.call(Block(55)).tolist())
         self.assertEqual(5, o.maincounter)
-        self.assertEqual(chipimplclock*5//2, o.prescalercount)
+        self.assertEqual(chipimplclock*5//2, o.precounterxmfp)
         # XXX: Finished?
 
     def test_works3(self):
@@ -268,17 +268,17 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         d = RToneOsc(mfpclock, 1000, timer)
         for _ in xrange(50):
             self.assertEqual([0] * 100, d.call(Block(100)).tolist()) # Expect no interrupts.
-        self.assertEqual(None, d.prescalercount)
+        self.assertEqual(None, d.precounterxmfp)
         self.assertEqual(0, d.maincounter)
         timer.prescalerornone.value = 24576
         # The maincounter was 0, so that's an interrupt in the void:
         self.assertEqual([1] * 10 + [0] * 10 + [1] * 5, d.call(Block(25)).tolist())
-        self.assertEqual(5*mfpclock, d.prescalercount)
+        self.assertEqual(5*mfpclock, d.precounterxmfp)
         self.assertEqual(1, d.maincounter)
         timer.prescalerornone.value = None
         # No more interrupts, maincounter preserved:
         self.assertEqual([1] * 25, d.call(Block(25)).tolist())
-        self.assertEqual(None, d.prescalercount)
+        self.assertEqual(None, d.precounterxmfp)
         self.assertEqual(1, d.maincounter)
 
 class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
