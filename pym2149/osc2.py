@@ -170,7 +170,7 @@ class RToneOsc(BufNode):
             self_index += 1
             if self_index == self_shape_size:
                 self_index = self_shape_introlen
-        nextstepxmfp = nextstepxmfp - self_mfpclock * self_block_framecount
+        nextstepxmfp -= self_mfpclock * self_block_framecount
         self_maincounter = 1
         while nextstepxmfp < 0:
             nextstepxmfp += chunksizexmfp
