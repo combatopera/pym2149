@@ -138,7 +138,7 @@ class RToneOsc(BufNode):
     @turbo(
         self = dict(
             oscnodepyrbotype,
-            mfpclock = u8,
+            mfpclock = i8, # Signed so j doesn't blow up.
             chipimplclock = u8,
             maincounter = i4,
             precounterxmfp = u4,
