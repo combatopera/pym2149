@@ -114,7 +114,7 @@ class RToneOsc(BufNode):
     def reset(self, shape):
         self.index = -1
         self.maincounter = 0
-        self.prescalercount = None
+        self.precounterxmfp = None
         self.shape = shape
 
     def callimpl(self):
@@ -129,11 +129,11 @@ class RToneOsc(BufNode):
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
             self.blockbuf.fill_same(self.shape.buf[self.index])
-            self.prescalercount = None
+            self.precounterxmfp = None
         else:
-            if self.prescalercount is None:
-                self.prescalercount = prescalerornone * self.chipimplclock
-            self.index, self.maincounter, self.prescalercount = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
+            if self.precounterxmfp is None:
+                self.precounterxmfp = prescalerornone * self.chipimplclock
+            self.index, self.maincounter, self.precounterxmfp = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
     @turbo(
         self = dict(
@@ -141,7 +141,7 @@ class RToneOsc(BufNode):
             mfpclock = u8,
             chipimplclock = u8,
             maincounter = i4,
-            prescalercount = u4,
+            precounterxmfp = u4,
         ),
         prescaler = u4,
         etdr = u4,
@@ -153,10 +153,10 @@ class RToneOsc(BufNode):
         val = signaldtype,
     )
     def rtoneimpl(self, prescaler, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_maincounter = self_prescalercount = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_maincounter = self_precounterxmfp = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
-        nextstepxmfp = chunksizexmfp * self_maincounter + self_prescalercount - chunksizexmfp
+        nextstepxmfp = chunksizexmfp * self_maincounter + self_precounterxmfp - chunksizexmfp
         i = 0
         while True:
             j = min((nextstepxmfp + self_mfpclock - 1) // self_mfpclock, self_block_framecount)
