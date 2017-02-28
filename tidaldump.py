@@ -41,7 +41,9 @@ def main():
             line = readline()[10:49]
             v.extend(int(x, 16) for x in bytepattern.findall(line))
         del v[:header]
-        print osctrl.parse(v)
+        obj = osctrl.parse(v)
+        if hasattr(obj, 'timetag'):
+            print obj
 
 if '__main__' == __name__:
     main()
