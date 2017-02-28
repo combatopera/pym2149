@@ -82,9 +82,6 @@ class Buf:
             start += step
             j += 1
 
-    def integrate(self, that):
-        np.cumsum(that.buf, out = self.buf)
-
     def ceildiv(self, divisor, alreadynegated = False):
         if not alreadynegated:
             self.buf *= -1
