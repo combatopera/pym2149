@@ -48,6 +48,9 @@ class Reader:
     def float32(self):
         return struct.unpack('>f', self.consume(4))[0]
 
+    def float64(self):
+        return struct.unpack('>d', self.consume(8))[0]
+
     def blob(self):
         blob = self.consume(self.int32())
         self.align()
@@ -81,6 +84,7 @@ class Message:
     types = {
         'i': Reader.int32,
         'f': Reader.float32,
+        'd': Reader.float64,
         'b': Reader.blob,
         's': Reader.string,
     }
