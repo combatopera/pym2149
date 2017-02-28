@@ -25,8 +25,6 @@ lenpattern = re.compile(' length ([0-9]+)')
 header = 28
 linesize = 16
 bytepattern = re.compile('[0-9a-f]{2}')
-statusprefix = '/status\0'.encode('ascii')
-bundleprefix = '#bundle\0'.encode('ascii')
 
 def main():
     p = subprocess.Popen(command, stdout = subprocess.PIPE)
