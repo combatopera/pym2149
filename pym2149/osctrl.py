@@ -79,6 +79,9 @@ class Bundle:
         while r:
             self.elements.append(r.element())
 
+    def __repr__(self):
+        return "%s(%r, %r)" % (self.__class__.__name__, self.timetag, self.elements)
+
 class Message:
 
     types = {
@@ -95,3 +98,6 @@ class Message:
         self.args = []
         for tt in r.string()[1:]:
             self.args.append(self.types[tt](r))
+
+    def __repr__(self):
+        return "%s(%r, %r)" % (self.__class__.__name__, self.addrpattern, self.args)
