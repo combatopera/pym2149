@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -61,6 +59,3 @@ class TestSpeedDetector(unittest.TestCase):
 
     def test_sparse(self):
         self.check([(3, 0), (9, 3), (3, 0)], '1..1.....1..1........1.....1..1..1')
-
-if '__main__' == __name__:
-    unittest.main()

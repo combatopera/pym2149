@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -38,6 +36,3 @@ class TestDac(unittest.TestCase):
     def test_works(self):
         d = Dac(Ramps(), 16, 1)
         self.assertEqual([d.leveltopeaktopeak[v] for v in xrange(32)], d.call(Block(32)).tolist())
-
-if '__main__' == __name__:
-    unittest.main()

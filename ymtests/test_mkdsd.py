@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -30,6 +28,3 @@ class TestReg(unittest.TestCase):
         r.anim(2, 5)
         # We did a whole cycle to decide it never stops:
         self.assertEqual(128, d.totalticks)
-
-if '__main__' == __name__:
-    unittest.main()

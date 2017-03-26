@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -34,6 +32,3 @@ class TestMFPTimer(unittest.TestCase):
         t.control_data.value = 3, 0
         self.assertEqual(300, t.getfreq())
         self.assertEqual((3, 0), t.findtcrtdr(300))
-
-if '__main__' == __name__:
-    unittest.main()

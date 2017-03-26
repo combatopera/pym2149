@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -30,6 +28,3 @@ class TestLfsr(unittest.TestCase):
         expected = [1 - x for x in expected]
         actual = tuple(Lfsr(ym2149nzdegrees))
         self.assertTrue(''.join(map(str, expected)) in ''.join(map(str, actual)))
-
-if '__main__' == __name__:
-    unittest.main()

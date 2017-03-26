@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -77,6 +75,3 @@ class TestNote(unittest.TestCase):
         self.assertEqual(15, fixedlevels[0].value)
         # The chip never gains a reference:
         self.assertEqual([], fixedlevels[0].links)
-
-if '__main__' == __name__:
-    unittest.main()

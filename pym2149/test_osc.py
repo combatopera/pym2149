@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -459,6 +457,3 @@ class TestEnvOsc(unittest.TestCase):
             for i in xrange(32):
                 self.assertEqual([i] * 24, v[i * 24:(i + 1) * 24])
             self.assertEqual([0] * (8 * 3 * 34), o.call(Block(8 * 3 * 34)).tolist())
-
-if '__main__' == __name__:
-    unittest.main()

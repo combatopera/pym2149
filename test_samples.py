@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -24,6 +22,3 @@ class TestSamples(unittest.TestCase):
 
     def test_samples(self):
         samples.mainimpl(ConfigName(nameornone = None, args = []))
-
-if '__main__' == __name__:
-    unittest.main()

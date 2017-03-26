@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -45,6 +43,3 @@ class TestClockInfo(unittest.TestCase):
             self.assertEqual(1, toneperiodclampor0(nomclock+underclock, 250000))
             # But not half of this one:
             self.assertEqual(0, toneperiodclampor0(nomclock, 250000))
-
-if '__main__' == __name__:
-    unittest.main()

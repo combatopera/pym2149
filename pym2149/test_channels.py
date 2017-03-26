@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -47,6 +45,3 @@ class TestControlPair(unittest.TestCase):
         cp.setlsb(1, 0x7f)
         cp.setmsb(1, 0x3f)
         self.assertEqual([0, -1, 1, 1, -1], self.v[1:])
-
-if '__main__' == __name__:
-    unittest.main()

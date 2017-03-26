@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -33,6 +31,3 @@ class TestPitch(unittest.TestCase):
         self.assertEqual('B.-1   ', str(Pitch(11)))
         self.assertEqual('B..9   ', str(Pitch(131)))
         self.assertEqual('C.10   ', str(Pitch(132)))
-
-if '__main__' == __name__:
-    unittest.main()

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -99,6 +97,3 @@ class TestReg(unittest.TestCase):
         that.value = -1
         self.assertEqual(-1, that.value)
         self.assertEqual(1, r.value)
-
-if '__main__' == __name__:
-    unittest.main()

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -81,6 +79,3 @@ class TestMinBleps(unittest.TestCase):
         l = 10 ** 20
         self.assertEqual(long, type(l))
         self.assertEqual('1' + 20 * '0' + 'L', MinBleps.minrepr(l))
-
-if '__main__' == __name__:
-    unittest.main()

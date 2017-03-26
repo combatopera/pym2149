@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -57,6 +55,3 @@ class TestMultiplexer(unittest.TestCase):
         c = Counter(30)
         m = Multiplexer(Counter.dtype, [a, b, c])
         self.assertEqual([0, 10, 30, 1, 11, 31, 2, 12, 32, 3, 13, 33, 4, 14, 34], m.call(Block(5)).tolist())
-
-if '__main__' == __name__:
-    unittest.main()

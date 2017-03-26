@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -86,6 +84,3 @@ class TestMinBlockRateTimer(unittest.TestCase):
         # Every block satisfies the given condition:
         self.assertEqual([333, 333, 333, 1], [b.framecount for b in t.blocksforperiod(1)])
         self.assertEqual(0, t.carryticks)
-
-if '__main__' == __name__:
-    unittest.main()

@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -119,6 +117,3 @@ class TestDynamicMediation(unittest.TestCase):
         self.warn.reset_mock()
         # Note-off for interrupted note is now spurious:
         self.assertIs(None, self.m.releasechipchan(4, 61))
-
-if '__main__' == __name__:
-    unittest.main()
