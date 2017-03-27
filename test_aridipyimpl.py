@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2016 Andrzej Cichocki
 
 # This file is part of aridipy.
@@ -33,6 +31,3 @@ class TestFork(unittest.TestCase):
         self.assertEqual('viewyay', fork.woo)
         fork.yay = 'forkyay'
         self.assertEqual('forkyay', fork.woo)
-
-if '__main__' == __name__:
-    unittest.main()

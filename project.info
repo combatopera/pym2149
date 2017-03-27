@@ -3,3 +3,4 @@ name = 'aridipy'
 years = 2016,
 projects = ()
 deps = ()
+pyversions = 2,
