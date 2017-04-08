@@ -16,12 +16,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport numpy as np
-import numpy as pynp
+import numpy as pynp, time
 from libc.stdio cimport fprintf, stderr
 from libc.stdlib cimport malloc
 from libc.string cimport memcpy
 from libc.stdint cimport uintptr_t
 from cpython.ref cimport PyObject
+from cpython.exc cimport PyErr_CheckSignals
 
 cdef extern from "pthread.h":
 
@@ -153,9 +154,13 @@ cdef class Client:
     cdef unsigned writecursorproxy
 
     def __init__(self, const char* client_name, chancount, ringsize, coupling):
-        self.client = jack_client_open(client_name, JackNoStartServer, NULL)
-        if NULL == self.client:
-            raise Exception('Failed to create a JACK client.')
+        while True:
+            self.client = jack_client_open(client_name, JackNoStartServer, NULL)
+            if NULL != self.client:
+                break
+            fprintf(stderr, "%s\n", <char*> 'Failed to create a JACK client.')
+            time.sleep(1)
+            PyErr_CheckSignals()
         self.buffersize = jack_get_buffer_size(self.client)
         self.outbufs = [pynp.empty((chancount, self.buffersize), dtype = pynp.float32) for _ in xrange(ringsize)]
         self.payload = Payload(self.buffersize, ringsize, coupling)
