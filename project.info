@@ -1,6 +1,4 @@
-author = 'Andrzej Cichocki'
-name = 'aridipy'
-years = 2016,
-projects = ()
-deps = ()
-pyversions = 2,
+author = Andrzej Cichocki
+name = aridipy
+years#2016 = 2016
+pyversions#2 = 2
