@@ -22,11 +22,11 @@ from iface import Config
 
 log = logging.getLogger(__name__)
 
-class AConfigName:
+class ConfigName:
 
-    envparam = 'ARIDIPY_CONFIG'
-    workspacepath = os.path.join(os.path.expanduser('~'), 'workspace')
-    configfilename = 'config.py'
+    envparam = 'PYM2149_CONFIG'
+    workspacepath = os.path.join(appconfigdir, 'workspace')
+    configfilename = 'chip.py'
     defaultslabel = 'defaults'
 
     @classmethod
@@ -128,12 +128,6 @@ class AConfigSubscription(SimpleBackground):
                 config = self.pathinfo.reloadornone()
                 if config is not None:
                     self.consumer(config)
-
-class ConfigName(AConfigName):
-
-    envparam = 'PYM2149_CONFIG'
-    workspacepath = os.path.join(appconfigdir, os.path.basename(AConfigName.workspacepath))
-    configfilename = 'chip.py'
 
 class ConfigImpl(AConfig, Config): pass
 
