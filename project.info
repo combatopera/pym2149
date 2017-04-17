@@ -1,6 +1,10 @@
-author = 'Andrzej Cichocki'
-name = 'pym2149'
-projects = 'pyrbo', 'diapyr', 'aridipy'
-deps = 'numpy', 'cython', 'mock'
-years = 2014,
-pyversions = 2,
+author = Andrzej Cichocki
+name = pym2149
+projects#pyrbo = pyrbo
+projects#diapyr = diapyr
+projects#aridipy = aridipy
+deps#numpy = numpy
+deps#cython = cython
+deps#mock = mock
+years#2014 = 2014
+pyversions#2 = 2
