@@ -124,4 +124,14 @@ class ConfigSubscription(SimpleBackground):
                 if config is not None:
                     self.consumer(config)
 
-class ConfigImpl(aridipyimpl.View, Config): pass
+class ConfigImpl(Config):
+
+    def __init__(self, expressions):
+        self.pRiVaTe = aridipyimpl.Private(expressions, self)
+
+    def __getattr__(self, name):
+        context = self.pRiVaTe.currentcontext()
+        obj = self.pRiVaTe.expressions.expression(name).resolve(context)
+        for mod in self.pRiVaTe.expressions.modifiers(name):
+            mod.modify(context, name, obj)
+        return obj

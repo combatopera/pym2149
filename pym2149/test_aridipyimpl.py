@@ -16,7 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from aridipyimpl import Expressions, View, Fork
+from aridipyimpl import Expressions, Fork
+from config import ConfigImpl
 
 class TestFork(unittest.TestCase):
 
@@ -25,7 +26,7 @@ class TestFork(unittest.TestCase):
         lines = ['woo = config.yay\n', '']
         readline = lambda: lines.pop(0)
         expressions.loadlines('whatever', readline)
-        view = View(expressions)
+        view = ConfigImpl(expressions)
         fork = Fork(view)
         view.yay = 'viewyay'
         self.assertEqual('viewyay', fork.woo)

@@ -53,18 +53,6 @@ class Private:
     def currentcontext(self):
         return self.contextstack[-1]
 
-class View:
-
-    def __init__(self, expressions):
-        self.pRiVaTe = Private(expressions, self)
-
-    def __getattr__(self, name):
-        context = self.pRiVaTe.currentcontext()
-        obj = self.pRiVaTe.expressions.expression(name).resolve(context)
-        for mod in self.pRiVaTe.expressions.modifiers(name):
-            mod.modify(context, name, obj)
-        return obj
-
 class Fork:
 
     def __init__(self, parent):
