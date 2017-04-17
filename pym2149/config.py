@@ -19,18 +19,18 @@ import os, aridipy
 from const import appconfigdir
 from iface import Config
 
-class ConfigName(aridipy.ConfigName):
+class ConfigName(aridipy.AConfigName):
 
     envparam = 'PYM2149_CONFIG'
-    workspacepath = os.path.join(appconfigdir, os.path.basename(aridipy.ConfigName.workspacepath))
+    workspacepath = os.path.join(appconfigdir, os.path.basename(aridipy.AConfigName.workspacepath))
     configfilename = 'chip.py'
 
-class ConfigImpl(aridipy.Config, Config): pass
+class ConfigImpl(aridipy.AConfig, Config): pass
 
-class PathInfo(aridipy.PathInfo):
+class PathInfo(aridipy.APathInfo):
 
     configimpl = ConfigImpl
 
-class ConfigSubscription(aridipy.ConfigSubscription):
+class ConfigSubscription(aridipy.AConfigSubscription):
 
     pathinfoimpl = PathInfo

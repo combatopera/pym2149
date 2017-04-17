@@ -20,7 +20,7 @@ from bg import SimpleBackground
 
 log = logging.getLogger(__name__)
 
-class ConfigName:
+class AConfigName:
 
     envparam = 'ARIDIPY_CONFIG'
     workspacepath = os.path.join(os.path.expanduser('~'), 'workspace')
@@ -74,12 +74,12 @@ class ConfigName:
         for name, value in self.additems:
             setattr(config, name, value)
 
-Config = aridipyimpl.View
+AConfig = aridipyimpl.View
 
-class PathInfo:
+class APathInfo:
 
     defaultsmodulename = 'defaultconf'
-    configimpl = Config
+    configimpl = AConfig
 
     def __init__(self, configname):
         self.configname = configname
@@ -104,9 +104,9 @@ class PathInfo:
             log.info("Reloading: %s", path)
             return self.load()
 
-class ConfigSubscription(SimpleBackground):
+class AConfigSubscription(SimpleBackground):
 
-    pathinfoimpl = PathInfo
+    pathinfoimpl = APathInfo
 
     def __init__(self, configname, consumer):
         self.configname = configname
