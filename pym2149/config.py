@@ -76,8 +76,6 @@ class ConfigName:
         for name, value in self.additems:
             setattr(config, name, value)
 
-AConfig = aridipyimpl.View
-
 class PathInfo:
 
     defaultsmodulename = 'defaultconf'
@@ -126,4 +124,4 @@ class ConfigSubscription(SimpleBackground):
                 if config is not None:
                     self.consumer(config)
 
-class ConfigImpl(AConfig, Config): pass
+class ConfigImpl(aridipyimpl.View, Config): pass
