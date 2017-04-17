@@ -78,10 +78,9 @@ class ConfigName:
 
 AConfig = aridipyimpl.View
 
-class APathInfo:
+class PathInfo:
 
     defaultsmodulename = 'defaultconf'
-    configimpl = AConfig
 
     def __init__(self, configname):
         self.configname = configname
@@ -96,7 +95,7 @@ class APathInfo:
         expressions.loadmodule(self.defaultsmodulename)
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
-        config = self.configimpl(expressions)
+        config = ConfigImpl(expressions)
         self.configname.applyitems(config)
         return config
 
@@ -130,10 +129,6 @@ class AConfigSubscription(SimpleBackground):
                     self.consumer(config)
 
 class ConfigImpl(AConfig, Config): pass
-
-class PathInfo(APathInfo):
-
-    configimpl = ConfigImpl
 
 class ConfigSubscription(AConfigSubscription):
 
