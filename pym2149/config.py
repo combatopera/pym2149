@@ -130,13 +130,6 @@ class Private:
         self.expressions = expressions
         self.contextstack = [rootcontext]
 
-    def withcontext(self, context, f):
-        self.contextstack.append(context)
-        try:
-            return f()
-        finally:
-            self.contextstack.pop()
-
     def currentcontext(self):
         return self.contextstack[-1]
 
