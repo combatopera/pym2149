@@ -105,16 +105,14 @@ class PathInfo:
             log.info("Reloading: %s", path)
             return self.load()
 
-class AConfigSubscription(SimpleBackground):
-
-    pathinfoimpl = APathInfo
+class ConfigSubscription(SimpleBackground):
 
     def __init__(self, configname, consumer):
         self.configname = configname
         self.consumer = consumer
 
     def start(self):
-        self.pathinfo = self.pathinfoimpl(self.configname)
+        self.pathinfo = PathInfo(self.configname)
         self.consumer(self.pathinfo.load())
         SimpleBackground.start(self, self.bg, self.Sleeper())
 
@@ -129,7 +127,3 @@ class AConfigSubscription(SimpleBackground):
                     self.consumer(config)
 
 class ConfigImpl(AConfig, Config): pass
-
-class ConfigSubscription(AConfigSubscription):
-
-    pathinfoimpl = PathInfo
