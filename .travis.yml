@@ -2,5 +2,7 @@ addons:
   apt:
     packages:
     - python-pyparsing
-install: git clone https://github.com/combatopera/pyven.git ../pyven
+install:
+- git clone https://github.com/combatopera/aridity.git ../aridity
+- git clone https://github.com/combatopera/pyven.git ../pyven
 script: ../pyven/travis_ci.py
