@@ -37,22 +37,6 @@ class Expression:
     def modify(self, view, objname, obj):
         self.run({'config': view, objname: obj})
 
-class Private:
-
-    def __init__(self, expressions, rootcontext):
-        self.expressions = expressions
-        self.contextstack = [rootcontext]
-
-    def withcontext(self, context, f):
-        self.contextstack.append(context)
-        try:
-            return f()
-        finally:
-            self.contextstack.pop()
-
-    def currentcontext(self):
-        return self.contextstack[-1]
-
 class Fork:
 
     def __init__(self, parent):

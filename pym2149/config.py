@@ -124,10 +124,26 @@ class ConfigSubscription(SimpleBackground):
                 if config is not None:
                     self.consumer(config)
 
+class Private:
+
+    def __init__(self, expressions, rootcontext):
+        self.expressions = expressions
+        self.contextstack = [rootcontext]
+
+    def withcontext(self, context, f):
+        self.contextstack.append(context)
+        try:
+            return f()
+        finally:
+            self.contextstack.pop()
+
+    def currentcontext(self):
+        return self.contextstack[-1]
+
 class ConfigImpl(Config):
 
     def __init__(self, expressions):
-        self.pRiVaTe = aridipyimpl.Private(expressions, self)
+        self.pRiVaTe = Private(expressions, self)
 
     def __getattr__(self, name):
         context = self.pRiVaTe.currentcontext()
