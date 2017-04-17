@@ -37,14 +37,6 @@ class Expression:
     def modify(self, view, objname, obj):
         self.run({'config': view, objname: obj})
 
-class Fork:
-
-    def __init__(self, parent):
-        self.parent = parent
-
-    def __getattr__(self, name):
-        return self.parent.pRiVaTe.withcontext(self, lambda: getattr(self.parent, name))
-
 class Expressions:
 
     # TODO LATER: Ideally inspect the AST as this can give false positives.
