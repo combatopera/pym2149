@@ -124,23 +124,13 @@ class ConfigSubscription(SimpleBackground):
                 if config is not None:
                     self.consumer(config)
 
-class Private:
-
-    def __init__(self, expressions, rootcontext):
-        self.expressions = expressions
-        self.contextstack = [rootcontext]
-
-    def currentcontext(self):
-        return self.contextstack[-1]
-
 class ConfigImpl(Config):
 
     def __init__(self, expressions):
-        self.pRiVaTe = Private(expressions, self)
+        self.pRiVaTe = expressions
 
     def __getattr__(self, name):
-        context = self.pRiVaTe.currentcontext()
-        obj = self.pRiVaTe.expressions.expression(name).resolve(context)
-        for mod in self.pRiVaTe.expressions.modifiers(name):
-            mod.modify(context, name, obj)
+        obj = self.pRiVaTe.expression(name).resolve(self)
+        for mod in self.pRiVaTe.modifiers(name):
+            mod.modify(self, name, obj)
         return obj
