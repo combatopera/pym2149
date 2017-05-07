@@ -1,8 +1,8 @@
 author = Andrzej Cichocki
 name = pym2149
-projects#pyrbo = pyrbo
-projects#diapyr = diapyr
-projects#aridity = aridity
-deps#mock = mock
-years#2014 = 2014
-pyversions#2 = 2
+projects pyrbo = pyrbo
+projects diapyr = diapyr
+projects aridity = aridity
+deps mock = mock
+years 2014 = 2014
+pyversions 2 = 2
