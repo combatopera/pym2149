@@ -7,3 +7,4 @@ projects
 deps += mock
 years += 2014
 pyversions += 2
+executable = true
