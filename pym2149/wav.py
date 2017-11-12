@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, errno
+import sys, errno, struct
 import numpy as np
 
 class Wave16:
@@ -29,10 +29,10 @@ class Wave16:
       self.f = sys.stdout
     else:
       self.f = open(path, 'wb') # Binary.
-    self.f.write('RIFF')
+    self.f.write(b'RIFF')
     self.riffsizeoff = 4
     self.writeriffsize(self.hugefilesize)
-    self.f.write('WAVEfmt ') # Observe trailing space.
+    self.f.write(b'WAVEfmt ') # Observe trailing space.
     self.writen(16) # Chunk data size.
     self.writen(1, 2) # PCM (uncompressed).
     self.writen(channels, 2)
@@ -41,7 +41,7 @@ class Wave16:
     self.writen(rate * bytesperframe) # Bytes per second.
     self.writen(bytesperframe, 2)
     self.writen(self.bytespersample * 8, 2) # Bits per sample.
-    self.f.write('data')
+    self.f.write(b'data')
     self.datasizeoff = 40
     self.writedatasize(self.hugefilesize)
     self.adjustsizes()
@@ -54,7 +54,7 @@ class Wave16:
 
   def writen(self, n, size = 4):
     for _ in range(size):
-      self.f.write(chr(n & 0xff))
+      self.f.write(struct.pack('B', n & 0xff))
       n >>= 8
 
   def block(self, buf):
