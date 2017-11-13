@@ -23,6 +23,7 @@ class Wave16:
   bytespersample = 2
   hugefilesize = 0x80000000
   dtype = np.int16
+  formats = {2: '<H', 4: '<I'}
 
   def __init__(self, path, rate, channels):
     if '-' == path:
@@ -53,9 +54,7 @@ class Wave16:
     self.writen(filesize - (self.datasizeoff + 4))
 
   def writen(self, n, size = 4):
-    for _ in range(size):
-      self.f.write(struct.pack('B', n & 0xff))
-      n >>= 8
+    self.f.write(struct.pack(self.formats[size], n))
 
   def block(self, buf):
     buf.tofile(self.f)
@@ -64,6 +63,8 @@ class Wave16:
   def adjustsizes(self):
     try:
       filesize = self.f.tell()
+      if not filesize:
+        return # It's probably /dev/null so give up.
     except IOError as e:
       if errno.ESPIPE != e.errno:
         raise
