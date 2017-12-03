@@ -21,43 +21,15 @@ from iface import AmpScale
 from out import FloatStream, StereoInfo
 from iface import Stream, JackConnection, Config
 from diapyr import types
-import outjack.cjack as cjack, logging
+import outjack.jackclient as jc, logging
 
 log = logging.getLogger(__name__)
 
-class JackClient(JackConnection):
+class JackClient(jc.JackClient, JackConnection):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
-        self.ringsize = config.jackringsize
-        self.coupling = config.jackcoupling
-        self.chancount = stereoinfo.getoutchans.size
-
-    def start(self):
-        self.jack = cjack.Client(clientname, self.chancount, self.ringsize, self.coupling)
-        self.outputrate = self.jack.get_sample_rate() # defaultconf.py uses this.
-        self.buffersize = self.jack.get_buffer_size()
-
-    def port_register_output(self, port_name):
-        self.jack.port_register_output(port_name)
-
-    def activate(self):
-        self.jack.activate()
-
-    def connect(self, source_port_name, destination_port_name):
-        self.jack.connect(source_port_name, destination_port_name)
-
-    def current_output_buffer(self):
-        return self.jack.current_output_buffer()
-
-    def send_and_get_output_buffer(self):
-        return self.jack.send_and_get_output_buffer()
-
-    def deactivate(self):
-        self.jack.deactivate()
-
-    def stop(self):
-        self.jack.dispose()
+        jc.JackClient.__init__(self, clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
 
 class JackStream(object, Node, Stream):
 
