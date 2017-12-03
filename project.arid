@@ -5,6 +5,7 @@ projects
     += diapyr
     += aridity
     += outjack
+    += nativecommon
 deps += mock
 years += 2014
 pyversions += 2
