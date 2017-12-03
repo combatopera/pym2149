@@ -4,6 +4,7 @@ projects
     += pyrbo
     += diapyr
     += aridity
+    += outjack
 deps += mock
 years += 2014
 pyversions += 2
