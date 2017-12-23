@@ -19,13 +19,13 @@ from .nod import Node
 from .const import clientname
 from .iface import AmpScale
 from .out import FloatStream, StereoInfo
-from .iface import Stream, JackConnection, Config
+from .iface import Stream, Platform, Config
 from diapyr import types
 import outjack.jackclient as jc, logging
 
 log = logging.getLogger(__name__)
 
-class JackClient(jc.JackClient, JackConnection):
+class JackClient(jc.JackClient, Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):

@@ -22,11 +22,14 @@ from collections import namedtuple
 class TestClockInfo(unittest.TestCase):
 
     def test_toneperiodclampor0(self):
-        Config = namedtuple('Config', 'nominalclock underclock freqclamp outputrate')
+        Config = namedtuple('Config', 'nominalclock underclock freqclamp')
+        Platform = namedtuple('Platform', 'outputrate')
         for underclock in 1, 2, 4, 8:
             nomclock = 2000000
             def toneperiodclampor0(nomclock, outrate):
-                ci = ClockInfo(Config(nomclock, underclock, True, outrate))
+                ci = ClockInfo(
+                    Config(nomclock, underclock, True),
+                    Platform(outrate))
                 return ci.toneperiodclampor0(outrate)
             self.assertEqual(5, toneperiodclampor0(nomclock, 44100))
             # We shouldn't make Nyquist itself the clamp:

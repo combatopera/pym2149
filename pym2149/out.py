@@ -22,7 +22,7 @@ from .nod import Node
 from .wav import Wave16
 from .mix import Multiplexer
 from .ym2149 import ClockInfo, YM2149
-from .iface import AmpScale, Multiplexed, Stream, JackConnection, Config
+from .iface import AmpScale, Multiplexed, Stream, Platform, Config
 from diapyr import types
 from .mix import IdealMixer
 from .minblep import MinBleps
@@ -71,11 +71,11 @@ class WavWriter(Stream, Node, metaclass = AmpScale):
 
   log2maxpeaktopeak = 16
 
-  @types(Config, Multiplexed, StereoInfo)
-  def __init__(self, config, wav, stereoinfo):
+  @types(Config, Multiplexed, StereoInfo, Platform)
+  def __init__(self, config, wav, stereoinfo, platform):
     Node.__init__(self)
     fclass = Wave16
-    self.open = lambda: fclass(config.outpath, config.outputrate, stereoinfo.getoutchans.size)
+    self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
     self.roundmaster = MasterBuf(dtype = floatdtype)
     self.wavmaster = MasterBuf(dtype = fclass.dtype)
     self.wav = wav
@@ -133,11 +133,9 @@ class MidiOutChannel(Node):
 
 class FloatStream(list):
 
-  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, JackConnection, Channels)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, jackconn = None, channels = None):
+  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, Channels)
+  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, channels = None):
     naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]
-    if jackconn is not None and config.outputrate != jackconn.outputrate:
-      log.info("Context outputrate %s overriden to: %s", jackconn.outputrate, config.outputrate)
     for naive in naives:
       self.append(WavBuf(clockinfo, naive, minbleps))
 

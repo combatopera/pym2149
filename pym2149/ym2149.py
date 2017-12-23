@@ -20,7 +20,7 @@ from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
 from .dac import Level, Dac
 from .mix import BinMix
 from .nod import Container
-from .iface import AmpScale, Chip, YMFile, Config
+from .iface import AmpScale, Chip, YMFile, Config, Platform
 from diapyr import types
 from .mfp import MFPTimer, mfpclock
 from .lfsr import Lfsr
@@ -84,8 +84,8 @@ class Registers:
 
 class ClockInfo:
 
-  @types(Config, YMFile)
-  def __init__(self, config, ymfile = None):
+  @types(Config, Platform, YMFile)
+  def __init__(self, config, platform, ymfile = None):
     if config.nominalclock % config.underclock:
       raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
     self.implclock = config.nominalclock // config.underclock
@@ -98,7 +98,7 @@ class ClockInfo:
     self.scale = defaultscale // config.underclock
     if config.freqclamp:
       # The 0 case just means that 1 is audible:
-      self.mintoneperiod = max(1, self.toneperiodclampor0(config.outputrate))
+      self.mintoneperiod = max(1, self.toneperiodclampor0(platform.outputrate))
       log.debug("Minimum tone period: %s", self.mintoneperiod)
     else:
       self.mintoneperiod = 1

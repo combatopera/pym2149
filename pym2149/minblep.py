@@ -17,9 +17,9 @@
 
 from mynblep.minblep import MinBleps
 from diapyr import types
-from .iface import Config
+from .iface import Platform
 from .ym2149 import ClockInfo
 
-@types(Config, ClockInfo, this = MinBleps)
-def loadorcreate(config, clockinfo):
-    return MinBleps.loadorcreate(clockinfo.implclock, config.outputrate, None)
+@types(Platform, ClockInfo, this = MinBleps)
+def loadorcreate(platform, clockinfo):
+    return MinBleps.loadorcreate(clockinfo.implclock, platform.outputrate, None)

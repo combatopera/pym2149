@@ -24,7 +24,7 @@ from diapyr import types
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
-from pym2149.iface import Stream, Config, Chip
+from pym2149.iface import Stream, Config, Chip, Platform
 from pym2149.program import Note
 from pym2149.mediation import SimpleMediation
 from pym2149.channels import Channels
@@ -161,6 +161,8 @@ class Target:
         path = os.path.join(self.targetpath, name)
         log.info(path)
         di = createdi(self.configname)
+        class PlatformImpl(Platform): outputrate = 44100
+        di.add(PlatformImpl())
         config = di(Config)
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
