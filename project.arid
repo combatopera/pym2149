@@ -1,10 +1,10 @@
 author = Andrzej Cichocki
 name = pym2149
-projects
-    += pyrbo
-    += diapyr
-    += aridity
-    += outjack
+projects +=
+    pyrbo
+    diapyr
+    aridity
+    outjack
 deps += mock
 years += 2014
 pyversions += 2
