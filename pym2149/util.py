@@ -16,8 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import time, logging
-from diapyr import types
-from .iface import Started
 
 log = logging.getLogger(__name__)
 
@@ -50,14 +48,3 @@ class EMA:
 
 def ceildiv(numerator, denominator):
     return (numerator + denominator - 1) // denominator
-
-def starter(startabletype):
-    class StartedImpl(Started):
-        @types(startabletype)
-        def __init__(self, startable):
-            startable.start()
-            self.startable = startable
-        def dispose(self):
-            log.debug("Stopping: %s.%s", startabletype.__module__, startabletype.__name__)
-            self.startable.stop()
-    return StartedImpl

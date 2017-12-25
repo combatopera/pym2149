@@ -20,7 +20,7 @@ from .const import clientname
 from .iface import AmpScale
 from .out import FloatStream, StereoInfo
 from .iface import Stream, Platform, Config
-from .util import starter
+from diapyr.start import starter
 from diapyr import types, ManualStart
 import outjack.jackclient as jc, logging
 

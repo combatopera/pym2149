@@ -21,9 +21,10 @@ from .program import FX
 from .const import midichannelcount
 from .mediation import Mediation
 from diapyr import types, ManualStart
+from diapyr.start import starter
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
-from .util import singleton, starter
+from .util import singleton
 
 log = logging.getLogger(__name__)
 
