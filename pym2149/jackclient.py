@@ -32,6 +32,13 @@ class JackClient(jc.JackClient, Platform):
     def __init__(self, config, stereoinfo):
         jc.JackClient.__init__(self, clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
 
+    def start(self):
+        super().start()
+        log.debug(
+            "JACK block size: %s or %.3f seconds",
+            self.buffersize,
+            self.buffersize / self.outputrate)
+
 class JackStream(Stream, Node, metaclass = AmpScale):
 
     log2maxpeaktopeak = 1
