@@ -33,13 +33,15 @@ class JackClient(jc.JackClient, Platform, ManualStart):
 
 class StartedJackClient(Started):
 
-    @types(JackClient)
-    def __init__(self, jackclient):
-        jackclient.start()
-        self.jackclient = jackclient
+    startabletype = JackClient
+
+    @types(startabletype)
+    def __init__(self, startable):
+        startable.start()
+        self.startable = startable
 
     def __del__(self):
-        self.jackclient.stop()
+        self.startable.stop()
 
 class JackStream(Stream, Node, ManualStart, metaclass = AmpScale):
 
@@ -89,13 +91,15 @@ class JackStream(Stream, Node, ManualStart, metaclass = AmpScale):
 
 class StartedJackStream(Started):
 
-    @types(JackStream)
-    def __init__(self, jackstream):
-        jackstream.start()
-        self.jackstream = jackstream
+    startabletype = JackStream
+
+    @types(startabletype)
+    def __init__(self, startable):
+        startable.start()
+        self.startable = startable
 
     def __del__(self):
-        self.jackstream.stop()
+        self.startable.stop()
 
 def configure(di):
     di.add(JackStream)
