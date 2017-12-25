@@ -31,3 +31,5 @@ class YMFile: pass
 class Platform: pass
 
 class Config: pass
+
+class Started: pass
