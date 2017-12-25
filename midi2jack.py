@@ -18,13 +18,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.jackclient import JackClient, StartedJackClient, configure
+from pym2149.jackclient import JackClient, configure
 from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Stream, Config, Platform, Started
-from pym2149.util import awaitinterrupt
+from pym2149.util import awaitinterrupt, starter
 from pym2149.pll import PLL
 from timerimpl import SyncTimer
 
@@ -35,7 +35,7 @@ def main():
     di.add(PLL)
     di.add(JackClient)
     di.start() # TODO: Reorder starts to avoid initial underruns.
-    di.add(StartedJackClient)
+    di.add(starter(JackClient))
     try:
         configure(di)
         di.all(Started)
