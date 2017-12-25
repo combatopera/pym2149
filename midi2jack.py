@@ -34,15 +34,16 @@ def main():
     di = createdi(ConfigName())
     di.add(PLL)
     di.add(JackClient)
-    di.start() # TODO: Reorder starts to avoid initial underruns.
     di.add(starter(JackClient))
+    di.start() # TODO: Reorder starts to avoid initial underruns.
+    di.all(Started)
     try:
         configure(di)
-        di.all(Started)
         config = di(Config)
         di.add(config.mediation)
         Channels.addtodi(di)
         di.start()
+        di.all(Started)
         log.info(di(Channels))
         stream = di(Stream)
         platform = di(Platform)
