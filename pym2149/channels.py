@@ -20,7 +20,7 @@ from .pitch import Pitch
 from .program import FX
 from .const import midichannelcount
 from .mediation import Mediation
-from diapyr import types, ManualStart
+from diapyr import types
 from diapyr.start import starter
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
@@ -194,7 +194,7 @@ class Channels:
     def __str__(self):
         return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.items()))
 
-class ChannelsConfigSubscription(ConfigSubscription, ManualStart):
+class ChannelsConfigSubscription(ConfigSubscription):
 
     @types(ConfigName, Channels)
     def __init__(self, configname, channels):

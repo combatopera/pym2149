@@ -21,18 +21,18 @@ from .iface import AmpScale
 from .out import FloatStream, StereoInfo
 from .iface import Stream, Platform, Config
 from diapyr.start import starter
-from diapyr import types, ManualStart
+from diapyr import types
 import outjack.jackclient as jc, logging
 
 log = logging.getLogger(__name__)
 
-class JackClient(jc.JackClient, Platform, ManualStart):
+class JackClient(jc.JackClient, Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
         jc.JackClient.__init__(self, clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
 
-class JackStream(Stream, Node, ManualStart, metaclass = AmpScale):
+class JackStream(Stream, Node, metaclass = AmpScale):
 
     log2maxpeaktopeak = 1
 
