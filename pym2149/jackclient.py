@@ -41,7 +41,7 @@ class StartedJackClient(Started):
     def __del__(self):
         self.jackclient.stop()
 
-class JackStream(Stream, Node, metaclass = AmpScale):
+class JackStream(Stream, Node, ManualStart, metaclass = AmpScale):
 
     log2maxpeaktopeak = 1
 
@@ -87,5 +87,16 @@ class JackStream(Stream, Node, metaclass = AmpScale):
     def stop(self):
         self.client.deactivate()
 
+class StartedJackStream(Started):
+
+    @types(JackStream)
+    def __init__(self, jackstream):
+        jackstream.start()
+        self.jackstream = jackstream
+
+    def __del__(self):
+        self.jackstream.stop()
+
 def configure(di):
     di.add(JackStream)
+    di.add(StartedJackStream)

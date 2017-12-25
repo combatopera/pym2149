@@ -36,9 +36,9 @@ def main():
     di.add(JackClient)
     di.start() # TODO: Reorder starts to avoid initial underruns.
     di.add(StartedJackClient)
-    di.all(Started)
     try:
         configure(di)
+        di.all(Started)
         config = di(Config)
         di.add(config.mediation)
         Channels.addtodi(di)
