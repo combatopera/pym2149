@@ -23,7 +23,7 @@ from .wav import Wave16
 from .mix import Multiplexer
 from .ym2149 import ClockInfo, YM2149
 from .iface import AmpScale, Multiplexed, Stream, Platform, Config
-from diapyr import types
+from diapyr import types, starter
 from .mix import IdealMixer
 from .minblep import MinBleps
 from .channels import Channels
@@ -184,4 +184,5 @@ class WavBuf(Node):
 
 def configure(di):
     di.add(WavWriter)
+    di.add(starter(WavWriter))
     di.add(WavBuf.multi)

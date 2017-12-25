@@ -21,6 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import ConfigName
 from diapyr import types
+from diapyr.start import Started
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
@@ -191,7 +192,7 @@ class Target:
         di.add(programids)
         di.add(frames)
         start = time.time()
-        di.start()
+        di.all(Started)
         try:
             di(Player)()
         finally:
