@@ -21,10 +21,7 @@ class Multiplexed: pass
 
 class Chip: pass
 
-class Stream:
-
-    def getbuffersize(self):
-        raise Exception('Implement me!')
+class Stream: pass
 
 class YMFile: pass
 

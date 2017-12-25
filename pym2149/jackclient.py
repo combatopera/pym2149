@@ -55,9 +55,6 @@ class JackStream(Stream, Node, metaclass = AmpScale):
         self.outbuf = self.client.current_output_buffer()
         self.cursor = 0
 
-    def getbuffersize(self):
-        return self.client.buffersize
-
     def callimpl(self):
         outbufs = [self.chain(wav) for wav in self.wavs]
         n = len(outbufs[0])
