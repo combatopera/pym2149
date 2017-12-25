@@ -196,7 +196,7 @@ class Target:
         try:
             di(Player)()
         finally:
-            di.stop()
+            di.discardall()
         log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
         if self.sox():
             subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
