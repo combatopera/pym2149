@@ -35,14 +35,12 @@ def main():
     di.add(PLL)
     di.add(JackClient)
     di.add(starter(JackClient))
-    di.start() # TODO: Reorder starts to avoid initial underruns.
-    di.all(Started)
     try:
+        di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         configure(di)
         config = di(Config)
         di.add(config.mediation)
         Channels.addtodi(di)
-        di.start()
         di.all(Started)
         log.info(di(Channels))
         stream = di(Stream)
@@ -52,12 +50,12 @@ def main():
             stream.getbuffersize(),
             stream.getbuffersize() / platform.outputrate)
         di.add(SyncTimer)
-        di.add(EventPump)
+        di.add(starter(EventPump))
         di.add(MidiListen)
-        di.start()
+        di.all(Started)
         awaitinterrupt(config)
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()

@@ -57,7 +57,7 @@ def starter(startabletype):
         def __init__(self, startable):
             startable.start()
             self.startable = startable
-        def __del__(self):
+        def dispose(self):
             log.debug("Stopping: %s.%s", startabletype.__module__, startabletype.__name__)
             self.startable.stop()
     return StartedImpl
