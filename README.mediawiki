@@ -1,1 +1,2 @@
-<a href="https://travis-ci.org/combatopera/pym2149/branches"><img src="https://travis-ci.org/combatopera/pym2149.svg?branch=master"></a>
+<img src="https://travis-ci.org/combatopera/pym2149.svg?branch=master">
+[https://travis-ci.org/combatopera/pym2149/branches All Branches]
