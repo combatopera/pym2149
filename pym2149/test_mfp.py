@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from mfp import MFPTimer
+from .mfp import MFPTimer
 
 class TestMFPTimer(unittest.TestCase):
 

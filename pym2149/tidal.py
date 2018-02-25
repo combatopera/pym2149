@@ -16,11 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from diapyr import types
-from pll import PLL
-from bg import SimpleBackground
-from iface import Config
-from midi import NoteOn
-import logging, socket, udppump, osctrl
+from .pll import PLL
+from .bg import SimpleBackground
+from .iface import Config
+from .midi import NoteOn
+import logging, socket
+from . import udppump, osctrl
 
 log = logging.getLogger(__name__)
 

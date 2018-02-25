@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from nod import Block
+from .nod import Block
 import logging
 
 log = logging.getLogger(__name__)

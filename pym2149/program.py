@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from lfo import LFO, FloatLFO
-from reg import Reg
+from .lfo import LFO, FloatLFO
+from .reg import Reg
 
 class FX:
 

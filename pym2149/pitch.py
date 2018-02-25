@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from util import singleton
+from .util import singleton
 import math
 
 class Pitch(float):

@@ -16,10 +16,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import struct, logging, os, tempfile, subprocess, shutil, sys
-from ym2149 import stclock
+from .ym2149 import stclock
 from diapyr import types
-from iface import YMFile, Config
-from dac import PWMEffect, SinusEffect
+from .iface import YMFile, Config
+from .dac import PWMEffect, SinusEffect
 
 log = logging.getLogger(__name__)
 

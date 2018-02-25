@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from iface import Config
+from .iface import Config
 from diapyr import types
-from util import EMA
+from .util import EMA
 import time, logging
 
 log = logging.getLogger(__name__)

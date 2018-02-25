@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from const import u4
+from .const import u4
 import math, numpy as np
 
 signaldtype = np.uint8 # Slightly faster than plain old int.

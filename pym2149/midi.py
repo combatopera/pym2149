@@ -16,17 +16,18 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from const import clientname
+from .const import clientname
 from diapyr import types
-from iface import Config, Stream, Chip
-from pll import PLL
-from bg import SimpleBackground, MainBackground
-from channels import Channels
-from minblep import MinBleps
-from timer import Timer
-from util import EMA
-from speed import SpeedDetector
-import native.calsa as calsa, logging, time
+from .iface import Config, Stream, Chip
+from .pll import PLL
+from .bg import SimpleBackground, MainBackground
+from .channels import Channels
+from .minblep import MinBleps
+from .timer import Timer
+from .util import EMA
+from .speed import SpeedDetector
+from ..native import calsa
+import logging, time
 
 log = logging.getLogger(__name__)
 

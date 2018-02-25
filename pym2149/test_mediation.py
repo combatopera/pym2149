@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, mock
-from mediation import DynamicMediation
+from .mediation import DynamicMediation
 from collections import namedtuple
 
 class TestDynamicMediation(unittest.TestCase):

@@ -17,7 +17,7 @@
 
 from __future__ import division
 import unittest
-from timer import SimpleTimer, MinBlockRateTimer
+from .timer import SimpleTimer, MinBlockRateTimer
 
 class TestSimpleTimer(unittest.TestCase):
 

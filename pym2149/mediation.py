@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from const import midichannelcount
-from iface import Config
+from .const import midichannelcount
+from .iface import Config
 from diapyr import types
 
 log = logging.getLogger(__name__)

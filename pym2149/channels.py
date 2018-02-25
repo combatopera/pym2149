@@ -16,14 +16,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pitch import Pitch
-from program import FX
-from const import midichannelcount
-from mediation import Mediation
+from .pitch import Pitch
+from .program import FX
+from .const import midichannelcount
+from .mediation import Mediation
 from diapyr import types
-from iface import Chip, Config
-from config import ConfigSubscription, ConfigName
-from util import singleton
+from .iface import Chip, Config
+from .config import ConfigSubscription, ConfigName
+from .util import singleton
 
 log = logging.getLogger(__name__)
 

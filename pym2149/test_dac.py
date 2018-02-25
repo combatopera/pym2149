@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from dac import Dac
-from nod import BufNode, Block
-from shapes import signaldtype
+from .dac import Dac
+from .nod import BufNode, Block
+from .shapes import signaldtype
 
 class Ramps(BufNode):
 

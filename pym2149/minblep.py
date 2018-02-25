@@ -17,11 +17,11 @@
 
 from __future__ import division
 import numpy as np, fractions, logging, os, cPickle as pickle
-from paste import pasteminbleps, X
+from .paste import pasteminbleps, X
 from diapyr import types
-from iface import Config
-from ym2149 import ClockInfo
-from shapes import floatdtype
+from .iface import Config
+from .ym2149 import ClockInfo
+from .shapes import floatdtype
 
 log = logging.getLogger(__name__)
 

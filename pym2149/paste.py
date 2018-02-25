@@ -17,7 +17,7 @@
 
 import numpy as np
 from pyrbo import turbo, X
-from const import u4
+from .const import u4
 
 mixinsize = None
 

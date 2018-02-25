@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, numpy as np
-from mix import IdealMixer, Multiplexer
-from nod import BufNode, Block, Container
-from out import TrivialOutChannel
+from .mix import IdealMixer, Multiplexer
+from .nod import BufNode, Block, Container
+from .out import TrivialOutChannel
 
 class Counter(BufNode):
 

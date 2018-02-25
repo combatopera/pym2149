@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pitch import Period, Freq
+from .pitch import Period, Freq
 from diapyr import types
-from iface import Chip, Config
+from .iface import Chip, Config
 import sys
 
 class Roll:

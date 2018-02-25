@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from nod import BufNode
+from .nod import BufNode
 from pyrbo import turbo, LOCAL
-from const import u1, u4, i4, u8, i8
-from shapes import Shape, toneshape, signaldtype
+from .const import u1, u4, i4, u8, i8
+from .shapes import Shape, toneshape, signaldtype
 import numpy as np, itertools
 
 oscnodepyrbotype = dict(

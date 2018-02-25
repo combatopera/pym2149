@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from nod import Node, Block
+from .nod import Node, Block
 
 class MyNode(Node):
 

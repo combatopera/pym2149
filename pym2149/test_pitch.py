@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from pitch import Pitch
+from .pitch import Pitch
 
 class TestPitch(unittest.TestCase):
 

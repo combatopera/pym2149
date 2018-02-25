@@ -16,14 +16,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest, time, sys
-from osc2 import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
-from mfp import mfpclock
-from nod import Block
-from reg import Reg, VersionReg
-from lfsr import Lfsr
-from ym2149 import ym2149nzdegrees, YM2149
-from shapes import toneshape
-from dac import PWMEffect
+from .osc2 import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
+from .mfp import mfpclock
+from .nod import Block
+from .reg import Reg, VersionReg
+from .lfsr import Lfsr
+from .ym2149 import ym2149nzdegrees, YM2149
+from .shapes import toneshape
+from .dac import PWMEffect
 from collections import namedtuple
 
 class AbstractTestOsc:

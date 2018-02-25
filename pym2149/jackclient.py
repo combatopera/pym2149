@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from nod import Node
-from const import clientname
-from iface import AmpScale
-from out import FloatStream, StereoInfo
-from iface import Stream, JackConnection, Config
+from .nod import Node
+from .const import clientname
+from .iface import AmpScale
+from .out import FloatStream, StereoInfo
+from .iface import Stream, JackConnection, Config
 from diapyr import types
 import outjack.jackclient as jc, logging
 

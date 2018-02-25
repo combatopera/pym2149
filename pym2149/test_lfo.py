@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from lfo import LFO, FloatLFO
+from .lfo import LFO, FloatLFO
 
 class TestLFO(unittest.TestCase):
 

@@ -19,7 +19,7 @@ from __future__ import division
 import logging, numpy as np
 from collections import namedtuple
 from pyrbo import turbo
-from const import u4
+from .const import u4
 
 log = logging.getLogger(__name__)
 

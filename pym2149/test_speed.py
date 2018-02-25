@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from speed import SpeedDetector
+from .speed import SpeedDetector
 
 class TestSpeedDetector(unittest.TestCase):
 

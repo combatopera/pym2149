@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from program import DefaultNote, FX, Note
+from .program import DefaultNote, FX, Note
 from collections import namedtuple
-from reg import Reg
+from .reg import Reg
 import unittest
 
 class TestFX(unittest.TestCase):

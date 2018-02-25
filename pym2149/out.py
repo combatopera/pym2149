@@ -17,18 +17,18 @@
 
 from __future__ import division
 import numpy as np, logging
-from buf import MasterBuf
-from shapes import floatdtype
-from nod import Node
-from wav import Wave16
-from mix import Multiplexer
-from ym2149 import ClockInfo, YM2149
-from iface import AmpScale, Multiplexed, Stream, JackConnection, Config
+from .buf import MasterBuf
+from .shapes import floatdtype
+from .nod import Node
+from .wav import Wave16
+from .mix import Multiplexer
+from .ym2149 import ClockInfo, YM2149
+from .iface import AmpScale, Multiplexed, Stream, JackConnection, Config
 from diapyr import types
-from mix import IdealMixer
-from minblep import MinBleps
-from channels import Channels
-from util import singleton
+from .mix import IdealMixer
+from .minblep import MinBleps
+from .channels import Channels
+from .util import singleton
 
 log = logging.getLogger(__name__)
 

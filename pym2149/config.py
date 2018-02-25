@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, logging, os, aridipyimpl
-from bg import SimpleBackground
-from const import appconfigdir
-from iface import Config
+from .bg import SimpleBackground
+from .const import appconfigdir
+from .iface import Config
 
 log = logging.getLogger(__name__)
 

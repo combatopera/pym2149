@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from channels import ControlPair
+from .channels import ControlPair
 
 class TestControlPair(unittest.TestCase):
 

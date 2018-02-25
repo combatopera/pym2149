@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from reg import Reg, VersionReg
-from osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
-from dac import Level, Dac
-from mix import BinMix
-from nod import Container
-from iface import AmpScale, Chip, YMFile, Config
+from .reg import Reg, VersionReg
+from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
+from .dac import Level, Dac
+from .mix import BinMix
+from .nod import Container
+from .iface import AmpScale, Chip, YMFile, Config
 from diapyr import types
-from mfp import MFPTimer, mfpclock
-from lfsr import Lfsr
+from .mfp import MFPTimer, mfpclock
+from .lfsr import Lfsr
 import logging
 
 log = logging.getLogger(__name__)
