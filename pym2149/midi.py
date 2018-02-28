@@ -26,7 +26,7 @@ from .minblep import MinBleps
 from .timer import Timer
 from .util import EMA
 from .speed import SpeedDetector
-from ..native import calsa
+from .native import calsa
 import logging, time
 
 log = logging.getLogger(__name__)
