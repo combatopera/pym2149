@@ -16,11 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+from mynblep.shapes import floatdtype
 from .const import u4
 import math, numpy as np
 
 signaldtype = np.uint8 # Slightly faster than plain old int.
-floatdtype = np.float32 # Effectively about 24 bits.
+floatdtype = floatdtype
 log2 = math.log(2)
 
 def level5toamp(level):

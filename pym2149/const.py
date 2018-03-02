@@ -16,12 +16,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, numpy as np
+from mynblep.const import u4
 
 clientname = 'pym2149'
 appconfigdir = os.path.join(os.path.expanduser('~'), '.pym2149')
 midichannelcount = 16
 u1 = np.uint8
-u4 = np.uint32
+u4 = u4
 u8 = np.uint64
 i4 = np.int32
 i8 = np.int64
