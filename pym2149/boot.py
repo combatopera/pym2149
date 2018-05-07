@@ -25,7 +25,7 @@ def createdi(configname):
     di = DI()
     di.add(configname)
     config = PathInfo(configname).load()
-    config.di = di
+    config.di = di # TODO: Retire this somehow.
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
