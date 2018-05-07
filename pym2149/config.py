@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os, aridipyimpl
+import sys, logging, os
+from .aridipyimpl import Expressions
 from .bg import SimpleBackground
 from .const import appconfigdir
 from .iface import Config
@@ -89,7 +90,7 @@ class PathInfo:
         return path
 
     def load(self):
-        expressions = aridipyimpl.Expressions()
+        expressions = Expressions()
         expressions.loadmodule(self.defaultsmodulename)
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
