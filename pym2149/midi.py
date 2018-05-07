@@ -30,7 +30,7 @@ import logging, time
 
 log = logging.getLogger(__name__)
 
-class MidiSchedule:
+class UpdateSchedule:
 
     maxdelay = .01
     targetlatency = .01 # Conservative?
@@ -173,7 +173,7 @@ class EventPump(MainBackground):
         self.pll = pll
 
     def __call__(self):
-        schedule = MidiSchedule(self.updaterate, self.skipenabled)
+        schedule = UpdateSchedule(self.updaterate, self.skipenabled)
         while not self.quit:
             update = self.pll.takeupdateimpl(schedule.awaittaketime())
             schedule.step(update.idealtaketime)
