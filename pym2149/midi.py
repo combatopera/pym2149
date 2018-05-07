@@ -163,7 +163,7 @@ class EventPump(MainBackground):
         MainBackground.__init__(self, config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
-        self.skipenabled = config.midiskipenabled
+        self.skipenabled = config.inputskipenabled
         self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
         self.channels = channels
         self.minbleps = minbleps
