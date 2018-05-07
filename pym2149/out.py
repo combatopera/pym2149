@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 import numpy as np, logging
 from .buf import MasterBuf
 from .shapes import floatdtype
@@ -58,19 +58,18 @@ class StereoInfo:
     gettrivialoutchans.size = 1
 
     def getstaticoutchans(self, *args):
-        return [StaticOutChannel([self.staticamp(oc, cc) for cc in xrange(self.n)]) for oc in xrange(2)]
+        return [StaticOutChannel([self.staticamp(oc, cc) for cc in range(self.n)]) for oc in range(2)]
     getstaticoutchans.size = 2
 
     def getmidioutchans(self, channels):
         class PanToAmp:
             def __init__(this, outchan): this.outchan = outchan
             def __call__(this, pan): return self.pantoamp(this.outchan, pan)
-        return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in xrange(2)]
+        return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in range(2)]
     getmidioutchans.size = 2
 
-class WavWriter(object, Node, Stream):
+class WavWriter(object, Node, Stream, metaclass=AmpScale):
 
-  __metaclass__ = AmpScale
   log2maxpeaktopeak = 16
 
   @types(Config, Multiplexed, StereoInfo)

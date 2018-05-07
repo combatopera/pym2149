@@ -42,9 +42,9 @@ class ConfigName:
             if os.path.exists(cls.workspacepath):
                 confignames = sorted(name for name in os.listdir(cls.workspacepath) if os.path.exists(cls.pathofname(name)))
                 for i, name in enumerate([cls.defaultslabel] + confignames):
-                    print >> sys.stderr, "%s) %s" % (i, name)
+                    print("%s) %s" % (i, name), file=sys.stderr)
                 sys.stderr.write('#? ')
-                number = int(raw_input())
+                number = int(input())
                 if number < 0:
                     raise Exception(number)
                 if number:
@@ -62,7 +62,7 @@ class ConfigName:
         except KeyError:
             nameornone = self.getnameornone()
         self.pathornone = None if nameornone is None else self.pathofname(nameornone)
-        self.additems = zip(params, args)
+        self.additems = list(zip(params, args))
 
     def isdefaults(self):
         return self.pathornone is None

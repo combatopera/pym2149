@@ -49,7 +49,7 @@ class TestFX(unittest.TestCase):
 class TestDefaultNote(unittest.TestCase):
 
     def test_fadeout(self):
-        self.assertEqual(sum([[i, i] for i in xrange(-1, -16, -1)], []), DefaultNote.fadeout.render())
+        self.assertEqual(sum([[i, i] for i in range(-1, -16, -1)], []), DefaultNote.fadeout.render())
 
 class TestNote(unittest.TestCase):
 

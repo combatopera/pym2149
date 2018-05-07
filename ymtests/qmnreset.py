@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 N_period.put(0x1f)
-for i in xrange(10):
+for i in range(10):
   mixer.put()
   A_level.put(0x0d)
   sleep(2 + i)

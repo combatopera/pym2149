@@ -201,16 +201,16 @@ class EnvOsc(ShapeOsc):
     eager = True
     steps = 32
     shapes = {
-        0x0c: Shape(xrange(steps)),
-        0x08: Shape(xrange(steps - 1, -1, -1)),
-        0x0e: Shape(itertools.chain(xrange(steps), xrange(steps - 1, -1, -1))),
-        0x0a: Shape(itertools.chain(xrange(steps - 1, -1, -1), xrange(steps))),
-        0x0f: Shape(itertools.chain(xrange(steps), steps * [0]), steps),
-        0x0d: Shape(itertools.chain(xrange(steps), steps * [steps - 1]), steps),
-        0x0b: Shape(itertools.chain(xrange(steps - 1, -1, -1), steps * [steps - 1]), steps),
-        0x09: Shape(itertools.chain(xrange(steps - 1, -1, -1), steps * [0]), steps),
+        0x0c: Shape(range(steps)),
+        0x08: Shape(range(steps - 1, -1, -1)),
+        0x0e: Shape(itertools.chain(range(steps), range(steps - 1, -1, -1))),
+        0x0a: Shape(itertools.chain(range(steps - 1, -1, -1), range(steps))),
+        0x0f: Shape(itertools.chain(range(steps), steps * [0]), steps),
+        0x0d: Shape(itertools.chain(range(steps), steps * [steps - 1]), steps),
+        0x0b: Shape(itertools.chain(range(steps - 1, -1, -1), steps * [steps - 1]), steps),
+        0x09: Shape(itertools.chain(range(steps - 1, -1, -1), steps * [0]), steps),
     }
-    for s in xrange(0x08):
+    for s in range(0x08):
         shapes[s] = shapes[0x0f if s & 0x04 else 0x09]
     del s
 

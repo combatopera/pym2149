@@ -35,9 +35,9 @@ class TestNode(unittest.TestCase):
         n = MyNode()
         b1 = Block(10)
         b2 = Block(20)
-        for _ in xrange(2):
+        for _ in range(2):
             self.assertEqual(10, n.call(b1))
-        for _ in xrange(2):
+        for _ in range(2):
             self.assertEqual(21, n.call(b2))
-        for _ in xrange(2):
+        for _ in range(2):
             self.assertEqual(12, n.call(b1))

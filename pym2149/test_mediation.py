@@ -27,7 +27,7 @@ class TestDynamicMediation(unittest.TestCase):
         self.m.warn = self.warn
 
     def tearDown(self):
-        self.assertEquals(0, self.warn.call_count)
+        self.assertEqual(0, self.warn.call_count)
 
     def acquire(self, *args):
         chan, noteid = self.m.acquirechipchan(*args)
@@ -39,80 +39,80 @@ class TestDynamicMediation(unittest.TestCase):
 
     def test_normalcase(self):
         # First-come first-served:
-        self.assertEquals(0, self.acquire(1, 60, 0))
-        self.assertEquals(1, self.acquire(2, 60, 1))
-        self.assertEquals(2, self.acquire(3, 60, 2))
+        self.assertEqual(0, self.acquire(1, 60, 0))
+        self.assertEqual(1, self.acquire(2, 60, 1))
+        self.assertEqual(2, self.acquire(3, 60, 2))
         # Chip channels are scarce, so go ahead and abort note-offs:
-        self.assertEquals(0, self.release(1, 60))
-        self.assertEquals(0, self.acquire(1, 61, 3))
-        self.assertEquals(1, self.release(2, 60))
-        self.assertEquals(1, self.acquire(2, 61, 4))
-        self.assertEquals(2, self.release(3, 60))
-        self.assertEquals(2, self.acquire(3, 61, 5))
+        self.assertEqual(0, self.release(1, 60))
+        self.assertEqual(0, self.acquire(1, 61, 3))
+        self.assertEqual(1, self.release(2, 60))
+        self.assertEqual(1, self.acquire(2, 61, 4))
+        self.assertEqual(2, self.release(3, 60))
+        self.assertEqual(2, self.acquire(3, 61, 5))
         # MIDI 3 should reuse chip channel 2:
-        self.assertEquals(2, self.release(3, 61))
-        self.assertEquals(2, self.acquire(3, 62, 6))
+        self.assertEqual(2, self.release(3, 61))
+        self.assertEqual(2, self.acquire(3, 62, 6))
         # MIDI 4 should use any spare chip channel:
-        self.assertEquals(1, self.release(2, 61))
-        self.assertEquals(1, self.acquire(4, 62, 7))
+        self.assertEqual(1, self.release(2, 61))
+        self.assertEqual(1, self.acquire(4, 62, 7))
 
     def test_reusewhenthereisachoice(self):
-        self.assertEquals(0, self.acquire(1, 60, 0))
-        self.assertEquals(1, self.acquire(2, 60, 1))
-        self.assertEquals(2, self.acquire(3, 60, 2))
-        self.assertEquals(0, self.release(1, 60))
-        self.assertEquals(1, self.release(2, 60))
-        self.assertEquals(2, self.release(3, 60))
+        self.assertEqual(0, self.acquire(1, 60, 0))
+        self.assertEqual(1, self.acquire(2, 60, 1))
+        self.assertEqual(2, self.acquire(3, 60, 2))
+        self.assertEqual(0, self.release(1, 60))
+        self.assertEqual(1, self.release(2, 60))
+        self.assertEqual(2, self.release(3, 60))
         # MIDI 2 should reuse chip channel 1:
-        self.assertEquals(1, self.acquire(2, 60, 3))
+        self.assertEqual(1, self.acquire(2, 60, 3))
         # MIDI 3 should reuse chip channel 2:
-        self.assertEquals(2, self.acquire(3, 60, 4))
+        self.assertEqual(2, self.acquire(3, 60, 4))
 
     def test_polyphony(self):
         # MIDI channel should only use as many chip channels as its current polyphony:
-        self.assertEquals(0, self.acquire(1, 60, 0))
-        self.assertEquals(1, self.acquire(1, 61, 1))
-        self.assertEquals(0, self.release(1, 60))
-        self.assertEquals(0, self.acquire(1, 60, 2))
-        self.assertEquals(1, self.release(1, 61))
-        self.assertEquals(1, self.acquire(1, 61, 3))
+        self.assertEqual(0, self.acquire(1, 60, 0))
+        self.assertEqual(1, self.acquire(1, 61, 1))
+        self.assertEqual(0, self.release(1, 60))
+        self.assertEqual(0, self.acquire(1, 60, 2))
+        self.assertEqual(1, self.release(1, 61))
+        self.assertEqual(1, self.acquire(1, 61, 3))
 
     def test_spuriousnoteon(self):
-        self.assertEquals(0, self.acquire(1, 60, 0))
+        self.assertEqual(0, self.acquire(1, 60, 0))
         # Simply return the already-acquired chip channel:
-        self.assertEquals(0, self.acquire(1, 60, 1))
+        self.assertEqual(0, self.acquire(1, 60, 1))
 
     def test_spuriousnoteoff(self):
         self.assertIs(None, self.m.releasechipchan(1, 60))
 
     def test_overload(self):
-        self.assertEquals(0, self.acquire(1, 60, 0))
-        self.assertEquals(1, self.acquire(2, 60, 1))
-        self.assertEquals(2, self.acquire(3, 60, 2))
-        self.assertEquals(0, self.release(1, 60))
-        self.assertEquals(0, self.acquire(1, 61, 3))
+        self.assertEqual(0, self.acquire(1, 60, 0))
+        self.assertEqual(1, self.acquire(2, 60, 1))
+        self.assertEqual(2, self.acquire(3, 60, 2))
+        self.assertEqual(0, self.release(1, 60))
+        self.assertEqual(0, self.acquire(1, 61, 3))
         # Chip channel 1 had note-on least recently:
-        self.assertEquals(0, self.warn.call_count)
-        self.assertEquals(1, self.acquire(4, 60, 4))
+        self.assertEqual(0, self.warn.call_count)
+        self.assertEqual(1, self.acquire(4, 60, 4))
         self.warn.assert_called_once_with(self.m.interruptingformat, 'B')
         self.warn.reset_mock()
         # Note-off for interrupted note is now spurious:
         self.assertIs(None, self.m.releasechipchan(2, 60))
 
     def test_overloadwhenthereisachoice(self):
-        self.assertEquals(0, self.acquire(1, 60, 0))
-        self.assertEquals(1, self.acquire(2, 60, 1))
-        self.assertEquals(2, self.acquire(3, 60, 2))
-        self.assertEquals(0, self.release(1, 60))
-        self.assertEquals(1, self.release(2, 60))
-        self.assertEquals(2, self.release(3, 60))
+        self.assertEqual(0, self.acquire(1, 60, 0))
+        self.assertEqual(1, self.acquire(2, 60, 1))
+        self.assertEqual(2, self.acquire(3, 60, 2))
+        self.assertEqual(0, self.release(1, 60))
+        self.assertEqual(1, self.release(2, 60))
+        self.assertEqual(2, self.release(3, 60))
         # Make all 3 chip channels equally attractive time-wise:
-        self.assertEquals(0, self.acquire(4, 60, 3))
-        self.assertEquals(1, self.acquire(4, 61, 3))
-        self.assertEquals(2, self.acquire(4, 62, 3))
+        self.assertEqual(0, self.acquire(4, 60, 3))
+        self.assertEqual(1, self.acquire(4, 61, 3))
+        self.assertEqual(2, self.acquire(4, 62, 3))
         # Last chip channel for MIDI 2 was 1:
-        self.assertEquals(0, self.warn.call_count)
-        self.assertEquals(1, self.acquire(2, 61, 4))
+        self.assertEqual(0, self.warn.call_count)
+        self.assertEqual(1, self.acquire(2, 61, 4))
         self.warn.assert_called_once_with(self.m.interruptingformat, 'B')
         self.warn.reset_mock()
         # Note-off for interrupted note is now spurious:

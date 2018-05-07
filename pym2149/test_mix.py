@@ -29,7 +29,7 @@ class Counter(BufNode):
         self.x = self.dtype(x)
 
     def callimpl(self):
-        for frameindex in xrange(self.block.framecount):
+        for frameindex in range(self.block.framecount):
             self.blockbuf.fillpart(frameindex, frameindex + 1, self.x)
             self.x += 1
 
@@ -37,7 +37,7 @@ class TestIdealMixer(unittest.TestCase):
 
     def expect(self, m, values, actual):
         self.assertEqual(len(values), len(actual))
-        for i in xrange(len(values)):
+        for i in range(len(values)):
             self.assertAlmostEqual(m.datum - values[i], actual.buf[i])
 
     def test_works(self):

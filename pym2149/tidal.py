@@ -63,7 +63,7 @@ class TidalClient:
                 bundle = osctrl.parse(v)
                 if 1 == len(bundle.elements) and '/play2' == bundle.elements[0].addrpattern:
                     args = bundle.elements[0].args
-                    args = dict([args[i:i + 2] for i in xrange(0, len(args), 2)])
+                    args = dict([args[i:i + 2] for i in range(0, len(args), 2)])
                     k = (args['s'], args.get('n', 0))
                     note = self.keytonote.get(k)
                     if note is not None:

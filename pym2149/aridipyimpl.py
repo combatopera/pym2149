@@ -93,6 +93,6 @@ class Expressions:
         return self.expressions[name]
 
     def modifiers(self, name):
-        for e in self.expressions.itervalues():
+        for e in self.expressions.values():
             if e.name.startswith(name + '['):
                 yield e

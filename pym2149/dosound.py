@@ -24,17 +24,17 @@ def dosound(bytecode, chip, timer, stream):
         for b in timer.blocksforperiod(50): # Authentic period.
             stream.call(b)
     while True:
-        ctrl = g.next()
+        ctrl = next(g)
         if ctrl <= 0xF:
-            chip.R[ctrl].value = g.next()
+            chip.R[ctrl].value = next(g)
         elif 0x80 == ctrl:
-            softreg = g.next()
+            softreg = next(g)
         elif 0x81 == ctrl:
-            targetreg = chip.R[g.next()]
-            adjust = g.next()
+            targetreg = chip.R[next(g)]
+            adjust = next(g)
             if adjust >= 0x80:
                 adjust -= 0x100 # Convert back to signed.
-            last = g.next()
+            last = next(g)
             while True:
                 softreg += adjust # Yes, this is done up-front.
                 # The real thing simply uses the truncation on overflow:
@@ -44,11 +44,11 @@ def dosound(bytecode, chip, timer, stream):
                 if last == softreg:
                     break
         elif ctrl >= 0x82:
-            ticks = g.next()
+            ticks = next(g)
             if not ticks:
                 break
             ticks += 1 # Apparently!
-            for _ in xrange(ticks):
+            for _ in range(ticks):
                 tick()
         else:
             raise Exception(ctrl)

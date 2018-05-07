@@ -53,7 +53,7 @@ class Wave16:
     self.writen(filesize - (self.datasizeoff + 4))
 
   def writen(self, n, size = 4):
-    for _ in xrange(size):
+    for _ in range(size):
       self.f.write(chr(n & 0xff))
       n >>= 8
 
@@ -64,7 +64,7 @@ class Wave16:
   def adjustsizes(self):
     try:
       filesize = self.f.tell()
-    except IOError, e:
+    except IOError as e:
       if errno.ESPIPE != e.errno:
         raise
       return # Leave huge sizes.

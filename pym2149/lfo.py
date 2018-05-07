@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from decimal import Decimal, ROUND_HALF_DOWN, ROUND_HALF_UP
 
 class AbstractLFO:
@@ -26,7 +26,7 @@ class AbstractLFO:
 
     def lin(self, n, target):
         source = self.v[-1]
-        for i in xrange(1, n + 1):
+        for i in range(1, n + 1):
             self.v.append(source + (target - source) * i / n)
         return self
 
@@ -39,7 +39,7 @@ class AbstractLFO:
         return self
 
     def hold(self, n):
-        for _ in xrange(n):
+        for _ in range(n):
             self.v.append(self.v[-1])
         return self
 
@@ -50,7 +50,7 @@ class AbstractLFO:
         if 0 != normn % linn:
             raise Exception("Expected a factor of %s but got: %s" % (normn, linn))
         source = self.v[-1]
-        for _ in xrange(normn // linn):
+        for _ in range(normn // linn):
             self.lin(linn, target)
             self.lin(linn * 2, source * 2 - target)
             self.lin(linn, source)
@@ -71,7 +71,7 @@ class AbstractLFO:
     def render(self, n = None):
         if n is None:
             n = len(self.v)
-        return [self(i) for i in xrange(n)] # Observe via the xform.
+        return [self(i) for i in range(n)] # Observe via the xform.
 
 class LFO(AbstractLFO):
 

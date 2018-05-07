@@ -30,7 +30,7 @@ class Quit:
         for interrupt in self.interrupts:
             interrupt()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.quit
 
 class SimpleBackground:

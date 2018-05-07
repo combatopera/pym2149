@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from .const import clientname
 from diapyr import types
 from .iface import Config, Stream, Chip
@@ -197,11 +197,11 @@ class EventPump(MainBackground):
             # Apply all channel state events first:
             sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)]
             # Then all notes that end up off:
-            for noteevents in chanandnotetoevents.itervalues():
+            for noteevents in chanandnotetoevents.values():
                 if NoteOff == noteevents[-1].__class__:
                     sortedevents.extend(noteevents)
             # Then all notes that end up on:
-            for noteevents in chanandnotetoevents.itervalues():
+            for noteevents in chanandnotetoevents.values():
                 if NoteOn == noteevents[-1].__class__:
                     sortedevents.extend(noteevents)
             for event in sortedevents:

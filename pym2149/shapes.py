@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from mynblep.shapes import floatdtype
 from .const import u4
 import math, numpy as np
@@ -55,9 +55,9 @@ def sinsliceamp(i, n, skew):
 
 def makesinusshape(steps, maxlevel4, skew):
     maxamp = level5toamp(level4to5(maxlevel4))
-    amps = [maxamp * sinsliceamp(step, steps, skew) for step in xrange(steps)]
+    amps = [maxamp * sinsliceamp(step, steps, skew) for step in range(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     unit = [max(0, int(round(amptolevel4(amp)))) for amp in amps]
     return Shape(unit)
 
-leveltosinusshape = dict([level4, makesinusshape(8, level4, 0)] for level4 in xrange(16))
+leveltosinusshape = dict([level4, makesinusshape(8, level4, 0)] for level4 in range(16))

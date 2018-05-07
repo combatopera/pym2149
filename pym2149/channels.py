@@ -119,10 +119,10 @@ class Channels:
 
     @types(Config, Chip, Mediation)
     def __init__(self, config, chip, mediation):
-        self.channels = [Channel(config, i, chip) for i in xrange(config.chipchannels)]
+        self.channels = [Channel(config, i, chip) for i in range(config.chipchannels)]
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.slidemidichans = set(config.slidechannels)
-        self.midichantofx = dict([c, FX(config, c in self.slidemidichans)] for c in xrange(config.midichannelbase, config.midichannelbase + midichannelcount))
+        self.midichantofx = dict([c, FX(config, c in self.slidemidichans)] for c in range(config.midichannelbase, config.midichannelbase + midichannelcount))
         self.mediation = mediation
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
@@ -143,7 +143,7 @@ class Channels:
         if (not vel) and midichan in self.zerovelisnoteoffmidichans:
             return self.noteoff(midichan, midinote, vel)
         if midichan in self.monophonicmidichans:
-            for mn in xrange(0x80):
+            for mn in range(0x80):
                 self.noteoff(midichan, mn, 0)
         program = self.midiprograms[self.midichantoprogram[midichan]]
         fx = self.midichantofx[midichan]
@@ -181,7 +181,7 @@ class Channels:
             channel.update(self.frameindex)
 
     def closeframe(self):
-        for fx in self.midichantofx.itervalues():
+        for fx in self.midichantofx.values():
             fx.applyrates()
         self.frameindex += 1
 
@@ -190,7 +190,7 @@ class Channels:
             yield c.getpan()
 
     def __str__(self):
-        return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.iteritems()))
+        return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.items()))
 
 class ChannelsConfigSubscription(ConfigSubscription):
 

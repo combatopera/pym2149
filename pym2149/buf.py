@@ -20,9 +20,7 @@ from pyrbo import turbo, T, generic, LOCAL
 from .const import u4
 from .shapes import signaldtype
 
-class Buf:
-
-    __metaclass__ = generic
+class Buf(metaclass=generic):
 
     def __init__(self, buf):
         self.buf = buf
@@ -36,13 +34,13 @@ class Buf:
     @turbo(self = dict(buf = [T]), endframe = u4, that = dict(buf = [T]), i = u4)
     def copyasprefix(self, endframe, that):
         self_buf = that_buf = LOCAL
-        for i in xrange(endframe):
+        for i in range(endframe):
             self_buf[i] = that_buf[i]
 
     @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = u4, endframe = u4, i = u4)
     def copywindow(self, that, startframe, endframe):
         self_buf = that_buf = LOCAL
-        for i in xrange(endframe - startframe):
+        for i in range(endframe - startframe):
             self_buf[i] = that_buf[startframe]
             startframe += 1
 
@@ -56,7 +54,7 @@ class Buf:
     @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, thatnp = [T], j = u4)
     def partcopyintonp(self, startframe, endframe, thatnp):
         self_buf = LOCAL
-        for j in xrange(endframe - startframe):
+        for j in range(endframe - startframe):
             thatnp[j] = self_buf[startframe]
             startframe += 1
 
@@ -64,13 +62,13 @@ class Buf:
     def fill_i1(self, value):
         self_buf = py_self_buf = LOCAL
         v = value # Cast once.
-        for i in xrange(py_self_buf.size):
+        for i in range(py_self_buf.size):
             self_buf[i] = v
 
     @turbo(self = dict(buf = [T]), value = T, i = u4)
     def fill_same(self, value):
         self_buf = py_self_buf = LOCAL
-        for i in xrange(py_self_buf.size):
+        for i in range(py_self_buf.size):
             self_buf[i] = value
 
     @turbo(self = dict(buf = [T]), start = u4, end = u4, step = u4, data = [T], j = u4)
@@ -94,7 +92,7 @@ class Buf:
     @turbo(self = dict(buf = [T]), that = dict(buf = [signaldtype]), lookup = [T], i = u4)
     def mapbuf(self, that, lookup):
         self_buf = that_buf = py_that_buf = LOCAL
-        for i in xrange(py_that_buf.size):
+        for i in range(py_that_buf.size):
             self_buf[i] = lookup[that_buf[i]]
 
     def add(self, value):

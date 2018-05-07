@@ -18,6 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, operator
+from functools import reduce
 
 class Reg:
 
@@ -73,19 +74,19 @@ class Data:
 class Globals:
 
     def __init__(g, data):
-        g.A_fine, g.A_rough, g.B_fine, g.B_rough, g.C_fine, g.C_rough, g.N_period = (data.reg() for _ in xrange(7))
+        g.A_fine, g.A_rough, g.B_fine, g.B_rough, g.C_fine, g.C_rough, g.N_period = (data.reg() for _ in range(7))
         g.mixer = data.reg(lambda *v: 0x3f & ~reduce(operator.or_, v, 0))
-        g.A_level, g.B_level, g.C_level, g.E_fine, g.E_rough, g.E_shape = (data.reg() for _ in xrange(6))
-        g.A_tone, g.B_tone, g.C_tone, g.A_noise, g.B_noise, g.C_noise = (0x01 << i for i in xrange(6))
+        g.A_level, g.B_level, g.C_level, g.E_fine, g.E_rough, g.E_shape = (data.reg() for _ in range(6))
+        g.A_tone, g.B_tone, g.C_tone, g.A_noise, g.B_noise, g.C_noise = (0x01 << i for i in range(6))
         g.setprev = data.setprev
         g.sleep = data.sleep
 
 def main():
     for inpath in sys.argv[1:]:
         outpath = inpath[:inpath.rindex('.')] + '.dsd'
-        print >> sys.stderr, outpath
+        print(outpath, file=sys.stderr)
         data = Data()
-        execfile(inpath, Globals(data).__dict__)
+        exec(compile(open(inpath).read(), inpath, 'exec'), Globals(data).__dict__)
         f = open(outpath, 'wb')
         try:
             data.save(f)

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from .nod import BufNode
 from .shapes import toneshape, leveltosinusshape, level5toamp, level4to5, signaldtype, floatdtype
 import numpy as np
@@ -24,7 +24,7 @@ class Level(BufNode):
 
     pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
     pwmzero5bit = level4to5(pwmzero4bit)
-    lookup = np.fromiter([pwmzero5bit] + range(32), signaldtype)
+    lookup = np.fromiter([pwmzero5bit] + list(range(32)), signaldtype)
 
     def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
         BufNode.__init__(self, signaldtype) # Must be suitable for use as index downstream.
@@ -89,7 +89,7 @@ class Dac(BufNode):
         # We take off .5 so that the peak amplitude is about -3 dB:
         maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
         # Lookup of ideal amplitudes:
-        self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in xrange(32)), self.dtype)
+        self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in range(32)), self.dtype)
         self.level = level
 
     def callimpl(self):

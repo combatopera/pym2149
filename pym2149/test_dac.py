@@ -28,11 +28,11 @@ class Ramps(BufNode):
         BufNode.__init__(self, self.dtype)
 
     def callimpl(self):
-        for i in xrange(self.block.framecount):
+        for i in range(self.block.framecount):
             self.blockbuf.fillpart(i, i + 1, self.dtype(i))
 
 class TestDac(unittest.TestCase):
 
     def test_works(self):
         d = Dac(Ramps(), 16, 1)
-        self.assertEqual([d.leveltopeaktopeak[v] for v in xrange(32)], d.call(Block(32)).tolist())
+        self.assertEqual([d.leveltopeaktopeak[v] for v in range(32)], d.call(Block(32)).tolist())

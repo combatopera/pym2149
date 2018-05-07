@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 mixer.put(A_noise)
-for p in xrange(0x20):
+for p in range(0x20):
   A_level.put(0x0f)
   N_period.put(p)
   sleep(48)

@@ -31,10 +31,8 @@ class JackClient(jc.JackClient, JackConnection):
     def __init__(self, config, stereoinfo):
         jc.JackClient.__init__(self, clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
 
-class JackStream(object, Node, Stream):
+class JackStream(object, Node, Stream, metaclass=AmpScale):
 
-    __metaclass__ = AmpScale
-    # For jack the available amplitude range is 2 ** 1:
     log2maxpeaktopeak = 1
 
     @types(Config, StereoInfo, FloatStream, JackClient)
@@ -42,7 +40,7 @@ class JackStream(object, Node, Stream):
         Node.__init__(self)
         self.systemchannelcount = config.systemchannelcount
         self.chancount = stereoinfo.getoutchans.size
-        for chanindex in xrange(self.chancount):
+        for chanindex in range(self.chancount):
             client.port_register_output("out_%s" % (1 + chanindex))
         self.wavs = wavs
         self.client = client
@@ -50,7 +48,7 @@ class JackStream(object, Node, Stream):
     def start(self):
         self.client.activate()
         # Connect all system channels, cycling over our streams if necessary:
-        for syschanindex in xrange(self.systemchannelcount):
+        for syschanindex in range(self.systemchannelcount):
             chanindex = syschanindex % self.chancount
             self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
         self.outbuf = self.client.current_output_buffer()
@@ -65,7 +63,7 @@ class JackStream(object, Node, Stream):
         i = 0
         while i < n:
             m = min(n - i, self.client.buffersize - self.cursor)
-            for chanindex in xrange(self.chancount):
+            for chanindex in range(self.chancount):
                 outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
             self.cursor += m
             i += m

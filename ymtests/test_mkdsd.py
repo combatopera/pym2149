@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from mkdsd import Data
+from .mkdsd import Data
 
 class TestReg(unittest.TestCase):
 

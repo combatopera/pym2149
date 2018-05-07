@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from pym2149.config import ConfigName
 from pym2149.iface import Config
 from pym2149.boot import createdi
@@ -26,10 +26,10 @@ def main():
     config = createdi(ConfigName())(Config)
     ups = config.updaterate
     lpb = config.linesperbeat
-    for upl in xrange(1, 21):
+    for upl in range(1, 21):
         lpm = 60 * ups / upl
         bpm = lpm / lpb
-        print "%2s" % upl, "%7.3f" % bpm
+        print("%2s" % upl, "%7.3f" % bpm)
 
 if '__main__' == __name__:
     main()

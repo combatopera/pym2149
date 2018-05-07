@@ -22,7 +22,7 @@ import sys
 
 class Roll:
 
-  shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', u'\\\u203e', '//', u'/\u203e', '/\\', '/_')
+  shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
 
   @types(Config, Chip)
   def __init__(self, config, chip):
@@ -40,7 +40,7 @@ class Roll:
       sys.stderr.write(self.jump)
       self.line = 0
     vals = []
-    for c in xrange(self.channels):
+    for c in range(self.channels):
       tone = self.chip.toneflags[c].value
       noise = self.chip.noiseflags[c].value
       env = self.chip.levelmodes[c].value
@@ -85,5 +85,5 @@ class Roll:
         vals.append('')
         vals.append('')
         vals.append('')
-    print >> sys.stderr, self.format % tuple(vals)
+    print(self.format % tuple(vals), file=sys.stderr)
     self.line += 1

@@ -85,7 +85,7 @@ class YM:
 
     def interleavedframe(self):
         frame = [None] * self.framesize
-        for i in xrange(self.framesize - 1):
+        for i in range(self.framesize - 1):
             frame[i] = ord(self.f.read(1))
             self.skip(-1 + self.framecount)
         frame[self.framesize - 1] = ord(self.f.read(1))
@@ -182,9 +182,9 @@ class YM56(YM):
         self.skip(self.word()) # Future expansion.
         if samplecount:
             log.warn("Ignoring %s samples.", samplecount)
-            for _ in xrange(samplecount):
+            for _ in range(samplecount):
                 self.skip(self.lword())
-        self.info = tuple(self.ntstring() for _ in xrange(3))
+        self.info = tuple(self.ntstring() for _ in range(3))
         dataoffset = self.f.tell()
         self.readframe = self.interleavedframe if interleaved else self.simpleframe
         if once:

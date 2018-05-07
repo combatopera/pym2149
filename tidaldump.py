@@ -43,7 +43,7 @@ def main():
         del v[:header]
         obj = osctrl.parse(v)
         if hasattr(obj, 'timetag'):
-            print obj
+            print(obj)
 
 if '__main__' == __name__:
     main()

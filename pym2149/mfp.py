@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from .reg import Reg, VersionReg
 
 prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
@@ -47,7 +47,7 @@ class MFPTimer:
 
     def findtcrtdr(self, freq):
         diff = None
-        for tcr, prescaler in prescalers.iteritems(): # XXX: Do we care about non-determinism?
+        for tcr, prescaler in prescalers.items(): # XXX: Do we care about non-determinism?
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
             if 1 <= etdr and etdr <= 0x100:

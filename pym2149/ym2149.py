@@ -49,22 +49,22 @@ class Registers:
   def __init__(self, clockinfo, confchannels):
     # TODO: Add reverse wiring.
     # Like the real thing we have 16 registers, this impl ignores the last 2:
-    self.R = tuple(Reg() for _ in xrange(16))
+    self.R = tuple(Reg() for _ in range(16))
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
     TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
     NP = lambda p: p & 0x1f
     EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
-    self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in xrange(confchannels)]
+    self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
     clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
-    for c in xrange(clampedchannels):
+    for c in range(clampedchannels):
       self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
     self.noiseperiod = Reg(minval = 1).link(NP, self.R[0x6])
-    self.toneflags = [Reg() for _ in xrange(confchannels)]
-    self.noiseflags = [Reg() for _ in xrange(confchannels)]
-    self.fixedlevels = [Reg() for _ in xrange(confchannels)]
-    self.levelmodes = [Reg() for _ in xrange(confchannels)]
-    for c in xrange(clampedchannels):
+    self.toneflags = [Reg() for _ in range(confchannels)]
+    self.noiseflags = [Reg() for _ in range(confchannels)]
+    self.fixedlevels = [Reg() for _ in range(confchannels)]
+    self.levelmodes = [Reg() for _ in range(confchannels)]
+    for c in range(clampedchannels):
       self.toneflags[c].link(MixerFlag(c), self.R[0x7])
       self.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
       self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
@@ -73,14 +73,14 @@ class Registers:
     self.envshape = VersionReg().link(lambda s: s & 0x0f, self.R[0xD])
     for r in self.R:
       r.value = 0
-    for c in xrange(self.supportedchannels, confchannels):
+    for c in range(self.supportedchannels, confchannels):
       # These won't have been inited via the registers:
       self.toneperiods[c].value = TP(0, 0)
       self.toneflags[c].value = MixerFlag(0)(0)
       self.noiseflags[c].value = MixerFlag(0)(0)
       self.fixedlevels[c].value = 0
       self.levelmodes[c].value = False
-    self.timers = tuple(MFPTimer() for _ in xrange(confchannels))
+    self.timers = tuple(MFPTimer() for _ in range(confchannels))
 
 class ClockInfo:
 
@@ -122,12 +122,12 @@ class YM2149(Registers, Container, Chip):
     noise = NoiseOsc(self.scale, self.noiseperiod, self.noiseshape)
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
-    tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in xrange(channels)]
-    rtones = [RToneOsc(mfpclock, self.clock, self.timers[c]) for c in xrange(channels)]
+    tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in range(channels)]
+    rtones = [RToneOsc(mfpclock, self.clock, self.timers[c]) for c in range(channels)]
     # XXX: Add rtones to maskables?
     self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
-    binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in xrange(channels)]
-    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].effect) for c in xrange(channels)]
+    binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in range(channels)]
+    levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].effect) for c in range(channels)]
     Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
@@ -76,10 +76,10 @@ neutralvelocity = 0x60
 velocityperlevel = 0x10
 '''Change of velocity required to adjust program level by 1.'''
 
-midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in xrange(0x80))
+midiprograms = dict([config.midiprogrambase + i, DefaultNote] for i in range(0x80))
 '''Program number to Note subclass.'''
 
-midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in xrange(midichannelcount))
+midichanneltoprogram = dict([config.midichannelbase + i, config.midiprogrambase + i] for i in range(midichannelcount))
 '''Initial assignment of programs to channels.'''
 
 pitchbendpersemitone = 0x200

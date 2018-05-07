@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import ConfigName
@@ -124,7 +124,7 @@ class Player:
 
     def __call__(self):
         # Play silence on all chip channels:
-        for chan in xrange(self.chipchannels):
+        for chan in range(self.chipchannels):
             self.chip.flagsoff(chan)
             self.chip.fixedlevels[chan].value = 13 # Neutral DC.
         for program in self.frames:
@@ -185,7 +185,7 @@ class Target:
                 register(program)
             frames.append(program)
             b, = lftimer.blocksforperiod(beatsperbar)
-            for _ in xrange(b.framecount - 1):
+            for _ in range(b.framecount - 1):
                 frames.append(0)
         di.add(programids)
         di.add(frames)
@@ -223,7 +223,7 @@ def mainimpl(configname):
     class PWM250(PWM): tfreq, rtfreq = 250, 250
     class PWM100(PWM): tfreq, rtfreq = 100, 101 # Necessarily detune.
     tones = []
-    for p in xrange(1, 9):
+    for p in range(1, 9):
         class t(BaseTone): period = p
         tones.append(t)
     target = Target(configname)

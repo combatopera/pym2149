@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+
 import logging, numpy as np
 from collections import namedtuple
 from pyrbo import turbo
@@ -40,13 +40,13 @@ def correlate(kernel, kernelsize, history, maxphase):
     phase = 0
     score = 0
     j = maxphase
-    for i in xrange(kernelsize):
+    for i in range(kernelsize):
         score += kernel[i] * history[j]
         j += 1
-    for p in xrange(1, maxphase + 1):
+    for p in range(1, maxphase + 1):
         s = 0
         j = maxphase - p
-        for i in xrange(kernelsize):
+        for i in range(kernelsize):
             s += kernel[i] * history[j]
             j += 1
         if s > score:
@@ -59,7 +59,7 @@ class Shape:
     def __init__(self, speed):
         self.kernelsize = kernelperiods * speed + 1
         def g():
-            for i in xrange(self.kernelsize):
+            for i in range(self.kernelsize):
                 yield -1 if i % speed else 1
         self.kernel = np.fromiter(g(), dtype = dtype)
         self.speed = speed
@@ -71,7 +71,7 @@ class Shape:
 class SpeedDetector:
 
     def __init__(self, maxspeed, callback = defaultcallback):
-        self.shapes = [Shape(speed) for speed in xrange(1, maxspeed + 1)]
+        self.shapes = [Shape(speed) for speed in range(1, maxspeed + 1)]
         self.history = np.zeros(maxspeed * (kernelperiods + 1), dtype = dtype)
         self.speedphase = None
         self.index = 0
