@@ -6,7 +6,10 @@ projects +=
     aridity
     outjack
     mynblep
+branch
+    pyrbo = py3
+    mynblep = py3
 deps += mock
 years += 2014
-pyversions += 2
+pyversions += 3
 executable = true
