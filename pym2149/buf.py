@@ -20,7 +20,7 @@ from pyrbo import turbo, T, generic, LOCAL
 from .const import u4
 from .shapes import signaldtype
 
-class Buf(metaclass=generic):
+class Buf(metaclass = generic):
 
     def __init__(self, buf):
         self.buf = buf
