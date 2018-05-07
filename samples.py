@@ -29,7 +29,7 @@ from pym2149.program import Note
 from pym2149.mediation import SimpleMediation
 from pym2149.channels import Channels
 from pym2149.dac import PWMEffect, SinusEffect
-from ymplayer import ChipTimer
+from timerimpl import ChipTimer
 import os, subprocess, time
 
 log = logging.getLogger(__name__)

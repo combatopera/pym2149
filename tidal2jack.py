@@ -27,7 +27,7 @@ from pym2149.boot import createdi
 from pym2149.iface import Stream, Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
-from ymplayer import SyncTimer
+from timerimpl import SyncTimer
 
 log = logging.getLogger(__name__)
 

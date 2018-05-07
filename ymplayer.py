@@ -15,41 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import Timer, MinBlockRateTimer, SimpleTimer
+from pym2149.timer import Timer, SimpleTimer
 from pym2149.vis import Roll
 from pym2149.iface import Chip, Stream, YMFile, Config
 from diapyr import types
 from pym2149.ym2149 import ClockInfo
 from pym2149.bg import MainBackground
-from pym2149.nod import Block
-from pym2149.minblep import MinBleps
-
-class SyncTimer(SimpleTimer):
-
-    @types(Stream, MinBleps, ClockInfo)
-    def __init__(self, stream, minbleps, clockinfo):
-        self.naiverate = clockinfo.implclock
-        SimpleTimer.__init__(self, self.naiverate)
-        self.buffersize = stream.getbuffersize()
-        self.naivex = 0
-        self.bufferx = 0
-        self.minbleps = minbleps
-
-    def blocksforperiod(self, refreshrate):
-        wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
-        naiveN = wholeperiodblock.framecount
-        while naiveN:
-            naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.buffersize - self.bufferx))
-            yield Block(naiven)
-            self.bufferx = (self.bufferx + self.minbleps.getoutcount(self.naivex, naiven)) % self.buffersize
-            self.naivex = (self.naivex + naiven) % self.naiverate
-            naiveN -= naiven
-
-class ChipTimer(MinBlockRateTimer):
-
-    @types(ClockInfo)
-    def __init__(self, clockinfo):
-        MinBlockRateTimer.__init__(self, clockinfo.implclock, 100)
 
 class SimpleChipTimer(SimpleTimer):
 

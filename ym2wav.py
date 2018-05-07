@@ -25,7 +25,8 @@ from pym2149.vis import Roll
 from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
-from ymplayer import Player, ChipTimer
+from ymplayer import Player
+from timerimpl import ChipTimer
 
 log = logging.getLogger(__name__)
 
