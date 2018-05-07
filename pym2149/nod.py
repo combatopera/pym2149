@@ -52,7 +52,7 @@ class Node:
 class Container(Node):
 
   def __init__(self, nodes):
-    Node.__init__(self)
+    super().__init__()
     self.nodes = nodes
 
   def callimpl(self):
@@ -64,7 +64,7 @@ class Container(Node):
 class BufNode(Node):
 
   def __init__(self, dtype, channels = 1):
-    Node.__init__(self)
+    super().__init__()
     self.masterbuf = MasterBuf(dtype)
     self.dtype = dtype
     self.channels = channels
