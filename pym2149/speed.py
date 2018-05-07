@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import logging, numpy as np
 from collections import namedtuple
 from pyrbo import turbo

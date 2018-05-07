@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import numpy as np, logging
 from .buf import MasterBuf
 from .shapes import floatdtype

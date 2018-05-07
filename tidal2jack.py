@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from pym2149.initlogging import logging
 from pym2149.jackclient import JackClient, configure
 from pym2149.tidal import TidalListen

@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from pym2149.ym2149 import stclock
 from pym2149.program import DefaultNote
 from pym2149.const import midichannelcount
