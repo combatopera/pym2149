@@ -67,7 +67,7 @@ class StereoInfo:
         return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in range(2)]
     getmidioutchans.size = 2
 
-class WavWriter(object, Node, Stream, metaclass=AmpScale):
+class WavWriter(Stream, Node, metaclass = AmpScale):
 
   log2maxpeaktopeak = 16
 
