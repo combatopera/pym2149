@@ -51,6 +51,7 @@ def main():
             stream.getbuffersize(),
             stream.getbuffersize() / platform.outputrate)
         di.add(SyncTimer)
+        di.add(EventPump)
         di.add(starter(EventPump))
         di.add(MidiListen)
         di.all(Started)
