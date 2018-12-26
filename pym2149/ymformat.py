@@ -31,7 +31,7 @@ class LoopInfo:
 
 class YM:
 
-    checkstr = 'LeOnArD!'
+    checkstr = 'LeOnArD!'.encode()
     wordstruct = struct.Struct('>H')
     lwordstruct = struct.Struct('>I')
     lwordlestruct = struct.Struct('<I')
@@ -262,7 +262,7 @@ class YM6(YM56):
         YM56.__init__(self, *args, **kwargs)
         self.logsyncbuzzer = True
 
-impls = dict([i.formatid, i] for i in [YM2, YM3, YM3b, YM5, YM6])
+impls = {i.formatid.encode(): i for i in [YM2, YM3, YM3b, YM5, YM6]}
 
 class YMOpen(YMFile):
 
