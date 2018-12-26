@@ -23,7 +23,8 @@ from .wav import Wave16
 from .mix import Multiplexer
 from .ym2149 import ClockInfo, YM2149
 from .iface import AmpScale, Multiplexed, Stream, Platform, Config
-from diapyr import types, starter
+from diapyr import types
+from diapyr.start import starter
 from .mix import IdealMixer
 from .minblep import MinBleps
 from .channels import Channels
