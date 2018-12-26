@@ -131,8 +131,12 @@ class ConfigImpl(Config):
         self.pRiVaTe = expressions
 
     def __getattr__(self, name):
-        if 'di_owntype' == name: raise AttributeError(name) # Hack.
-        obj = self.pRiVaTe.expression(name).resolve(self)
-        for mod in self.pRiVaTe.modifiers(name):
+        exprs = self.pRiVaTe
+        try:
+            expr = exprs.expression(name)
+        except KeyError:
+            raise AttributeError(name)
+        obj = expr.resolve(self)
+        for mod in exprs.modifiers(name):
             mod.modify(self, name, obj)
         return obj
