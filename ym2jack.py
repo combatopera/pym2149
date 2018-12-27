@@ -27,23 +27,27 @@ from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.ymplayer import Player
 from pym2149.timerimpl import SyncTimer
+from diapyr.start import starter, Started
 
 log = logging.getLogger(__name__)
 
 def main():
     di = createdi(ConfigName('inpath'))
     di.add(JackClient)
+    di.add(starter(JackClient))
     di.add(YMOpen)
-    di.start()
+    di.add(starter(YMOpen))
     try:
+        di.all(Started)
         configure(di)
         di.add(Roll)
         di.add(SyncTimer)
         di.add(Player)
-        di.start()
+        di.add(starter(Player))
+        di.all(Started)
         awaitinterrupt(di(Config))
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()
