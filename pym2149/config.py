@@ -79,7 +79,7 @@ class ConfigName:
 
 class PathInfo:
 
-    defaultsmodulename = 'defaultconf'
+    defaultsmodulepath = __package__, '.defaultconf'
 
     def __init__(self, configname):
         self.configname = configname
@@ -91,7 +91,7 @@ class PathInfo:
 
     def load(self):
         expressions = Expressions()
-        expressions.loadmodule(self.defaultsmodulename)
+        expressions.loadmodule(*self.defaultsmodulepath)
         if not self.configname.isdefaults():
             expressions.loadpath(self.mark())
         config = ConfigImpl(expressions)

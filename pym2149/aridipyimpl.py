@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, logging, os, imp
+import re, logging, os, importlib
 
 log = logging.getLogger(__name__)
 
@@ -55,8 +55,8 @@ class Expressions:
     def __init__(self):
         self.expressions = {}
 
-    def loadmodule(self, name):
-        self.loadpath(imp.find_module(name)[1])
+    def loadmodule(self, package, name):
+        self.loadpath(importlib.util.find_spec(name, package).origin)
 
     def loadpath(self, path):
         f = open(path)
