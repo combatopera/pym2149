@@ -24,7 +24,7 @@ from pym2149.midi import EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import createdi
-from pym2149.iface import Stream, Config
+from pym2149.iface import Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
