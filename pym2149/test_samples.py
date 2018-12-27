@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .config import ConfigName
 import unittest, samples
-from pym2149.config import ConfigName
 
 class TestSamples(unittest.TestCase):
 
