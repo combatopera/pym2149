@@ -79,7 +79,7 @@ class YM:
             pass
         textlen = self.f.tell() - 1 - start
         self.f.seek(start)
-        text = self.f.read(textlen)
+        text = self.f.read(textlen).decode()
         self.skip(1)
         return text
 
