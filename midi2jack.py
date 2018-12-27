@@ -26,8 +26,8 @@ from pym2149.boot import createdi
 from pym2149.iface import Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
+from pym2149.timerimpl import SyncTimer
 from diapyr.start import starter, Started
-from timerimpl import SyncTimer
 
 log = logging.getLogger(__name__)
 

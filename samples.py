@@ -20,8 +20,6 @@
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import ConfigName
-from diapyr import types
-from diapyr.start import Started
 from pym2149.timer import Timer, SimpleTimer
 from pym2149.out import configure
 from pym2149.boot import createdi
@@ -30,7 +28,9 @@ from pym2149.program import Note
 from pym2149.mediation import SimpleMediation
 from pym2149.channels import Channels
 from pym2149.dac import PWMEffect, SinusEffect
-from timerimpl import ChipTimer
+from pym2149.timerimpl import ChipTimer
+from diapyr import types
+from diapyr.start import Started
 import os, subprocess, time
 
 log = logging.getLogger(__name__)

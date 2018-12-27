@@ -26,7 +26,7 @@ from pym2149.vis import Roll
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.ymplayer import Player
-from timerimpl import SyncTimer
+from pym2149.timerimpl import SyncTimer
 
 log = logging.getLogger(__name__)
 

@@ -26,7 +26,7 @@ from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.ymplayer import Player
-from timerimpl import ChipTimer
+from pym2149.timerimpl import ChipTimer
 
 log = logging.getLogger(__name__)
 
