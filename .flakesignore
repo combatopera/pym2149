@@ -1,3 +1,3 @@
 ^ymtests/dosound.[.]py$
 ^ymtests/q.+[.]py$
-^defaultconf[.]py$
+^pym2149/defaultconf[.]py$
