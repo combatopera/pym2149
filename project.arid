@@ -10,6 +10,8 @@ branch
     pyrbo = py3
     mynblep = py3
 deps += mock
-years += 2014
+years +=
+    2014
+    2018
 pyversions += 3
 executable = true

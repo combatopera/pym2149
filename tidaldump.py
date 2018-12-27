@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2014 Andrzej Cichocki
+# Copyright 2014, 2018 Andrzej Cichocki
 
 # This file is part of pym2149.
 #
