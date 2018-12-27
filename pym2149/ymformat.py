@@ -31,7 +31,7 @@ class LoopInfo:
 
 class YM:
 
-    checkstr = 'LeOnArD!'.encode()
+    checkstr = b'LeOnArD!'
     wordstruct = struct.Struct('>H')
     lwordstruct = struct.Struct('>I')
     lwordlestruct = struct.Struct('<I')
