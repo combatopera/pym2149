@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import Timer, SimpleTimer
-from pym2149.vis import Roll
-from pym2149.iface import Chip, Stream, YMFile, Config
+from .timer import Timer, SimpleTimer
+from .vis import Roll
+from .iface import Chip, Stream, YMFile, Config
+from .ym2149 import ClockInfo
+from .bg import MainBackground
 from diapyr import types
-from pym2149.ym2149 import ClockInfo
-from pym2149.bg import MainBackground
 
 class SimpleChipTimer(SimpleTimer):
 

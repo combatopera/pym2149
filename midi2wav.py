@@ -26,7 +26,7 @@ from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
-from ymplayer import SimpleChipTimer
+from pym2149.ymplayer import SimpleChipTimer
 
 log = logging.getLogger(__name__)
 
