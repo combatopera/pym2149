@@ -43,8 +43,6 @@ def main():
         Channels.addtodi(di)
         di.start()
         log.info(di(Channels))
-        stream = di(Stream)
-        log.debug("JACK block size: %s or %.3f seconds", stream.getbuffersize(), stream.getbuffersize() / config.outputrate)
         di.add(SyncTimer)
         di.add(EventPump)
         di.add(TidalListen)
