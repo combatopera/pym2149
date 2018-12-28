@@ -17,7 +17,7 @@
 
 import struct
 
-bundlemagic = '#bundle\0'
+bundlemagic = b'#bundle\0'
 
 def parse(v):
     return (Bundle if v.startswith(bundlemagic) else Message)(v)
