@@ -24,7 +24,7 @@ from pym2149.config import ConfigName
 from pym2149.iface import Config
 from pym2149.channels import Channels
 from pym2149.boot import createdi
-from pym2149.util import awaitinterrupt
+from pym2149.util import awaitinterrupt, getglobal
 from pym2149.pll import PLL
 from pym2149.ymplayer import SimpleChipTimer
 
@@ -35,7 +35,7 @@ def main():
     di.add(PLL)
     configure(di)
     config = di(Config)
-    di.add(config.mediation)
+    di.add(getglobal(config.mediation))
     Channels.addtodi(di)
     di.start()
     try:

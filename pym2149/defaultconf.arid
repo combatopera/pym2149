@@ -120,4 +120,4 @@ inputskipenabled = true
 speeddetector = true
 : Set to False to turn off the speed detector and save some CPU.
 
-mediation = $py[DynamicMediation]
+mediation = .mediation.DynamicMediation

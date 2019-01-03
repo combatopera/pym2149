@@ -97,7 +97,6 @@ class PathInfo:
         imp('.program', 'DefaultNote')
         imp('.const', 'midichannelcount')
         imp('.iface', 'YMFile')
-        imp('.mediation', 'DynamicMediation')
         if di is not None:
             evalcontext['di'] = di
         context = Context()
