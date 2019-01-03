@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, logging, os
-from .aridipyimpl import Expressions
 from .bg import SimpleBackground
 from .const import appconfigdir
 from .iface import Config
+from aridity import Context, Repl
+from aridimpl.util import NoSuchPathException
+from aridimpl.model import Function, Number, Text
+import sys, logging, os, numbers, importlib
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +81,6 @@ class ConfigName:
 
 class PathInfo:
 
-    defaultsmodulepath = __package__, '.defaultconf'
-
     def __init__(self, configname):
         self.configname = configname
 
@@ -89,13 +89,29 @@ class PathInfo:
         self.mtime = os.stat(path).st_mtime
         return path
 
-    def load(self):
-        expressions = Expressions()
-        expressions.loadmodule(*self.defaultsmodulepath)
-        if not self.configname.isdefaults():
-            expressions.loadpath(self.mark())
-        config = ConfigImpl(expressions)
+    def load(self, di = None):
+        evalcontext = {}
+        def imp(module, name):
+            evalcontext[name] = getattr(importlib.import_module(module, __package__), name)
+        imp('.ym2149', 'stclock')
+        imp('.program', 'DefaultNote')
+        imp('.const', 'midichannelcount')
+        imp('.iface', 'YMFile')
+        imp('.mediation', 'DynamicMediation')
+        if di is not None:
+            evalcontext['di'] = di
+        context = Context()
+        def py(context, *clauses):
+            value = eval(' '.join(c.cat() for c in clauses), evalcontext)
+            return (Number if isinstance(value, numbers.Number) else Text)(value)
+        context['py',] = Function(py)
+        with Repl(context) as repl:
+            repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
+            if not self.configname.isdefaults():
+                context.loadpath(self.mark())
+        config = ConfigImpl(context)
         self.configname.applyitems(config)
+        evalcontext['config'] = config
         return config
 
     def reloadornone(self):
@@ -127,16 +143,11 @@ class ConfigSubscription(SimpleBackground):
 
 class ConfigImpl(Config):
 
-    def __init__(self, expressions):
-        self.pRiVaTe = expressions
+    def __init__(self, context):
+        self.pRiVaTe = context
 
     def __getattr__(self, name):
-        exprs = self.pRiVaTe
         try:
-            expr = exprs.expression(name)
-        except KeyError:
+            return self.pRiVaTe.resolved(name).unravel()
+        except NoSuchPathException:
             raise AttributeError(name)
-        obj = expr.resolve(self)
-        for mod in exprs.modifiers(name):
-            mod.modify(self, name, obj)
-        return obj

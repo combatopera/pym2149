@@ -24,8 +24,7 @@ from . import minblep
 def createdi(configname):
     di = DI()
     di.add(configname)
-    config = PathInfo(configname).load()
-    config.di = di # TODO: Retire this somehow.
+    config = PathInfo(configname).load(di)
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
