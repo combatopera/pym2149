@@ -94,6 +94,11 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
+def getglobal(context, resolvable):
+    spec = resolvable.resolve(context).cat()
+    lastdot = spec.rindex('.')
+    return wrap(getattr(importlib.import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
+
 class PathInfo:
 
     def __init__(self, configname):
@@ -108,13 +113,13 @@ class PathInfo:
         evalcontext = {}
         def imp(module, name):
             evalcontext[name] = getattr(importlib.import_module(module, __package__), name)
-        imp('.ym2149', 'stclock')
         imp('.program', 'DefaultNote')
         imp('.const', 'midichannelcount')
         imp('.iface', 'YMFile')
         if di is not None:
             evalcontext['di'] = di
         context = Context()
+        context['global',] = Function(getglobal)
         def py(context, *clauses):
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)

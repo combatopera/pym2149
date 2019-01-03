@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import time, logging, importlib
+import time, logging
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,3 @@ class EMA:
 
 def ceildiv(numerator, denominator):
     return (numerator + denominator - 1) // denominator
-
-def getglobal(spec):
-    lastdot = spec.rindex('.')
-    return getattr(importlib.import_module(spec[:lastdot], __package__), spec[lastdot + 1:])

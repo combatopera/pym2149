@@ -24,7 +24,7 @@ underclock = 8
 oscpause = false
 : Whether an oscillator is paused when turned off in the mixer. Setting to True doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
-nominalclock = $py[di(YMFile).nominalclock if di.all(YMFile) else stclock]
+nominalclock = $try($ymfile($(nominalclock)) $global(.ym2149.stclock))
 : You can specify your own clock here, which overrides any other value.
 
 midipan = false
@@ -120,4 +120,4 @@ inputskipenabled = true
 speeddetector = true
 : Set to False to turn off the speed detector and save some CPU.
 
-mediation = .mediation.DynamicMediation
+mediation = $global(.mediation.DynamicMediation)

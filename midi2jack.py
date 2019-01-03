@@ -24,7 +24,7 @@ from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import createdi
 from pym2149.iface import Config
-from pym2149.util import awaitinterrupt, getglobal
+from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
 from diapyr.start import starter, Started
@@ -40,7 +40,7 @@ def main():
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         configure(di)
         config = di(Config)
-        di.add(getglobal(config.mediation))
+        di.add(config.mediation)
         Channels.addtodi(di)
         di.all(Started)
         log.info(di(Channels))
