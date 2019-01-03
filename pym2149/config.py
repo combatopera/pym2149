@@ -17,7 +17,7 @@
 
 from .bg import SimpleBackground
 from .const import appconfigdir
-from .iface import Config
+from .iface import Config, YMFile
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
@@ -100,10 +100,14 @@ class PathInfo:
         if di is not None:
             evalcontext['di'] = di
         context = Context()
-        def py(context, *clauses):
-            value = eval(' '.join(c.cat() for c in clauses), evalcontext)
+        def wrap(value):
             return (Number if isinstance(value, numbers.Number) else Text)(value)
+        def py(context, *clauses):
+            return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)
+        def ymfile(context, name):
+            return wrap(getattr(di(YMFile), name.unravel()))
+        context['ymfile',] = Function(ymfile)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
             if not self.configname.isdefaults():

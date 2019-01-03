@@ -51,7 +51,7 @@ updaterate = $py[di(YMFile).updaterate if di.all(YMFile) else 50]
 linesperbeat = 4
 : bpmtool.py uses this.
 
-pianorollheight = $py[di(YMFile).pianorollheight]
+pianorollheight = $ymfile(pianorollheight)
 : You can override the deduced piano roll height here.
 
 midichannelbase = 1
