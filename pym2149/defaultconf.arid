@@ -45,7 +45,7 @@ systemchannelcount = 2
 ignoreloop = $py[hasattr(config, 'outpath')]
 : If True playback will not loop.
 
-updaterate = $py[di(YMFile).updaterate if di.all(YMFile) else 50]
+updaterate = $try($ymfile(updaterate) 50)
 : The rate at which chip params are updated.
 
 linesperbeat = 4

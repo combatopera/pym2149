@@ -106,7 +106,11 @@ class PathInfo:
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)
         def ymfile(context, name):
-            return wrap(getattr(di(YMFile), name.unravel()))
+            try:
+                ymfile = di(YMFile)
+            except Exception:
+                raise NoSuchPathException
+            return wrap(getattr(ymfile, name.unravel()))
         context['ymfile',] = Function(ymfile)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
