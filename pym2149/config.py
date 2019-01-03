@@ -79,6 +79,21 @@ class ConfigName:
         for name, value in self.additems:
             setattr(config, name, value)
 
+def wrap(value):
+    return (Number if isinstance(value, numbers.Number) else Text)(value)
+
+class AsContext:
+
+    def __init__(self, parent, obj):
+        self.parent = parent
+        self.obj = obj
+
+    def resolved(self, name):
+        try:
+            return wrap(getattr(self.obj, name))
+        except AttributeError:
+            return self.parent.resolved(name)
+
 class PathInfo:
 
     def __init__(self, configname):
@@ -100,17 +115,15 @@ class PathInfo:
         if di is not None:
             evalcontext['di'] = di
         context = Context()
-        def wrap(value):
-            return (Number if isinstance(value, numbers.Number) else Text)(value)
         def py(context, *clauses):
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)
-        def ymfile(context, name):
+        def ymfile(context, resolvable):
             try:
                 ymfile = di(YMFile)
             except Exception:
                 raise NoSuchPathException
-            return wrap(getattr(ymfile, name.unravel()))
+            return resolvable.resolve(AsContext(context, ymfile))
         context['ymfile',] = Function(ymfile)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
