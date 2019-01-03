@@ -102,7 +102,7 @@ pllalpha = .1
 jackringsize = $try($ymfile(2) 10)
 : In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.
 
-jackcoupling = $py[bool(di.all(YMFile))]
+jackcoupling = $try($ymfile(true) false)
 : If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
 
 zerovelocityisnoteoffchannels = $list()
