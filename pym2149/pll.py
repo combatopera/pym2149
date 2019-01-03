@@ -33,7 +33,7 @@ class PLL:
     @types(Config)
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
-        self.targetpos = config.plltargetpos
+        self.targetpos = float(config.plltargetpos)
         self.medianshiftema = EMA(config.pllalpha, None)
 
     def start(self):

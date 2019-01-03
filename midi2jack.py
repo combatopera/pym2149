@@ -34,6 +34,7 @@ log = logging.getLogger(__name__)
 def main():
     di = createdi(ConfigName())
     di.add(PLL)
+    di.add(starter(PLL))
     di.add(JackClient)
     di.add(starter(JackClient))
     try:
