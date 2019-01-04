@@ -147,7 +147,7 @@ class MidiListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, calsa.Client(clientname, "%s IN" % clientname))
+        SimpleBackground.start(self, self.bg, calsa.Client(clientname.encode(), ("%s IN" % clientname).encode()))
 
     def bg(self, client):
         while not self.quit:
