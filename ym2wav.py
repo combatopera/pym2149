@@ -27,22 +27,23 @@ from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.ymplayer import Player
 from pym2149.timerimpl import ChipTimer
+from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
 def main():
     di = createdi(ConfigName('inpath', 'outpath'))
     di.add(YMOpen)
-    di.start()
     try:
+        di.all(Started)
         configure(di)
         di.add(Roll)
         di.add(ChipTimer)
         di.add(Player)
-        di.start()
+        di.all(Started)
         awaitinterrupt(di(Config))
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()

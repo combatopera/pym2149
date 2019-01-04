@@ -28,6 +28,7 @@ from pym2149.iface import Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
+from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
@@ -35,21 +36,21 @@ def main():
     di = createdi(ConfigName())
     di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
     di.add(JackClient)
-    di.start()
     try:
+        di.all(Started)
         configure(di)
         config = di(Config)
         di.add(config.mediation) # Surely we can always use tidal connection for this.
         Channels.addtodi(di)
-        di.start()
+        di.all(Started)
         log.info(di(Channels))
         di.add(SyncTimer)
         di.add(EventPump)
         di.add(TidalListen)
-        di.start()
+        di.all(Started)
         awaitinterrupt(config)
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()

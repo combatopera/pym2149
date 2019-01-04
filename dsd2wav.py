@@ -25,6 +25,7 @@ from pym2149.out import configure
 from pym2149.boot import createdi
 from pym2149.iface import Chip, Stream, Config
 from pym2149.timerimpl import ChipTimer
+from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
@@ -39,14 +40,14 @@ def main():
         f.close()
     configure(di)
     chip = di(Chip)
-    di.start()
     try:
+        di.all(Started)
         di.add(ChipTimer)
         stream = di(Stream)
         dosound(bytecode, chip, di(Timer), stream)
         stream.flush()
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()

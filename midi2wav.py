@@ -27,6 +27,7 @@ from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.ymplayer import SimpleChipTimer
+from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
@@ -37,17 +38,17 @@ def main():
     config = di(Config)
     di.add(config.mediation)
     Channels.addtodi(di)
-    di.start()
     try:
+        di.all(Started)
         channels = di(Channels)
         log.info(channels)
         di.add(SimpleChipTimer) # One block per update.
         di.add(EventPump)
         di.add(MidiListen)
-        di.start()
+        di.all(Started)
         awaitinterrupt(config)
     finally:
-        di.stop()
+        di.discardall()
 
 if '__main__' == __name__:
     main()
