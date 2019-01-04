@@ -27,16 +27,14 @@ from pym2149.iface import Config
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
-from diapyr.start import starter, Started
+from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
 def main():
     di = createdi(ConfigName())
     di.add(PLL)
-    di.add(starter(PLL))
     di.add(JackClient)
-    di.add(starter(JackClient))
     try:
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         configure(di)
@@ -47,7 +45,6 @@ def main():
         log.info(di(Channels))
         di.add(SyncTimer)
         di.add(EventPump)
-        di.add(starter(EventPump))
         di.add(MidiListen)
         di.all(Started)
         awaitinterrupt(config)

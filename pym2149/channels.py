@@ -21,7 +21,6 @@ from .program import FX
 from .const import midichannelcount
 from .mediation import Mediation
 from diapyr import types
-from diapyr.start import starter
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
 from .util import singleton
@@ -117,7 +116,6 @@ class Channels:
     def addtodi(cls, di):
         di.add(cls)
         di.add(ChannelsConfigSubscription)
-        di.add(starter(ChannelsConfigSubscription))
 
     @types(Config, Chip, Mediation)
     def __init__(self, config, chip, mediation):

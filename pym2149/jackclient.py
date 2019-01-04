@@ -20,7 +20,6 @@ from .const import clientname
 from .iface import AmpScale
 from .out import FloatStream, StereoInfo
 from .iface import Stream, Platform, Config
-from diapyr.start import starter
 from diapyr import types
 import outjack.jackclient as jc, logging
 
@@ -84,4 +83,3 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
 def configure(di):
     di.add(JackStream)
-    di.add(starter(JackStream))
