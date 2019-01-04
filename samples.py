@@ -192,8 +192,8 @@ class Target:
         di.add(programids)
         di.add(frames)
         start = time.time()
-        di.all(Started)
         try:
+            di.all(Started)
             di(Player)()
         finally:
             di.discardall()
