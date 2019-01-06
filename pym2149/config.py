@@ -94,6 +94,15 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
+def componentfunction(di, clazz):
+    def f(context, resolvable):
+        try:
+            obj = di(clazz)
+        except Exception:
+            raise NoSuchPathException
+        return resolvable.resolve(AsContext(context, obj))
+    return Function(f)
+
 def getglobal(context, resolvable):
     spec = resolvable.resolve(context).cat()
     lastdot = spec.rindex('.')
@@ -123,20 +132,8 @@ class PathInfo:
         def py(context, *clauses):
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)
-        def ymfile(context, resolvable):
-            try:
-                ymfile = di(YMFile)
-            except Exception:
-                raise NoSuchPathException
-            return resolvable.resolve(AsContext(context, ymfile))
-        context['ymfile',] = Function(ymfile)
-        def prerecorded(context, resolvable):
-            try:
-                ymfile = di(Prerecorded)
-            except Exception:
-                raise NoSuchPathException
-            return resolvable.resolve(AsContext(context, ymfile))
-        context['prerecorded',] = Function(prerecorded)
+        context['ymfile',] = componentfunction(di, YMFile)
+        context['prerecorded',] = componentfunction(di, Prerecorded)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
             if not self.configname.isdefaults():
