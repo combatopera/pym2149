@@ -182,6 +182,12 @@ class WavBuf(Node):
     self.dc = naivebuf.last()
     return self.outmaster.ensureandcrop(outcount)
 
+class WavPlatform(Platform):
+
+    @types(Config)
+    def __init__(self, config):
+        self.outputrate = config.wavrate
+
 def configure(di):
     di.add(WavWriter)
     di.add(WavBuf.multi)

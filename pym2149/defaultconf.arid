@@ -15,6 +15,9 @@
 : You should have received a copy of the GNU General Public License
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+wavrate = 44100
+: The rate for WAV output, ignored when JACK is the target.
+
 freqclamp = true
 : Whether inaudible tones are clamped to the lowest such tone. Setting this to True improves performance when very high frequency tones are used to attenuate the envelope. Quality may be degraded, particularly at lower outputrates.
 
