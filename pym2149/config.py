@@ -97,7 +97,7 @@ class AsContext:
 
 def resolve(di, context, resolvable):
     try:
-        return AsContext(context, di(resolvable.resolve(context).value))
+        return AsContext(context, di(getglobal(context, resolvable).value))
     except UnsatisfiableRequestException:
         raise NoSuchPathException
 

@@ -15,8 +15,8 @@
 : You should have received a copy of the GNU General Public License
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-prerecorded = $resolve$global(.iface.Prerecorded)
-ymfile = $resolve$global(.iface.YMFile)
+prerecorded = $resolve(.iface.Prerecorded)
+ymfile = $resolve(.iface.YMFile)
 
 wavrate = 44100
 : The rate for WAV output, ignored when JACK is the target.
