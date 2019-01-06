@@ -18,7 +18,7 @@
 import re
 
 # Does not support quoted whitespace, but we're only interested in numbers:
-pattern = re.compile(r'^([^\s]+)?\s+([^\s]+)?\s+([^\s]+)?')
+pattern = re.compile(r'^(\S*)(?:\s+(\S+)(?:\s+(\S+))?)?')
 
 def readbytecode(f, label):
   while True:
