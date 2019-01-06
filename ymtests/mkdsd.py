@@ -40,6 +40,8 @@ class Reg:
             if value == last or value == self.data.prev:
                 break
 
+class UnsupportedTicksException(Exception): pass
+
 class Data:
 
     def __init__(self):
@@ -58,7 +60,7 @@ class Data:
 
     def sleep(self, ticks):
         if ticks < 2:
-            raise Exception(ticks)
+            raise UnsupportedTicksException(ticks)
         while ticks:
             part = min(256, ticks)
             self.bytecode.extend([0x82, part - 1])
