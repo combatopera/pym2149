@@ -76,9 +76,9 @@ class ConfigName:
             raise Exception("Using %s." % self.defaultslabel)
         return self.pathornone
 
-    def applyitems(self, config):
+    def applyitems(self, context):
         for name, value in self.additems:
-            setattr(config, name, value)
+            context[name,] = wrap(value)
 
 def wrap(value):
     return (Number if isinstance(value, numbers.Number) else Text)(value)
@@ -134,12 +134,12 @@ class PathInfo:
         context['py',] = Function(py)
         context['ymfile',] = componentfunction(di, YMFile)
         context['prerecorded',] = componentfunction(di, Prerecorded)
+        self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
             if not self.configname.isdefaults():
                 context.loadpath(self.mark())
         config = ConfigImpl(context)
-        self.configname.applyitems(config)
         evalcontext['config'] = config
         return config
 
