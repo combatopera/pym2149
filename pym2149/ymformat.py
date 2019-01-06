@@ -29,6 +29,8 @@ class LoopInfo:
         self.frame = frame
         self.offset = offset
 
+class YMFileException(Exception): pass
+
 class YM:
 
     checkstr = b'LeOnArD!'
@@ -44,7 +46,7 @@ class YM:
         log.debug("Format ID: %s", self.formatid)
         if expectcheckstr:
             if self.checkstr != f.read(len(self.checkstr)):
-                raise Exception('Bad check string.')
+                raise YMFileException('Bad check string.')
         self.frameindex = 0
         self.f = f
 
