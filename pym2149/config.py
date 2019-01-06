@@ -96,13 +96,16 @@ class AsContext:
             return self.parent.resolved(name)
 
 def componentfunction(di, clazz):
-    def f(context, resolvable):
+    def f(context):
         try:
             obj = di(clazz)
         except UnsatisfiableRequestException:
             raise NoSuchPathException
-        return resolvable.resolve(AsContext(context, obj))
+        return AsContext(context, obj)
     return Function(f)
+
+def enter(context, contextresolvable, resolvable):
+    return resolvable.resolve(contextresolvable.resolve(context))
 
 def getglobal(context, resolvable):
     spec = resolvable.resolve(context).cat()
@@ -129,6 +132,7 @@ class PathInfo:
             evalcontext['di'] = di
         context = Context()
         context['global',] = Function(getglobal)
+        context['enter',] = Function(enter)
         def py(context, *clauses):
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)

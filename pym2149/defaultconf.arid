@@ -27,7 +27,7 @@ underclock = 8
 oscpause = false
 : Whether an oscillator is paused when turned off in the mixer. Setting to True doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
-nominalclock = $try($ymfile($(nominalclock)) $global(.ym2149.stclock))
+nominalclock = $try($enter($ymfile() $(nominalclock)) $global(.ym2149.stclock))
 : You can specify your own clock here, which overrides any other value.
 
 midipan = false
@@ -45,16 +45,16 @@ maxpan = .75
 systemchannelcount = 2
 : The number of system output channels when using JACK.
 
-ignoreloop = $py[hasattr(config, 'outpath')]
+ignoreloop = $try($enter($(outpath) true) false)
 : If True playback will not loop.
 
-updaterate = $try($ymfile($(updaterate)) 50)
+updaterate = $try($enter($ymfile() $(updaterate)) 50)
 : The rate at which chip params are updated.
 
 linesperbeat = 4
 : bpmtool.py uses this.
 
-pianorollheight = $ymfile($(pianorollheight))
+pianorollheight = $enter($ymfile() $(pianorollheight))
 : You can override the deduced piano roll height here.
 
 midichannelbase = 1
@@ -102,10 +102,10 @@ plltargetpos = $div(.5 $(updaterate))
 pllalpha = .1
 : The alpha value for the exponential moving average we use for convergence to plltargetpos.
 
-jackringsize = $try($prerecorded(2) 10)
+jackringsize = $try($enter($prerecorded() 2) 10)
 : In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.
 
-jackcoupling = $try($prerecorded(true) false)
+jackcoupling = $try($enter($prerecorded() true) false)
 : If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
 
 zerovelocityisnoteoffchannels = $list()
