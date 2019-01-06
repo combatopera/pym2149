@@ -40,9 +40,11 @@ def main():
         configure(di)
         di.add(Roll)
         di.add(ChipTimer)
-        di.add(Player)
         di.all(Started)
-        awaitinterrupt(di(Config))
+        di.add(Player)
+        player = di(Player)
+        player.quit = False
+        player()
     finally:
         di.discardall()
 
