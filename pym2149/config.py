@@ -127,8 +127,6 @@ class PathInfo:
             evalcontext[name] = getattr(importlib.import_module(module, __package__), name)
         imp('.program', 'DefaultNote')
         imp('.const', 'midichannelcount')
-        if di is not None:
-            evalcontext['di'] = di
         context = Context()
         context['global',] = Function(getglobal)
         context['enter',] = Function(enter)
