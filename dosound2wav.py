@@ -33,11 +33,8 @@ log = logging.getLogger(__name__)
 def main():
     di = createdi(ConfigName('inpath', 'srclabel', 'outpath'))
     config = di(Config)
-    f = open(config.inpath)
-    try:
+    with open(config.inpath) as f:
         bytecode = readbytecode(f, config.srclabel)
-    finally:
-        f.close()
     configure(di)
     chip = di(Chip)
     try:
