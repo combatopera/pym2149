@@ -98,10 +98,9 @@ class AsContext:
 def componentfunction(di, clazz):
     def f(context):
         try:
-            obj = di(clazz)
+            return AsContext(context, di(clazz))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
-        return AsContext(context, obj)
     return Function(f)
 
 def enter(context, contextresolvable, resolvable):
