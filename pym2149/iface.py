@@ -23,7 +23,9 @@ class Chip: pass
 
 class Stream: pass
 
-class YMFile: pass
+class Prerecorded: pass
+
+class YMFile(Prerecorded): pass
 
 class Platform: pass
 

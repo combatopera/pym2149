@@ -17,7 +17,7 @@
 
 from .bg import SimpleBackground
 from .const import appconfigdir
-from .iface import Config, YMFile
+from .iface import Config, YMFile, Prerecorded
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
@@ -130,6 +130,13 @@ class PathInfo:
                 raise NoSuchPathException
             return resolvable.resolve(AsContext(context, ymfile))
         context['ymfile',] = Function(ymfile)
+        def prerecorded(context, resolvable):
+            try:
+                ymfile = di(Prerecorded)
+            except Exception:
+                raise NoSuchPathException
+            return resolvable.resolve(AsContext(context, ymfile))
+        context['prerecorded',] = Function(prerecorded)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
             if not self.configname.isdefaults():
