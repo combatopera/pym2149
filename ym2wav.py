@@ -22,7 +22,7 @@ from pym2149.ymformat import YMOpen
 from pym2149.config import ConfigName
 from pym2149.iface import Config
 from pym2149.vis import Roll
-from pym2149.out import configure
+from pym2149.out import configure, WavPlatform
 from pym2149.boot import createdi
 from pym2149.util import awaitinterrupt
 from pym2149.ymplayer import Player
@@ -33,6 +33,7 @@ log = logging.getLogger(__name__)
 
 def main():
     di = createdi(ConfigName('inpath', 'outpath'))
+    di.add(WavPlatform)
     di.add(YMOpen)
     try:
         di.all(Started)
