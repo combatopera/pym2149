@@ -45,7 +45,7 @@ class BaseTone(Note):
 class Tone(BaseTone):
 
     def __init__(self, *args):
-        BaseTone.__init__(self, *args)
+        super().__init__(*args)
         self.period = Freq(self.freq).toneperiod(self.nomclock)
 
 class Noise(Note):
@@ -213,7 +213,7 @@ def mainimpl(configname):
     class T1N5k(Both):
         nfreq = 5000
         def __init__(self, *args):
-            Both.__init__(self, *args)
+            super().__init__(*args)
             self.tfreq = self.nomclock // 16
     class Saw600(Env): freq, shape = 600, 0x08
     class Sin1k(Sinus): freq = 1000

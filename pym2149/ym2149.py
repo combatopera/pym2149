@@ -131,7 +131,7 @@ class YM2149(Registers, Container, Chip):
     Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
   def callimpl(self):
-    result = Container.callimpl(self)
+    result = super().callimpl()
     if not self.oscpause:
       # Pass the block to any nodes that were masked:
       for maskable in self.maskables:

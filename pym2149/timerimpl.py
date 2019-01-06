@@ -27,14 +27,14 @@ class SyncTimer(SimpleTimer):
     @types(Platform, MinBleps, ClockInfo)
     def __init__(self, platform, minbleps, clockinfo):
         self.naiverate = clockinfo.implclock
-        SimpleTimer.__init__(self, self.naiverate)
+        super().__init__(self.naiverate)
         self.buffersize = platform.buffersize
         self.naivex = 0
         self.bufferx = 0
         self.minbleps = minbleps
 
     def blocksforperiod(self, refreshrate):
-        wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
+        wholeperiodblock, = super().blocksforperiod(refreshrate)
         naiveN = wholeperiodblock.framecount
         while naiveN:
             naiven = min(naiveN, self.minbleps.getminnaiven(self.naivex, self.buffersize - self.bufferx))
@@ -47,4 +47,4 @@ class ChipTimer(MinBlockRateTimer):
 
     @types(ClockInfo)
     def __init__(self, clockinfo):
-        MinBlockRateTimer.__init__(self, clockinfo.implclock, 100)
+        super().__init__(clockinfo.implclock, 100)

@@ -81,7 +81,7 @@ class TidalListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, TidalClient(self.config.chipchannels))
+        super().start(self.bg, TidalClient(self.config.chipchannels))
 
     def bg(self, client):
         while not self.quit:

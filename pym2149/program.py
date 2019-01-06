@@ -142,7 +142,7 @@ class DefaultNote(Note):
 class Unpitched(Note):
 
   def __init__(self, *args):
-    Note.__init__(self, *args)
+    super().__init__(*args)
     self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.fx)
 
   def noteon(self):

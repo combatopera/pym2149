@@ -26,7 +26,7 @@ class Level(BufNode):
     lookup = np.fromiter([pwmzero5bit] + list(range(32)), signaldtype)
 
     def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
-        BufNode.__init__(self, signaldtype) # Must be suitable for use as index downstream.
+        super().__init__(signaldtype) # Must be suitable for use as index downstream.
         self.levelmodereg = levelmodereg
         self.fixedreg = fixedreg
         self.env = env
@@ -84,7 +84,7 @@ class SinusEffect(TimerEffect):
 class Dac(BufNode):
 
     def __init__(self, level, log2maxpeaktopeak, ampshare):
-        BufNode.__init__(self, floatdtype)
+        super().__init__(floatdtype)
         # We take off .5 so that the peak amplitude is about -3 dB:
         maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
         # Lookup of ideal amplitudes:

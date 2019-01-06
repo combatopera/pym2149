@@ -76,8 +76,8 @@ class VersionReg(Reg):
 
     def __init__(self, **kwargs):
         self.version = 0
-        Reg.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def setimpl(self, value):
-        Reg.setimpl(self, value)
+        super().setimpl(value)
         self.version += 1

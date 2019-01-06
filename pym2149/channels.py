@@ -196,4 +196,4 @@ class ChannelsConfigSubscription(ConfigSubscription):
 
     @types(ConfigName, Channels)
     def __init__(self, configname, channels):
-        ConfigSubscription.__init__(self, configname, channels.reconfigure)
+        super().__init__(configname, channels.reconfigure)

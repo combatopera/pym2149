@@ -33,7 +33,7 @@ class ShapeOsc(BufNode):
     progressdtype = u4
 
     def __init__(self, scale, periodreg):
-        BufNode.__init__(self, signaldtype)
+        super().__init__(signaldtype)
         self.stepsize = 0 # XXX: Move to reset?
         self.scale = scale
         self.periodreg = periodreg
@@ -105,7 +105,7 @@ class IncompatibleShapeException(Exception): pass
 class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
-        BufNode.__init__(self, signaldtype)
+        super().__init__(signaldtype)
         self.effectversion = None
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
@@ -184,7 +184,7 @@ class ToneOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg):
         scaleofstep = scale * 2 // 2 # Normally half of 16.
-        ShapeOsc.__init__(self, scaleofstep, periodreg)
+        super().__init__(scaleofstep, periodreg)
         self.reset(toneshape)
 
 class NoiseOsc(ShapeOsc):
@@ -193,7 +193,7 @@ class NoiseOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg, shape):
         scaleofstep = scale * 2 # This results in authentic spectrum, see qnoispec.
-        ShapeOsc.__init__(self, scaleofstep, periodreg)
+        super().__init__(scaleofstep, periodreg)
         self.reset(shape)
 
 class EnvOsc(ShapeOsc):
@@ -216,7 +216,7 @@ class EnvOsc(ShapeOsc):
 
     def __init__(self, scale, periodreg, shapereg):
         scaleofstep = scale * 32 // self.steps
-        ShapeOsc.__init__(self, scaleofstep, periodreg)
+        super().__init__(scaleofstep, periodreg)
         self.shapeversion = None
         self.shapereg = shapereg
 
@@ -224,4 +224,4 @@ class EnvOsc(ShapeOsc):
         if self.shapeversion != self.shapereg.version:
             self.reset(self.shapes[self.shapereg.value])
             self.shapeversion = self.shapereg.version
-        ShapeOsc.callimpl(self)
+        super().callimpl()

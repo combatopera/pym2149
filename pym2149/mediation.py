@@ -54,7 +54,7 @@ class DynamicMediation(Mediation):
 
     @types(Config)
     def __init__(self, config):
-        Mediation.__init__(self, config)
+        super().__init__(config)
         midichanbase = config.midichannelbase
         chipchancount = config.chipchannels
         self.midichantochipchanhistory = dict([midichanbase + i, list(range(chipchancount))] for i in range(midichannelcount))
@@ -89,7 +89,7 @@ class SimpleMediation(Mediation):
 
     @types(Config)
     def __init__(self, config):
-        Mediation.__init__(self, config)
+        super().__init__(config)
         self.midichanbase = config.midichannelbase
         self.chipchancount = config.chipchannels
 

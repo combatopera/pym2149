@@ -27,7 +27,7 @@ class MinPeriodTone(Node):
     size = 250000 # One second at adjusted rate.
 
     def __init__(self):
-        Node.__init__(self)
+        super().__init__()
         toneamp = .5 * 2 ** 15 # Half of full scale.
         self.buf = np.empty(self.size, dtype = floatdtype)
         self.buf[::2] = toneamp

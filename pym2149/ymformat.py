@@ -137,7 +137,7 @@ class YM23(YM):
     frameobj = PlainFrame
 
     def __init__(self, f):
-        YM.__init__(self, f, False)
+        super().__init__(f, False)
         self.framecount = (os.fstat(f.fileno()).st_size - len(self.formatid)) // self.framesize
 
 class YM2(YM23): # FIXME LATER: Work out format from ST-Sound source, it's not this simple.
@@ -145,21 +145,21 @@ class YM2(YM23): # FIXME LATER: Work out format from ST-Sound source, it's not t
     formatid = 'YM2!'
 
     def __init__(self, f, once):
-        YM23.__init__(self, f)
+        super().__init__(f)
 
 class YM3(YM23):
 
     formatid = 'YM3!'
 
     def __init__(self, f, once):
-        YM23.__init__(self, f)
+        super().__init__(f)
 
 class YM3b(YM23):
 
     formatid = 'YM3b'
 
     def __init__(self, f, once):
-        YM23.__init__(self, f)
+        super().__init__(f)
         if once:
             self.logignoringloopinfo()
         else:
@@ -173,7 +173,7 @@ class YM56(YM):
     framesize = 16
 
     def __init__(self, f, once):
-        YM.__init__(self, f, True)
+        super().__init__(f, True)
         self.framecount = self.lword()
         # We can ignore the other attributes as they are specific to sample data:
         interleaved = self.lword() & 0x01
@@ -201,14 +201,14 @@ class YM56(YM):
 class Frame56(PlainFrame):
 
     def __init__(self, ym):
-        PlainFrame.__init__(self, ym)
+        super().__init__(ym)
         self.index = ym.frameindex
         self.flags = ym
 
 class Frame5(Frame56):
 
     def __call__(self, chip):
-        PlainFrame.__call__(self, chip)
+        super().__call__(chip)
         if self.data[0x1] & 0x30:
             chan = ((self.data[0x1] & 0x30) >> 4) - 1
             tcr = (self.data[0x6] & 0xe0) >> 5
@@ -222,7 +222,7 @@ class Frame5(Frame56):
 class Frame6(Frame56):
 
     def __call__(self, chip):
-        PlainFrame.__call__(self, chip)
+        super().__call__(chip)
         timerchans = set()
         for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
             if self.data[r] & 0x30:
@@ -261,7 +261,7 @@ class YM6(YM56):
     frameobj = Frame6
 
     def __init__(self, *args, **kwargs):
-        YM56.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.logsyncbuzzer = True
 
 impls = {i.formatid.encode(): i for i in [YM2, YM3, YM3b, YM5, YM6]}

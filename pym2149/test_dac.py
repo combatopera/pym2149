@@ -25,7 +25,7 @@ class Ramps(BufNode):
     dtype = signaldtype
 
     def __init__(self):
-        BufNode.__init__(self, self.dtype)
+        super().__init__(self.dtype)
 
     def callimpl(self):
         for i in range(self.block.framecount):

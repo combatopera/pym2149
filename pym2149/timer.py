@@ -45,10 +45,10 @@ class MinBlockRateTimer(SimpleTimer):
         self.maxblocksize = int(clock // minblockrate)
         if not self.maxblocksize:
             raise Exception(clock, minblockrate)
-        SimpleTimer.__init__(self, clock)
+        super().__init__(clock)
 
     def blocksforperiod(self, refreshrate):
-        wholeperiodblock, = SimpleTimer.blocksforperiod(self, refreshrate)
+        wholeperiodblock, = super().blocksforperiod(refreshrate)
         blockticks = wholeperiodblock.framecount
         while blockticks:
             size = min(blockticks, self.maxblocksize)

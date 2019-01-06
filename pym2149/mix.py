@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 class BinMix(BufNode):
 
     def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-        BufNode.__init__(self, signaldtype)
+        super().__init__(signaldtype)
         self.tone = tone
         self.noise = noise
         self.toneflagreg = toneflagreg
@@ -51,7 +51,7 @@ class BinMix(BufNode):
 class Multiplexer(Node):
 
     def __init__(self, dtype, streams):
-        Node.__init__(self)
+        super().__init__()
         self.multi = MasterBuf(dtype)
         self.channels = len(streams)
         self.streams = streams
@@ -78,7 +78,7 @@ class IdealMixer(BufNode):
             self.callimpl = self.nontrivialcallimpl
         else:
             self.callimpl = self.trivialcallimpl
-        BufNode.__init__(self, dtype)
+        super().__init__(dtype)
         self.datum = dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
         self.container = container
         self.chipamps = chipamps

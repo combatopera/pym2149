@@ -71,7 +71,7 @@ class ChannelStateMessage(ChannelMessage): pass
 class NoteOnOff(ChannelMessage):
 
     def __init__(self, config, event):
-        ChannelMessage.__init__(self, config, event)
+        super().__init__(config, event)
         self.midinote = event.note
         self.vel = event.velocity
 
@@ -95,7 +95,7 @@ class NoteOff(NoteOnOff):
 class PitchBend(ChannelStateMessage):
 
     def __init__(self, config, event):
-        ChannelStateMessage.__init__(self, config, event)
+        super().__init__(config, event)
         self.bend = event.value # In [-0x2000, 0x2000).
 
     def __call__(self, channels):
@@ -107,7 +107,7 @@ class PitchBend(ChannelStateMessage):
 class ProgramChange(ChannelStateMessage):
 
     def __init__(self, config, event):
-        ChannelStateMessage.__init__(self, config, event)
+        super().__init__(config, event)
         self.program = config.midiprogrambase + event.value
 
     def __call__(self, channels):
@@ -119,7 +119,7 @@ class ProgramChange(ChannelStateMessage):
 class ControlChange(ChannelStateMessage):
 
     def __init__(self, config, event):
-        ChannelStateMessage.__init__(self, config, event)
+        super().__init__(config, event)
         self.controller = event.param
         self.value = event.value
 
@@ -147,7 +147,7 @@ class MidiListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        SimpleBackground.start(self, self.bg, calsa.Client(clientname.encode(), ("%s IN" % clientname).encode()))
+        super().start(self.bg, calsa.Client(clientname.encode(), ("%s IN" % clientname).encode()))
 
     def bg(self, client):
         while not self.quit:
@@ -160,7 +160,7 @@ class EventPump(MainBackground):
 
     @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
     def __init__(self, config, channels, minbleps, stream, chip, timer, pll):
-        MainBackground.__init__(self, config)
+        super().__init__(config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.inputskipenabled

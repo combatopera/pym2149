@@ -158,7 +158,7 @@ class ConfigSubscription(SimpleBackground):
     def start(self):
         self.pathinfo = PathInfo(self.configname)
         self.consumer(self.pathinfo.load())
-        SimpleBackground.start(self, self.bg, self.Sleeper())
+        super().start(self.bg, self.Sleeper())
 
     def bg(self, sleeper):
         if not self.configname.isdefaults():

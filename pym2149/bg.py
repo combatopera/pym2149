@@ -85,7 +85,7 @@ class MainBackground(SimpleBackground):
             self.bg = self
 
     def start(self, *interruptibles):
-        SimpleBackground.start(self, self.bg, *interruptibles)
+        super().start(self.bg, *interruptibles)
 
     def profile(self, *args, **kwargs):
         profilepath = self.profilepath + time.strftime('.%Y-%m-%dT%H-%M-%S')

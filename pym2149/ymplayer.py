@@ -26,13 +26,13 @@ class SimpleChipTimer(SimpleTimer):
 
     @types(ClockInfo)
     def __init__(self, clockinfo):
-        SimpleTimer.__init__(self, clockinfo.implclock)
+        super().__init__(clockinfo.implclock)
 
 class Player(MainBackground):
 
     @types(Config, YMFile, Chip, Roll, Timer, Stream)
     def __init__(self, config, ymfile, chip, roll, timer, stream):
-        MainBackground.__init__(self, config)
+        super().__init__(config)
         self.updaterate = config.updaterate
         self.ym = ymfile.ym
         self.chip = chip

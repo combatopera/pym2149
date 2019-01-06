@@ -102,7 +102,7 @@ class StaticOutChannel(Node):
     nontrivial = True
 
     def __init__(self, chipamps):
-        Node.__init__(self)
+        super().__init__()
         self.chipamps = chipamps
 
     def size(self):
@@ -121,7 +121,7 @@ class MidiOutChannel(Node):
     nontrivial = True
 
     def __init__(self, channels, pantoamp):
-        Node.__init__(self)
+        super().__init__()
         self.channels = channels
         self.pantoamp = pantoamp
 
@@ -151,7 +151,7 @@ class WavBuf(Node):
     return wav
 
   def __init__(self, clockinfo, naive, minbleps):
-    Node.__init__(self)
+    super().__init__()
     self.diffmaster = MasterBuf(dtype = floatdtype)
     self.outmaster = MasterBuf(dtype = floatdtype)
     # Need space for a whole mixin in case it is rooted at sample outcount:

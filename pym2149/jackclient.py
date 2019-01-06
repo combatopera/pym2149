@@ -29,7 +29,7 @@ class JackClient(jc.JackClient, Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
-        jc.JackClient.__init__(self, clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
+        super().__init__(clientname, stereoinfo.getoutchans.size, config.jackringsize, config.jackcoupling)
 
     def start(self):
         super().start()
@@ -44,7 +44,7 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
     @types(Config, StereoInfo, FloatStream, JackClient)
     def __init__(self, config, stereoinfo, wavs, client):
-        Node.__init__(self)
+        super().__init__()
         self.systemchannelcount = config.systemchannelcount
         self.chancount = stereoinfo.getoutchans.size
         for chanindex in range(self.chancount):

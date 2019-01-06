@@ -21,7 +21,7 @@ from .nod import Node, Block
 class MyNode(Node):
 
     def __init__(self):
-        Node.__init__(self)
+        super().__init__()
         self.x = 0
 
     def callimpl(self):
