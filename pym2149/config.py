@@ -21,6 +21,7 @@ from .iface import Config, YMFile, Prerecorded
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
+from diapyr import UnsatisfiableRequestException
 import sys, logging, os, numbers, importlib
 
 log = logging.getLogger(__name__)
@@ -98,7 +99,7 @@ def componentfunction(di, clazz):
     def f(context, resolvable):
         try:
             obj = di(clazz)
-        except Exception:
+        except UnsatisfiableRequestException:
             raise NoSuchPathException
         return resolvable.resolve(AsContext(context, obj))
     return Function(f)
