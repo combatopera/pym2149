@@ -121,10 +121,6 @@ class PathInfo:
 
     def load(self, di = None):
         evalcontext = {}
-        def imp(module, name):
-            evalcontext[name] = getattr(importlib.import_module(module, __package__), name)
-        imp('.program', 'DefaultNote')
-        imp('.const', 'midichannelcount')
         context = Context()
         context['global',] = Function(getglobal)
         context['enter',] = Function(enter)
