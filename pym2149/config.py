@@ -95,25 +95,28 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
-def resolve(di, context, resolvable):
-    try:
-        return AsContext(context, di(getglobal(context, resolvable).value))
-    except UnsatisfiableRequestException:
-        raise NoSuchPathException
-
-def enter(context, contextresolvable, resolvable):
-    return resolvable.resolve(contextresolvable.resolve(context))
-
-def getglobal(context, resolvable):
-    spec = resolvable.resolve(context).cat()
-    lastdot = spec.rindex('.')
-    return wrap(getattr(importlib.import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
-
 class PathInfo:
+
+    @staticmethod
+    def getglobal(context, resolvable):
+        spec = resolvable.resolve(context).cat()
+        lastdot = spec.rindex('.')
+        return wrap(getattr(importlib.import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
+
+    @staticmethod
+    def enter(context, contextresolvable, resolvable):
+        return resolvable.resolve(contextresolvable.resolve(context))
 
     @staticmethod
     def py(config, context, *clauses):
         return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
+
+    @classmethod
+    def resolve(cls, di, context, resolvable):
+        try:
+            return AsContext(context, di(cls.getglobal(context, resolvable).value))
+        except UnsatisfiableRequestException:
+            raise NoSuchPathException
 
     def __init__(self, configname):
         self.configname = configname
@@ -125,11 +128,11 @@ class PathInfo:
 
     def load(self, di = None):
         context = Context()
-        context['global',] = Function(getglobal)
-        context['enter',] = Function(enter)
+        context['global',] = Function(self.getglobal)
+        context['enter',] = Function(self.enter)
         context['py',] = Function(lambda *args: self.py(config, *args))
         if di is not None:
-            context['resolve',] = Function(lambda *args: resolve(di, *args))
+            context['resolve',] = Function(lambda *args: self.resolve(di, *args))
         self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
