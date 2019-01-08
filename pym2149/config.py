@@ -127,7 +127,8 @@ class PathInfo:
         def py(context, *clauses):
             return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
         context['py',] = Function(py)
-        context['resolve',] = Function(lambda *args: resolve(di, *args))
+        if di is not None:
+            context['resolve',] = Function(lambda *args: resolve(di, *args))
         self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
