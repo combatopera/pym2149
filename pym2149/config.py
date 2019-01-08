@@ -111,6 +111,10 @@ def getglobal(context, resolvable):
 
 class PathInfo:
 
+    @staticmethod
+    def py(config, context, *clauses):
+        return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
+
     def __init__(self, configname):
         self.configname = configname
 
@@ -120,13 +124,10 @@ class PathInfo:
         return path
 
     def load(self, di = None):
-        evalcontext = {}
         context = Context()
         context['global',] = Function(getglobal)
         context['enter',] = Function(enter)
-        def py(context, *clauses):
-            return wrap(eval(' '.join(c.cat() for c in clauses), evalcontext))
-        context['py',] = Function(py)
+        context['py',] = Function(lambda *args: self.py(config, *args))
         if di is not None:
             context['resolve',] = Function(lambda *args: resolve(di, *args))
         self.configname.applyitems(context)
@@ -135,7 +136,6 @@ class PathInfo:
             if not self.configname.isdefaults():
                 context.loadpath(self.mark())
         config = ConfigImpl(context)
-        evalcontext['config'] = config
         return config
 
     def reloadornone(self):
