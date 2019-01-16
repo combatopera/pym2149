@@ -56,7 +56,7 @@ class Reader:
         return blob
 
     def string(self):
-        text = self.consume(self.v.index('\0', self.c) - self.c).decode('ascii')
+        text = self.consume(self.v.index(b'\0', self.c) - self.c).decode('ascii')
         self.c += 1 # Consume at least one null.
         self.align()
         return text
