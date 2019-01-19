@@ -70,6 +70,15 @@ class NewGroup(SCSynthHandler):
     def __call__(self, timetags, message, reply):
         id, action, target = message.args
 
+class NewSynth(SCSynthHandler):
+
+    addresses = '/s_new',
+
+    def __call__(self, timetags, message, reply):
+        name, id, action, target = message.args[:4]
+        controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
+        print(name, controls)
+
 class FoxDotClient:
 
     def __init__(self, chancount, host, port, bufsize, handlers, label):
@@ -150,5 +159,6 @@ def configure(di):
     di.add(GetInfo)
     di.add(LoadSynthDef)
     di.add(NewGroup)
+    di.add(NewSynth)
     di.add(SCSynth)
     di.add(SCLang)
