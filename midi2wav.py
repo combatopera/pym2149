@@ -35,7 +35,7 @@ def main():
     di.add(PLL)
     configure(di)
     di.add(config.mediation)
-    Channels.addtodi(di)
+    Channels.configure(di)
     try:
         di.all(Started)
         channels = di(Channels)

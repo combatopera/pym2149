@@ -38,7 +38,7 @@ def main():
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         configure(di)
         di.add(config.mediation)
-        Channels.addtodi(di)
+        Channels.configure(di)
         di.all(Started)
         log.info(di(Channels))
         di.add(SyncTimer)

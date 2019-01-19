@@ -113,7 +113,7 @@ class ControlPair:
 class Channels:
 
     @classmethod
-    def addtodi(cls, di):
+    def configure(cls, di):
         di.add(cls)
         di.add(ChannelsConfigSubscription)
 

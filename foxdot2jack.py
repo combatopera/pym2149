@@ -38,7 +38,7 @@ def main():
     try:
         di.all(Started)
         di.add(config.mediation) # TODO: Use upstream channel info.
-        Channels.addtodi(di)
+        Channels.configure(di)
         di.add(SyncTimer)
         di.add(FoxDotListen)
         configure(di)

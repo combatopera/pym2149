@@ -39,7 +39,7 @@ def main():
         di.all(Started)
         configure(di)
         di.add(config.mediation) # Surely we can always use tidal connection for this.
-        Channels.addtodi(di)
+        Channels.configure(di)
         di.all(Started)
         log.info(di(Channels))
         di.add(SyncTimer)
