@@ -181,3 +181,6 @@ class ConfigImpl(Config):
             return self.pRiVaTe.resolved(name).unravel()
         except NoSuchPathException:
             raise AttributeError(name)
+
+    def __getitem__(self, path):
+        return self.pRiVaTe.resolved(*path)

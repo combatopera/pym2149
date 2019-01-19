@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import udppump, osctrl
+from . import osctrl
 from .bg import SimpleBackground
 from .iface import Config
 from .midi import NoteOn
@@ -35,17 +35,18 @@ class FoxDotClient:
             self.note = note
             self.velocity = velocity
 
-    def __init__(self, chancount, port):
+    def __init__(self, chancount, host, port, bufsize):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.1) # For polling the open flag.
-        self.sock.bind((udppump.host, port))
+        self.sock.bind((host, port))
         self.open = True
         self.chancount = chancount
+        self.bufsize = bufsize
 
     def read(self):
         while self.open:
             try:
-                bytes, address = self.sock.recvfrom(udppump.bufsize)
+                bytes, address = self.sock.recvfrom(self.bufsize)
                 self._message(osctrl.parse(bytes))
             except socket.timeout:
                 pass
@@ -64,7 +65,9 @@ class FoxDotListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        super().start(self.bg, FoxDotClient(self.config.chipchannels, self.config.FoxDot[self.portkey]))
+        config = self.config['FoxDot', self.configkey]
+        host, port, bufsize = (config.resolved(name).unravel() for name in ['host', 'port', 'bufsize'])
+        super().start(self.bg, FoxDotClient(self.config.chipchannels, host, port, bufsize))
 
     def bg(self, client):
         while not self.quit:
@@ -73,10 +76,10 @@ class FoxDotListen(SimpleBackground):
                 eventobj = NoteOn(self.config, event)
                 self.pll.event(event.time, eventobj, True)
 
-class FoxDotListen1(FoxDotListen):
+class SCSynth(FoxDotListen):
 
-    portkey = 'port1'
+    configkey = 'scsynth'
 
-class FoxDotListen2(FoxDotListen):
+class SCLang(FoxDotListen):
 
-    portkey = 'port2'
+    configkey = 'sclang'

@@ -133,5 +133,7 @@ speeddetector = true
 mediation = $global(.mediation.DynamicMediation)
 
 FoxDot
-    port1 = 57110
-    port2 = 57120
+    host = 127.0.0.1
+    scsynth port = 57110
+    sclang port = 57120
+    bufsize = 1024
