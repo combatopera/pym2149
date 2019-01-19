@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from diapyr import types
-from .pll import PLL
+from . import udppump, osctrl
 from .bg import SimpleBackground
 from .iface import Config
 from .midi import NoteOn
+from .pll import PLL
+from diapyr import types
 import logging, socket
-from . import udppump, osctrl
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class FoxDotClient:
 
     def __init__(self, chancount, port):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.settimeout(.5)
+        self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((udppump.host, port))
         self.open = True
         self.chancount = chancount
@@ -45,19 +45,13 @@ class FoxDotClient:
     def read(self):
         while self.open:
             try:
-                v = self.sock.recvfrom(udppump.bufsize)[0]
+                bytes, address = self.sock.recvfrom(udppump.bufsize)
+                self._message(osctrl.parse(bytes))
             except socket.timeout:
-                continue
-            print(v)
-            if v.startswith(osctrl.bundlemagic):
-                bundle = osctrl.parse(v)
-                if 1 == len(bundle.elements) and '/play2' == bundle.elements[0].addrpattern:
-                    args = bundle.elements[0].args
-                    args = dict([args[i:i + 2] for i in range(0, len(args), 2)])
-                    k = (args['s'], args.get('n', 0))
-                    note = self.keytonote.get(k)
-                    if note is not None:
-                        return self.FoxDotEvent(bundle.timetag, (args['chan'] - 1) % self.chancount, note, 0x7f)
+                pass
+
+    def _message(self, message):
+        print(message)
 
     def interrupt(self):
         self.open = False
