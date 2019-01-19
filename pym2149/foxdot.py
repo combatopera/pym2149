@@ -25,8 +25,6 @@ from . import udppump, osctrl
 
 log = logging.getLogger(__name__)
 
-ourport = 57110 # TODO: One more port.
-
 class FoxDotClient:
 
     class FoxDotEvent:
@@ -37,10 +35,10 @@ class FoxDotClient:
             self.note = note
             self.velocity = velocity
 
-    def __init__(self, chancount):
+    def __init__(self, chancount, port):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.5)
-        self.sock.bind((udppump.host, ourport))
+        self.sock.bind((udppump.host, port))
         self.open = True
         self.chancount = chancount
 
@@ -50,6 +48,7 @@ class FoxDotClient:
                 v = self.sock.recvfrom(udppump.bufsize)[0]
             except socket.timeout:
                 continue
+            print(v)
             if v.startswith(osctrl.bundlemagic):
                 bundle = osctrl.parse(v)
                 if 1 == len(bundle.elements) and '/play2' == bundle.elements[0].addrpattern:
@@ -71,7 +70,7 @@ class FoxDotListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        super().start(self.bg, FoxDotClient(self.config.chipchannels))
+        super().start(self.bg, FoxDotClient(self.config.chipchannels, self.port))
 
     def bg(self, client):
         while not self.quit:
@@ -79,3 +78,11 @@ class FoxDotListen(SimpleBackground):
             if event is not None:
                 eventobj = NoteOn(self.config, event)
                 self.pll.event(event.time, eventobj, True)
+
+class FoxDotListen1(FoxDotListen):
+
+    port = 57110
+
+class FoxDotListen2(FoxDotListen):
+
+    port = 57120

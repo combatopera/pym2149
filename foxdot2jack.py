@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149 import jackclient
-from pym2149.foxdot import FoxDotListen
+from pym2149.foxdot import FoxDotListen1, FoxDotListen2
 from pym2149.midi import EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
@@ -39,7 +39,8 @@ def main():
         di.add(config.mediation) # TODO: Use upstream channel info.
         Channels.configure(di)
         di.add(SyncTimer)
-        di.add(FoxDotListen)
+        di.add(FoxDotListen1)
+        di.add(FoxDotListen2)
         jackclient.configure(di)
         di.add(EventPump)
         di.all(Started)
