@@ -178,7 +178,7 @@ class ConfigImpl(Config):
 
     def __getattr__(self, name):
         try:
-            return self.pRiVaTe.resolved(name).unravel()
+            return self[(name,)].unravel()
         except NoSuchPathException:
             raise AttributeError(name)
 
