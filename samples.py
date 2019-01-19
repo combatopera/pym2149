@@ -21,7 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import ConfigName
 from pym2149.timer import Timer, SimpleTimer
-from pym2149.out import configure, WavPlatform
+from pym2149 import out
 from pym2149.boot import boot
 from pym2149.iface import Stream, Config, Chip
 from pym2149.program import Note
@@ -162,11 +162,11 @@ class Target:
         path = os.path.join(self.targetpath, name)
         log.info(path)
         config, di = boot(self.configname)
-        di.add(WavPlatform)
+        di.add(out.WavPlatform)
         config.midichanneltoprogram = {} # We'll use programchange as necessary.
         config.outpath = path + '.wav'
         config.freqclamp = False # I want to see the very low periods.
-        configure(di)
+        out.configure(di)
         di.add(SimpleMediation) # TODO LATER: Could be even simpler.
         di.add(Channels)
         channels = di(Channels)
