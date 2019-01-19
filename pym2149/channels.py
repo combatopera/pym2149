@@ -20,7 +20,7 @@ from .pitch import Pitch
 from .program import FX
 from .const import midichannelcount
 from .mediation import Mediation
-from diapyr import types
+from diapyr import types, DI
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
 from .util import singleton
@@ -194,6 +194,6 @@ class Channels:
 
 class ChannelsConfigSubscription(ConfigSubscription):
 
-    @types(ConfigName, Channels)
-    def __init__(self, configname, channels):
-        super().__init__(configname, channels.reconfigure)
+    @types(ConfigName, DI, Channels)
+    def __init__(self, configname, di, channels):
+        super().__init__(configname, di, channels.reconfigure)

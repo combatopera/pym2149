@@ -129,13 +129,12 @@ class ConfigLoader:
         self.mtime = os.stat(path).st_mtime
         return path
 
-    def load(self, di = None):
+    def load(self, di):
         context = Context()
         context['global',] = Function(self.getglobal)
         context['enter',] = Function(self.enter)
         context['py',] = Function(lambda *args: self.py(config, *args))
-        if di is not None:
-            context['resolve',] = Function(lambda *args: self.resolve(di, *args))
+        context['resolve',] = Function(lambda *args: self.resolve(di, *args))
         self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
@@ -144,21 +143,22 @@ class ConfigLoader:
         config = ConfigImpl(context)
         return config
 
-    def reloadornone(self):
+    def reloadornone(self, di):
         path = self.configname.path()
         if os.stat(path).st_mtime != self.mtime:
             log.info("Reloading: %s", path)
-            return self.load()
+            return self.load(di)
 
 class ConfigSubscription(SimpleBackground):
 
-    def __init__(self, configname, consumer):
+    def __init__(self, configname, di, consumer):
         self.configname = configname
+        self.di = di
         self.consumer = consumer
 
     def start(self):
         self.loader = self.configname.newloader()
-        self.consumer(self.loader.load())
+        self.consumer(self.loader.load(self.di))
         super().start(self.bg, self.Sleeper())
 
     def bg(self, sleeper):
@@ -167,7 +167,7 @@ class ConfigSubscription(SimpleBackground):
                 sleeper.sleep(1)
                 if self.quit:
                     break
-                config = self.loader.reloadornone()
+                config = self.loader.reloadornone(self.di)
                 if config is not None:
                     self.consumer(config)
 
