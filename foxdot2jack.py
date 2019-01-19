@@ -38,15 +38,15 @@ def main():
     di.add(JackClient)
     try:
         di.all(Started)
-        configure(di)
         config = di(Config)
         di.add(config.mediation) # TODO: Use upstream channel info.
         Channels.addtodi(di)
+        di.add(SyncTimer)
+        di.add(FoxDotListen)
+        configure(di)
         di.all(Started)
         log.info(di(Channels))
-        di.add(SyncTimer)
         di.add(EventPump)
-        di.add(FoxDotListen)
         di.all(Started)
         awaitinterrupt(config)
     finally:
