@@ -131,3 +131,7 @@ speeddetector = true
 : Set to False to turn off the speed detector and save some CPU.
 
 mediation = $global(.mediation.DynamicMediation)
+
+FoxDot
+    port1 = 57110
+    port2 = 57120

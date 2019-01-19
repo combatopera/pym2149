@@ -70,7 +70,7 @@ class FoxDotListen(SimpleBackground):
         self.pll = pll
 
     def start(self):
-        super().start(self.bg, FoxDotClient(self.config.chipchannels, self.port))
+        super().start(self.bg, FoxDotClient(self.config.chipchannels, self.config.FoxDot[self.portkey]))
 
     def bg(self, client):
         while not self.quit:
@@ -81,8 +81,8 @@ class FoxDotListen(SimpleBackground):
 
 class FoxDotListen1(FoxDotListen):
 
-    port = 57110
+    portkey = 'port1'
 
 class FoxDotListen2(FoxDotListen):
 
-    port = 57120
+    portkey = 'port2'
