@@ -22,7 +22,7 @@ from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
-from pym2149.out import configure, WavPlatform
+from pym2149 import out
 from pym2149.boot import boot
 from pym2149.iface import Chip, Stream
 from pym2149.timerimpl import ChipTimer
@@ -34,8 +34,8 @@ def main():
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
     with open(config.inpath) as f:
         bytecode = readbytecode(f, config.srclabel)
-    configure(di)
-    di.add(WavPlatform)
+    out.configure(di)
+    di.add(out.WavPlatform)
     chip = di(Chip)
     try:
         di.all(Started)

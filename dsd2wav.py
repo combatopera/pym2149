@@ -21,7 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.config import ConfigName
-from pym2149.out import configure
+from pym2149 import out
 from pym2149.boot import boot
 from pym2149.iface import Chip, Stream
 from pym2149.timerimpl import ChipTimer
@@ -37,7 +37,7 @@ def main():
         bytecode = [ord(c) for c in f.read()]
     finally:
         f.close()
-    configure(di)
+    out.configure(di)
     chip = di(Chip)
     try:
         di.all(Started)

@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.out import configure
+from pym2149 import out
 from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('outpath'))
     di.add(PLL)
-    configure(di)
+    out.configure(di)
     di.add(config.mediation)
     Channels.configure(di)
     try:

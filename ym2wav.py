@@ -21,7 +21,7 @@ from pym2149.initlogging import logging
 from pym2149.ymformat import YMOpen
 from pym2149.config import ConfigName
 from pym2149.vis import Roll
-from pym2149.out import configure, WavPlatform
+from pym2149 import out
 from pym2149.boot import boot
 from pym2149.ymplayer import Player
 from pym2149.timerimpl import ChipTimer
@@ -31,11 +31,11 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath', 'outpath'))
-    di.add(WavPlatform)
+    di.add(out.WavPlatform)
     di.add(YMOpen)
     try:
         di.all(Started)
-        configure(di)
+        out.configure(di)
         di.add(Roll)
         di.add(ChipTimer)
         di.all(Started)
