@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149 import jackclient
-from pym2149.foxdot import SCSynth, SCLang
+from pym2149 import foxdot
 from pym2149.midi import EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
@@ -39,8 +39,7 @@ def main():
         di.add(config.mediation) # TODO: Use upstream channel info.
         Channels.configure(di)
         di.add(SyncTimer)
-        di.add(SCSynth)
-        di.add(SCLang)
+        foxdot.configure(di)
         jackclient.configure(di)
         di.add(EventPump)
         di.all(Started)

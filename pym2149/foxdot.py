@@ -25,23 +25,32 @@ import logging, socket
 
 log = logging.getLogger(__name__)
 
+class SCSynthHandler: pass
+
+class SCLangHandler: pass
+
+class LoadSynthDef(SCLangHandler):
+
+    address = '/foxdot'
+
+    @types()
+    def __init__(self): pass
+
+    def __call__(self, message):
+        path, = message.args
+        log.debug("Ignore SynthDef: %s", path)
+
 class FoxDotClient:
 
-    class FoxDotEvent:
-
-        def __init__(self, time, channel, note, velocity):
-            self.time = time
-            self.channel = channel
-            self.note = note
-            self.velocity = velocity
-
-    def __init__(self, chancount, host, port, bufsize):
+    def __init__(self, chancount, host, port, bufsize, handlers, label):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
         self.open = True
         self.chancount = chancount
         self.bufsize = bufsize
+        self.handlers = handlers
+        self.label = label
 
     def read(self):
         while self.open:
@@ -52,22 +61,32 @@ class FoxDotClient:
                 pass
 
     def _message(self, message):
-        print(message)
+        try:
+            addrpattern = message.addrpattern
+        except AttributeError:
+            log.warn("Unhandled %s bundle: %s", self.label, message)
+            return
+        try:
+            handler = self.handlers[addrpattern]
+        except KeyError:
+            log.warn("Unhandled %s message: %s", self.label, message)
+            return
+        handler(message)
 
     def interrupt(self):
         self.open = False
 
 class FoxDotListen(SimpleBackground):
 
-    @types(Config, PLL)
-    def __init__(self, config, pll):
+    def __init__(self, config, pll, handlers):
         self.config = config
         self.pll = pll
+        self.handlers = {h.address: h for h in handlers}
 
     def start(self):
         config = self.config['FoxDot', self.configkey]
         host, port, bufsize = (config.resolved(name).unravel() for name in ['host', 'port', 'bufsize'])
-        super().start(self.bg, FoxDotClient(self.config.chipchannels, host, port, bufsize))
+        super().start(self.bg, FoxDotClient(self.config.chipchannels, host, port, bufsize, self.handlers, self.configkey))
 
     def bg(self, client):
         while not self.quit:
@@ -80,6 +99,19 @@ class SCSynth(FoxDotListen):
 
     configkey = 'scsynth'
 
+    @types(Config, PLL, [SCSynthHandler])
+    def __init__(self, config, pll, handlers):
+        super().__init__(config, pll, handlers)
+
 class SCLang(FoxDotListen):
 
     configkey = 'sclang'
+
+    @types(Config, PLL, [SCLangHandler])
+    def __init__(self, config, pll, handlers):
+        super().__init__(config, pll, handlers)
+
+def configure(di):
+    di.add(LoadSynthDef)
+    di.add(SCSynth)
+    di.add(SCLang)
