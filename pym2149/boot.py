@@ -23,7 +23,7 @@ from . import minblep
 def createdi(configname):
     di = DI()
     di.add(configname)
-    config = configname.newloader().load(di)
+    config = configname.newloader(di).load()
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)

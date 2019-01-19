@@ -80,8 +80,8 @@ class ConfigName:
         for name, value in self.additems:
             context[name,] = wrap(value)
 
-    def newloader(self):
-        return ConfigLoader(self)
+    def newloader(self, di):
+        return ConfigLoader(self, di)
 
 def wrap(value):
     return (Number if isinstance(value, numbers.Number) else Text)(value)
@@ -114,27 +114,27 @@ class ConfigLoader:
     def py(config, context, *clauses):
         return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
 
-    @classmethod
-    def resolve(cls, di, context, resolvable):
+    def resolve(self, context, resolvable):
         try:
-            return AsContext(context, di(cls.getglobal(context, resolvable).value))
+            return AsContext(context, self.di(self.getglobal(context, resolvable).value))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
-    def __init__(self, configname):
+    def __init__(self, configname, di):
         self.configname = configname
+        self.di = di
 
     def mark(self):
         path = self.configname.path()
         self.mtime = os.stat(path).st_mtime
         return path
 
-    def load(self, di):
+    def load(self):
         context = Context()
         context['global',] = Function(self.getglobal)
         context['enter',] = Function(self.enter)
         context['py',] = Function(lambda *args: self.py(config, *args))
-        context['resolve',] = Function(lambda *args: self.resolve(di, *args))
+        context['resolve',] = Function(self.resolve)
         self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
@@ -143,11 +143,11 @@ class ConfigLoader:
         config = ConfigImpl(context)
         return config
 
-    def reloadornone(self, di):
+    def reloadornone(self):
         path = self.configname.path()
         if os.stat(path).st_mtime != self.mtime:
             log.info("Reloading: %s", path)
-            return self.load(di)
+            return self.load()
 
 class ConfigSubscription(SimpleBackground):
 
@@ -157,8 +157,8 @@ class ConfigSubscription(SimpleBackground):
         self.consumer = consumer
 
     def start(self):
-        self.loader = self.configname.newloader()
-        self.consumer(self.loader.load(self.di))
+        self.loader = self.configname.newloader(self.di)
+        self.consumer(self.loader.load())
         super().start(self.bg, self.Sleeper())
 
     def bg(self, sleeper):
@@ -167,7 +167,7 @@ class ConfigSubscription(SimpleBackground):
                 sleeper.sleep(1)
                 if self.quit:
                     break
-                config = self.loader.reloadornone(self.di)
+                config = self.loader.reloadornone()
                 if config is not None:
                     self.consumer(config)
 
