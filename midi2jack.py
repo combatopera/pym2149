@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.jackclient import JackClient, configure
+from pym2149 import jackclient
 from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
@@ -33,10 +33,10 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName())
     di.add(PLL)
-    di.add(JackClient)
+    di.add(jackclient.JackClient)
     try:
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
-        configure(di)
+        jackclient.configure(di)
         di.add(config.mediation)
         Channels.configure(di)
         di.all(Started)

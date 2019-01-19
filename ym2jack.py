@@ -19,7 +19,7 @@
 
 from pym2149.initlogging import logging
 from pym2149.ymformat import YMOpen
-from pym2149.jackclient import JackClient, configure
+from pym2149 import jackclient
 from pym2149.config import ConfigName
 from pym2149.vis import Roll
 from pym2149.boot import boot
@@ -32,11 +32,11 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath'))
-    di.add(JackClient)
+    di.add(jackclient.JackClient)
     di.add(YMOpen)
     try:
         di.all(Started)
-        configure(di)
+        jackclient.configure(di)
         di.add(Roll)
         di.add(SyncTimer)
         di.add(Player)

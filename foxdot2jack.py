@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.jackclient import JackClient, configure
+from pym2149 import jackclient
 from pym2149.foxdot import FoxDotListen
 from pym2149.midi import EventPump
 from pym2149.config import ConfigName
@@ -34,14 +34,14 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName())
     di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
-    di.add(JackClient)
+    di.add(jackclient.JackClient)
     try:
         di.all(Started)
         di.add(config.mediation) # TODO: Use upstream channel info.
         Channels.configure(di)
         di.add(SyncTimer)
         di.add(FoxDotListen)
-        configure(di)
+        jackclient.configure(di)
         di.add(EventPump)
         di.all(Started)
         log.info(di(Channels))

@@ -22,7 +22,7 @@ from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
-from pym2149.jackclient import JackClient, configure
+from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.iface import Chip, Stream, Prerecorded
 from pym2149.timerimpl import ChipTimer
@@ -41,11 +41,11 @@ def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
     with open(config.inpath) as f:
         bytecode = readbytecode(f, config.srclabel)
-    di.add(JackClient)
+    di.add(jackclient.JackClient)
     di.add(PrerecordedImpl)
     try:
         di.all(Started)
-        configure(di)
+        jackclient.configure(di)
         chip = di(Chip)
         di.all(Started)
         di.add(ChipTimer)
