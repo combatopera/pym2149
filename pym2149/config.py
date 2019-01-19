@@ -80,6 +80,9 @@ class ConfigName:
         for name, value in self.additems:
             context[name,] = wrap(value)
 
+    def newloader(self):
+        return PathInfo(self)
+
 def wrap(value):
     return (Number if isinstance(value, numbers.Number) else Text)(value)
 
@@ -154,8 +157,8 @@ class ConfigSubscription(SimpleBackground):
         self.consumer = consumer
 
     def start(self):
-        self.pathinfo = PathInfo(self.configname)
-        self.consumer(self.pathinfo.load())
+        self.loader = self.configname.newloader()
+        self.consumer(self.loader.load())
         super().start(self.bg, self.Sleeper())
 
     def bg(self, sleeper):
@@ -164,7 +167,7 @@ class ConfigSubscription(SimpleBackground):
                 sleeper.sleep(1)
                 if self.quit:
                     break
-                config = self.pathinfo.reloadornone()
+                config = self.loader.reloadornone()
                 if config is not None:
                     self.consumer(config)
 

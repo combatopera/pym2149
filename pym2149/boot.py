@@ -18,13 +18,12 @@
 from diapyr import DI
 from .ym2149 import ClockInfo, YM2149
 from .out import StereoInfo, FloatStream
-from .config import PathInfo
 from . import minblep
 
 def createdi(configname):
     di = DI()
     di.add(configname)
-    config = PathInfo(configname).load(di)
+    config = configname.newloader().load(di)
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
