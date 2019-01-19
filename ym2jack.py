@@ -35,7 +35,6 @@ def main():
     try:
         di.add(jackclient.JackClient)
         di.add(YMOpen)
-        di.all(Started)
         jackclient.configure(di)
         di.add(Roll)
         di.add(SyncTimer)
