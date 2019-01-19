@@ -32,12 +32,20 @@ class SCLangHandler: pass
 class GetInfo(SCLangHandler):
 
     address = '/foxdot/info'
+    audiochans = 100
+    inputchans = 2
+    outputchans = 2
+    buffers = 1024
 
     @types()
     def __init__(self): pass
 
     def __call__(self, message, reply):
-        reply(b'/foxdot/info\x00\x00\x00\x00,ffiiiiiiiii\x00\x00\x00\x00G;\x80\x00G;~\xf9\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00t\x00\x00\x10\x00\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x04\x00\x00\x00\x80\x00\x00\x00\x04\x00')
+        reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
+                self.audiochans, 0,
+                self.inputchans,
+                self.outputchans,
+                self.buffers, 0, 0]).ser())
 
 class LoadSynthDef(SCLangHandler):
 

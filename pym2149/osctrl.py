@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import struct
+import struct, io
 
 bundlemagic = b'#bundle\0'
+charset = 'ascii'
+int32 = '>i'
 
 def parse(v):
-    return (Bundle if v.startswith(bundlemagic) else Message)(v)
+    return (Bundle.read if v.startswith(bundlemagic) else Message.read)(v)
 
 class Reader:
 
@@ -42,7 +44,7 @@ class Reader:
         self.c += (-self.c) % 4
 
     def int32(self):
-        return struct.unpack('>i', self.consume(4))[0]
+        return struct.unpack(int32, self.consume(4))[0]
 
     def float32(self):
         return struct.unpack('>f', self.consume(4))[0]
@@ -56,7 +58,7 @@ class Reader:
         return blob
 
     def string(self):
-        text = self.consume(self.v.index(b'\0', self.c) - self.c).decode('ascii')
+        text = self.consume(self.v.index(b'\0', self.c) - self.c).decode(charset)
         self.c += 1 # Consume at least one null.
         self.align()
         return text
@@ -68,7 +70,24 @@ class Reader:
     def element(self):
         return parse(self.consume(self.int32()))
 
+class Writer:
+
+    def __init__(self, f):
+        self.f = f
+
+    def s(self, text):
+        v = text.encode(charset) + b'\0'
+        v += b'\0' * ((-len(v)) % 4)
+        self.f.write(v)
+
+    def i(self, n):
+        self.f.write(struct.pack(int32, n))
+
 class Bundle:
+
+    @classmethod
+    def read(cls, v):
+        return cls(v)
 
     def __init__(self, v):
         r = Reader(v)
@@ -90,13 +109,27 @@ class Message:
         'b': Reader.blob,
         's': Reader.string,
     }
+    tags = {
+        int: 'i',
+    }
 
-    def __init__(self, v):
+    @classmethod
+    def read(cls, v):
         r = Reader(v)
-        self.addrpattern = r.string()
-        self.args = []
-        for tt in r.string()[1:]:
-            self.args.append(self.types[tt](r))
+        return cls(r.string(), [cls.types[tt](r) for tt in r.string()[1:]])
+
+    def __init__(self, addrpattern, args):
+        self.addrpattern = addrpattern
+        self.args = args
 
     def __repr__(self):
         return "%s(%r, %r)" % (self.__class__.__name__, self.addrpattern, self.args)
+
+    def ser(self):
+        f = io.BytesIO()
+        w = Writer(f)
+        w.s(self.addrpattern)
+        w.s(',' + ''.join(self.tags[type(arg)] for arg in self.args))
+        for arg in self.args:
+            getattr(w, self.tags[type(arg)])(arg)
+        return f.getvalue()
