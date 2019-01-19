@@ -21,9 +21,8 @@ from pym2149.initlogging import logging
 from pym2149.out import configure
 from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
-from pym2149.iface import Config
 from pym2149.channels import Channels
-from pym2149.boot import createdi
+from pym2149.boot import boot
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.ymplayer import SimpleChipTimer
@@ -32,10 +31,9 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    di = createdi(ConfigName('outpath'))
+    config, di = boot(ConfigName('outpath'))
     di.add(PLL)
     configure(di)
-    config = di(Config)
     di.add(config.mediation)
     Channels.addtodi(di)
     try:

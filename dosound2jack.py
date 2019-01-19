@@ -23,8 +23,8 @@ from pym2149.timer import Timer
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149.jackclient import JackClient, configure
-from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream, Config, Prerecorded
+from pym2149.boot import boot
+from pym2149.iface import Chip, Stream, Prerecorded
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
 from diapyr import types
@@ -38,8 +38,7 @@ class PrerecordedImpl(Prerecorded):
         pass
 
 def main():
-    di = createdi(ConfigName('inpath', 'srclabel'))
-    config = di(Config)
+    config, di = boot(ConfigName('inpath', 'srclabel'))
     with open(config.inpath) as f:
         bytecode = readbytecode(f, config.srclabel)
     di.add(JackClient)

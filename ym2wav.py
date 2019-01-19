@@ -22,7 +22,7 @@ from pym2149.ymformat import YMOpen
 from pym2149.config import ConfigName
 from pym2149.vis import Roll
 from pym2149.out import configure, WavPlatform
-from pym2149.boot import createdi
+from pym2149.boot import boot
 from pym2149.ymplayer import Player
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
@@ -30,7 +30,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    di = createdi(ConfigName('inpath', 'outpath'))
+    config, di = boot(ConfigName('inpath', 'outpath'))
     di.add(WavPlatform)
     di.add(YMOpen)
     try:

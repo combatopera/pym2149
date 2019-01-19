@@ -20,7 +20,7 @@ from .ym2149 import ClockInfo, YM2149
 from .out import StereoInfo, FloatStream
 from . import minblep
 
-def createdi(configname):
+def boot(configname):
     di = DI()
     di.add(configname)
     di.add(di)
@@ -31,4 +31,4 @@ def createdi(configname):
     di.add(YM2149)
     di.add(minblep.loadorcreate)
     di.add(FloatStream)
-    return di
+    return config, di

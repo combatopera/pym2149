@@ -22,16 +22,15 @@ from pym2149.dosound import dosound
 from pym2149.timer import Timer
 from pym2149.config import ConfigName
 from pym2149.out import configure
-from pym2149.boot import createdi
-from pym2149.iface import Chip, Stream, Config
+from pym2149.boot import boot
+from pym2149.iface import Chip, Stream
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
 def main():
-    di = createdi(ConfigName('inpath', 'outpath'))
-    config = di(Config)
+    config, di = boot(ConfigName('inpath', 'outpath'))
     f = open(config.inpath, 'rb')
     try:
         log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
