@@ -36,7 +36,6 @@ def main():
     try:
         di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
         di.add(jackclient.JackClient)
-        di.all(Started)
         di.add(config.mediation) # TODO: Use upstream channel info.
         Channels.configure(di)
         di.add(SyncTimer)
