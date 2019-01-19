@@ -25,16 +25,18 @@ import logging, socket
 
 log = logging.getLogger(__name__)
 
-class SCSynthHandler: pass
+class Handler:
 
-class SCLangHandler: pass
+    @types()
+    def __init__(self): pass
+
+class SCSynthHandler(Handler): pass
+
+class SCLangHandler(Handler): pass
 
 class NullCommand(SCSynthHandler):
 
     addresses = '/g_freeAll', '/dumpOSC'
-
-    @types()
-    def __init__(self): pass
 
     def __call__(self, *args): pass
 
@@ -45,9 +47,6 @@ class GetInfo(SCLangHandler):
     inputchans = 2
     outputchans = 2
     buffers = 1024
-
-    @types()
-    def __init__(self): pass
 
     def __call__(self, timetags, message, reply):
         reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
@@ -60,12 +59,16 @@ class LoadSynthDef(SCLangHandler):
 
     addresses = '/foxdot',
 
-    @types()
-    def __init__(self): pass
-
     def __call__(self, timetags, message, reply):
         path, = message.args
         log.debug("Ignore SynthDef: %s", path)
+
+class NewGroup(SCSynthHandler):
+
+    addresses = '/g_new',
+
+    def __call__(self, timetags, message, reply):
+        id, action, target = message.args
 
 class FoxDotClient:
 
@@ -146,5 +149,6 @@ def configure(di):
     di.add(NullCommand)
     di.add(GetInfo)
     di.add(LoadSynthDef)
+    di.add(NewGroup)
     di.add(SCSynth)
     di.add(SCLang)
