@@ -29,6 +29,16 @@ class SCSynthHandler: pass
 
 class SCLangHandler: pass
 
+class GetInfo(SCLangHandler):
+
+    address = '/foxdot/info'
+
+    @types()
+    def __init__(self): pass
+
+    def __call__(self, message, reply):
+        reply(b'/foxdot/info\x00\x00\x00\x00,ffiiiiiiiii\x00\x00\x00\x00G;\x80\x00G;~\xf9\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00t\x00\x00\x10\x00\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x04\x00\x00\x00\x80\x00\x00\x00\x04\x00')
+
 class LoadSynthDef(SCLangHandler):
 
     address = '/foxdot'
@@ -36,14 +46,14 @@ class LoadSynthDef(SCLangHandler):
     @types()
     def __init__(self): pass
 
-    def __call__(self, message):
+    def __call__(self, message, reply):
         path, = message.args
         log.debug("Ignore SynthDef: %s", path)
 
 class FoxDotClient:
 
     def __init__(self, chancount, host, port, bufsize, handlers, label):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
         self.open = True
@@ -56,11 +66,11 @@ class FoxDotClient:
         while self.open:
             try:
                 bytes, address = self.sock.recvfrom(self.bufsize)
-                self._message(osctrl.parse(bytes))
+                self._message(address, osctrl.parse(bytes))
             except socket.timeout:
                 pass
 
-    def _message(self, message):
+    def _message(self, udpaddr, message):
         try:
             addrpattern = message.addrpattern
         except AttributeError:
@@ -71,7 +81,7 @@ class FoxDotClient:
         except KeyError:
             log.warn("Unhandled %s message: %s", self.label, message)
             return
-        handler(message)
+        handler(message, lambda reply: self.sock.sendto(reply, udpaddr))
 
     def interrupt(self):
         self.open = False
@@ -112,6 +122,7 @@ class SCLang(FoxDotListen):
         super().__init__(config, pll, handlers)
 
 def configure(di):
+    di.add(GetInfo)
     di.add(LoadSynthDef)
     di.add(SCSynth)
     di.add(SCLang)
