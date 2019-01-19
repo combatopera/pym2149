@@ -29,9 +29,18 @@ class SCSynthHandler: pass
 
 class SCLangHandler: pass
 
+class NullCommand(SCSynthHandler):
+
+    addresses = '/g_freeAll', '/dumpOSC'
+
+    @types()
+    def __init__(self): pass
+
+    def __call__(self, *args): pass
+
 class GetInfo(SCLangHandler):
 
-    address = '/foxdot/info'
+    addresses = '/foxdot/info',
     audiochans = 100
     inputchans = 2
     outputchans = 2
@@ -49,7 +58,7 @@ class GetInfo(SCLangHandler):
 
 class LoadSynthDef(SCLangHandler):
 
-    address = '/foxdot'
+    addresses = '/foxdot',
 
     @types()
     def __init__(self): pass
@@ -99,7 +108,7 @@ class FoxDotListen(SimpleBackground):
     def __init__(self, config, pll, handlers):
         self.config = config
         self.pll = pll
-        self.handlers = {h.address: h for h in handlers}
+        self.handlers = {a: h for h in handlers for a in h.addresses}
 
     def start(self):
         config = self.config['FoxDot', self.configkey]
@@ -130,6 +139,7 @@ class SCLang(FoxDotListen):
         super().__init__(config, pll, handlers)
 
 def configure(di):
+    di.add(NullCommand)
     di.add(GetInfo)
     di.add(LoadSynthDef)
     di.add(SCSynth)
