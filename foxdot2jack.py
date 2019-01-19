@@ -44,10 +44,9 @@ def main():
         di.add(SyncTimer)
         di.add(FoxDotListen)
         configure(di)
-        di.all(Started)
-        log.info(di(Channels))
         di.add(EventPump)
         di.all(Started)
+        log.info(di(Channels))
         awaitinterrupt(config)
     finally:
         di.discardall()
