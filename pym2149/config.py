@@ -81,7 +81,7 @@ class ConfigName:
             context[name,] = wrap(value)
 
     def newloader(self):
-        return PathInfo(self)
+        return ConfigLoader(self)
 
 def wrap(value):
     return (Number if isinstance(value, numbers.Number) else Text)(value)
@@ -98,7 +98,7 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
-class PathInfo:
+class ConfigLoader:
 
     @staticmethod
     def getglobal(context, resolvable):
