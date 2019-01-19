@@ -39,11 +39,11 @@ class PrerecordedImpl(Prerecorded):
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
-    with open(config.inpath) as f:
-        bytecode = readbytecode(f, config.srclabel)
-    di.add(jackclient.JackClient)
-    di.add(PrerecordedImpl)
     try:
+        with open(config.inpath) as f:
+            bytecode = readbytecode(f, config.srclabel)
+        di.add(jackclient.JackClient)
+        di.add(PrerecordedImpl)
         di.all(Started)
         jackclient.configure(di)
         chip = di(Chip)

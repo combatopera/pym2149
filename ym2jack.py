@@ -32,9 +32,9 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath'))
-    di.add(jackclient.JackClient)
-    di.add(YMOpen)
     try:
+        di.add(jackclient.JackClient)
+        di.add(YMOpen)
         di.all(Started)
         jackclient.configure(di)
         di.add(Roll)

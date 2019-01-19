@@ -33,9 +33,9 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName())
-    di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
-    di.add(jackclient.JackClient)
     try:
+        di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
+        di.add(jackclient.JackClient)
         di.all(Started)
         jackclient.configure(di)
         di.add(config.mediation) # Surely we can always use tidal connection for this.

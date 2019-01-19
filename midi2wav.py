@@ -32,11 +32,11 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('outpath'))
-    di.add(PLL)
-    out.configure(di)
-    di.add(config.mediation)
-    Channels.configure(di)
     try:
+        di.add(PLL)
+        out.configure(di)
+        di.add(config.mediation)
+        Channels.configure(di)
         di.all(Started)
         channels = di(Channels)
         log.info(channels)

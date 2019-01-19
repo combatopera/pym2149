@@ -31,9 +31,9 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath', 'outpath'))
-    di.add(out.WavPlatform)
-    di.add(YMOpen)
     try:
+        di.add(out.WavPlatform)
+        di.add(YMOpen)
         di.all(Started)
         out.configure(di)
         di.add(Roll)

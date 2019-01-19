@@ -31,15 +31,12 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath', 'outpath'))
-    f = open(config.inpath, 'rb')
     try:
-        log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-        bytecode = [ord(c) for c in f.read()]
-    finally:
-        f.close()
-    out.configure(di)
-    chip = di(Chip)
-    try:
+        with open(config.inpath, 'rb') as f:
+            log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
+            bytecode = [ord(c) for c in f.read()]
+        out.configure(di)
+        chip = di(Chip)
         di.all(Started)
         di.add(ChipTimer)
         stream = di(Stream)

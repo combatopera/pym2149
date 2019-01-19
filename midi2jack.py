@@ -32,9 +32,9 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName())
-    di.add(PLL)
-    di.add(jackclient.JackClient)
     try:
+        di.add(PLL)
+        di.add(jackclient.JackClient)
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         jackclient.configure(di)
         di.add(config.mediation)

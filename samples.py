@@ -162,35 +162,35 @@ class Target:
         path = os.path.join(self.targetpath, name)
         log.info(path)
         config, di = boot(self.configname)
-        di.add(out.WavPlatform)
-        config.midichanneltoprogram = {} # We'll use programchange as necessary.
-        config.outpath = path + '.wav'
-        config.freqclamp = False # I want to see the very low periods.
-        out.configure(di)
-        di.add(SimpleMediation) # TODO LATER: Could be even simpler.
-        di.add(Channels)
-        channels = di(Channels)
-        channels.midiprograms = {}
-        di.add(ChipTimer)
-        di.add(Player)
-        programids = ProgramIds()
-        frames = Frames()
-        def register(program):
-            programid = config.midiprogrambase + len(programids)
-            channels.midiprograms[programid] = program
-            programids[program] = programid
-        lftimer = SimpleTimer(config.updaterate)
-        for program in beats:
-            if program and program not in programids:
-                register(program)
-            frames.append(program)
-            b, = lftimer.blocksforperiod(beatsperbar)
-            for _ in range(b.framecount - 1):
-                frames.append(0)
-        di.add(programids)
-        di.add(frames)
-        start = time.time()
         try:
+            di.add(out.WavPlatform)
+            config.midichanneltoprogram = {} # We'll use programchange as necessary.
+            config.outpath = path + '.wav'
+            config.freqclamp = False # I want to see the very low periods.
+            out.configure(di)
+            di.add(SimpleMediation) # TODO LATER: Could be even simpler.
+            di.add(Channels)
+            channels = di(Channels)
+            channels.midiprograms = {}
+            di.add(ChipTimer)
+            di.add(Player)
+            programids = ProgramIds()
+            frames = Frames()
+            def register(program):
+                programid = config.midiprogrambase + len(programids)
+                channels.midiprograms[programid] = program
+                programids[program] = programid
+            lftimer = SimpleTimer(config.updaterate)
+            for program in beats:
+                if program and program not in programids:
+                    register(program)
+                frames.append(program)
+                b, = lftimer.blocksforperiod(beatsperbar)
+                for _ in range(b.framecount - 1):
+                    frames.append(0)
+            di.add(programids)
+            di.add(frames)
+            start = time.time()
             di.all(Started)
             di(Player)()
         finally:

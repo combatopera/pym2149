@@ -32,12 +32,12 @@ log = logging.getLogger(__name__)
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
-    with open(config.inpath) as f:
-        bytecode = readbytecode(f, config.srclabel)
-    out.configure(di)
-    di.add(out.WavPlatform)
-    chip = di(Chip)
     try:
+        with open(config.inpath) as f:
+            bytecode = readbytecode(f, config.srclabel)
+        out.configure(di)
+        di.add(out.WavPlatform)
+        chip = di(Chip)
         di.all(Started)
         di.add(ChipTimer)
         timer = di(Timer)
