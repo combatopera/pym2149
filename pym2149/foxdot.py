@@ -49,7 +49,7 @@ class GetInfo(SCLangHandler):
     @types()
     def __init__(self): pass
 
-    def __call__(self, message, reply):
+    def __call__(self, timetags, message, reply):
         reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
                 self.audiochans, 0,
                 self.inputchans,
@@ -63,7 +63,7 @@ class LoadSynthDef(SCLangHandler):
     @types()
     def __init__(self): pass
 
-    def __call__(self, message, reply):
+    def __call__(self, timetags, message, reply):
         path, = message.args
         log.debug("Ignore SynthDef: %s", path)
 
@@ -83,22 +83,26 @@ class FoxDotClient:
         while self.open:
             try:
                 bytes, address = self.sock.recvfrom(self.bufsize)
-                self._message(address, osctrl.parse(bytes))
+                self._message(address, [], osctrl.parse(bytes))
             except socket.timeout:
                 pass
 
-    def _message(self, udpaddr, message):
+    def _message(self, udpaddr, timetags, message):
         try:
             addrpattern = message.addrpattern
         except AttributeError:
-            log.warn("Unhandled %s bundle: %s", self.label, message)
+            self._elements(udpaddr, timetags + [message.timetag], message.elements)
             return
         try:
             handler = self.handlers[addrpattern]
         except KeyError:
             log.warn("Unhandled %s message: %s", self.label, message)
             return
-        handler(message, lambda reply: self.sock.sendto(reply, udpaddr))
+        handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr))
+
+    def _elements(self, udpaddr, timetags, elements):
+        for element in elements:
+            self._message(udpaddr, timetags, element)
 
     def interrupt(self):
         self.open = False
