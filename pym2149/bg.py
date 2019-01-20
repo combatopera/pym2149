@@ -95,14 +95,11 @@ class MainBackground(SimpleBackground):
             import cProfile
             cProfile.runctx('self.__call__(*args, **kwargs)', globals(), locals(), binpath)
             import pstats
-            f = open(profilepath, 'w')
-            try:
+            with open(profilepath, 'w') as f:
                 stats = pstats.Stats(binpath, stream = f)
                 stats.sort_stats(self.profilesort)
                 stats.print_stats()
-                f.flush()
-            finally:
-                f.close()
+                f.flush() # XXX: Why?
         finally:
             shutil.rmtree(tmpdir)
 
