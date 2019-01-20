@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2014, 2018 Andrzej Cichocki
+# Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
 #
