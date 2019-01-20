@@ -18,8 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149 import jackclient
-from pym2149 import foxdot
+from pym2149 import jackclient, foxdot
 from pym2149.midi import EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
