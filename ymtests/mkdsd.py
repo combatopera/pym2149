@@ -89,12 +89,9 @@ def main():
         print(outpath, file=sys.stderr)
         data = Data()
         exec(compile(open(inpath).read(), inpath, 'exec'), Globals(data).__dict__)
-        f = open(outpath, 'wb')
-        try:
+        with open(outpath, 'wb') as f:
             data.save(f)
-            f.flush()
-        finally:
-            f.close()
+            f.flush() # XXX: Why?
 
 if '__main__' == __name__:
     main()
