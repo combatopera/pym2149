@@ -79,7 +79,7 @@ class NewSynth(SCSynthHandler):
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
         if 'pluck' == name:
             tt, = timetags
-            print(tt, controls['freq'])
+            print(tt, controls['player'], controls['freq'])
 
 class FoxDotClient:
 
