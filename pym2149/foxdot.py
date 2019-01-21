@@ -77,7 +77,9 @@ class NewSynth(SCSynthHandler):
     def __call__(self, timetags, message, reply):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
-        print(name, controls)
+        if 'pluck' == name:
+            tt, = timetags
+            print(tt, controls['freq'])
 
 class FoxDotClient:
 
