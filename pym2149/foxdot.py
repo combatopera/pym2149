@@ -93,7 +93,7 @@ class FoxDotClient:
         self.handlers = handlers
         self.label = label
 
-    def read(self):
+    def readornone(self):
         while self.open:
             try:
                 bytes, address = self.sock.recvfrom(self.bufsize)
@@ -138,7 +138,7 @@ class FoxDotListen(SimpleBackground):
 
     def bg(self, client):
         while not self.quit:
-            event = client.read()
+            event = client.readornone()
             if event is not None:
                 eventobj = NoteOn(self.config, event)
                 self.pll.event(event.time, eventobj, True)
