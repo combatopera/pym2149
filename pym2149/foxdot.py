@@ -18,10 +18,9 @@
 from . import osctrl
 from .bg import SimpleBackground
 from .iface import Config
-from .midi import NoteOn
 from .pll import PLL
 from diapyr import types
-import logging, socket
+import logging, socket, re
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class GetInfo(SCLangHandler):
     outputchans = 2
     buffers = 1024
 
-    def __call__(self, timetags, message, reply):
+    def __call__(self, timetags, message, reply, addevent):
         reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
                 self.audiochans, 0,
                 self.inputchans,
@@ -59,7 +58,7 @@ class LoadSynthDef(SCLangHandler):
 
     addresses = '/foxdot',
 
-    def __call__(self, timetags, message, reply):
+    def __call__(self, timetags, message, reply, addevent):
         path, = message.args
         log.debug("Ignore SynthDef: %s", path)
 
@@ -67,19 +66,32 @@ class NewGroup(SCSynthHandler):
 
     addresses = '/g_new',
 
-    def __call__(self, timetags, message, reply):
+    def __call__(self, timetags, message, reply, addevent):
         id, action, target = message.args
+
+class FoxDotEvent:
+
+    def __init__(self, timetag, chan, freq):
+        self.timetag = timetag
+        self.chan = chan
+        self.freq = freq
 
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
+    playerregex = re.compile('y([a-z])')
 
-    def __call__(self, timetags, message, reply):
+    def __call__(self, timetags, message, reply, addevent):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
-        if 'pluck' == name:
+        try:
+            player, freq = (controls[k] for k in ['player', 'freq'])
+        except KeyError:
+            return
+        m = self.playerregex.fullmatch(player)
+        if m is not None:
             tt, = timetags
-            print(tt, controls['player'], controls['freq'])
+            addevent(FoxDotEvent(tt, ord(m.group(1)) - ord('a'), freq))
 
 class FoxDotClient:
 
@@ -87,36 +99,36 @@ class FoxDotClient:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
-        self.open = True
         self.chancount = chancount
         self.bufsize = bufsize
         self.handlers = handlers
         self.label = label
 
-    def readornone(self):
-        while self.open:
-            try:
-                bytes, address = self.sock.recvfrom(self.bufsize)
-                self._message(address, [], osctrl.parse(bytes))
-            except socket.timeout:
-                pass
+    def eventsortimeout(self):
+        events = []
+        try:
+            bytes, address = self.sock.recvfrom(self.bufsize)
+            self._message(address, [], osctrl.parse(bytes), events.append)
+        except socket.timeout:
+            pass
+        return events
 
-    def _message(self, udpaddr, timetags, message):
+    def _message(self, udpaddr, timetags, message, addevent):
         try:
             addrpattern = message.addrpattern
         except AttributeError:
-            self._elements(udpaddr, timetags + [message.timetag], message.elements)
+            self._elements(udpaddr, timetags + [message.timetag], message.elements, addevent)
             return
         try:
             handler = self.handlers[addrpattern]
         except KeyError:
             log.warn("Unhandled %s message: %s", self.label, message)
             return
-        handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr))
+        handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr), addevent)
 
-    def _elements(self, udpaddr, timetags, elements):
+    def _elements(self, udpaddr, timetags, elements, addevent):
         for element in elements:
-            self._message(udpaddr, timetags, element)
+            self._message(udpaddr, timetags, element, addevent)
 
     def interrupt(self):
         self.open = False
@@ -138,10 +150,9 @@ class FoxDotListen(SimpleBackground):
 
     def bg(self, client):
         while not self.quit:
-            event = client.readornone()
-            if event is not None:
-                eventobj = NoteOn(self.config, event)
-                self.pll.event(event.time, eventobj, True)
+            for event in client.eventsortimeout():
+                print(event)
+                pass#self.pll.event(event.time, eventobj, True)
 
 class SCSynth(FoxDotListen):
 
