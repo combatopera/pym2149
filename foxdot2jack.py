@@ -26,6 +26,7 @@ from pym2149.boot import boot
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
+from pym2149.mediation import SimpleMediation
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ def main():
     try:
         di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
         di.add(jackclient.JackClient)
-        di.add(config.mediation) # TODO: Use upstream channel info.
+        di.add(SimpleMediation) # XXX: Allow override by config?
         Channels.configure(di)
         di.add(SyncTimer)
         foxdot.configure(di)
