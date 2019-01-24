@@ -130,8 +130,11 @@ class FoxDotListen(SimpleBackground):
 
     def start(self):
         config = self.config['FoxDot', self.configkey]
-        host, port, bufsize = (config.resolved(name).unravel() for name in ['host', 'port', 'bufsize'])
-        super().start(self.bg, FoxDotClient(self.config.chipchannels, host, port, bufsize, self.handlers, self.configkey))
+        super().start(self.bg, FoxDotClient(
+                self.config.chipchannels,
+                *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
+                self.handlers,
+                self.configkey))
 
     def bg(self, client):
         while not self.quit:
