@@ -18,6 +18,7 @@
 from . import osctrl
 from .bg import SimpleBackground
 from .iface import Config
+from .midi import NoteOn
 from .pll import PLL
 from diapyr import types
 import logging, socket, re
@@ -71,10 +72,11 @@ class NewGroup(SCSynthHandler):
 
 class FoxDotEvent:
 
-    def __init__(self, timetag, midichan, freq):
+    def __init__(self, timetag, channel, note, velocity):
         self.timetag = timetag
-        self.midichan = midichan
-        self.freq = freq
+        self.channel = channel
+        self.note = note
+        self.velocity = velocity
 
 class NewSynth(SCSynthHandler):
 
@@ -83,19 +85,19 @@ class NewSynth(SCSynthHandler):
 
     @types(Config)
     def __init__(self, config):
-        self.midichanbase = config.midichannelbase
+        self.neutralvel = config.neutralvelocity
 
     def __call__(self, timetags, message, reply, addevent):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
         try:
-            player, freq = (controls[k] for k in ['player', 'freq'])
+            player, midinote, amp = (controls[k] for k in ['player', 'midinote', 'amp'])
         except KeyError:
             return
         m = self.playerregex.fullmatch(player)
         if m is not None:
-            tt, = timetags
-            addevent(FoxDotEvent(tt, self.midichanbase + ord(m.group(1)) - ord('a'), freq))
+            timetag, = timetags
+            addevent(FoxDotEvent(timetag, ord(m.group(1)) - ord('a'), midinote, round(amp * self.neutralvel)))
 
 class FoxDotClient:
 
@@ -155,7 +157,7 @@ class FoxDotListen(SimpleBackground):
     def bg(self, client):
         while not self.quit:
             for event in client.eventsortimeout():
-                self.pll.event(event.timetag, event, True)
+                self.pll.event(event.timetag, NoteOn(self.config, event), True)
 
 class SCSynth(FoxDotListen):
 
