@@ -71,15 +71,19 @@ class NewGroup(SCSynthHandler):
 
 class FoxDotEvent:
 
-    def __init__(self, timetag, chan, freq):
+    def __init__(self, timetag, midichan, freq):
         self.timetag = timetag
-        self.chan = chan
+        self.midichan = midichan
         self.freq = freq
 
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
     playerregex = re.compile('y([a-z])')
+
+    @types(Config)
+    def __init__(self, config):
+        self.midichanbase = config.midichannelbase
 
     def __call__(self, timetags, message, reply, addevent):
         name, id, action, target = message.args[:4]
@@ -91,7 +95,7 @@ class NewSynth(SCSynthHandler):
         m = self.playerregex.fullmatch(player)
         if m is not None:
             tt, = timetags
-            addevent(FoxDotEvent(tt, ord(m.group(1)) - ord('a'), freq))
+            addevent(FoxDotEvent(tt, self.midichanbase + ord(m.group(1)) - ord('a'), freq))
 
 class FoxDotClient:
 
@@ -151,8 +155,7 @@ class FoxDotListen(SimpleBackground):
     def bg(self, client):
         while not self.quit:
             for event in client.eventsortimeout():
-                print(event)
-                pass#self.pll.event(event.time, eventobj, True)
+                self.pll.event(event.timetag, event, True)
 
 class SCSynth(FoxDotListen):
 
