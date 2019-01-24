@@ -34,7 +34,7 @@ class PLL:
     def __init__(self, config):
         self.updateperiod = 1 / config.updaterate
         self.targetpos = float(config.plltargetpos)
-        self.medianshiftema = EMA(config.pllalpha, None)
+        self.medianshiftema = EMA(float(config.pllalpha), None)
 
     def start(self):
         self.events = []
