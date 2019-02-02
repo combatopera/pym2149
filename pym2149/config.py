@@ -139,7 +139,7 @@ class ConfigLoader:
         with Repl(context) as repl:
             repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
             if not self.configname.isdefaults():
-                context.loadpath(self.mark())
+                repl.printf(". %s", self.mark())
         config = ConfigImpl(context)
         return config
 
