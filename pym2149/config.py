@@ -96,6 +96,9 @@ class ConfigLoader:
         self.configname.applyitems(context)
         with Repl(context) as repl:
             repl.printf(". %s", self.mark())
+            settings = Path.home() / '.settings.arid'
+            if settings.exists():
+                repl.printf(". %s", settings)
         config = ConfigImpl(context)
         return config
 
