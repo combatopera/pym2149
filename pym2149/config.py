@@ -95,7 +95,9 @@ class ConfigLoader:
         context['resolve',] = Function(self.resolve)
         self.configname.applyitems(context)
         with Repl(context) as repl:
-            repl.printf(". %s", self.mark())
+            path = self.mark()
+            repl.printf("cwd = %s", path.parent)
+            repl.printf(". %s", path.name)
             settings = Path.home() / '.settings.arid'
             if settings.exists():
                 repl.printf(". %s", settings)

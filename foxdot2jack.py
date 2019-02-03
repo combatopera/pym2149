@@ -32,7 +32,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName())
+    config, di = boot(ConfigName(name = 'foxdot'))
     try:
         di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
         di.add(jackclient.JackClient)
