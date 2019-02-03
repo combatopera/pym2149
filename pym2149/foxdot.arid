@@ -16,3 +16,5 @@
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 . defaultconf.arid
+
+mediation = $global(.mediation.SimpleMediation)
