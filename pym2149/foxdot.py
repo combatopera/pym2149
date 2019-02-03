@@ -81,10 +81,10 @@ class FoxDotEvent:
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
-    playerregex = re.compile('y([a-z])')
 
     @types(Config)
     def __init__(self, config):
+        self.playerregex = re.compile(config.playerregex)
         self.neutralvel = config.neutralvelocity
 
     def __call__(self, timetags, message, reply, addevent):

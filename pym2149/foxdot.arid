@@ -18,3 +18,5 @@
 . defaultconf.arid
 
 mediation = $global(.mediation.SimpleMediation)
+
+playerregex = y([a-z])
