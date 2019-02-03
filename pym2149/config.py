@@ -16,44 +16,17 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .bg import SimpleBackground
-from .const import appconfigdir
 from .iface import Config
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
 from pathlib import Path
-import sys, logging, os, numbers, importlib
+import sys, logging, numbers, importlib
 
 log = logging.getLogger(__name__)
 
 class ConfigName:
-
-    envparam = 'PYM2149_CONFIG'
-    workspacepath = os.path.join(appconfigdir, 'workspace')
-    configfilename = 'chip.py'
-    defaultslabel = 'defaults'
-
-    @classmethod
-    def pathofname(cls, name):
-        return os.path.join(cls.workspacepath, name, cls.configfilename)
-
-    @classmethod
-    def getnameornone(cls):
-        try:
-            name = os.environ[cls.envparam]
-            return name if name else None # Empty means defaults.
-        except KeyError:
-            if os.path.exists(cls.workspacepath):
-                confignames = sorted(name for name in os.listdir(cls.workspacepath) if os.path.exists(cls.pathofname(name)))
-                for i, name in enumerate([cls.defaultslabel] + confignames):
-                    print("%s) %s" % (i, name), file=sys.stderr)
-                sys.stderr.write('#? ')
-                number = int(input())
-                if number < 0:
-                    raise Exception(number)
-                if number:
-                    return confignames[number - 1]
 
     def __init__(self, *params, **kwargs):
         try:
@@ -122,7 +95,7 @@ class ConfigLoader:
 
     def mark(self):
         path = self.configname.path
-        self.mtime = os.stat(path).st_mtime
+        self.mtime = path.stat().st_mtime
         return path
 
     def load(self):
@@ -139,7 +112,7 @@ class ConfigLoader:
 
     def reloadornone(self):
         path = self.configname.path
-        if os.stat(path).st_mtime != self.mtime:
+        if path.stat().st_mtime != self.mtime:
             log.info("Reloading: %s", path)
             return self.load()
 
