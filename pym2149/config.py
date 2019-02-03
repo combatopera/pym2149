@@ -22,6 +22,7 @@ from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
+from pathlib import Path
 import sys, logging, os, numbers, importlib
 
 log = logging.getLogger(__name__)
@@ -62,19 +63,14 @@ class ConfigName:
         if len(args) != len(params):
             raise Exception("Expected %s but got: %s" % (params, args))
         try:
-            nameornone = kwargs['nameornone']
+            name = kwargs['nameornone']
         except KeyError:
-            nameornone = self.getnameornone()
-        self.pathornone = None if nameornone is None else self.pathofname(nameornone)
+            name = 'defaultconf'
+        self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
         self.additems = list(zip(params, args))
 
     def isdefaults(self):
         return self.pathornone is None
-
-    def path(self):
-        if self.pathornone is None:
-            raise Exception("Using %s." % self.defaultslabel)
-        return self.pathornone
 
     def applyitems(self, context):
         for name, value in self.additems:
@@ -125,7 +121,7 @@ class ConfigLoader:
         self.di = di
 
     def mark(self):
-        path = self.configname.path()
+        path = self.configname.path
         self.mtime = os.stat(path).st_mtime
         return path
 
@@ -137,14 +133,12 @@ class ConfigLoader:
         context['resolve',] = Function(self.resolve)
         self.configname.applyitems(context)
         with Repl(context) as repl:
-            repl.printf(". $/(%s %s)", os.path.dirname(__file__), 'defaultconf.arid')
-            if not self.configname.isdefaults():
-                repl.printf(". %s", self.mark())
+            repl.printf(". %s", self.mark())
         config = ConfigImpl(context)
         return config
 
     def reloadornone(self):
-        path = self.configname.path()
+        path = self.configname.path
         if os.stat(path).st_mtime != self.mtime:
             log.info("Reloading: %s", path)
             return self.load()
@@ -162,14 +156,13 @@ class ConfigSubscription(SimpleBackground):
         super().start(self.bg, self.Sleeper())
 
     def bg(self, sleeper):
-        if not self.configname.isdefaults():
-            while True:
-                sleeper.sleep(1)
-                if self.quit:
-                    break
-                config = self.loader.reloadornone()
-                if config is not None:
-                    self.consumer(config)
+        while True:
+            sleeper.sleep(1)
+            if self.quit:
+                break
+            config = self.loader.reloadornone()
+            if config is not None:
+                self.consumer(config)
 
 class ConfigImpl(Config):
 

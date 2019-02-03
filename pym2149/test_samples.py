@@ -21,4 +21,4 @@ import unittest, samples
 class TestSamples(unittest.TestCase):
 
     def test_samples(self):
-        samples.mainimpl(ConfigName(nameornone = None, args = []))
+        samples.mainimpl(ConfigName(args = []))
