@@ -28,22 +28,11 @@ log = logging.getLogger(__name__)
 
 class ConfigName:
 
-    def __init__(self, *params, **kwargs):
-        try:
-            args = kwargs['args']
-        except KeyError:
-            args = sys.argv[1:]
+    def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
         if len(args) != len(params):
             raise Exception("Expected %s but got: %s" % (params, args))
-        try:
-            name = kwargs['nameornone']
-        except KeyError:
-            name = 'defaultconf'
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
         self.additems = list(zip(params, args))
-
-    def isdefaults(self):
-        return self.pathornone is None
 
     def applyitems(self, context):
         for name, value in self.additems:
