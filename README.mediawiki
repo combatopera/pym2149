@@ -1,7 +1,7 @@
 {|
 ! master
-! py3
+! legacy
 |-
 | [[Image:https://travis-ci.org/combatopera/pym2149.svg?branch=master]]
-| [[Image:https://travis-ci.org/combatopera/pym2149.svg?branch=py3]]
+| [[Image:https://travis-ci.org/combatopera/pym2149.svg?branch=legacy]]
 |}
