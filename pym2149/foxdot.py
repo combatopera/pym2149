@@ -85,6 +85,8 @@ class NewSynth(SCSynthHandler):
     @types(Config)
     def __init__(self, config):
         self.playerregex = re.compile(config.playerregex)
+        self.firstchanord = ord(config.firstchannelchar)
+        self.chipchannels = config.chipchannels
         self.neutralvel = config.neutralvelocity
 
     def __call__(self, timetags, message, reply, addevent):
@@ -97,7 +99,11 @@ class NewSynth(SCSynthHandler):
         m = self.playerregex.fullmatch(player)
         if m is not None:
             timetag, = timetags
-            addevent(FoxDotEvent(timetag, ord(m.group(1)) - ord('a'), midinote, round(amp * self.neutralvel)))
+            addevent(FoxDotEvent(
+                    timetag,
+                    (ord(m.group(1)) - self.firstchanord) % self.chipchannels,
+                    midinote,
+                    round(amp * self.neutralvel)))
 
 class FoxDotClient:
 

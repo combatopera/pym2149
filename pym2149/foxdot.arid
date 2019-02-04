@@ -19,4 +19,6 @@
 
 mediation = $global(.mediation.SimpleMediation)
 
-playerregex = y([a-z])
+playerregex = .(.)
+
+firstchannelchar = $.(1)
