@@ -107,11 +107,10 @@ class NewSynth(SCSynthHandler):
 
 class FoxDotClient:
 
-    def __init__(self, chancount, host, port, bufsize, handlers, label):
+    def __init__(self, host, port, bufsize, handlers, label):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
-        self.chancount = chancount
         self.bufsize = bufsize
         self.handlers = handlers
         self.label = label
@@ -155,7 +154,6 @@ class FoxDotListen(SimpleBackground):
     def start(self):
         config = self.config['FoxDot', self.configkey]
         super().start(self.bg, FoxDotClient(
-                self.config.chipchannels,
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
                 self.handlers,
                 self.configkey))
