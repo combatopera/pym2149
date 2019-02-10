@@ -203,6 +203,8 @@ class EventPump(MainBackground):
             for noteevents in chanandnotetoevents.values():
                 if NoteOn == noteevents[-1].__class__:
                     sortedevents.extend(noteevents)
+            # Any custom events:
+            sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage))
             for event in sortedevents:
                 log.debug("%.6f %s @ %s -> %s", event.offset, event, timecode, event(self.channels))
             self.channels.updateall()
