@@ -18,8 +18,8 @@
 from . import osctrl
 from .bg import SimpleBackground
 from .iface import Config
-from .midi import NoteOn
 from .pll import PLL
+from .program import DefaultNote
 from diapyr import types
 import logging, socket, re
 
@@ -72,11 +72,17 @@ class NewGroup(SCSynthHandler):
 
 class FoxDotEvent:
 
-    def __init__(self, timetag, channel, note, velocity):
+    def __init__(self, timetag, player, programname, midinote, vel):
         self.timetag = timetag
-        self.channel = channel
-        self.note = note
-        self.velocity = velocity
+        self.midichan = player
+        self.programname = programname
+        self.midinote = midinote
+        self.vel = vel
+
+    def __call__(self, channels):
+        channels.midiprograms[self.programname] = DefaultNote # TODO: Use actual program.
+        channels.programchange(self.midichan, self.programname)
+        return channels.noteon(self.midichan, self.midinote, self.vel)
 
 class NewSynth(SCSynthHandler):
 
@@ -85,8 +91,6 @@ class NewSynth(SCSynthHandler):
     @types(Config)
     def __init__(self, config):
         self.playerregex = re.compile(config.playerregex)
-        self.firstchanord = ord(config.firstchannelchar)
-        self.chipchannels = config.chipchannels
         self.neutralvel = config.neutralvelocity
 
     def __call__(self, timetags, message, reply, addevent):
@@ -101,7 +105,8 @@ class NewSynth(SCSynthHandler):
             timetag, = timetags
             addevent(FoxDotEvent(
                     timetag,
-                    (ord(m.group(1)) - self.firstchanord) % self.chipchannels,
+                    player,
+                    name,
                     midinote,
                     round(amp * self.neutralvel)))
 
@@ -161,7 +166,7 @@ class FoxDotListen(SimpleBackground):
     def bg(self, client):
         while not self.quit:
             for event in client.eventsortimeout():
-                self.pll.event(event.timetag, NoteOn(self.config, event), True)
+                self.pll.event(event.timetag, event, True)
 
 class SCSynth(FoxDotListen):
 

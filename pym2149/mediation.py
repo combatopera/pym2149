@@ -97,3 +97,16 @@ class SimpleMediation(Mediation):
         chipchan = (midichan - self.midichanbase) % self.chipchancount
         noteid = (midichan - self.midichanbase) // self.chipchancount
         return chipchan, noteid
+
+class PlayerMediation(Mediation):
+
+    @types(Config)
+    def __init__(self, config):
+        super().__init__(config)
+        self.chipchancount = config.chipchannels
+
+    def tochipchanandnoteid(self, midichan, midinote, frame):
+        channel = ord(midichan[1]) - ord('1') # FIXME: Do this properly.
+        chipchan = channel % self.chipchancount
+        noteid = channel // self.chipchancount
+        return chipchan, noteid

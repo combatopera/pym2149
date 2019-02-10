@@ -122,7 +122,8 @@ class Channels:
         self.channels = [Channel(config, i, chip) for i in range(config.chipchannels)]
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.slidemidichans = set(config.slidechannels)
-        self.midichantofx = dict([c, FX(config, c in self.slidemidichans)] for c in range(config.midichannelbase, config.midichannelbase + midichannelcount))
+        self.fxfactory = lambda midichan: FX(config, midichan in self.slidemidichans)
+        self.midichantofx = {c: self.fxfactory(c) for c in range(config.midichannelbase, config.midichannelbase + midichannelcount)}
         self.mediation = mediation
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
@@ -146,7 +147,10 @@ class Channels:
             for mn in range(0x80):
                 self.noteoff(midichan, mn, 0)
         program = self.midiprograms[self.midichantoprogram[midichan]]
-        fx = self.midichantofx[midichan]
+        try:
+            fx = self.midichantofx[midichan]
+        except KeyError:
+            self.midichantofx[midichan] = fx = self.fxfactory(midichan)
         chipchan, noteid = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
         channel = self.channels[chipchan]
         if midichan in self.slidemidichans:
