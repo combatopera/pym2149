@@ -17,9 +17,10 @@
 
 from . import osctrl
 from .bg import SimpleBackground
+from .channels import Channels
 from .iface import Config
 from .pll import PLL
-from .program import DefaultNote
+from .program import Note
 from diapyr import types
 import logging, socket, re
 
@@ -59,9 +60,19 @@ class LoadSynthDef(SCLangHandler):
 
     addresses = '/foxdot',
 
+    @types(Channels)
+    def __init__(self, channels):
+        self.context = {}
+        self.channels = channels
+
     def __call__(self, timetags, message, reply, addevent):
-        path, = message.args
-        log.debug("Ignore SynthDef: %s", path)
+        text, = message.args
+        context = {}
+        exec(text, self.context, context)
+        for name, obj in context.items():
+            if issubclass(obj, Note):
+                self.channels.midiprograms[name] = obj
+        self.context.update(context)
 
 class NewGroup(SCSynthHandler):
 
@@ -80,7 +91,6 @@ class FoxDotEvent:
         self.vel = vel
 
     def __call__(self, channels):
-        channels.midiprograms[self.programname] = DefaultNote # TODO: Use actual program.
         channels.programchange(self.midichan, self.programname)
         return channels.noteon(self.midichan, self.midinote, self.vel)
 
