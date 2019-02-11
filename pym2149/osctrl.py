@@ -111,6 +111,7 @@ class Message:
     }
     tags = {
         int: 'i',
+        str: 's',
     }
 
     @classmethod
