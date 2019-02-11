@@ -68,7 +68,12 @@ class LoadSynthDef(SCLangHandler):
     def __call__(self, timetags, message, reply, addevent):
         text, = message.args
         context = {}
-        exec(text, self.context, context)
+        try:
+            exec(text, self.context, context)
+        except Exception:
+            log.exception('Message failed:')
+            return
+        log.debug('Message OK.')
         for name, obj in context.items():
             if issubclass(obj, Note):
                 self.channels.midiprograms[name] = obj
