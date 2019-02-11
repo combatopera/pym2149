@@ -17,6 +17,8 @@
 
 . defaultconf.arid
 
+speeddetector = false
+
 mediation = $global(.mediation.PlayerMediation)
 
 playerregex = .(.)

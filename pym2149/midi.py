@@ -23,7 +23,7 @@ from .bg import SimpleBackground, MainBackground
 from .channels import Channels
 from .minblep import MinBleps
 from .timer import Timer
-from .util import EMA
+from .util import EMA, singleton
 from .speed import SpeedDetector
 from .native import calsa
 import logging, time
@@ -156,6 +156,13 @@ class MidiListen(SimpleBackground):
                 eventobj = self.classes[event.type](self.config, event)
                 self.pll.event(event.time, eventobj, eventobj.midichan not in self.pllignoremidichans)
 
+@singleton
+class NullSpeedDetector:
+
+    speedphase = None
+
+    def __call__(self, eventcount): pass
+
 class EventPump(MainBackground):
 
     @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
@@ -164,7 +171,7 @@ class EventPump(MainBackground):
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.inputskipenabled
-        self.speeddetector = SpeedDetector(10) if config.speeddetector else lambda eventcount: None
+        self.speeddetector = SpeedDetector(10) if config.speeddetector else NullSpeedDetector
         self.channels = channels
         self.minbleps = minbleps
         self.stream = stream
