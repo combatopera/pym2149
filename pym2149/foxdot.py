@@ -22,7 +22,7 @@ from .iface import Config
 from .pll import PLL
 from .program import Note
 from diapyr import types
-import logging, socket, re, inspect
+import logging, socket, re, inspect, traceback
 
 log = logging.getLogger(__name__)
 
@@ -70,13 +70,15 @@ class LoadSynthDef(SCLangHandler):
             text, = message.args
             context = {}
             exec(text, self.context, context)
+            lines = ["# Add/update: %s" % ', '.join(context.keys())]
             for name, obj in context.items():
-                if inspect.isclass(obj) and issubclass(obj, Note):
+                if obj != Note and inspect.isclass(obj) and issubclass(obj, Note):
                     self.channels.midiprograms[name] = obj
+                    lines.append("%s = SynthDef(%r)" % (name, name))
             self.context.update(context)
-            log.info("Add/update: %s", ', '.join(context.keys()))
         except Exception:
-            log.exception('Message failed:')
+            lines = ["# %s" % l for l in traceback.format_exc().splitlines()]
+        reply(''.join("%s\n" % l for l in lines).encode('utf_8'))
 
 class NewGroup(SCSynthHandler):
 
