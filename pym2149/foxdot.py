@@ -66,18 +66,17 @@ class LoadSynthDef(SCLangHandler):
         self.channels = channels
 
     def __call__(self, timetags, message, reply, addevent):
-        text, = message.args
-        context = {}
         try:
+            text, = message.args
+            context = {}
             exec(text, self.context, context)
+            for name, obj in context.items():
+                if issubclass(obj, Note):
+                    self.channels.midiprograms[name] = obj
+            self.context.update(context)
+            log.info("Add/update: %s", ', '.join(context.keys()))
         except Exception:
             log.exception('Message failed:')
-            return
-        log.debug('Message OK.')
-        for name, obj in context.items():
-            if issubclass(obj, Note):
-                self.channels.midiprograms[name] = obj
-        self.context.update(context)
 
 class NewGroup(SCSynthHandler):
 
