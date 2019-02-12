@@ -22,7 +22,7 @@ from .iface import Config
 from .pll import PLL
 from .program import Note
 from diapyr import types
-import logging, socket, re
+import logging, socket, re, inspect
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ class LoadSynthDef(SCLangHandler):
             context = {}
             exec(text, self.context, context)
             for name, obj in context.items():
-                if issubclass(obj, Note):
+                if inspect.isclass(obj) and issubclass(obj, Note):
                     self.channels.midiprograms[name] = obj
             self.context.update(context)
             log.info("Add/update: %s", ', '.join(context.keys()))
