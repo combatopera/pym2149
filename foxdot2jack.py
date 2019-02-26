@@ -28,7 +28,7 @@ from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
 from diapyr.start import Started
 
-log = logging.getLogger(__name__)
+del logging
 
 def main():
     config, di = boot(ConfigName(name = 'foxdot'))
@@ -42,7 +42,6 @@ def main():
         jackclient.configure(di)
         di.add(EventPump)
         di.all(Started)
-        log.info(di(Channels))
         awaitinterrupt(config)
     finally:
         di.discardall()

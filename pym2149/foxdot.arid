@@ -24,3 +24,7 @@ mediation = $global(.mediation.PlayerMediation)
 playerregex = .(.)
 
 firstchannelchar = $.(1)
+
+midiprograms = $py[{}]
+
+midichanneltoprogram = $py[{}]
