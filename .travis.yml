@@ -1,7 +1,7 @@
 addons:
   apt:
     packages:
-    - python-pyparsing
+    - python3-pyparsing
 install:
 - git clone https://github.com/combatopera/aridity.git ../aridity
 - git clone https://github.com/combatopera/pyven.git ../pyven
