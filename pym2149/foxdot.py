@@ -68,14 +68,15 @@ class LoadSynthDef(SCLangHandler):
     def __call__(self, timetags, message, reply, addevent):
         try:
             text, = message.args
-            context = {}
-            exec(text, self.context, context)
+            snapshot = self.context.copy()
+            exec(text, self.context)
+            context = {name: obj for name, obj in self.context.items()
+                    if name not in snapshot or obj is not snapshot[name]}
             lines = ["# Add/update: %s" % ', '.join(context.keys())]
             for name, obj in context.items():
                 if obj != Note and inspect.isclass(obj) and issubclass(obj, Note):
                     self.channels.midiprograms[name] = obj
                     lines.append("%s = SynthDef(%r)" % (name, name))
-            self.context.update(context)
         except Exception:
             lines = ["# %s" % l for l in traceback.format_exc().splitlines()]
         reply(''.join("%s\n" % l for l in lines).encode('utf_8'))
