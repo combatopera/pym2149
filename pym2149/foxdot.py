@@ -22,7 +22,7 @@ from .iface import Config
 from .pll import PLL
 from .program import Note
 from diapyr import types
-import logging, socket, re, inspect, traceback
+import logging, socket, re, inspect, traceback, pym2149
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class LoadSynthDef(SCLangHandler):
 
     @types(Channels)
     def __init__(self, channels):
-        self.context = {}
+        self.context = {'__name__': pym2149.__name__}
         self.channels = channels
 
     def __call__(self, timetags, message, reply, addevent):
