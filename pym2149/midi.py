@@ -214,9 +214,12 @@ class EventPump(MainBackground):
             sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage)) # XXX: Retire?
             for event in sortedevents:
                 try:
-                    log.debug("%.6f %s @ %s -> %s", event.offset, event, timecode, event(self.channels))
+                    result = event(self.channels)
                 except Exception as e:
-                    log.error("%.6f %s @ %s -> %s", event.offset, event, timecode, e) # TODO: Exception looks confusing.
+                    result = e
+                # TODO: Exception looks confusing.
+                result = '' if result is None else " -> %s" % result
+                log.error("%.6f %s @ %s%s", event.offset, event, timecode, result)
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
