@@ -25,7 +25,7 @@ from .program import Note, Unpitched
 from diapyr import types
 from threading import Timer
 from types import SimpleNamespace
-import logging, socket, re, inspect, traceback, pym2149
+import logging, socket, re, inspect, traceback
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class LoadSynthDef(SCLangHandler):
 
     @types(Channels)
     def __init__(self, channels):
-        self.context = {'__name__': pym2149.__name__}
+        self.context = {'__name__': 'pym2149.context'}
         self.channels = channels
 
     def __call__(self, timetags, message, reply):
