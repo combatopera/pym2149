@@ -23,6 +23,7 @@ projects +=
     aridity
     outjack
     mynblep
+    system
 branch
     pyrbo = py3
     mynblep = py3

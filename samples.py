@@ -31,7 +31,7 @@ from pym2149.dac import PWMEffect, SinusEffect
 from pym2149.timerimpl import ChipTimer
 from diapyr import types
 from diapyr.start import Started
-import os, subprocess, time
+import os, time
 
 log = logging.getLogger(__name__)
 
@@ -140,17 +140,10 @@ class Player:
 
 class Target:
 
-    @classmethod
-    def sox(cls):
-        try:
-            return cls.soxflag
-        except AttributeError:
-            pass
-        with open(os.devnull, 'w') as devnull:
-            cls.soxflag = not subprocess.call(['which', 'sox'], stdout = devnull)
-        if not cls.soxflag:
-            log.info("sox is not available, spectrograms won't be created.")
-        return cls.soxflag
+    try:
+        from system import sox
+    except ImportError:
+        log.warning("sox is not available, spectrograms won't be created.")
 
     def __init__(self, configname):
         self.targetpath = os.path.join(os.path.dirname(__file__), 'target')
@@ -196,8 +189,8 @@ class Target:
         finally:
             di.discardall()
         log.info("Render of %.3f seconds took %.3f seconds.", len(frames) / config.updaterate, time.time() - start)
-        if self.sox():
-            subprocess.check_call(['sox', path + '.wav', '-n', 'spectrogram', '-o', path + '.png'])
+        if hasattr(self, 'sox'):
+            self.sox(path + '.wav', '-n', 'spectrogram', '-o', path + '.png')
 
 def main():
     mainimpl(ConfigName())
