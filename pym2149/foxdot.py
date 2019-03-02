@@ -22,6 +22,7 @@ from .iface import Config
 from .pll import PLL
 from .program import Note, Unpitched
 from diapyr import types
+from threading import Timer
 import logging, socket, re, inspect, traceback, pym2149
 
 log = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ class NewGroup(SCSynthHandler):
     def __call__(self, timetags, message, reply):
         id, action, target = message.args
 
-class FoxDotEvent:
+class FoxDotNoteOn:
 
     def __init__(self, player, programname, midinote, vel):
         self.midichan = player
@@ -99,6 +100,15 @@ class FoxDotEvent:
     def __call__(self, channels):
         channels.programchange(self.midichan, self.programname)
         return channels.noteon(self.midichan, self.midinote, self.vel)
+
+class FoxDotNoteOff:
+
+    def __init__(self, player, midinote):
+        self.midichan = player
+        self.midinote = midinote
+
+    def __call__(self, channels):
+        return channels.noteoff(self.midichan, self.midinote, None)
 
 class NewSynth(SCSynthHandler):
 
@@ -114,7 +124,8 @@ class NewSynth(SCSynthHandler):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
         try:
-            player, midinote, amp = (controls[k] for k in ['player', 'midinote', 'amp'])
+            player, midinote, amp, sus, blur = (controls[k]
+                    for k in ['player', 'midinote', 'amp', 'sus', 'blur'])
         except KeyError:
             return
         m = self.playerregex.fullmatch(player)
@@ -122,8 +133,12 @@ class NewSynth(SCSynthHandler):
             timetag, = timetags
             self.pll.event(
                     timetag,
-                    FoxDotEvent(player, name, midinote, round(amp * self.neutralvel)),
+                    FoxDotNoteOn(player, name, midinote, round(amp * self.neutralvel)),
                     True)
+            onfor = sus * blur
+            def noteoff():
+                self.pll.event(timetag + onfor, FoxDotNoteOff(player, midinote), False)
+            Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
 
 class FoxDotClient:
 
