@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import struct, logging, os, tempfile, subprocess, shutil, sys
+import struct, logging, os, tempfile, shutil, sys
 from .ym2149 import stclock
 from diapyr import types
 from .iface import YMFile, Config
@@ -306,8 +306,9 @@ class UnpackedFile:
     def __init__(self, path):
         self.tmpdir = tempfile.mkdtemp()
         try:
+            from system import lha
             # Observe we redirect stdout so it doesn't get played:
-            subprocess.check_call(['lha', 'x', os.path.abspath(path)], cwd = self.tmpdir, stdout = sys.stderr)
+            lha('x', os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
             name, = os.listdir(self.tmpdir)
             self.f = open(os.path.join(self.tmpdir, name), 'rb')
         except:
