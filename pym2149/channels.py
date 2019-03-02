@@ -73,8 +73,10 @@ class Channel:
         self.chip = chip
         self.channote = nullchannote
 
-    def programornone(self):
-        return self.channote.programornone()
+    def programstr(self):
+        program = self.channote.programornone()
+        if program is not None:
+            return program.__name__
 
     def newnote(self, noteid, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel))
@@ -177,7 +179,7 @@ class Channels:
         self.midichantoprogram[midichan] = program
 
     def updateall(self):
-        text = ' | '.join("%s@%s" % (c.programornone(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
+        text = ' | '.join("%s@%s" % (c.programstr(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
         if text != self.prevtext:
             log.debug(text)
             self.prevtext = text
