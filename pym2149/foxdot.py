@@ -49,7 +49,7 @@ class GetInfo(SCLangHandler):
     outputchans = 2
     buffers = 1024
 
-    def __call__(self, timetags, message, reply, addevent):
+    def __call__(self, timetags, message, reply):
         reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
                 self.audiochans, 0,
                 self.inputchans,
@@ -65,7 +65,7 @@ class LoadSynthDef(SCLangHandler):
         self.context = {'__name__': pym2149.__name__}
         self.channels = channels
 
-    def __call__(self, timetags, message, reply, addevent):
+    def __call__(self, timetags, message, reply):
         try:
             text, = message.args
             snapshot = self.context.copy()
@@ -85,13 +85,12 @@ class NewGroup(SCSynthHandler):
 
     addresses = '/g_new',
 
-    def __call__(self, timetags, message, reply, addevent):
+    def __call__(self, timetags, message, reply):
         id, action, target = message.args
 
 class FoxDotEvent:
 
-    def __init__(self, timetag, player, programname, midinote, vel):
-        self.timetag = timetag
+    def __init__(self, player, programname, midinote, vel):
         self.midichan = player
         self.programname = programname
         self.midinote = midinote
@@ -105,12 +104,13 @@ class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
 
-    @types(Config)
-    def __init__(self, config):
+    @types(Config, PLL)
+    def __init__(self, config, pll):
         self.playerregex = re.compile(config.playerregex)
         self.neutralvel = config.neutralvelocity
+        self.pll = pll
 
-    def __call__(self, timetags, message, reply, addevent):
+    def __call__(self, timetags, message, reply):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
         try:
@@ -120,12 +120,10 @@ class NewSynth(SCSynthHandler):
         m = self.playerregex.fullmatch(player)
         if m is not None:
             timetag, = timetags
-            addevent(FoxDotEvent(
+            self.pll.event(
                     timetag,
-                    player,
-                    name,
-                    midinote,
-                    round(amp * self.neutralvel)))
+                    FoxDotEvent(player, name, midinote, round(amp * self.neutralvel)),
+                    True)
 
 class FoxDotClient:
 
@@ -137,40 +135,37 @@ class FoxDotClient:
         self.handlers = handlers
         self.label = label
 
-    def eventsortimeout(self):
-        events = []
+    def pumponeortimeout(self):
         try:
             bytes, address = self.sock.recvfrom(self.bufsize)
-            self._message(address, [], osctrl.parse(bytes), events.append)
+            self._message(address, [], osctrl.parse(bytes))
         except socket.timeout:
             pass
-        return events
 
-    def _message(self, udpaddr, timetags, message, addevent):
+    def _message(self, udpaddr, timetags, message):
         try:
             addrpattern = message.addrpattern
         except AttributeError:
-            self._elements(udpaddr, timetags + [message.timetag], message.elements, addevent)
+            self._elements(udpaddr, timetags + [message.timetag], message.elements)
             return
         try:
             handler = self.handlers[addrpattern]
         except KeyError:
             log.warn("Unhandled %s message: %s", self.label, message)
             return
-        handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr), addevent)
+        handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr))
 
-    def _elements(self, udpaddr, timetags, elements, addevent):
+    def _elements(self, udpaddr, timetags, elements):
         for element in elements:
-            self._message(udpaddr, timetags, element, addevent)
+            self._message(udpaddr, timetags, element)
 
     def interrupt(self):
         self.open = False
 
 class FoxDotListen(SimpleBackground):
 
-    def __init__(self, config, pll, handlers):
+    def __init__(self, config, handlers):
         self.config = config
-        self.pll = pll
         self.handlers = {a: h for h in handlers for a in h.addresses}
 
     def start(self):
@@ -182,24 +177,23 @@ class FoxDotListen(SimpleBackground):
 
     def bg(self, client):
         while not self.quit:
-            for event in client.eventsortimeout():
-                self.pll.event(event.timetag, event, True)
+            client.pumponeortimeout()
 
 class SCSynth(FoxDotListen):
 
     configkey = 'scsynth'
 
-    @types(Config, PLL, [SCSynthHandler])
-    def __init__(self, config, pll, handlers):
-        super().__init__(config, pll, handlers)
+    @types(Config, [SCSynthHandler])
+    def __init__(self, config, handlers):
+        super().__init__(config, handlers)
 
 class SCLang(FoxDotListen):
 
     configkey = 'sclang'
 
-    @types(Config, PLL, [SCLangHandler])
-    def __init__(self, config, pll, handlers):
-        super().__init__(config, pll, handlers)
+    @types(Config, [SCLangHandler])
+    def __init__(self, config, handlers):
+        super().__init__(config, handlers)
 
 def configure(di):
     di.add(NullCommand)
