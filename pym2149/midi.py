@@ -76,7 +76,7 @@ class NoteOnOff(ChannelMessage):
         self.vel = event.velocity
 
     def __str__(self):
-        return "%s %2d %3d %3d" % (self.char, self.midichan, self.midinote, self.vel)
+        return "%s %2s %3d %3s" % (self.char, self.midichan, self.midinote, self.vel)
 
 class NoteOn(NoteOnOff):
 
@@ -114,7 +114,7 @@ class ProgramChange(ChannelStateMessage):
         return channels.programchange(self.midichan, self.program)
 
     def __str__(self):
-        return "P %2d %3d" % (self.midichan, self.program)
+        return "P %2s %3s" % (self.midichan, self.program)
 
 class ControlChange(ChannelStateMessage):
 

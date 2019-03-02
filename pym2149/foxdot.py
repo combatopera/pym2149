@@ -19,10 +19,12 @@ from . import osctrl
 from .bg import SimpleBackground
 from .channels import Channels
 from .iface import Config
+from .midi import ProgramChange, NoteOn, NoteOff
 from .pll import PLL
 from .program import Note, Unpitched
 from diapyr import types
 from threading import Timer
+from types import SimpleNamespace
 import logging, socket, re, inspect, traceback, pym2149
 
 log = logging.getLogger(__name__)
@@ -89,30 +91,10 @@ class NewGroup(SCSynthHandler):
     def __call__(self, timetags, message, reply):
         id, action, target = message.args
 
-class FoxDotNoteOn:
-
-    def __init__(self, player, programname, midinote, vel):
-        self.midichan = player
-        self.programname = programname
-        self.midinote = midinote
-        self.vel = vel
-
-    def __call__(self, channels):
-        channels.programchange(self.midichan, self.programname)
-        return channels.noteon(self.midichan, self.midinote, self.vel)
-
-class FoxDotNoteOff:
-
-    def __init__(self, player, midinote):
-        self.midichan = player
-        self.midinote = midinote
-
-    def __call__(self, channels):
-        return channels.noteoff(self.midichan, self.midinote, None)
-
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
+    midiconfig = SimpleNamespace(midichannelbase = '', midiprogrambase = '')
 
     @types(Config, PLL)
     def __init__(self, config, pll):
@@ -133,11 +115,18 @@ class NewSynth(SCSynthHandler):
             timetag, = timetags
             self.pll.event(
                     timetag,
-                    FoxDotNoteOn(player, name, midinote, round(amp * self.neutralvel)),
+                    ProgramChange(self.midiconfig, SimpleNamespace(channel = player, value = name)),
+                    False)
+            self.pll.event(
+                    timetag,
+                    NoteOn(self.midiconfig, SimpleNamespace(channel = player, note = midinote, velocity = round(amp * self.neutralvel))),
                     True)
             onfor = sus * blur
             def noteoff():
-                self.pll.event(timetag + onfor, FoxDotNoteOff(player, midinote), False)
+                self.pll.event(
+                        timetag + onfor,
+                        NoteOff(self.midiconfig, SimpleNamespace(channel = player, note = midinote, velocity = None)),
+                        False)
             Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
 
 class FoxDotClient:
