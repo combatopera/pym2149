@@ -100,6 +100,7 @@ class NewSynth(SCSynthHandler):
     def __init__(self, config, pll):
         self.playerregex = re.compile(config.playerregex)
         self.neutralvel = config.neutralvelocity
+        self.playertoprogram = {}
         self.pll = pll
 
     def _event(self, timetag, clazz, kwargs, significant):
@@ -116,9 +117,11 @@ class NewSynth(SCSynthHandler):
         m = self.playerregex.fullmatch(player)
         if m is not None:
             timetag, = timetags
-            self._event(timetag, ProgramChange,
-                    dict(channel = player, value = name),
-                    False)
+            if name != self.playertoprogram.get(player):
+                self._event(timetag, ProgramChange,
+                        dict(channel = player, value = name),
+                        False)
+                self.playertoprogram[player] = name
             self._event(timetag, NoteOn,
                     dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)),
                     True)
