@@ -201,7 +201,7 @@ class EventPump(MainBackground):
                     except KeyError:
                         chanandnotetoevents[event.midichan, event.midinote] = [event]
             # Apply all channel state events first:
-            sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)]
+            sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)] # XXX: Before off?
             # Then all notes that end up off:
             for noteevents in chanandnotetoevents.values():
                 if NoteOff == noteevents[-1].__class__:
@@ -211,12 +211,12 @@ class EventPump(MainBackground):
                 if NoteOn == noteevents[-1].__class__:
                     sortedevents.extend(noteevents)
             # Any custom events:
-            sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage))
+            sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage)) # XXX: Retire?
             for event in sortedevents:
                 try:
                     log.debug("%.6f %s @ %s -> %s", event.offset, event, timecode, event(self.channels))
                 except Exception as e:
-                    log.error("%.6f %s @ %s -> %s", event.offset, event, timecode, e)
+                    log.error("%.6f %s @ %s -> %s", event.offset, event, timecode, e) # TODO: Exception looks confusing.
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
