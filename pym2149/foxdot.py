@@ -102,6 +102,9 @@ class NewSynth(SCSynthHandler):
         self.neutralvel = config.neutralvelocity
         self.pll = pll
 
+    def _event(self, timetag, clazz, kwargs, significant):
+        self.pll.event(timetag, clazz(self.midiconfig, SimpleNamespace(**kwargs)), significant)
+
     def __call__(self, timetags, message, reply):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
@@ -113,19 +116,16 @@ class NewSynth(SCSynthHandler):
         m = self.playerregex.fullmatch(player)
         if m is not None:
             timetag, = timetags
-            self.pll.event(
-                    timetag,
-                    ProgramChange(self.midiconfig, SimpleNamespace(channel = player, value = name)),
+            self._event(timetag, ProgramChange,
+                    dict(channel = player, value = name),
                     False)
-            self.pll.event(
-                    timetag,
-                    NoteOn(self.midiconfig, SimpleNamespace(channel = player, note = midinote, velocity = round(amp * self.neutralvel))),
+            self._event(timetag, NoteOn,
+                    dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)),
                     True)
             onfor = sus * blur
             def noteoff():
-                self.pll.event(
-                        timetag + onfor,
-                        NoteOff(self.midiconfig, SimpleNamespace(channel = player, note = midinote, velocity = None)),
+                self._event(timetag + onfor, NoteOff,
+                        dict(channel = player, note = midinote, velocity = None),
                         False)
             Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
 
