@@ -20,7 +20,7 @@ from .bg import SimpleBackground
 from .channels import Channels
 from .iface import Config
 from .pll import PLL
-from .program import Note
+from .program import Note, Unpitched
 from diapyr import types
 import logging, socket, re, inspect, traceback, pym2149
 
@@ -74,7 +74,7 @@ class LoadSynthDef(SCLangHandler):
                     if name not in snapshot or obj is not snapshot[name]}
             lines = ["# Add/update: %s" % ', '.join(context.keys())]
             for name, obj in context.items():
-                if obj != Note and inspect.isclass(obj) and issubclass(obj, Note):
+                if obj != Note and obj != Unpitched and inspect.isclass(obj) and issubclass(obj, Note):
                     self.channels.midiprograms[name] = obj
                     lines.append("%s = SynthDef(%r)" % (name, name))
         except Exception:
