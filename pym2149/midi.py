@@ -212,14 +212,13 @@ class EventPump(MainBackground):
                     sortedevents.extend(noteevents)
             # Any custom events:
             sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage)) # XXX: Retire?
+            format = "%s %.6f %s%s"
             for event in sortedevents:
                 try:
-                    result = event(self.channels)
-                except Exception as e:
-                    result = e
-                # TODO: Exception looks confusing.
-                result = '' if result is None else " -> %s" % result
-                log.error("%.6f %s @ %s%s", event.offset, event, timecode, result)
+                    response = event(self.channels)
+                    log.debug(format, timecode, event.offset, event, '' if response is None else " -> %s" % response)
+                except Exception:
+                    log.exception(format, timecode, event.offset, event, '')
             self.channels.updateall()
             for block in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(block)
