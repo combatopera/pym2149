@@ -103,7 +103,9 @@ profile = $py[None]
 trace = $py[None]
 : If not None, the number of seconds worth of trace data to collect.
 
-plltargetpos = $div(.5 $(updaterate))
+relplltargetpos = .5
+
+plltargetpos = $div($(relplltargetpos) $(updaterate))
 : The target median shift in seconds between the start of a MIDI event processing window (of size 1/updaterate) and the events in that window. Higher values (i.e. MIDI events closer to end of window and thus our processing of them) improve latency at increased risk of unstable timing (we don't want any events to stray into the next window).
 
 pllalpha = .1

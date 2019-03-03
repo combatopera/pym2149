@@ -31,6 +31,6 @@ midichanneltoprogram = $py[{}]
 
 clickname = click
 
-plltargetpos = $div(.25 $(updaterate))
+relplltargetpos = .25
 
 pllalpha = .25
