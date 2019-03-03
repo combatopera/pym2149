@@ -99,6 +99,9 @@ class ClickEvent:
     def __call__(self, channels):
         pass
 
+    def __str__(self):
+        return "+ %s" % self.midichan
+
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
