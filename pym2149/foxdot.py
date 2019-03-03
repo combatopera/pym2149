@@ -91,6 +91,14 @@ class NewGroup(SCSynthHandler):
     def __call__(self, timetags, message, reply):
         id, action, target = message.args
 
+class ClickEvent:
+
+    def __init__(self, midichan):
+        self.midichan = midichan
+
+    def __call__(self, channels):
+        pass
+
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
@@ -99,16 +107,21 @@ class NewSynth(SCSynthHandler):
     @types(Config, PLL)
     def __init__(self, config, pll):
         self.playerregex = re.compile(config.playerregex)
+        self.clickname = config.clickname
         self.neutralvel = config.neutralvelocity
         self.playertoprogram = {}
         self.pll = pll
 
-    def _event(self, timetag, clazz, kwargs, significant):
-        self.pll.event(timetag, clazz(self.midiconfig, SimpleNamespace(**kwargs)), significant)
+    def _event(self, timetag, clazz, kwargs):
+        self.pll.event(timetag, clazz(self.midiconfig, SimpleNamespace(**kwargs)), False)
 
     def __call__(self, timetags, message, reply):
         name, id, action, target = message.args[:4]
         controls = dict(zip(*(message.args[x::2] for x in [4, 5])))
+        if name == self.clickname:
+            timetag, = timetags
+            self.pll.event(timetag, ClickEvent(controls['player']), True)
+            return
         try:
             player, midinote, amp, sus, blur = (controls[k]
                     for k in ['player', 'midinote', 'amp', 'sus', 'blur'])
@@ -119,17 +132,14 @@ class NewSynth(SCSynthHandler):
             timetag, = timetags
             if name != self.playertoprogram.get(player):
                 self._event(timetag, ProgramChange,
-                        dict(channel = player, value = name),
-                        False)
+                        dict(channel = player, value = name))
                 self.playertoprogram[player] = name
             self._event(timetag, NoteOn,
-                    dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)),
-                    True)
+                    dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)))
             onfor = sus * blur
             def noteoff():
                 self._event(timetag + onfor, NoteOff,
-                        dict(channel = player, note = midinote, velocity = None),
-                        False)
+                        dict(channel = player, note = midinote, velocity = None))
             Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
 
 class FoxDotClient:
