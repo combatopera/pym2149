@@ -187,7 +187,7 @@ class FoxDotClient:
             self._message(udpaddr, timetags, element)
 
     def interrupt(self):
-        self.open = False
+        self.open = False # FIXME: Unused.
 
 class FoxDotListen(SimpleBackground):
 

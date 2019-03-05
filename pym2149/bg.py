@@ -43,7 +43,7 @@ class SimpleBackground:
         def sleep(self, t):
             self.cv.acquire()
             try:
-                self.cv.wait(t)
+                self.cv.wait(t) # FIXME: Deny if interrupted between quit check and sleep.
             finally:
                 self.cv.release()
 
