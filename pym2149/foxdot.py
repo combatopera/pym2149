@@ -113,10 +113,13 @@ class NewSynth(SCSynthHandler):
         self.clickname = config.clickname
         self.neutralvel = config.neutralvelocity
         self.playertoprogram = {}
+        self.midinotetonoteon = {}
         self.pll = pll
 
     def _event(self, timetag, clazz, kwargs):
-        self.pll.event(timetag, clazz(self.midiconfig, SimpleNamespace(**kwargs)), False)
+        event = clazz(self.midiconfig, SimpleNamespace(**kwargs))
+        self.pll.event(timetag, event, False)
+        return event
 
     def __call__(self, timetags, message, reply):
         name, id, action, target = message.args[:4]
@@ -137,12 +140,16 @@ class NewSynth(SCSynthHandler):
                 self._event(timetag, ProgramChange,
                         dict(channel = player, value = name))
                 self.playertoprogram[player] = name
-            self._event(timetag, NoteOn,
+            # XXX: Can midinote be a float?
+            self.midinotetonoteon[midinote] = noteon = self._event(timetag, NoteOn,
                     dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)))
             onfor = sus * blur
             def noteoff():
-                self._event(timetag + onfor, NoteOff,
-                        dict(channel = player, note = midinote, velocity = None))
+                if noteon == self.midinotetonoteon[midinote]:
+                    self._event(timetag + onfor, NoteOff,
+                            dict(channel = player, note = midinote, velocity = None))
+                else:
+                    log.debug('NoteOff %s denied.', midinote)
             Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
 
 class FoxDotClient:
