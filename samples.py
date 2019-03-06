@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 class BaseTone(Note):
 
     def noteon(self):
-        self.toneflag.value = True
+        self.toneflag = True
         self.fixedlevel.value = 15
         self.toneperiod.value = self.period
 
@@ -58,7 +58,7 @@ class Noise(Note):
 class Both(Note):
 
     def noteon(self):
-        self.toneflag.value = True
+        self.toneflag = True
         self.noiseflag.value = True
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
@@ -76,7 +76,7 @@ class All(Note):
     tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
 
     def noteon(self):
-        self.toneflag.value = True
+        self.toneflag = True
         self.noiseflag.value = True
         self.levelmode.value = 1
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
@@ -87,7 +87,7 @@ class All(Note):
 class PWM(Note):
 
     def noteon(self):
-        self.toneflag.value = True
+        self.toneflag = True
         self.timer.effect.value = PWMEffect(self.chip.fixedlevels[self.chipchan])
         self.fixedlevel.value = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)

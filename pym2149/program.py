@@ -81,11 +81,21 @@ class FX:
     # Observe we don't apply maxpan, which is only for the auto-stereo:
     return max(self.minsigned + 1, self.pan.value) / (self.halfrange - 1)
 
+def regproperty(reg):
+    def get(note):
+        return reg(note).value
+    def set(note, value):
+        reg(note).value = value
+    return property(get, set)
+
 class Note:
+
+  toneflag = regproperty(lambda note: note.toneflagreg)
+  tonepitch = regproperty(lambda note: note.tonepitchreg)
 
   def __init__(self, nomclock, chip, chipchan, pitch, fx):
     self.toneperiod = chip.toneperiods[chipchan]
-    self.toneflag = chip.toneflags[chipchan]
+    self.toneflagreg = chip.toneflags[chipchan]
     self.timer = chip.timers[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
     self.fixedlevel = Reg()
@@ -99,8 +109,8 @@ class Note:
     self.fx = fx
     self.tonefreq = Reg()
     self.toneperiod.link(lambda f: f.toneperiod(nomclock), self.tonefreq) # No reverse link.
-    self.tonepitch = Reg()
-    self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitch)
+    self.tonepitchreg = Reg()
+    self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
 
   def callnoteon(self, voladj):
     self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
@@ -129,14 +139,14 @@ class DefaultNote(Note):
   fadeout = LFO(-1).hold(1).lin(28, -15)
 
   def noteon(self):
-    self.toneflag.value = True
+    self.toneflag = True
     self.fixedlevel.value = 13 + self.voladj
 
   def noteonframe(self, frame):
-    self.tonepitch.value = self.pitch + self.fx.relmodulation() * self.vib(frame)
+    self.tonepitch = self.pitch + self.fx.relmodulation() * self.vib(frame)
 
   def noteoffframe(self, frame):
-    self.tonepitch.value = self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame)
+    self.tonepitch = self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame)
     self.fixedlevel.value = 13 + self.voladj + self.fadeout(frame)
 
 class Unpitched(Note):
