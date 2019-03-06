@@ -18,12 +18,12 @@
 from . import osctrl
 from .bg import SimpleBackground
 from .channels import Channels
+from .delay import Delay
 from .iface import Config
 from .midi import ProgramChange, NoteOn, NoteOff
 from .pll import PLL
 from .program import Note, Unpitched
 from diapyr import types
-from threading import Timer
 from types import SimpleNamespace
 import logging, socket, re, inspect, traceback
 
@@ -107,14 +107,15 @@ class NewSynth(SCSynthHandler):
     addresses = '/s_new',
     midiconfig = SimpleNamespace(midichannelbase = '', midiprogrambase = '')
 
-    @types(Config, PLL)
-    def __init__(self, config, pll):
+    @types(Config, PLL, Delay)
+    def __init__(self, config, pll, delay):
         self.playerregex = re.compile(config.playerregex)
         self.clickname = config.clickname
         self.neutralvel = config.neutralvelocity
         self.playertoprogram = {}
         self.midinotetonoteon = {}
         self.pll = pll
+        self.delay = delay
 
     def _event(self, timetag, clazz, kwargs):
         event = clazz(self.midiconfig, SimpleNamespace(**kwargs))
@@ -150,7 +151,7 @@ class NewSynth(SCSynthHandler):
                             dict(channel = player, note = midinote, velocity = None))
                 else:
                     log.debug('NoteOff %s denied.', midinote)
-            Timer(onfor, noteoff).start() # TODO: Reimplement less expensively e.g. sched.
+            self.delay(onfor, noteoff)
 
 class FoxDotClient:
 

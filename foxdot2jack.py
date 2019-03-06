@@ -26,6 +26,7 @@ from pym2149.boot import boot
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
+from pym2149.delay import Delay
 from diapyr.start import Started
 
 del logging
@@ -33,6 +34,7 @@ del logging
 def main():
     config, di = boot(ConfigName(name = 'foxdot'))
     try:
+        di.add(Delay)
         di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
         di.add(jackclient.JackClient)
         di.add(config.mediation)
