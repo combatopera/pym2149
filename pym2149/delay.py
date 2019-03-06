@@ -17,15 +17,18 @@
 
 from .bg import SimpleBackground
 from diapyr import types
-import threading, logging, time
+from collections import namedtuple
+import threading, logging, time, bisect
 
 log = logging.getLogger(__name__)
 
-class Task:
+class Task(namedtuple('BaseTask', 'when task')):
 
-    def __init__(self, when, task):
-        self.when = when
-        self.task = task
+    def __call__(self):
+        try:
+            self.task()
+        except Exception:
+            log.exception('Task failed:')
 
 class Delay(SimpleBackground):
 
@@ -35,28 +38,26 @@ class Delay(SimpleBackground):
 
     def start(self):
         self.sleeper = self.Sleeper()
-        self.tasks = set()
+        self.tasks = []
         self.taskslock = threading.RLock()
         super().start(self._bg, self.sleeper)
 
     def __call__(self, delay, task):
         with self.taskslock:
-            self.tasks.add(Task(time.time() + delay, task))
+            t = Task(time.time() + delay, task)
+            self.tasks.insert(bisect.bisect(self.tasks, t), t)
         self.sleeper.interrupt()
 
     def _bg(self, sleeper):
         while not self.quit:
             now = time.time()
             with self.taskslock:
-                tasks = {task for task in self.tasks if task.when <= now}
+                tasks = [task for task in self.tasks if task.when <= now] # TODO: Use bisect.
+                del self.tasks[:len(tasks)]
             for task in tasks:
-                try:
-                    task.task()
-                except Exception:
-                    log.exception('Task failed:')
+                task()
             with self.taskslock:
-                self.tasks -= tasks
-                sleeptime = min(task.when for task in self.tasks) - time.time() if self.tasks else None
+                sleeptime = self.tasks[0].when - time.time() if self.tasks else None
             sleeper.sleep(sleeptime)
         with self.taskslock:
             log.debug("Tasks denied: %s", len(self.tasks))
