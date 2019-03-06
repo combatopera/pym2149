@@ -63,15 +63,15 @@ class TestNote(unittest.TestCase):
         chip = namedtuple('Chip', 'toneperiods toneflags noiseflags fixedlevels levelmodes timers')(toneperiods, toneflags, noiseflags, fixedlevels, levelmodes, timers)
         note = Note(None, chip, 0, None, None)
         self.assertFalse(hasattr(fixedlevels[0], 'value'))
-        note.fixedlevel.value = 7
+        note.fixedlevel = 7
         self.assertEqual(7, fixedlevels[0].value)
-        note.fixedlevel.value = 0
+        note.fixedlevel = 0
         self.assertEqual(0, fixedlevels[0].value)
-        note.fixedlevel.value = -1
+        note.fixedlevel = -1
         self.assertEqual(0, fixedlevels[0].value)
-        note.fixedlevel.value = 15
+        note.fixedlevel = 15
         self.assertEqual(15, fixedlevels[0].value)
-        note.fixedlevel.value = 16
+        note.fixedlevel = 16
         self.assertEqual(15, fixedlevels[0].value)
         # The chip never gains a reference:
         self.assertEqual([], fixedlevels[0].links)

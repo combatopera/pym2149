@@ -39,7 +39,7 @@ class BaseTone(Note):
 
     def noteon(self):
         self.toneflag = True
-        self.fixedlevel.value = 15
+        self.fixedlevel = 15
         self.toneperiod.value = self.period
 
 class Tone(BaseTone):
@@ -52,7 +52,7 @@ class Noise(Note):
 
     def noteon(self):
         self.noiseflag.value = True
-        self.fixedlevel.value = 15
+        self.fixedlevel = 15
         self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Note):
@@ -60,7 +60,7 @@ class Both(Note):
     def noteon(self):
         self.toneflag = True
         self.noiseflag.value = True
-        self.fixedlevel.value = 15
+        self.fixedlevel = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
 
@@ -89,7 +89,7 @@ class PWM(Note):
     def noteon(self):
         self.toneflag = True
         self.timer.effect.value = PWMEffect(self.chip.fixedlevels[self.chipchan])
-        self.fixedlevel.value = 15
+        self.fixedlevel = 15
         self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq
 
@@ -101,7 +101,7 @@ class Sinus(Note):
         self.timer.freq.value = self.freq * 4 # FIXME: It should know wavelength from effect.
 
     def noteonframe(self, frame):
-        self.fixedlevel.value = 15 - frame // 5
+        self.fixedlevel = 15 - frame // 5
 
 class Frames(list): pass
 
