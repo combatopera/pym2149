@@ -23,9 +23,9 @@ log = logging.getLogger(__name__)
 
 class Task:
 
-    def __init__(self, delay, procedure):
-        self.when = time.time() + delay
-        self.procedure = procedure
+    def __init__(self, when, task):
+        self.when = when
+        self.task = task
 
 class Delay(SimpleBackground):
 
@@ -39,9 +39,9 @@ class Delay(SimpleBackground):
         self.taskslock = threading.RLock()
         super().start(self._bg, self.sleeper)
 
-    def __call__(self, delay, procedure):
+    def __call__(self, delay, task):
         with self.taskslock:
-            self.tasks.add(Task(delay, procedure))
+            self.tasks.add(Task(time.time() + delay, task))
         self.sleeper.interrupt()
 
     def _bg(self, sleeper):
@@ -51,7 +51,7 @@ class Delay(SimpleBackground):
                 tasks = {task for task in self.tasks if task.when <= now}
             for task in tasks:
                 try:
-                    task.procedure()
+                    task.task()
                 except Exception:
                     log.exception('Task failed:')
             with self.taskslock:
