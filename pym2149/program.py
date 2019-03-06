@@ -94,6 +94,7 @@ class Note:
   toneflag = regproperty(lambda note: note.toneflagreg)
   noiseflag = regproperty(lambda note: note.noiseflagreg)
   fixedlevel = regproperty(lambda note: note.fixedlevelreg)
+  levelmode = regproperty(lambda note: note.levelmodereg)
   tonepitch = regproperty(lambda note: note.tonepitchreg)
 
   def __init__(self, nomclock, chip, chipchan, pitch, fx):
@@ -104,7 +105,7 @@ class Note:
     self.fixedlevelreg = Reg()
     # No reverse link, we don't want to pollute the chip with references:
     chip.fixedlevels[chipchan].link(lambda unclamped: max(0, min(15, unclamped)), self.fixedlevelreg)
-    self.levelmode = chip.levelmodes[chipchan]
+    self.levelmodereg = chip.levelmodes[chipchan]
     self.nomclock = nomclock
     self.chip = chip
     self.chipchan = chipchan
