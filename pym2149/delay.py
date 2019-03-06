@@ -43,8 +43,8 @@ class Delay(SimpleBackground):
         super().start(self._bg, self.sleeper)
 
     def __call__(self, delay, task):
+        t = Task(time.time() + delay, task)
         with self.taskslock:
-            t = Task(time.time() + delay, task)
             self.tasks.insert(bisect.bisect(self.tasks, t), t)
         self.sleeper.interrupt()
 
