@@ -43,9 +43,8 @@ class SimpleBackground:
 
         def sleep(self, t):
             with self.cv:
-                if not self.interrupted:
-                    self.cv.wait(t)
-                self.interrupted = False
+                if self.interrupted or self.cv.wait(t):
+                    self.interrupted = False
 
         def interrupt(self):
             with self.cv:
