@@ -51,7 +51,7 @@ class Tone(BaseTone):
 class Noise(Note):
 
     def noteon(self):
-        self.noiseflag.value = True
+        self.noiseflag = True
         self.fixedlevel = 15
         self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
 
@@ -59,7 +59,7 @@ class Both(Note):
 
     def noteon(self):
         self.toneflag = True
-        self.noiseflag.value = True
+        self.noiseflag = True
         self.fixedlevel = 15
         self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
@@ -77,7 +77,7 @@ class All(Note):
 
     def noteon(self):
         self.toneflag = True
-        self.noiseflag.value = True
+        self.noiseflag = True
         self.levelmode.value = 1
         self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)

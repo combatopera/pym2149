@@ -92,6 +92,7 @@ class Note:
 
   toneperiod = regproperty(lambda note: note.toneperiodreg)
   toneflag = regproperty(lambda note: note.toneflagreg)
+  noiseflag = regproperty(lambda note: note.noiseflagreg)
   fixedlevel = regproperty(lambda note: note.fixedlevelreg)
   tonepitch = regproperty(lambda note: note.tonepitchreg)
 
@@ -99,7 +100,7 @@ class Note:
     self.toneperiodreg = chip.toneperiods[chipchan]
     self.toneflagreg = chip.toneflags[chipchan]
     self.timer = chip.timers[chipchan]
-    self.noiseflag = chip.noiseflags[chipchan]
+    self.noiseflagreg = chip.noiseflags[chipchan]
     self.fixedlevelreg = Reg()
     # No reverse link, we don't want to pollute the chip with references:
     chip.fixedlevels[chipchan].link(lambda unclamped: max(0, min(15, unclamped)), self.fixedlevelreg)
