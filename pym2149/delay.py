@@ -36,25 +36,27 @@ class Delay(SimpleBackground):
     def start(self):
         self.sleeper = self.Sleeper()
         self.tasks = set()
-        self.lock = threading.RLock()
+        self.taskslock = threading.RLock()
         super().start(self._bg, self.sleeper)
 
     def __call__(self, delay, procedure):
-        with self.lock:
+        with self.taskslock:
             self.tasks.add(Task(delay, procedure))
         self.sleeper.interrupt()
 
     def _bg(self, sleeper):
         while not self.quit:
             now = time.time()
-            with self.lock:
+            with self.taskslock:
                 tasks = {task for task in self.tasks if task.when <= now}
             for task in tasks:
                 try:
                     task.procedure()
                 except Exception:
                     log.exception('Task failed:')
-            with self.lock:
+            with self.taskslock:
                 self.tasks -= tasks
                 sleeptime = min(task.when for task in self.tasks) - time.time() if self.tasks else None
             sleeper.sleep(sleeptime)
+        with self.taskslock:
+            log.debug("Tasks denied: %s", len(self.tasks))
