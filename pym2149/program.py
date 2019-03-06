@@ -90,12 +90,13 @@ def regproperty(reg):
 
 class Note:
 
+  toneperiod = regproperty(lambda note: note.toneperiodreg)
   toneflag = regproperty(lambda note: note.toneflagreg)
   fixedlevel = regproperty(lambda note: note.fixedlevelreg)
   tonepitch = regproperty(lambda note: note.tonepitchreg)
 
   def __init__(self, nomclock, chip, chipchan, pitch, fx):
-    self.toneperiod = chip.toneperiods[chipchan]
+    self.toneperiodreg = chip.toneperiods[chipchan]
     self.toneflagreg = chip.toneflags[chipchan]
     self.timer = chip.timers[chipchan]
     self.noiseflag = chip.noiseflags[chipchan]
@@ -109,7 +110,7 @@ class Note:
     self.pitch = pitch
     self.fx = fx
     self.tonefreq = Reg()
-    self.toneperiod.link(lambda f: f.toneperiod(nomclock), self.tonefreq) # No reverse link.
+    self.toneperiodreg.link(lambda f: f.toneperiod(nomclock), self.tonefreq) # No reverse link.
     self.tonepitchreg = Reg()
     self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
 

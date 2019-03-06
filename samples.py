@@ -40,7 +40,7 @@ class BaseTone(Note):
     def noteon(self):
         self.toneflag = True
         self.fixedlevel = 15
-        self.toneperiod.value = self.period
+        self.toneperiod = self.period
 
 class Tone(BaseTone):
 
@@ -61,7 +61,7 @@ class Both(Note):
         self.toneflag = True
         self.noiseflag.value = True
         self.fixedlevel = 15
-        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
 
 class Env(Note):
@@ -79,7 +79,7 @@ class All(Note):
         self.toneflag = True
         self.noiseflag.value = True
         self.levelmode.value = 1
-        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
         self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
         self.chip.envshape.value = self.shape
@@ -90,7 +90,7 @@ class PWM(Note):
         self.toneflag = True
         self.timer.effect.value = PWMEffect(self.chip.fixedlevels[self.chipchan])
         self.fixedlevel = 15
-        self.toneperiod.value = Freq(self.tfreq).toneperiod(self.nomclock)
+        self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.timer.freq.value = self.rtfreq
 
 # TODO LATER: Find out why the result appears shifted a few samples to the right.
