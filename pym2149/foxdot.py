@@ -186,9 +186,6 @@ class FoxDotClient:
         for element in elements:
             self._message(udpaddr, timetags, element)
 
-    def interrupt(self):
-        self.open = False # FIXME: Unused.
-
 class FoxDotListen(SimpleBackground):
 
     def __init__(self, config, handlers):
@@ -196,13 +193,14 @@ class FoxDotListen(SimpleBackground):
         self.handlers = {a: h for h in handlers for a in h.addresses}
 
     def start(self):
+        super().start(self.bg)
+
+    def bg(self):
         config = self.config['FoxDot', self.configkey]
-        super().start(self.bg, FoxDotClient(
+        client = FoxDotClient(
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
                 self.handlers,
-                self.configkey))
-
-    def bg(self, client):
+                self.configkey)
         while not self.quit:
             client.pumponeortimeout()
 
