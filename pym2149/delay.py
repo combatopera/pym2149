@@ -50,10 +50,10 @@ class Delay(SimpleBackground):
 
     def _bg(self, sleeper):
         while not self.quit:
-            now = time.time()
             with self.taskslock:
-                tasks = [task for task in self.tasks if task.when <= now] # TODO: Use bisect.
-                del self.tasks[:len(tasks)]
+                i = bisect.bisect(self.tasks, (time.time(), None))
+                tasks = self.tasks[:i]
+                del self.tasks[:i]
             for task in tasks:
                 task()
             with self.taskslock:
