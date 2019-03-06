@@ -39,13 +39,17 @@ class SimpleBackground:
 
         def __init__(self):
             self.cv = threading.Condition()
+            self.interrupted = False
 
         def sleep(self, t):
             with self.cv:
-                self.cv.wait(t) # FIXME: Deny if interrupted between quit check and sleep.
+                if not self.interrupted:
+                    self.cv.wait(t)
+                self.interrupted = False
 
         def interrupt(self):
             with self.cv:
+                self.interrupted = True
                 self.cv.notify() # There should be at most one.
 
     def start(self, bg, *interruptibles):
