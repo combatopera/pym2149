@@ -76,7 +76,7 @@ class Roll:
         shape = self.chip.envshape.value
         vals.append(self.shapes[shape])
         vals.append(('', '~')[newshape])
-        vals.append(Period(self.chip.envperiod.value).envfreq(self.nomclock, shape).pitch())
+        vals.append(Period(self.chip.envperiod).envfreq(self.nomclock, shape).pitch())
       elif level:
         vals.append(level)
         vals.append('')

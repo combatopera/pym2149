@@ -68,7 +68,7 @@ class Env(Note):
 
     def noteon(self):
         self.levelmode = 1
-        self.chip.envperiod.value = Freq(self.freq).envperiod(self.nomclock, self.shape)
+        self.chip.envperiod = Freq(self.freq).envperiod(self.nomclock, self.shape)
         self.chip.envshape.value = self.shape
 
 class All(Note):
@@ -81,7 +81,7 @@ class All(Note):
         self.levelmode = 1
         self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
         self.chip.noiseperiod = Freq(self.nfreq).noiseperiod(self.nomclock)
-        self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
+        self.chip.envperiod = Freq(self.efreq).envperiod(self.nomclock, self.shape)
         self.chip.envshape.value = self.shape
 
 class PWM(Note):

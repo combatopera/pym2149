@@ -46,6 +46,7 @@ class Registers:
 
   supportedchannels = 3
   noiseperiod = regproperty(lambda regs: regs.noiseperiodreg)
+  envperiod = regproperty(lambda regs: regs.envperiodreg)
 
   def __init__(self, clockinfo, confchannels):
     # TODO: Add reverse wiring.
@@ -70,7 +71,7 @@ class Registers:
       self.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
       self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
       self.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
-    self.envperiod = Reg(minval = 1).link(EP, self.R[0xB], self.R[0xC])
+    self.envperiodreg = Reg(minval = 1).link(EP, self.R[0xB], self.R[0xC])
     self.envshape = VersionReg().link(lambda s: s & 0x0f, self.R[0xD])
     for r in self.R:
       r.value = 0
@@ -121,7 +122,7 @@ class YM2149(Registers, Container, Chip):
     Registers.__init__(self, clockinfo, channels)
     # Chip-wide signals:
     noise = NoiseOsc(self.scale, self.noiseperiodreg, self.noiseshape)
-    env = EnvOsc(self.scale, self.envperiod, self.envshape)
+    env = EnvOsc(self.scale, self.envperiodreg, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in range(channels)]
     rtones = [RToneOsc(mfpclock, self.clock, self.timers[c]) for c in range(channels)]
