@@ -89,6 +89,7 @@ class Note:
   fixedlevel = regproperty(lambda note: note.fixedlevelreg)
   levelmode = regproperty(lambda note: note.levelmodereg)
   tonepitch = regproperty(lambda note: note.tonepitchreg)
+  tonefreq = regproperty(lambda note: note.tonefreqreg)
 
   def __init__(self, nomclock, chip, chipchan, pitch, fx):
     self.toneperiodreg = chip.toneperiods[chipchan]
@@ -104,10 +105,10 @@ class Note:
     self.chipchan = chipchan
     self.pitch = pitch
     self.fx = fx
-    self.tonefreq = Reg()
-    self.toneperiodreg.link(lambda f: f.toneperiod(nomclock), self.tonefreq) # No reverse link.
+    self.tonefreqreg = Reg()
+    self.toneperiodreg.link(lambda f: f.toneperiod(nomclock), self.tonefreqreg) # No reverse link.
     self.tonepitchreg = Reg()
-    self.tonefreq.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
+    self.tonefreqreg.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
 
   def callnoteon(self, voladj):
     self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
