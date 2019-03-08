@@ -53,7 +53,7 @@ class Noise(Note):
     def noteon(self):
         self.noiseflag = True
         self.fixedlevel = 15
-        self.chip.noiseperiod.value = Freq(self.freq).noiseperiod(self.nomclock)
+        self.chip.noiseperiod = Freq(self.freq).noiseperiod(self.nomclock)
 
 class Both(Note):
 
@@ -62,7 +62,7 @@ class Both(Note):
         self.noiseflag = True
         self.fixedlevel = 15
         self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
+        self.chip.noiseperiod = Freq(self.nfreq).noiseperiod(self.nomclock)
 
 class Env(Note):
 
@@ -80,7 +80,7 @@ class All(Note):
         self.noiseflag = True
         self.levelmode = 1
         self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.chip.noiseperiod.value = Freq(self.nfreq).noiseperiod(self.nomclock)
+        self.chip.noiseperiod = Freq(self.nfreq).noiseperiod(self.nomclock)
         self.chip.envperiod.value = Freq(self.efreq).envperiod(self.nomclock, self.shape)
         self.chip.envshape.value = self.shape
 

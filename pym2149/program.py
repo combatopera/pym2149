@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .lfo import LFO, FloatLFO
-from .reg import Reg
+from .reg import Reg, regproperty
 
 class FX:
 
@@ -80,13 +80,6 @@ class FX:
   def normpan(self):
     # Observe we don't apply maxpan, which is only for the auto-stereo:
     return max(self.minsigned + 1, self.pan.value) / (self.halfrange - 1)
-
-def regproperty(reg):
-    def get(note):
-        return reg(note).value
-    def set(note, value):
-        reg(note).value = value
-    return property(get, set)
 
 class Note:
 

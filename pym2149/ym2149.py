@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .reg import Reg, VersionReg
+from .reg import Reg, VersionReg, regproperty
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
 from .dac import Level, Dac
 from .mix import BinMix
@@ -45,6 +45,7 @@ class MixerFlag:
 class Registers:
 
   supportedchannels = 3
+  noiseperiod = regproperty(lambda regs: regs.noiseperiodreg)
 
   def __init__(self, clockinfo, confchannels):
     # TODO: Add reverse wiring.
@@ -59,7 +60,7 @@ class Registers:
     clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
     for c in range(clampedchannels):
       self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
-    self.noiseperiod = Reg(minval = 1).link(NP, self.R[0x6])
+    self.noiseperiodreg = Reg(minval = 1).link(NP, self.R[0x6])
     self.toneflags = [Reg() for _ in range(confchannels)]
     self.noiseflags = [Reg() for _ in range(confchannels)]
     self.fixedlevels = [Reg() for _ in range(confchannels)]
@@ -119,7 +120,7 @@ class YM2149(Registers, Container, Chip):
     self.clock = clockinfo.implclock
     Registers.__init__(self, clockinfo, channels)
     # Chip-wide signals:
-    noise = NoiseOsc(self.scale, self.noiseperiod, self.noiseshape)
+    noise = NoiseOsc(self.scale, self.noiseperiodreg, self.noiseshape)
     env = EnvOsc(self.scale, self.envperiod, self.envshape)
     # Digital channels from binary to level in [0, 31]:
     tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in range(channels)]

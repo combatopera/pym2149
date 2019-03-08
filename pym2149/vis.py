@@ -58,7 +58,7 @@ class Roll:
       else:
         vals.append('')
       if noise and rhs:
-        vals.append(self.chip.noiseperiod.value)
+        vals.append(self.chip.noiseperiod)
       else:
         vals.append('')
       if (tone or noise) and rhs:

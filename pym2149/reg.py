@@ -81,3 +81,10 @@ class VersionReg(Reg):
     def setimpl(self, value):
         super().setimpl(value)
         self.version += 1
+
+def regproperty(reg):
+    def get(regs):
+        return reg(regs).value
+    def set(regs, value):
+        reg(regs).value = value
+    return property(get, set)
