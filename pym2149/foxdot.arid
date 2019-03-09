@@ -35,4 +35,4 @@ relplltargetpos = .25
 
 pllalpha = .25
 
-midinoteclass = $global(.foxdot.MidiNote100)
+midinoteclass = $global(.foxdotlib.MidiNote100)
