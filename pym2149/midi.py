@@ -76,7 +76,7 @@ class NoteOnOff(ChannelMessage):
         self.vel = event.velocity
 
     def __str__(self):
-        return "%s %2s %3d %3s" % (self.char, self.midichan, self.midinote, self.vel)
+        return "%s %2s %3s %3s" % (self.char, self.midichan, self.midinote, self.vel)
 
 class NoteOn(NoteOnOff):
 

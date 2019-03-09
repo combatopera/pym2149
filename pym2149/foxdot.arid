@@ -34,3 +34,5 @@ clickname = click
 relplltargetpos = .25
 
 pllalpha = .25
+
+midinoteclass = $global(.foxdot.MidiNote100)

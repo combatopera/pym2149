@@ -25,6 +25,7 @@ from .pll import PLL
 from .program import Note, Unpitched
 from diapyr import types
 from types import SimpleNamespace
+from collections import namedtuple
 import logging, socket, re, inspect, traceback
 
 log = logging.getLogger(__name__)
@@ -102,6 +103,29 @@ class ClickEvent:
     def __str__(self):
         return "+ %s" % self.midichan
 
+class MidiNote(namedtuple('BaseMidiNote', 'whole micro')):
+
+    @classmethod
+    def of(cls, midinote):
+        x = round(midinote * cls.microsteps)
+        return cls(x // cls.microsteps, x % cls.microsteps)
+
+    def __float__(self):
+        return self.whole + self.micro / self.microsteps
+
+    def __str__(self):
+        return "%s.%s" % (self.whole, self.microformat(self.micro))
+
+class MidiNote100(MidiNote):
+
+    microsteps = 100
+    microformat = staticmethod(lambda micro: "%02d" % micro)
+
+class MidiNote128(MidiNote):
+
+    microsteps = 128
+    microformat = staticmethod(lambda micro: "%02X" % (micro * 2))
+
 class NewSynth(SCSynthHandler):
 
     addresses = '/s_new',
@@ -112,6 +136,7 @@ class NewSynth(SCSynthHandler):
         self.playerregex = re.compile(config.playerregex)
         self.clickname = config.clickname
         self.neutralvel = config.neutralvelocity
+        self.midinoteclass = config.midinoteclass
         self.playertoprogram = {}
         self.midinotetonoteon = {}
         self.pll = pll
@@ -141,7 +166,7 @@ class NewSynth(SCSynthHandler):
                 self._event(timetag, ProgramChange,
                         dict(channel = player, value = name))
                 self.playertoprogram[player] = name
-            # XXX: Can midinote be a float?
+            midinote = self.midinoteclass.of(midinote)
             self.midinotetonoteon[midinote] = noteon = self._event(timetag, NoteOn,
                     dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)))
             onfor = sus * blur
