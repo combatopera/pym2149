@@ -18,13 +18,15 @@
 class BadCommandException(Exception): pass
 
 def dosound(bytecode, chip, timer, stream):
+    for _ in _dosound(bytecode, chip):
+        for b in timer.blocksforperiod(50): # Authentic period.
+            stream.call(b)
+
+def _dosound(bytecode, chip):
     def g():
         for b in bytecode:
             yield b & 0xff # It's supposed to be bytecode.
     g = g()
-    def tick():
-        for b in timer.blocksforperiod(50): # Authentic period.
-            stream.call(b)
     while True:
         ctrl = next(g)
         if ctrl <= 0xF:
@@ -41,7 +43,7 @@ def dosound(bytecode, chip, timer, stream):
                 softreg += adjust # Yes, this is done up-front.
                 # The real thing simply uses the truncation on overflow:
                 targetreg.value = softreg
-                tick()
+                yield
                 # That's right, if we skip past it we loop forever:
                 if last == softreg:
                     break
@@ -51,6 +53,6 @@ def dosound(bytecode, chip, timer, stream):
                 break
             ticks += 1 # Apparently!
             for _ in range(ticks):
-                tick()
+                yield
         else:
             raise BadCommandException(ctrl)
