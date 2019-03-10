@@ -17,6 +17,9 @@
 
 from .lfo import LFO, FloatLFO
 from .reg import Reg, regproperty
+import logging
+
+log = logging.getLogger(__name__)
 
 class FX:
 
@@ -110,21 +113,33 @@ class Note:
     self.tonepitchreg = Reg()
     self.tonefreqreg.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
 
+  def _call(self, f, *args):
+    try:
+      f(*args)
+    except Exception:
+      log.exception("%s.%s failed:", type(self).__name__, f.__name__)
+
   def callnoteon(self, voladj):
     self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
     self.voladj = voladj
-    self.noteon()
+    self._call(self.noteon)
 
   def noteon(self): pass
+
+  def callnoteonframe(self, *args):
+    self._call(self.noteonframe, *args)
 
   def noteonframe(self, frame):
     """Note may never be called, so don't make changes that noteoff or a custom impl of noteoffframe later relies on."""
 
   def callnoteoff(self, onframes):
     self.onframes = onframes
-    self.noteoff()
+    self._call(self.noteoff)
 
   def noteoff(self): pass
+
+  def callnoteoffframe(self, *args):
+    self._call(self.noteoffframe, *args)
 
   def noteoffframe(self, frame):
     self.noteonframe(self.onframes + frame)
