@@ -98,7 +98,7 @@ class NewSynth(SCSynthHandler):
         self.pll = pll
         self.delay = delay
 
-    def _event(self, timetag, clazz, kwargs):
+    def _event(self, timetag, clazz, **kwargs):
         event = clazz(self.midiconfig, SimpleNamespace(**kwargs))
         self.pll.event(timetag, event, False)
         return event
@@ -120,16 +120,16 @@ class NewSynth(SCSynthHandler):
             timetag, = timetags
             if name != self.playertoprogram.get(player):
                 self._event(timetag, ProgramChange,
-                        dict(channel = player, value = name))
+                        channel = player, value = name)
                 self.playertoprogram[player] = name
             midinote = self.midinoteclass.of(midinote)
             self.midinotetonoteon[midinote] = noteon = self._event(timetag, NoteOn,
-                    dict(channel = player, note = midinote, velocity = round(amp * self.neutralvel)))
+                    channel = player, note = midinote, velocity = round(amp * self.neutralvel))
             onfor = sus * blur
             def noteoff():
                 if noteon == self.midinotetonoteon[midinote]:
                     self._event(timetag + onfor, NoteOff,
-                            dict(channel = player, note = midinote, velocity = None))
+                            channel = player, note = midinote, velocity = None)
                 else:
                     log.debug('NoteOff %s denied.', midinote)
             self.delay(onfor, noteoff)
