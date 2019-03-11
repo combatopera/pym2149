@@ -71,6 +71,7 @@ class FoxDotClient:
 
     def __init__(self, host, port, bufsize, handlers, label):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
+        # TODO LATER: Send self an interrupt message instead of relying on timeout.
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
         self.bufsize = bufsize
