@@ -204,11 +204,11 @@ class EventPump(MainBackground):
             sortedevents = [event for event in update.events if isinstance(event, ChannelStateMessage)] # XXX: Before off?
             # Then all notes that end up off:
             for noteevents in chanandnotetoevents.values():
-                if NoteOff == noteevents[-1].__class__: # FIXME: May be simulated NoteOff for previous NoteOn.
+                if NoteOff == type(noteevents[-1]): # FIXME: May be simulated NoteOff for previous NoteOn.
                     sortedevents.extend(noteevents)
             # Then all notes that end up on:
             for noteevents in chanandnotetoevents.values():
-                if NoteOn == noteevents[-1].__class__:
+                if NoteOn == type(noteevents[-1]):
                     sortedevents.extend(noteevents)
             # Any custom events:
             sortedevents.extend(event for event in update.events if not isinstance(event, ChannelMessage)) # XXX: Retire?

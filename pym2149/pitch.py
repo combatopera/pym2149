@@ -28,10 +28,10 @@ class Pitch(float):
         return Freq(self.a4freq * (2 ** ((self - self.a4midi) / 12)))
 
     def __add__(self, that):
-        return self.__class__(float.__add__(self, that))
+        return type(self)(float.__add__(self, that))
 
     def __sub__(self, that):
-        return self.__class__(float.__sub__(self, that))
+        return type(self)(float.__sub__(self, that))
 
     def __str__(self):
         nearest = int(math.ceil(self - .5))
@@ -78,7 +78,7 @@ class Freq(float):
         return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
 
     def __mul__(self, that):
-        return self.__class__(float.__mul__(self, that))
+        return type(self)(float.__mul__(self, that))
 
 class Period(int):
 

@@ -44,7 +44,7 @@ class ChanNote:
         self.voladj = voladj
         self.offframe = None
 
-    def programornone(self): return self.note.__class__
+    def programornone(self): return type(self.note)
 
     def getpan(self): return self.note.fx.normpan()
 

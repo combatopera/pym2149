@@ -98,7 +98,7 @@ class Bundle:
             self.elements.append(r.element())
 
     def __repr__(self):
-        return "%s(%r, %r)" % (self.__class__.__name__, self.timetag, self.elements)
+        return "%s(%r, %r)" % (type(self).__name__, self.timetag, self.elements)
 
 class Message:
 
@@ -124,7 +124,7 @@ class Message:
         self.args = args
 
     def __repr__(self):
-        return "%s(%r, %r)" % (self.__class__.__name__, self.addrpattern, self.args)
+        return "%s(%r, %r)" % (type(self).__name__, self.addrpattern, self.args)
 
     def ser(self):
         f = io.BytesIO()
