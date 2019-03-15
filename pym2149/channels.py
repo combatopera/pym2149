@@ -78,10 +78,10 @@ class Channel:
         if program is not None:
             return program.__name__
 
-    def newnote(self, noteid, frame, program, midinote, vel, fx):
+    def newnote(self, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel))
 
-    def noteoff(self, noteid, frame):
+    def noteoff(self, frame):
         self.channote.offframe = frame
 
     def update(self, frame):
@@ -153,19 +153,19 @@ class Channels:
             fx = self.midichantofx[midichan]
         except KeyError:
             self.midichantofx[midichan] = fx = self.fxfactory(midichan)
-        chipchan, noteid = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
+        chipchan, _ = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
         channel = self.channels[chipchan]
         if midichan in self.slidemidichans:
             fx.bend.value = 0 # Leave target and rate as-is. Note race with midi instant pitch bend (fine part 0).
-        channel.newnote(noteid, self.frameindex, program, midinote, vel, fx)
+        channel.newnote(self.frameindex, program, midinote, vel, fx)
         return channel
 
     def noteoff(self, midichan, midinote, vel):
         pair = self.mediation.releasechipchan(midichan, midinote)
         if pair is not None:
-            chipchan, noteid = pair
+            chipchan, _ = pair
             channel = self.channels[chipchan]
-            channel.noteoff(noteid, self.frameindex)
+            channel.noteoff(self.frameindex)
             return channel
 
     def pitchbend(self, midichan, bend):
