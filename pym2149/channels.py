@@ -28,7 +28,7 @@ from .util import singleton
 log = logging.getLogger(__name__)
 
 @singleton
-class nullchannote:
+class NullChanNote:
 
     def programornone(self): pass
 
@@ -71,7 +71,7 @@ class Channel:
         self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
         self.chipindex = chipindex
         self.chip = chip
-        self.channote = nullchannote
+        self.channote = NullChanNote
 
     def programstr(self):
         program = self.channote.programornone()

@@ -19,8 +19,8 @@ import time, logging
 
 log = logging.getLogger(__name__)
 
-def singleton(f):
-    return f()
+def singleton(t):
+    return t()
 
 def awaitinterrupt(config):
     if config.profile or config.trace:
