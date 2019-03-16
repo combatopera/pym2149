@@ -62,6 +62,15 @@ def readbytecode(f, findlabel):
 
 class Bytecode:
 
+    @staticmethod
+    def number(s):
+        if s[0] == '%':
+            return int(s[1:], 2)
+        elif s[0] == '$':
+            return int(s[1:], 16)
+        else:
+            return int(s) # XXX: Could it be octal?
+
     def __init__(self, aligned):
         self.bytes = []
         self.aligned = aligned
@@ -77,18 +86,10 @@ class Bytecode:
         elif 'dc.w' == key:
             self.bytes.extend([None, None]) # Unknown endianness.
         elif 'dc.b' == key:
-            self.bytes.extend(map(number, line.argstext.split(',')))
+            self.bytes.extend(map(self.number, line.argstext.split(',')))
         else:
             raise SourceException("Unsupported directive: %s" % line.directive)
 
     def hasterminator(self):
         # TODO LATER: Support termination not just at end of line.
         return len(self.bytes) >= 2 and not self.bytes[-1] and issleepcommand(self.bytes[-2])
-
-def number(s):
-    if s[0] == '%':
-        return int(s[1:], 2)
-    elif s[0] == '$':
-        return int(s[1:], 16)
-    else:
-        return int(s) # XXX: Could it be octal?
