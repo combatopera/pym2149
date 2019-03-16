@@ -128,6 +128,7 @@ class NewSynth(SCSynthHandler):
             onfor = sus * blur
             def noteoff():
                 if noteon == self.noteons[player, midinote]:
+                    # FIXME: If noteon was replaced in its chipchan this must not turn off the new one.
                     self._event(timetag + onfor, NoteOff,
                             channel = player, note = midinote, velocity = None)
                 else:
