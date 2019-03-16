@@ -94,7 +94,7 @@ class NewSynth(SCSynthHandler):
         self.neutralvel = config.neutralvelocity
         self.midinoteclass = config.midinoteclass
         self.playertoprogram = {}
-        self.midinotetonoteon = {}
+        self.noteons = {}
         self.pll = pll
         self.delay = delay
 
@@ -123,11 +123,11 @@ class NewSynth(SCSynthHandler):
                         channel = player, value = name)
                 self.playertoprogram[player] = name
             midinote = self.midinoteclass.of(midinote)
-            self.midinotetonoteon[midinote] = noteon = self._event(timetag, NoteOn,
+            self.noteons[player, midinote] = noteon = self._event(timetag, NoteOn,
                     channel = player, note = midinote, velocity = round(amp * self.neutralvel))
             onfor = sus * blur
             def noteoff():
-                if noteon == self.midinotetonoteon[midinote]:
+                if noteon == self.noteons[player, midinote]:
                     self._event(timetag + onfor, NoteOff,
                             channel = player, note = midinote, velocity = None)
                 else:
