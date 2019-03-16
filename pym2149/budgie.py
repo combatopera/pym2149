@@ -51,7 +51,7 @@ def readbytecode(f, findlabel):
         if bytecode is None and findlabel == label: # XXX: Support terminating colon?
             bytecode = [] # And fall through to next clause if there is a directive.
         if bytecode is not None and directive is not None:
-            process(bytecode, directive, argstext)
+            process(bytecode, directive, argstext, False)
             # TODO LATER: Support termination not just at end of line.
             if len(bytecode) >= 2 and not bytecode[-1] and issleepcommand(bytecode[-2]):
                 break
@@ -59,9 +59,9 @@ def readbytecode(f, findlabel):
         raise SourceException("Label not found: %s" % findlabel)
     return bytecode
 
-def process(bytecode, directive, argstext, startedeven = False):
+def process(bytecode, directive, argstext, aligned):
     key = directive.lower()
-    if startedeven and 'even' == key:
+    if aligned and 'even' == key:
         if len(bytecode) & 1:
             bytecode.append(0) # May be used as value by accident.
     elif 'dc.w' == key:
