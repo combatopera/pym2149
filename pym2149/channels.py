@@ -84,7 +84,8 @@ class ChanNote:
                 self._callnoteon()
             f = frame - self.offframe
             if not f:
-                self.note.callnoteoff(self.offframe - self.onframe)
+                self.note.onframes = self.offframe - self.onframe
+                self.note.noteoff()
             self.note.noteoffframe(f)
 
 class Channel:
