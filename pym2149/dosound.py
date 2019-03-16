@@ -47,7 +47,7 @@ def _dosound(bytecode, chip):
                 # That's right, if we skip past it we loop forever:
                 if last == softreg:
                     break
-        elif ctrl >= 0x82:
+        elif iswaitcommand(ctrl):
             ticks = next(g)
             if not ticks:
                 break
@@ -56,3 +56,6 @@ def _dosound(bytecode, chip):
                 yield
         else:
             raise BadCommandException(ctrl)
+
+def iswaitcommand(ctrl):
+    return ctrl >= 0x82
