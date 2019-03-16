@@ -26,8 +26,6 @@ class Line:
     def __init__(self, line):
         self.label, self.directive, self.argstext = self.pattern.search(line).groups()
 
-class SourceException(Exception): pass
-
 class Label:
 
     def __init__(self, bytecode, index):
@@ -47,6 +45,8 @@ def readlabeltobytecode(f):
             bytecode.process(line)
     return labels
 
+class NoSuchLabelException(Exception): pass
+
 def readbytecode(f, findlabel):
     bytecode = None
     for line in map(Line, f):
@@ -57,8 +57,10 @@ def readbytecode(f, findlabel):
             if bytecode.hasterminator():
                 break
     if bytecode is None:
-        raise SourceException("Label not found: %s" % findlabel)
+        raise NoSuchLabelException(findlabel)
     return bytecode.bytes
+
+class UnsupportedDirectiveException(Exception): pass
 
 class Bytecode:
 
@@ -88,7 +90,7 @@ class Bytecode:
         elif 'dc.b' == key:
             self.bytes.extend(map(self.number, line.argstext.split(',')))
         else:
-            raise SourceException("Unsupported directive: %s" % line.directive)
+            raise UnsupportedDirectiveException(line.directive)
 
     def hasterminator(self):
         # TODO LATER: Support termination not just at end of line.
