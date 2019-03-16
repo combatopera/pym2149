@@ -39,39 +39,51 @@ class Label:
 
 def readlabeltobytecode(f):
     labels = {}
-    bytecode = []
+    bytecode = Bytecode(True)
     for line in map(Line, f):
         if line.label is not None:
-            labels[line.label] = Label(bytecode, len(bytecode)) # Last one wins.
+            labels[line.label] = bytecode.startingnow() # Last one wins.
         if line.directive is not None:
-            process(bytecode, line, True)
+            bytecode.process(line)
     return labels
 
 def readbytecode(f, findlabel):
     bytecode = None
     for line in map(Line, f):
         if bytecode is None and findlabel == line.label: # XXX: Support terminating colon?
-            bytecode = [] # And fall through to next clause if there is a directive.
+            bytecode = Bytecode(False) # And fall through to next clause if there is a directive.
         if bytecode is not None and line.directive is not None:
-            process(bytecode, line, False)
-            # TODO LATER: Support termination not just at end of line.
-            if len(bytecode) >= 2 and not bytecode[-1] and issleepcommand(bytecode[-2]):
+            bytecode.process(line)
+            if bytecode.hasterminator():
                 break
     if bytecode is None:
         raise SourceException("Label not found: %s" % findlabel)
-    return bytecode
+    return bytecode.bytes
 
-def process(bytecode, line, aligned):
-    key = line.directive.lower()
-    if aligned and 'even' == key:
-        if len(bytecode) & 1:
-            bytecode.append(0) # May be used as value by accident.
-    elif 'dc.w' == key:
-        bytecode.extend([None, None]) # Unknown endianness.
-    elif 'dc.b' == key:
-        bytecode.extend(map(number, line.argstext.split(',')))
-    else:
-        raise SourceException("Unsupported directive: %s" % line.directive)
+class Bytecode:
+
+    def __init__(self, aligned):
+        self.bytes = []
+        self.aligned = aligned
+
+    def startingnow(self):
+        return Label(self.bytes, len(self.bytes))
+
+    def process(self, line):
+        key = line.directive.lower()
+        if self.aligned and 'even' == key:
+            if len(self.bytes) & 1:
+                self.bytes.append(0) # May be used as value by accident.
+        elif 'dc.w' == key:
+            self.bytes.extend([None, None]) # Unknown endianness.
+        elif 'dc.b' == key:
+            self.bytes.extend(map(number, line.argstext.split(',')))
+        else:
+            raise SourceException("Unsupported directive: %s" % line.directive)
+
+    def hasterminator(self):
+        # TODO LATER: Support termination not just at end of line.
+        return len(self.bytes) >= 2 and not self.bytes[-1] and issleepcommand(self.bytes[-2])
 
 def number(s):
     if s[0] == '%':
