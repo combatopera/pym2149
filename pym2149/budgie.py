@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .dosound import iswaitcommand
+from .dosound import issleepcommand
 import re, itertools
 
 # Does not support quoted whitespace, but we're only interested in numbers:
@@ -53,7 +53,7 @@ def readbytecode(f, findlabel):
         if bytecode is not None and directive is not None:
             process(bytecode, directive, argstext)
             # TODO LATER: Support termination not just at end of line.
-            if len(bytecode) >= 2 and not bytecode[-1] and iswaitcommand(bytecode[-2]):
+            if len(bytecode) >= 2 and not bytecode[-1] and issleepcommand(bytecode[-2]):
                 break
     if bytecode is None:
         raise SourceException("Label not found: %s" % findlabel)
