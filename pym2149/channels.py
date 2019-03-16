@@ -55,15 +55,19 @@ class ChanNote:
             log.exception("%s failed:", type(self.note).__name__)
             self.update = lambda *args: None # Freeze this note.
 
+    def _callnoteon(self):
+        self.note.chip.flagsoff(self.note.chipchan) # Make it so that the impl only has to switch things on.
+        self.note.noteon()
+
     def _update(self, frame):
         if self.offframe is None:
             f = frame - self.onframe
             if not f:
-                self.note.callnoteon()
+                self._callnoteon()
             self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
         else:
             if self.onframe == self.offframe:
-                self.note.callnoteon()
+                self._callnoteon()
             f = frame - self.offframe
             if not f:
                 self.note.callnoteoff(self.offframe - self.onframe)

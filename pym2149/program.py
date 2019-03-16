@@ -114,10 +114,6 @@ class Note:
         self.voladj = voladj
         self.fx = fx
 
-    def callnoteon(self):
-        self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
-        self.noteon()
-
     def noteon(self): pass
 
     def noteonframe(self, frame):
@@ -157,7 +153,7 @@ class Unpitched(Note):
         self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.fx)
 
     def noteon(self):
-        self.note.callnoteon()
+        self.note.noteon()
 
     def noteonframe(self, frame):
         self.note.noteonframe(frame)
