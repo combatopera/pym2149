@@ -70,7 +70,7 @@ class ChanNote:
             self.update = lambda *args: None # Freeze this note.
 
     def _callnoteon(self):
-        self.chip.flagsoff(self.chipindex) # Make it so that the impl only has to switch things on.
+        self.chip.flagsoff(self.chipindex) # Make it so that the impl only has to switch things on. TODO LATER: Not all notes will want this, e.g. overlay hihats or buzzer-combining tone.
         self.note.noteon()
 
     def _update(self, frame):
