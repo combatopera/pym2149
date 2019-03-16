@@ -18,8 +18,13 @@
 from .dosound import issleepcommand
 import re, itertools
 
-# Does not support quoted whitespace, but we're only interested in numbers:
-pattern = re.compile(r'^(\S+)?(?:\s+(\S+)(?:\s+(\S+))?)?')
+class Line:
+
+    # Does not support quoted whitespace, but we're only interested in numbers:
+    pattern = re.compile(r'^(\S+)?(?:\s+(\S+)(?:\s+(\S+))?)?')
+
+    def __init__(self, line):
+        self.label, self.directive, self.argstext = self.pattern.search(line).groups()
 
 class SourceException(Exception): pass
 
@@ -32,26 +37,23 @@ class Label:
     def __iter__(self):
         return itertools.islice(self.bytecode, self.index, None)
 
-def lines(f):
-    return (pattern.search(line).groups() for line in f)
-
 def readlabeltobytecode(f):
     labels = {}
     bytecode = []
-    for label, directive, argstext in lines(f):
-        if label is not None:
-            labels[label] = Label(bytecode, len(bytecode)) # Last one wins.
-        if directive is not None:
-            process(bytecode, directive, argstext, True)
+    for line in map(Line, f):
+        if line.label is not None:
+            labels[line.label] = Label(bytecode, len(bytecode)) # Last one wins.
+        if line.directive is not None:
+            process(bytecode, line, True)
     return labels
 
 def readbytecode(f, findlabel):
     bytecode = None
-    for label, directive, argstext in lines(f):
-        if bytecode is None and findlabel == label: # XXX: Support terminating colon?
+    for line in map(Line, f):
+        if bytecode is None and findlabel == line.label: # XXX: Support terminating colon?
             bytecode = [] # And fall through to next clause if there is a directive.
-        if bytecode is not None and directive is not None:
-            process(bytecode, directive, argstext, False)
+        if bytecode is not None and line.directive is not None:
+            process(bytecode, line, False)
             # TODO LATER: Support termination not just at end of line.
             if len(bytecode) >= 2 and not bytecode[-1] and issleepcommand(bytecode[-2]):
                 break
@@ -59,17 +61,17 @@ def readbytecode(f, findlabel):
         raise SourceException("Label not found: %s" % findlabel)
     return bytecode
 
-def process(bytecode, directive, argstext, aligned):
-    key = directive.lower()
+def process(bytecode, line, aligned):
+    key = line.directive.lower()
     if aligned and 'even' == key:
         if len(bytecode) & 1:
             bytecode.append(0) # May be used as value by accident.
     elif 'dc.w' == key:
         bytecode.extend([None, None]) # Unknown endianness.
     elif 'dc.b' == key:
-        bytecode.extend(map(number, argstext.split(',')))
+        bytecode.extend(map(number, line.argstext.split(',')))
     else:
-        raise SourceException("Unsupported directive: %s" % directive)
+        raise SourceException("Unsupported directive: %s" % line.directive)
 
 def number(s):
     if s[0] == '%':
