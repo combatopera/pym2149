@@ -26,23 +26,22 @@ class Mediation:
 
     def __init__(self, config):
         self.chipchantomidipairs = tuple(set() for _ in range(config.chipchannels))
-        self.midichanandnotetochipchanandnoteid = {}
+        self.midipairtochipchan = {}
 
     def currentmidichans(self, chipchan): # Only used for logging.
         return [pair[0] for pair in self.chipchantomidipairs[chipchan]]
 
     def acquirechipchan(self, midichan, midinote, frame):
-        if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
-            return self.midichanandnotetochipchanandnoteid[midichan, midinote][0] # Spurious case.
-        chipchan, noteid = self.tochipchanandnoteid(midichan, frame)
-        self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
+        if (midichan, midinote) in self.midipairtochipchan:
+            return self.midipairtochipchan[midichan, midinote] # Spurious case.
+        chipchan = self.tochipchan(midichan, frame)
+        self.midipairtochipchan[midichan, midinote] = chipchan
         self.chipchantomidipairs[chipchan].add((midichan, midinote))
         return chipchan
 
     def releasechipchan(self, midichan, midinote):
-        chipchanandnoteid = self.midichanandnotetochipchanandnoteid.pop((midichan, midinote), None)
-        if chipchanandnoteid is not None: # Non-spurious case.
-            chipchan, _ = chipchanandnoteid
+        chipchan = self.midipairtochipchan.pop((midichan, midinote), None)
+        if chipchan is not None: # Non-spurious case.
             self.chipchantomidipairs[chipchan].discard((midichan, midinote))
             return chipchan
 
@@ -59,13 +58,13 @@ class DynamicMediation(Mediation):
         self.chipchantoonframe = [None] * chipchancount
         self.warn = log.warn
 
-    def tochipchanandnoteid(self, midichan, frame):
+    def tochipchan(self, midichan, frame):
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
             del chipchanhistory[i]
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
-            return chipchan, 0
+            return chipchan
         offchipchans = set()
         for chipchan, pairs in enumerate(self.chipchantomidipairs):
             if not pairs:
@@ -92,10 +91,8 @@ class SimpleMediation(Mediation):
         self.midichanbase = config.midichannelbase
         self.chipchancount = config.chipchannels
 
-    def tochipchanandnoteid(self, midichan, frame):
-        chipchan = (midichan - self.midichanbase) % self.chipchancount
-        noteid = (midichan - self.midichanbase) // self.chipchancount
-        return chipchan, noteid
+    def tochipchan(self, midichan, frame):
+        return (midichan - self.midichanbase) % self.chipchancount
 
 class PlayerMediation(Mediation):
 
@@ -104,8 +101,6 @@ class PlayerMediation(Mediation):
         super().__init__(config)
         self.chipchancount = config.chipchannels
 
-    def tochipchanandnoteid(self, midichan, frame):
+    def tochipchan(self, midichan, frame):
         channel = ord(midichan[1]) - ord('1') # FIXME: Do this properly.
-        chipchan = channel % self.chipchancount
-        noteid = channel // self.chipchancount
-        return chipchan, noteid
+        return channel % self.chipchancount
