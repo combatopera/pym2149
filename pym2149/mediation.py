@@ -65,10 +65,7 @@ class DynamicMediation(Mediation):
             chipchanhistory.insert(0, chipchan)
             self.chipchantoonframe[chipchan] = frame
             return chipchan
-        offchipchans = set()
-        for chipchan, pairs in enumerate(self.chipchantomidipairs):
-            if not pairs:
-                offchipchans.add(chipchan)
+        offchipchans = {chipchan for chipchan, pairs in enumerate(self.chipchantomidipairs) if not pairs}
         if offchipchans:
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in offchipchans:
