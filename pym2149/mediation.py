@@ -34,7 +34,7 @@ class Mediation:
     def acquirechipchan(self, midichan, midinote, frame):
         if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
             return self.midichanandnotetochipchanandnoteid[midichan, midinote] # Spurious case.
-        chipchan, noteid = self.tochipchanandnoteid(midichan, midinote, frame)
+        chipchan, noteid = self.tochipchanandnoteid(midichan, frame)
         self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
         if not noteid:
             self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
@@ -61,7 +61,7 @@ class DynamicMediation(Mediation):
         self.chipchantoonframe = [None] * chipchancount
         self.warn = log.warn
 
-    def tochipchanandnoteid(self, midichan, midinote, frame):
+    def tochipchanandnoteid(self, midichan, frame):
         chipchanhistory = self.midichantochipchanhistory[midichan]
         def acquire(chipchan):
             del chipchanhistory[i]
@@ -93,7 +93,7 @@ class SimpleMediation(Mediation):
         self.midichanbase = config.midichannelbase
         self.chipchancount = config.chipchannels
 
-    def tochipchanandnoteid(self, midichan, midinote, frame):
+    def tochipchanandnoteid(self, midichan, frame):
         chipchan = (midichan - self.midichanbase) % self.chipchancount
         noteid = (midichan - self.midichanbase) // self.chipchancount
         return chipchan, noteid
@@ -105,7 +105,7 @@ class PlayerMediation(Mediation):
         super().__init__(config)
         self.chipchancount = config.chipchannels
 
-    def tochipchanandnoteid(self, midichan, midinote, frame):
+    def tochipchanandnoteid(self, midichan, frame):
         channel = ord(midichan[1]) - ord('1') # FIXME: Do this properly.
         chipchan = channel % self.chipchancount
         noteid = channel // self.chipchancount
