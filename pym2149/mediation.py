@@ -33,12 +33,12 @@ class Mediation:
 
     def acquirechipchan(self, midichan, midinote, frame):
         if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
-            return self.midichanandnotetochipchanandnoteid[midichan, midinote] # Spurious case.
+            return self.midichanandnotetochipchanandnoteid[midichan, midinote][0] # Spurious case.
         chipchan, noteid = self.tochipchanandnoteid(midichan, frame)
         self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
         if not noteid:
             self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
-        return chipchan, noteid
+        return chipchan
 
     def releasechipchan(self, midichan, midinote):
         chipchanandnoteid = self.midichanandnotetochipchanandnoteid.pop((midichan, midinote), None)
@@ -46,7 +46,7 @@ class Mediation:
             chipchan, noteid = chipchanandnoteid
             if not noteid:
                 self.chipchantomidichanandnote[chipchan][1] = None
-            return chipchanandnoteid
+            return chipchan
 
 class DynamicMediation(Mediation):
 

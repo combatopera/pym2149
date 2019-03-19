@@ -30,12 +30,10 @@ class TestDynamicMediation(unittest.TestCase):
         self.assertEqual(0, self.warn.call_count)
 
     def acquire(self, *args):
-        chan, noteid = self.m.acquirechipchan(*args)
-        return chan
+        return self.m.acquirechipchan(*args)
 
     def release(self, *args):
-        chan, noteid = self.m.releasechipchan(*args)
-        return chan
+        return self.m.releasechipchan(*args)
 
     def test_normalcase(self):
         # First-come first-served:
