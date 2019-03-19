@@ -25,27 +25,25 @@ log = logging.getLogger(__name__)
 class Mediation:
 
     def __init__(self, config):
-        self.chipchantomidichanandnote = [(None, None)] * config.chipchannels
+        self.chipchantomidipairs = tuple(set() for _ in range(config.chipchannels))
         self.midichanandnotetochipchanandnoteid = {}
 
-    def currentmidichanandnote(self, chipchan): # Only used for logging.
-        return self.chipchantomidichanandnote[chipchan]
+    def currentmidichans(self, chipchan): # Only used for logging.
+        return [pair[0] for pair in self.chipchantomidipairs[chipchan]]
 
     def acquirechipchan(self, midichan, midinote, frame):
         if (midichan, midinote) in self.midichanandnotetochipchanandnoteid:
             return self.midichanandnotetochipchanandnoteid[midichan, midinote][0] # Spurious case.
         chipchan, noteid = self.tochipchanandnoteid(midichan, frame)
         self.midichanandnotetochipchanandnoteid[midichan, midinote] = chipchan, noteid
-        if not noteid:
-            self.chipchantomidichanandnote[chipchan] = [midichan, midinote]
+        self.chipchantomidipairs[chipchan].add((midichan, midinote))
         return chipchan
 
     def releasechipchan(self, midichan, midinote):
         chipchanandnoteid = self.midichanandnotetochipchanandnoteid.pop((midichan, midinote), None)
         if chipchanandnoteid is not None: # Non-spurious case.
-            chipchan, noteid = chipchanandnoteid
-            if not noteid:
-                self.chipchantomidichanandnote[chipchan][1] = None
+            chipchan, _ = chipchanandnoteid
+            self.chipchantomidipairs[chipchan].discard((midichan, midinote))
             return chipchan
 
 class DynamicMediation(Mediation):
@@ -69,8 +67,8 @@ class DynamicMediation(Mediation):
             self.chipchantoonframe[chipchan] = frame
             return chipchan, 0
         offchipchans = set()
-        for chipchan, midichanandnote in enumerate(self.chipchantomidichanandnote):
-            if midichanandnote[1] is None:
+        for chipchan, pairs in enumerate(self.chipchantomidipairs):
+            if not pairs:
                 offchipchans.add(chipchan)
         if offchipchans:
             for i, chipchan in enumerate(chipchanhistory):
@@ -82,7 +80,8 @@ class DynamicMediation(Mediation):
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in bestchipchans:
                     self.warn(self.interruptingformat, chr(ord('A') + chipchan))
-                    self.releasechipchan(*self.chipchantomidichanandnote[chipchan])
+                    for mc, mn in self.chipchantomidipairs[chipchan].copy():
+                        self.releasechipchan(mc, mn)
                     return acquire(chipchan)
 
 class SimpleMediation(Mediation):

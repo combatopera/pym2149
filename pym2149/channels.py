@@ -178,7 +178,7 @@ class Channels:
         self.midichantoprogram[midichan] = program
 
     def updateall(self):
-        text = ' | '.join("%s@%s" % (c.programstr(), self.mediation.currentmidichanandnote(c.chipindex)[0]) for c in self.channels)
+        text = ' | '.join("%s@%s" % (c.programstr(), self.mediation.currentmidichans(c.chipindex)) for c in self.channels)
         if text != self.prevtext:
             log.debug(text)
             self.prevtext = text
