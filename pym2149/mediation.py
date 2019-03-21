@@ -29,20 +29,22 @@ class Mediation:
         self.midipairtochipchan = {}
 
     def currentmidichans(self, chipchan): # Only used for logging.
-        return [pair[0] for pair in self.chipchantomidipairs[chipchan]]
+        return [midichan for midichan, _ in self.chipchantomidipairs[chipchan]]
 
     def acquirechipchan(self, midichan, midinote, frame):
-        if (midichan, midinote) in self.midipairtochipchan:
-            return self.midipairtochipchan[midichan, midinote] # Spurious case.
+        midipair = midichan, midinote
+        if midipair in self.midipairtochipchan:
+            return self.midipairtochipchan[midipair] # Spurious case.
         chipchan = self.tochipchan(midichan, frame)
-        self.midipairtochipchan[midichan, midinote] = chipchan
-        self.chipchantomidipairs[chipchan].add((midichan, midinote))
+        self.midipairtochipchan[midipair] = chipchan
+        self.chipchantomidipairs[chipchan].add(midipair)
         return chipchan
 
     def releasechipchan(self, midichan, midinote):
-        chipchan = self.midipairtochipchan.pop((midichan, midinote), None)
-        if chipchan is not None: # Non-spurious case.
-            self.chipchantomidipairs[chipchan].discard((midichan, midinote))
+        midipair = midichan, midinote
+        if midipair in self.midipairtochipchan: # Non-spurious case.
+            chipchan = self.midipairtochipchan.pop(midipair)
+            self.chipchantomidipairs[chipchan].discard(midipair)
             return chipchan
 
 class DynamicMediation(Mediation):
