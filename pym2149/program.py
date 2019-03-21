@@ -120,9 +120,6 @@ class Note:
 
     def noteon(self): pass
 
-    def callnoteonframe(self, *args):
-        self.noteonframe(*args)
-
     def noteonframe(self, frame):
         "Note may never be called, so don't make changes that noteoff or a custom impl of noteoffframe later relies on."
 
@@ -131,9 +128,6 @@ class Note:
         self.noteoff()
 
     def noteoff(self): pass
-
-    def callnoteoffframe(self, *args):
-        self.noteoffframe(*args)
 
     def noteoffframe(self, frame):
         self.noteonframe(self.onframes + frame)

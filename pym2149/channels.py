@@ -61,14 +61,14 @@ class ChanNote:
             f = frame - self.onframe
             if not f:
                 self.note.callnoteon(self.voladj)
-            self.note.callnoteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
+            self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
         else:
             if self.onframe == self.offframe:
                 self.note.callnoteon(self.voladj)
             f = frame - self.offframe
             if not f:
                 self.note.callnoteoff(self.offframe - self.onframe)
-            self.note.callnoteoffframe(f)
+            self.note.noteoffframe(f)
 
 class Channel:
 
