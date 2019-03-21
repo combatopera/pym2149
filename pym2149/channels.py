@@ -50,6 +50,13 @@ class ChanNote:
     def getpan(self): return self.note.fx.normpan()
 
     def update(self, frame):
+        try:
+            self._update(frame)
+        except Exception:
+            log.exception("%s failed:", type(self.note).__name__)
+            self.update = lambda *args: None # Freeze this note.
+
+    def _update(self, frame):
         if self.offframe is None:
             f = frame - self.onframe
             if not f:
