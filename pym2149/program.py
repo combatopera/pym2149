@@ -94,7 +94,7 @@ class Note:
     tonepitch = regproperty(lambda note: note.tonepitchreg)
     tonefreq = regproperty(lambda note: note.tonefreqreg)
 
-    def __init__(self, nomclock, chip, chipchan, pitch, fx):
+    def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx):
         self.toneperiodreg = chip.toneperiods[chipchan]
         self.toneflagreg = chip.toneflags[chipchan]
         self.timer = chip.timers[chipchan]
@@ -103,19 +103,19 @@ class Note:
         # No reverse link, we don't want to pollute the chip with references:
         chip.fixedlevels[chipchan].link(lambda unclamped: max(0, min(15, unclamped)), self.fixedlevelreg)
         self.levelmodereg = chip.levelmodes[chipchan]
-        self.nomclock = nomclock
-        self.chip = chip
-        self.chipchan = chipchan
-        self.pitch = pitch
-        self.fx = fx
         self.tonefreqreg = Reg()
         self.toneperiodreg.link(lambda f: f.toneperiod(nomclock), self.tonefreqreg) # No reverse link.
         self.tonepitchreg = Reg()
         self.tonefreqreg.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
-
-    def callnoteon(self, voladj):
-        self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
+        self.nomclock = nomclock
+        self.chip = chip
+        self.chipchan = chipchan
+        self.pitch = pitch
         self.voladj = voladj
+        self.fx = fx
+
+    def callnoteon(self):
+        self.chip.flagsoff(self.chipchan) # Make it so that the impl only has to switch things on.
         self.noteon()
 
     def noteon(self): pass
@@ -157,7 +157,7 @@ class Unpitched(Note):
         self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.fx)
 
     def noteon(self):
-        self.note.callnoteon(self.voladj)
+        self.note.callnoteon()
 
     def noteonframe(self, frame):
         self.note.noteonframe(frame)

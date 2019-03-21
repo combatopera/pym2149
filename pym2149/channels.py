@@ -38,10 +38,9 @@ class NullChanNote:
 
 class ChanNote:
 
-    def __init__(self, onframe, note, voladj, midinote):
+    def __init__(self, onframe, note, midinote):
         self.onframe = onframe
         self.note = note
-        self.voladj = voladj
         self.midinote = midinote
         self.offframe = None
 
@@ -60,11 +59,11 @@ class ChanNote:
         if self.offframe is None:
             f = frame - self.onframe
             if not f:
-                self.note.callnoteon(self.voladj)
+                self.note.callnoteon()
             self.note.noteonframe(f) # May never be called, so noteoff/noteoffframe should not rely on side-effects.
         else:
             if self.onframe == self.offframe:
-                self.note.callnoteon(self.voladj)
+                self.note.callnoteon()
             f = frame - self.offframe
             if not f:
                 self.note.callnoteoff(self.offframe - self.onframe)
@@ -87,7 +86,7 @@ class Channel:
             return program.__name__
 
     def newnote(self, frame, program, midinote, vel, fx):
-        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel), midinote)
+        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), self.tovoladj(vel), fx), midinote)
 
     def noteoff(self, frame):
         self.channote.offframe = frame
