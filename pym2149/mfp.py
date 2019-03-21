@@ -17,7 +17,7 @@
 
 from .reg import Reg, VersionReg
 
-prescalers = dict([1 + i, v] for i, v in enumerate([4, 10, 16, 50, 64, 100, 200]))
+prescalers = {1 + i: v for i, v in enumerate([4, 10, 16, 50, 64, 100, 200])}
 mfpclock = 2457600
 
 class MFPTimer:

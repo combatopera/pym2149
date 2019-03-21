@@ -56,7 +56,7 @@ class DynamicMediation(Mediation):
         super().__init__(config)
         midichanbase = config.midichannelbase
         chipchancount = config.chipchannels
-        self.midichantochipchanhistory = dict([midichanbase + i, list(range(chipchancount))] for i in range(midichannelcount))
+        self.midichantochipchanhistory = {midichanbase + i: list(range(chipchancount)) for i in range(midichannelcount)}
         self.chipchantoonframe = [None] * chipchancount
         self.warn = log.warn
 
