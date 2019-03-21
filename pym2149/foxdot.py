@@ -132,7 +132,7 @@ class NewSynth(SCSynthHandler):
                     self._event(timetag + onfor, NoteOff,
                             channel = player, note = midinote, velocity = None)
                 else:
-                    log.debug('NoteOff %s denied.', midinote)
+                    log.debug('NoteOff %s no longer valid.', midinote)
             self.delay(onfor, noteoff)
 
 def configure(di):
