@@ -61,17 +61,16 @@ class DynamicMediation(Mediation):
         self.warn = log.warning
 
     def tochipchan(self, midichan, frame):
-        chipchanhistory = self.midichantochipchanhistory[midichan]
-        def acquire(chipchan):
-            del chipchanhistory[i]
-            chipchanhistory.insert(0, chipchan)
+        def acquire():
+            chipchanhistory.insert(0, chipchanhistory.pop(i))
             self.chipchantoonframe[chipchan] = frame
             return chipchan
+        chipchanhistory = self.midichantochipchanhistory[midichan]
         offchipchans = {chipchan for chipchan, pairs in enumerate(self.chipchantomidipairs) if not pairs}
         if offchipchans:
             for i, chipchan in enumerate(chipchanhistory):
                 if chipchan in offchipchans:
-                    return acquire(chipchan)
+                    return acquire()
         else:
             bestonframe = min(self.chipchantoonframe) # May be None.
             bestchipchans = set(c for c, f in enumerate(self.chipchantoonframe) if f == bestonframe)
@@ -80,7 +79,7 @@ class DynamicMediation(Mediation):
                     self.warn(self.interruptingformat, chr(ord('A') + chipchan))
                     for mc, mn in self.chipchantomidipairs[chipchan].copy():
                         self.releasechipchan(mc, mn)
-                    return acquire(chipchan)
+                    return acquire()
 
 class SimpleMediation(Mediation):
 
