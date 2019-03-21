@@ -36,7 +36,7 @@ class SimpleTimer(Timer):
 
     def __del__(self):
         if self.carryticks:
-            log.warn("Non-zero carry on dispose: %s", self.carryticks)
+            log.warning("Non-zero carry on dispose: %s", self.carryticks)
 
 class MinBlockRateTimer(SimpleTimer):
 

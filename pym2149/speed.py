@@ -26,7 +26,7 @@ def defaultcallback(oldspeedphaseornone, speedphase, clarity):
     if oldspeedphaseornone is None:
         log.info("Speed detected: %s", speedphase)
     else:
-        log.warn("Speed was %s but is now: %s", oldspeedphaseornone, speedphase)
+        log.warning("Speed was %s but is now: %s", oldspeedphaseornone, speedphase)
 
 kernelperiods = 2
 dtype = np.int32 # Must be signed.

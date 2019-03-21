@@ -94,7 +94,7 @@ class FoxDotClient:
         try:
             handler = self.handlers[addrpattern]
         except KeyError:
-            log.warn("Unhandled %s message: %s", self.label, message)
+            log.warning("Unhandled %s message: %s", self.label, message)
             return
         handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr))
 

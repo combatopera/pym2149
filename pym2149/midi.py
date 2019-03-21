@@ -53,7 +53,7 @@ class UpdateSchedule:
             else: # We're in the [0, maxdelay] window (or late if skip disabled).
                 break
         if skipped:
-            log.warn("Skipped sync with %s updates.", skipped)
+            log.warning("Skipped sync with %s updates.", skipped)
         return now
 
     def step(self, idealtaketime):

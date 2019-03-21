@@ -94,6 +94,6 @@ class PLL:
         if 1 == n:
             update, = copy
         else:
-            log.warn("Yielding %s updates as one.", n)
+            log.warning("Yielding %s updates as one.", n)
             update = sum(copy, [])
         return Update(update, self.exclusivewindowend)

@@ -43,7 +43,7 @@ class Node:
       self.masked = masked
       self.result = self.callimpl()
     elif not masked and self.masked:
-      log.warn("This node has already executed masked: %s", self)
+      log.warning("This node has already executed masked: %s", self)
     return self.result
 
   def chain(self, node):

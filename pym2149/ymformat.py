@@ -69,7 +69,7 @@ class YM:
             log.info('Loop frame apparently little-endian.')
             return loopframe
         loopframe = 0
-        log.warn("Cannot interpret loop frame, defaulting to %s.", loopframe)
+        log.warning("Cannot interpret loop frame, defaulting to %s.", loopframe)
         return loopframe
 
     def skip(self, n):
@@ -183,7 +183,7 @@ class YM56(YM):
         loopframe = self.readloopframe()
         self.skip(self.word()) # Future expansion.
         if samplecount:
-            log.warn("Ignoring %s samples.", samplecount)
+            log.warning("Ignoring %s samples.", samplecount)
             for _ in range(samplecount):
                 self.skip(self.lword())
         self.info = tuple(self.ntstring() for _ in range(3))
@@ -216,7 +216,7 @@ class Frame5(Frame56):
                 tdr = self.data[0xE]
                 chip.timers[chan].update(tcr, tdr, PWMEffect(chip.fixedlevels[chan]))
         if self.flags.logdigidrum and (self.data[0x3] & 0x30):
-            log.warn("Digi-drum at frame %s.", self.index)
+            log.warning("Digi-drum at frame %s.", self.index)
             self.flags.logdigidrum = False
 
 class Frame6(Frame56):
@@ -235,7 +235,7 @@ class Frame6(Frame56):
                         chip.timers[chan].update(tcr, tdr, PWMEffect(chip.fixedlevels[chan]))
                         timerchans.add(chan)
                 if self.flags.logdigidrum and 0x40 == fx:
-                    log.warn("Digi-drum at frame %s.", self.index)
+                    log.warning("Digi-drum at frame %s.", self.index)
                     self.flags.logdigidrum = False
                 if 0x80 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
@@ -244,7 +244,7 @@ class Frame6(Frame56):
                         chip.timers[chan].update(tcr, tdr, SinusEffect(chip.fixedlevels[chan]))
                         timerchans.add(chan)
                 if self.flags.logsyncbuzzer and 0xc0 == fx:
-                    log.warn("Sync-buzzer at frame %s.", self.index)
+                    log.warning("Sync-buzzer at frame %s.", self.index)
                     self.flags.logsyncbuzzer = False
         for chan, timer in enumerate(chip.timers):
             if chan not in timerchans:
