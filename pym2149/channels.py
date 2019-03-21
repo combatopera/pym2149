@@ -38,10 +38,11 @@ class NullChanNote:
 
 class ChanNote:
 
-    def __init__(self, onframe, note, voladj):
+    def __init__(self, onframe, note, voladj, midinote):
         self.onframe = onframe
         self.note = note
         self.voladj = voladj
+        self.midinote = midinote
         self.offframe = None
 
     def programornone(self): return type(self.note)
@@ -79,7 +80,7 @@ class Channel:
             return program.__name__
 
     def newnote(self, frame, program, midinote, vel, fx):
-        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel))
+        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), fx), self.tovoladj(vel), midinote)
 
     def noteoff(self, frame):
         self.channote.offframe = frame
@@ -164,8 +165,9 @@ class Channels:
         chipchan = self.mediation.releasechipchan(midichan, midinote)
         if chipchan is not None:
             channel = self.channels[chipchan]
-            channel.noteoff(self.frameindex)
-            return channel
+            if midinote == channel.channote.midinote:
+                channel.noteoff(self.frameindex)
+                return channel
 
     def pitchbend(self, midichan, bend):
         self.midichantofx[midichan].bend.set(bend)
