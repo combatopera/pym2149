@@ -39,10 +39,11 @@ class NullChanNote:
 
 class ChanNote:
 
-    def __init__(self, onframe, program, chip, note, midinote, fx):
+    def __init__(self, onframe, program, chip, chipindex, note, midinote, fx):
         self.onframe = onframe
         self.program = program
         self.chip = chip
+        self.chipindex = chipindex
         self.note = note
         self.midinote = midinote
         self.fx = fx
@@ -67,7 +68,7 @@ class ChanNote:
             self.update = lambda *args: None # Freeze this note.
 
     def _callnoteon(self):
-        self.chip.flagsoff(self.note.chipchan) # Make it so that the impl only has to switch things on.
+        self.chip.flagsoff(self.chipindex) # Make it so that the impl only has to switch things on.
         self.note.noteon()
 
     def _update(self, frame):
@@ -101,7 +102,7 @@ class Channel:
             return program.__name__
 
     def newnote(self, frame, program, midinote, vel, fx):
-        self.channote = ChanNote(frame, program, chip, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), self.tovoladj(vel), fx), midinote, fx)
+        self.channote = ChanNote(frame, program, chip, chipindex, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), self.tovoladj(vel), fx), midinote, fx)
 
     def noteoff(self, frame):
         self.channote.offframe = frame
