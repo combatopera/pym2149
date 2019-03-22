@@ -185,13 +185,13 @@ class Channels:
         if midichan in self.monophonicmidichans:
             for mn in range(0x80):
                 self.noteoff(midichan, mn, 0)
-        # XXX: Keep owner program for logging?
-        program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote)
         fx = self._getfx(midichan)
-        chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
-        channel = self.channels[chipchan]
         if midichan in self.slidemidichans:
             fx.bend.value = 0 # Leave target and rate as-is. Note race with midi instant pitch bend (fine part 0).
+        # XXX: Keep owner program for logging?
+        program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote)
+        chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
+        channel = self.channels[chipchan]
         channel.newnote(self.frameindex, program, midinote, vel, fx)
         return channel
 
