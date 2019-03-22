@@ -50,6 +50,11 @@ class ChanNote:
         self.fx = fx
         self.offframe = None
 
+    def off(self, frame):
+        with self._guard():
+            self.note.onframes = frame - self.onframe
+        self.offframe = frame
+
     def programornone(self):
         return self.program
 
@@ -84,7 +89,6 @@ class ChanNote:
                 self._callnoteon()
             f = frame - self.offframe
             if not f:
-                self.note.onframes = self.offframe - self.onframe
                 self.note.noteoff()
             self.note.noteoffframe(f)
 
@@ -108,7 +112,7 @@ class Channel:
         self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
 
     def noteoff(self, frame):
-        self.channote.offframe = frame
+        self.channote.off(frame)
 
     def update(self, frame):
         self.channote.update(frame)
