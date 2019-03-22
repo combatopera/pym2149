@@ -15,15 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from .pitch import Pitch
 from .program import FX
 from .const import midichannelcount
 from .mediation import Mediation
-from diapyr import types, DI
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
 from .util import singleton
+from diapyr import types, DI
+from contextlib import contextmanager
+import logging
 
 log = logging.getLogger(__name__)
 
@@ -49,8 +50,13 @@ class ChanNote:
     def getpan(self): return self.note.fx.normpan()
 
     def update(self, frame):
-        try:
+        with self._guard():
             self._update(frame)
+
+    @contextmanager
+    def _guard(self):
+        try:
+            yield
         except Exception:
             log.exception("%s failed:", type(self.note).__name__)
             self.update = lambda *args: None # Freeze this note.
