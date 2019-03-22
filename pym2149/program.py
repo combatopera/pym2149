@@ -127,7 +127,7 @@ class Note(Unpitched):
     def noteon(self): pass
 
     def noteonframe(self, frame):
-        "Note may never be called, so don't make changes that noteoff or a custom impl of noteoffframe later relies on."
+        "May never be called, so don't make changes that noteoff or a custom impl of noteoffframe later relies on."
 
     def noteoff(self): pass
 
