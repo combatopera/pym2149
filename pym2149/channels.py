@@ -39,13 +39,15 @@ class NullChanNote:
 
 class ChanNote:
 
-    def __init__(self, onframe, note, midinote):
+    def __init__(self, onframe, program, note, midinote):
         self.onframe = onframe
+        self.program = program
         self.note = note
         self.midinote = midinote
         self.offframe = None
 
-    def programornone(self): return type(self.note)
+    def programornone(self):
+        return self.program
 
     def getpan(self): return self.note.fx.normpan()
 
@@ -58,7 +60,7 @@ class ChanNote:
         try:
             yield
         except Exception:
-            log.exception("%s failed:", type(self.note).__name__)
+            log.exception("%s failed:", self.program.__name__)
             self.update = lambda *args: None # Freeze this note.
 
     def _callnoteon(self):
@@ -96,7 +98,7 @@ class Channel:
             return program.__name__
 
     def newnote(self, frame, program, midinote, vel, fx):
-        self.channote = ChanNote(frame, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), self.tovoladj(vel), fx), midinote)
+        self.channote = ChanNote(frame, program, program(self.nomclock, self.chip, self.chipindex, Pitch(midinote), self.tovoladj(vel), fx), midinote)
 
     def noteoff(self, frame):
         self.channote.offframe = frame
