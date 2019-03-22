@@ -88,7 +88,7 @@ class Unpitched:
 
     @classmethod
     def programformidinote(cls, midinote):
-        return cls.midinotetoprogram.get(midinote, NullNote)
+        return cls.midinotetoprogram.get(midinote, Note) # XXX: Or should the default not even do flagsoff?
 
 class Note(Unpitched):
 
@@ -134,9 +134,7 @@ class Note(Unpitched):
     def noteoffframe(self, frame):
         self.noteonframe(self.onframes + frame)
 
-class NullNote(Note): pass
-
-class DefaultNote(Note):
+class DefaultNote(Note): # TODO: Does not belong here.
 
     vib = FloatLFO(0).hold(10).tri(8, 2, .2).loop(8)
     fadeout = LFO(-1).hold(1).lin(28, -15)
