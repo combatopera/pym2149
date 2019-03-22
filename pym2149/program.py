@@ -88,10 +88,11 @@ class Unpitched:
 
     @classmethod
     def programformidinote(cls, midinote):
-        return cls.midinotetoprogram.get(midinote, Note) # XXX: Or should the default not even do flagsoff?
+        return cls.midinotetoprogram.get(midinote, Note) # Observe a miss results in silence.
 
 class Note(Unpitched):
 
+    clean = True
     toneperiod = regproperty(lambda note: note.toneperiodreg)
     toneflag = regproperty(lambda note: note.toneflagreg)
     noiseflag = regproperty(lambda note: note.noiseflagreg)
@@ -133,6 +134,10 @@ class Note(Unpitched):
 
     def noteoffframe(self, frame):
         self.noteonframe(self.onframes + frame)
+
+class NullNote(Note):
+
+    clean = False
 
 class DefaultNote(Note): # TODO: Does not belong here.
 
