@@ -84,7 +84,13 @@ class FX:
         # Observe we don't apply maxpan, which is only for the auto-stereo:
         return max(self.minsigned + 1, self.pan.value) / (self.halfrange - 1)
 
-class Note:
+class Unpitched:
+
+    @classmethod
+    def programformidinote(cls, midinote):
+        return cls.midinotetoprogram.get(midinote, NullNote)
+
+class Note(Unpitched):
 
     toneperiod = regproperty(lambda note: note.toneperiodreg)
     toneflag = regproperty(lambda note: note.toneflagreg)
@@ -93,6 +99,10 @@ class Note:
     levelmode = regproperty(lambda note: note.levelmodereg)
     tonepitch = regproperty(lambda note: note.tonepitchreg)
     tonefreq = regproperty(lambda note: note.tonefreqreg)
+
+    @classmethod
+    def programformidinote(cls, midinote):
+        return cls
 
     def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx):
         self.toneperiodreg = chip.toneperiods[chipchan]
@@ -145,21 +155,3 @@ class DefaultNote(Note):
     def noteoffframe(self, frame):
         self.tonepitch = self.pitch + self.fx.relmodulation() * self.vib(self.onframes + frame)
         self.fixedlevel = 13 + self.voladj + self.fadeout(frame)
-
-class Unpitched(Note):
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.note = self.midinotetoprogram.get(self.pitch, NullNote)(self.nomclock, self.chip, self.chipchan, None, self.voladj, self.fx)
-
-    def noteon(self):
-        self.note.noteon()
-
-    def noteonframe(self, frame):
-        self.note.noteonframe(frame)
-
-    def noteoff(self):
-        self.note.callnoteoff(self.onframes)
-
-    def noteoffframe(self, frame):
-        self.note.noteoffframe(frame)

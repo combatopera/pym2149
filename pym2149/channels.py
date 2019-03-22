@@ -173,7 +173,8 @@ class Channels:
         if midichan in self.monophonicmidichans:
             for mn in range(0x80):
                 self.noteoff(midichan, mn, 0)
-        program = self.midiprograms[self.midichantoprogram[midichan]]
+        # XXX: Keep owner program for logging?
+        program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote)
         try:
             fx = self.midichantofx[midichan]
         except KeyError:

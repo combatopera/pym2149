@@ -49,7 +49,8 @@ class MidiNote(namedtuple('BaseMidiNote', 'whole micro')):
     @classmethod
     def of(cls, midinote):
         x = round(midinote * cls.microsteps)
-        return cls(x // cls.microsteps, x % cls.microsteps)
+        whole, micro = x // cls.microsteps, x % cls.microsteps
+        return cls(whole, micro) if micro else whole
 
     def __float__(self):
         return self.whole + self.micro / self.microsteps
