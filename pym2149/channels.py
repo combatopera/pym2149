@@ -168,18 +168,22 @@ class Channels:
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
 
+    def _getfx(self, midichan):
+        try:
+            fx = self.midichantofx[midichan]
+        except KeyError:
+            self.midichantofx[midichan] = fx = self.fxfactory(midichan)
+        return fx
+
     def noteon(self, midichan, midinote, vel):
-        if (not vel) and midichan in self.zerovelisnoteoffmidichans:
+        if (not vel) and midichan in self.zerovelisnoteoffmidichans: # TODO: This is normal, confirm midi spec.
             return self.noteoff(midichan, midinote, vel)
         if midichan in self.monophonicmidichans:
             for mn in range(0x80):
                 self.noteoff(midichan, mn, 0)
         # XXX: Keep owner program for logging?
         program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote)
-        try:
-            fx = self.midichantofx[midichan]
-        except KeyError:
-            self.midichantofx[midichan] = fx = self.fxfactory(midichan)
+        fx = self._getfx(midichan)
         chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
         channel = self.channels[chipchan]
         if midichan in self.slidemidichans:
@@ -187,7 +191,7 @@ class Channels:
         channel.newnote(self.frameindex, program, midinote, vel, fx)
         return channel
 
-    def noteoff(self, midichan, midinote, vel):
+    def noteoff(self, midichan, midinote, vel): # XXX: Use vel?
         chipchan = self.mediation.releasechipchan(midichan, midinote)
         if chipchan is not None:
             channel = self.channels[chipchan]
