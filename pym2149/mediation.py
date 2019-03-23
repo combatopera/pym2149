@@ -47,6 +47,9 @@ class Mediation:
             self.chipchantomidipairs[chipchan].discard(midipair)
             return chipchan
 
+    def tochipchan(self, midichan, frame):
+        raise NotImplementedError
+
 class DynamicMediation(Mediation):
 
     interruptingformat = "[%s] Interrupting note on channel."
