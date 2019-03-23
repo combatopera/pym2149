@@ -70,6 +70,11 @@ class ChannelStateMessage(ChannelMessage): pass
 
 class NoteOnOff(ChannelMessage):
 
+    @staticmethod
+    def formatchipchans(chipchans):
+        if chipchans is not None:
+            return ''.join(chr(ord('A') + chipchan) for chipchan in chipchans)
+
     def __init__(self, config, event):
         super().__init__(config, event)
         self.midinote = event.note
@@ -83,14 +88,14 @@ class NoteOn(NoteOnOff):
     char = 'I'
 
     def __call__(self, channels):
-        return channels.noteon(self.midichan, self.midinote, self.vel)
+        return self.formatchipchans(channels.noteon(self.midichan, self.midinote, self.vel))
 
 class NoteOff(NoteOnOff):
 
     char = 'O'
 
     def __call__(self, channels):
-        return channels.noteoff(self.midichan, self.midinote, self.vel)
+        return self.formatchipchans(channels.noteoff(self.midichan, self.midinote, self.vel))
 
 class PitchBend(ChannelStateMessage):
 

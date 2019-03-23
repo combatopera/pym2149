@@ -90,9 +90,6 @@ class Channel:
     def newnote(self, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
 
-    def __str__(self):
-        return chr(ord('A') + self.chipindex)
-
 class ControlPair:
 
     def __init__(self, binaryzero, flush, shift):
@@ -166,7 +163,7 @@ class Channels:
         chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
         channel = self.channels[chipchan]
         channel.newnote(self.frameindex, program, midinote, vel, fx)
-        return channel
+        return chipchan,
 
     def noteoff(self, midichan, midinote, vel): # XXX: Use vel?
         chipchan = self.mediation.releasechipchan(midichan, midinote)
@@ -174,7 +171,7 @@ class Channels:
             channel = self.channels[chipchan]
             if midinote == channel.channote.midinote: # TODO: Also check midichan.
                 channel.channote.off(self.frameindex)
-                return channel
+                return chipchan,
 
     def pitchbend(self, midichan, bend):
         self.midichantofx[midichan].bend.set(bend)
