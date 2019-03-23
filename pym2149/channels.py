@@ -90,9 +90,6 @@ class Channel:
     def newnote(self, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
 
-    def noteoff(self, frame):
-        self.channote.off(frame)
-
     def update(self, frame):
         self.channote.update(frame)
 
@@ -179,7 +176,7 @@ class Channels:
         if chipchan is not None:
             channel = self.channels[chipchan]
             if midinote == channel.channote.midinote: # TODO: Also check midichan.
-                channel.noteoff(self.frameindex)
+                channel.channote.off(self.frameindex)
                 return channel
 
     def pitchbend(self, midichan, bend):
