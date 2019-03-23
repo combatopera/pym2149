@@ -45,9 +45,6 @@ class ChanNote:
             self.note.onframes = frame - self.onframe
         self.offframe = frame
 
-    def getpan(self):
-        return self.fx.normpan()
-
     def update(self, frame):
         with self._guard():
             self._update(frame)
@@ -98,9 +95,6 @@ class Channel:
 
     def update(self, frame):
         self.channote.update(frame)
-
-    def getpan(self):
-        return self.channote.getpan()
 
     def __str__(self):
         return chr(ord('A') + self.chipindex)
@@ -213,7 +207,7 @@ class Channels:
 
     def getpans(self):
         for c in self.channels:
-            yield c.getpan()
+            yield c.channote.fx.normpan()
 
     def __str__(self):
         return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.items()))
