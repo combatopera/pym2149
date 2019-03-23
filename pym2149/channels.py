@@ -184,7 +184,7 @@ class Channels:
         if (not vel) and midichan in self.zerovelisnoteoffmidichans: # TODO: This is normal, confirm midi spec.
             return self.noteoff(midichan, midinote, vel)
         if midichan in self.monophonicmidichans:
-            for mn in range(0x80):
+            for mn in range(0x80): # FIXME LATER: We have microtonal midinotes now.
                 self.noteoff(midichan, mn, 0)
         fx = self._getfx(midichan)
         if midichan in self.slidemidichans:
