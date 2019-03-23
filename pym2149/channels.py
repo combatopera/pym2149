@@ -45,9 +45,6 @@ class ChanNote:
             self.note.onframes = frame - self.onframe
         self.offframe = frame
 
-    def programornone(self):
-        return self.program
-
     def getpan(self):
         return self.fx.normpan()
 
@@ -92,11 +89,6 @@ class Channel:
         self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
         self.chipindex = chipindex
         self.chip = chip
-
-    def programstr(self):
-        program = self.channote.programornone()
-        if program is not None:
-            return program.__name__
 
     def newnote(self, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
@@ -207,7 +199,7 @@ class Channels:
         self.midichantoprogram[midichan] = program
 
     def updateall(self):
-        text = ' | '.join("%s@%s" % (c.programstr(), self.mediation.currentmidichans(c.chipindex)) for c in self.channels)
+        text = ' | '.join("%s@%s" % (c.channote.program.__name__, self.mediation.currentmidichans(c.chipindex)) for c in self.channels)
         if text != self.prevtext:
             log.debug(text)
             self.prevtext = text
