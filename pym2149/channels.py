@@ -29,14 +29,14 @@ log = logging.getLogger(__name__)
 
 class ChanNote:
 
-    def __init__(self, onframe, program, nomclock, chip, chipindex, midinote, voladj, fx):
+    def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx):
         self.program = program
         with self._guard():
-            self.note = program(nomclock, chip, chipindex, Pitch(midinote), voladj, fx)
+            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx)
         self.onframe = onframe
         self.chip = chip
         self.chipindex = chipindex
-        self.midinote = midinote
+        self.midipair = midipair
         self.fx = fx
         self.offframe = None
 
@@ -129,10 +129,10 @@ class Channels:
         self.channotes = [None] * config.chipchannels
         throwawayfx = self.fxfactory(None)
         for chipchan in range(config.chipchannels):
-            self.newnote(NullNote, 60, 0x7f, throwawayfx, chipchan)
+            self.newnote(NullNote, (None, 60), 0x7f, throwawayfx, chipchan)
 
-    def newnote(self, program, midinote, vel, fx, chipchan):
-        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midinote, self.tovoladj(vel), fx)
+    def newnote(self, program, midipair, vel, fx, chipchan):
+        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx)
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
@@ -156,14 +156,14 @@ class Channels:
         # XXX: Keep owner program for logging?
         program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote) # TODO: Friendlier errors.
         chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
-        self.newnote(program, midinote, vel, fx, chipchan)
+        self.newnote(program, (midichan, midinote), vel, fx, chipchan)
         return chipchan,
 
     def noteoff(self, midichan, midinote, vel): # XXX: Use vel?
         chipchan = self.mediation.releasechipchan(midichan, midinote)
         if chipchan is not None:
             channote = self.channotes[chipchan]
-            if midinote == channote.midinote: # TODO: Also check midichan.
+            if (midichan, midinote) == channote.midipair:
                 channote.off(self.frameindex)
                 return chipchan,
 
