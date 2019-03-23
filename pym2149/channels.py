@@ -90,9 +90,6 @@ class Channel:
     def newnote(self, frame, program, midinote, vel, fx):
         self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
 
-    def update(self, frame):
-        self.channote.update(frame)
-
     def __str__(self):
         return chr(ord('A') + self.chipindex)
 
@@ -195,7 +192,7 @@ class Channels:
             log.debug(text)
             self.prevtext = text
         for channel in self.channels:
-            channel.update(self.frameindex)
+            channel.channote.update(self.frameindex)
 
     def closeframe(self):
         for fx in self.midichantofx.values():
