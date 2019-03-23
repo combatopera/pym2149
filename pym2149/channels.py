@@ -16,26 +16,16 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .pitch import Pitch
-from .program import FX
+from .program import FX, NullNote
 from .const import midichannelcount
 from .mediation import Mediation
 from .iface import Chip, Config
 from .config import ConfigSubscription, ConfigName
-from .util import singleton
 from diapyr import types, DI
 from contextlib import contextmanager
 import logging
 
 log = logging.getLogger(__name__)
-
-@singleton
-class NullChanNote:
-
-    def programornone(self): pass
-
-    def getpan(self): return 0
-
-    def update(self, frame): pass
 
 class ChanNote:
 
@@ -102,7 +92,6 @@ class Channel:
         self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
         self.chipindex = chipindex
         self.chip = chip
-        self.channote = NullChanNote
 
     def programstr(self):
         program = self.channote.programornone()
@@ -169,6 +158,9 @@ class Channels:
         ControlPair(0x2000, flush, 0).install(self.controllers, 0x0a)
         self.prevtext = None
         self.frameindex = 0
+        throwawayfx = self.fxfactory(None)
+        for channel in self.channels:
+            channel.newnote(self.frameindex, NullNote, 60, 0x7f, throwawayfx)
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
@@ -200,7 +192,7 @@ class Channels:
         chipchan = self.mediation.releasechipchan(midichan, midinote)
         if chipchan is not None:
             channel = self.channels[chipchan]
-            if midinote == channel.channote.midinote:
+            if midinote == channel.channote.midinote: # TODO: Also check midichan.
                 channel.noteoff(self.frameindex)
                 return channel
 
