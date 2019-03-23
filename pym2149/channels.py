@@ -127,10 +127,10 @@ class Channels:
         self.prevtext = None
         self.frameindex = 0
         throwawayfx = self.fxfactory(None)
-        self.channotes = [self.newnote(self.frameindex, NullNote, 60, 0x7f, throwawayfx, chipchan) for chipchan in range(config.chipchannels)]
+        self.channotes = [self.newnote(NullNote, 60, 0x7f, throwawayfx, chipchan) for chipchan in range(config.chipchannels)]
 
-    def newnote(self, frame, program, midinote, vel, fx, chipchan):
-        return ChanNote(frame, program, self.nomclock, self.chip, chipchan, midinote, self.tovoladj(vel), fx)
+    def newnote(self, program, midinote, vel, fx, chipchan):
+        return ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midinote, self.tovoladj(vel), fx)
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
@@ -154,7 +154,7 @@ class Channels:
         # XXX: Keep owner program for logging?
         program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote) # TODO: Friendlier errors.
         chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
-        self.channotes[chipchan] = self.newnote(self.frameindex, program, midinote, vel, fx, chipchan)
+        self.channotes[chipchan] = self.newnote(program, midinote, vel, fx, chipchan)
         return chipchan,
 
     def noteoff(self, midichan, midinote, vel): # XXX: Use vel?
