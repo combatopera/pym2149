@@ -77,19 +77,6 @@ class ChanNote:
                 self.note.noteoff()
             self.note.noteoffframe(f)
 
-class Channel:
-
-    def __init__(self, config, chipindex, chip):
-        self.nomclock = config.nominalclock
-        neutralvel = config.neutralvelocity
-        velperlevel = config.velocityperlevel
-        self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
-        self.chipindex = chipindex
-        self.chip = chip
-
-    def newnote(self, frame, program, midinote, vel, fx):
-        self.channote = ChanNote(frame, program, self.nomclock, self.chip, self.chipindex, midinote, self.tovoladj(vel), fx)
-
 class ControlPair:
 
     def __init__(self, binaryzero, flush, shift):
@@ -118,7 +105,11 @@ class Channels:
 
     @types(Config, Chip, Mediation)
     def __init__(self, config, chip, mediation):
-        self.channels = [Channel(config, i, chip) for i in range(config.chipchannels)]
+        self.nomclock = config.nominalclock
+        neutralvel = config.neutralvelocity
+        velperlevel = config.velocityperlevel
+        self.tovoladj = lambda vel: (vel - neutralvel + velperlevel // 2) // velperlevel
+        self.chip = chip
         self.midichantoprogram = dict(config.midichanneltoprogram) # Copy as we will be changing it.
         self.slidemidichans = set(config.slidechannels)
         self.fxfactory = lambda midichan: FX(config, midichan in self.slidemidichans)
@@ -136,8 +127,10 @@ class Channels:
         self.prevtext = None
         self.frameindex = 0
         throwawayfx = self.fxfactory(None)
-        for channel in self.channels:
-            channel.newnote(self.frameindex, NullNote, 60, 0x7f, throwawayfx)
+        self.channotes = [self.newnote(self.frameindex, NullNote, 60, 0x7f, throwawayfx, chipchan) for chipchan in range(config.chipchannels)]
+
+    def newnote(self, frame, program, midinote, vel, fx, chipchan):
+        return ChanNote(frame, program, self.nomclock, self.chip, chipchan, midinote, self.tovoladj(vel), fx)
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
@@ -161,16 +154,15 @@ class Channels:
         # XXX: Keep owner program for logging?
         program = self.midiprograms[self.midichantoprogram[midichan]].programformidinote(midinote) # TODO: Friendlier errors.
         chipchan = self.mediation.acquirechipchan(midichan, midinote, self.frameindex)
-        channel = self.channels[chipchan]
-        channel.newnote(self.frameindex, program, midinote, vel, fx)
+        self.channotes[chipchan] = self.newnote(self.frameindex, program, midinote, vel, fx, chipchan)
         return chipchan,
 
     def noteoff(self, midichan, midinote, vel): # XXX: Use vel?
         chipchan = self.mediation.releasechipchan(midichan, midinote)
         if chipchan is not None:
-            channel = self.channels[chipchan]
-            if midinote == channel.channote.midinote: # TODO: Also check midichan.
-                channel.channote.off(self.frameindex)
+            channote = self.channotes[chipchan]
+            if midinote == channote.midinote: # TODO: Also check midichan.
+                channote.off(self.frameindex)
                 return chipchan,
 
     def pitchbend(self, midichan, bend):
@@ -184,12 +176,12 @@ class Channels:
         self.midichantoprogram[midichan] = program
 
     def updateall(self):
-        text = ' | '.join("%s@%s" % (c.channote.program.__name__, self.mediation.currentmidichans(c.chipindex)) for c in self.channels)
+        text = ' | '.join("%s@%s" % (channote.program.__name__, self.mediation.currentmidichans(channote.chipindex)) for channote in self.channotes)
         if text != self.prevtext:
             log.debug(text)
             self.prevtext = text
-        for channel in self.channels:
-            channel.channote.update(self.frameindex)
+        for channote in self.channotes:
+            channote.update(self.frameindex)
 
     def closeframe(self):
         for fx in self.midichantofx.values():
@@ -197,8 +189,8 @@ class Channels:
         self.frameindex += 1
 
     def getpans(self):
-        for c in self.channels:
-            yield c.channote.fx.normpan()
+        for channote in self.channotes:
+            yield channote.fx.normpan()
 
     def __str__(self):
         return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.items()))
