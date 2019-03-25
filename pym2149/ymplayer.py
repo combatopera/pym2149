@@ -19,7 +19,7 @@ from .timer import Timer, SimpleTimer
 from .vis import Roll
 from .iface import Chip, Stream, YMFile, Config
 from .ym2149 import ClockInfo
-from .bg import MainBackground
+from splut.bg import MainBackground
 from diapyr import types
 
 class SimpleChipTimer(SimpleTimer):

@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from . import osctrl
-from .bg import SimpleBackground
 from .iface import Config
+from splut.bg import SimpleBackground
 from diapyr import types
 from collections import namedtuple
 import logging, socket

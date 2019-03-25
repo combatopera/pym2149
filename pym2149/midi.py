@@ -16,16 +16,16 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .const import clientname
-from diapyr import types
 from .iface import Config, Stream, Chip
 from .pll import PLL
-from .bg import SimpleBackground, MainBackground
 from .channels import Channels
 from .minblep import MinBleps
 from .timer import Timer
 from .util import EMA, singleton
 from .speed import SpeedDetector
 from .native import calsa
+from splut.bg import SimpleBackground, MainBackground
+from diapyr import types
 import logging, time
 
 log = logging.getLogger(__name__)

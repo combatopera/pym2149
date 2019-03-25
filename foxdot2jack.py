@@ -26,7 +26,7 @@ from pym2149.boot import boot
 from pym2149.util import awaitinterrupt
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
-from pym2149.delay import Delay
+from splut.delay import Delay
 from diapyr.start import Started
 
 del logging
