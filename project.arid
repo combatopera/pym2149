@@ -24,6 +24,7 @@ projects +=
     outjack
     mynblep
     system
+    splut
 branch
     pyrbo = py3
     mynblep = py3
