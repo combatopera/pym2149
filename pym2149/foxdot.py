@@ -133,7 +133,7 @@ class NewSynth(SCSynthHandler):
                 else:
                     # We sent a subsequent NoteOn that has its own scheduled NoteOff:
                     log.debug('NoteOff %s no longer valid.', midinote)
-            self.delay(onfor, noteoff)
+            self.delay.after(onfor, noteoff)
 
 def configure(di):
     di.add(NullCommand)
