@@ -22,20 +22,21 @@ from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
 from pathlib import Path
-import sys, logging, numbers, importlib
+import sys, logging, numbers, importlib, argparse
 
 log = logging.getLogger(__name__)
 
 class ConfigName:
 
     def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
-        if len(args) != len(params):
-            raise Exception("Expected %s but got: %s" % (params, args))
+        parser = argparse.ArgumentParser()
+        for param in params:
+            parser.add_argument(param)
+        self.additems = parser.parse_args(args)
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
-        self.additems = list(zip(params, args))
 
     def applyitems(self, context):
-        for name, value in self.additems:
+        for name, value in self.additems.__dict__.items():
             context[name,] = wrap(value)
 
     def newloader(self, di):
