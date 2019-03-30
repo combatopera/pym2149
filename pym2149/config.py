@@ -30,6 +30,7 @@ class ConfigName:
 
     def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
         parser = argparse.ArgumentParser()
+        parser.add_argument('--repr', action = 'append', default = [])
         for param in params:
             parser.add_argument(param)
         self.additems = parser.parse_args(args)
