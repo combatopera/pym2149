@@ -54,8 +54,10 @@ class LoadSynthDef(SCLangHandler):
 
     addresses = '/foxdot',
 
-    @types(Channels)
-    def __init__(self, channels):
+    @types(Config, Channels)
+    def __init__(self, config, channels):
+        self.session = config.session
+        self.window = config.window
         self.context = {'__name__': 'pym2149.context'}
         self.channels = channels
 
@@ -73,6 +75,7 @@ class LoadSynthDef(SCLangHandler):
                     lines.append("%s = SynthDef(%r)" % (name, name))
         except Exception:
             lines = ["# %s" % l for l in traceback.format_exc().splitlines()]
+        print(self.session, self.window)
         reply(''.join("%s\n" % l for l in lines).encode('utf_8'))
 
 class NewGroup(SCSynthHandler):
