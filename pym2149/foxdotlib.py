@@ -85,6 +85,8 @@ class FoxDotClient:
             self._message(address, [], osctrl.parse(bytes))
         except socket.timeout:
             pass
+        except Exception:
+            log.exception('Failed to receive message:')
 
     def _message(self, udpaddr, timetags, message):
         try:
