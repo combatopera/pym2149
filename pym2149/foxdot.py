@@ -25,7 +25,7 @@ from .program import Note, Unpitched
 from splut.delay import Delay
 from diapyr import types
 from types import SimpleNamespace
-import logging, re, inspect, traceback
+import logging, re, inspect, traceback, screen
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +53,8 @@ class GetInfo(SCLangHandler):
 class LoadSynthDef(SCLangHandler):
 
     addresses = '/foxdot',
+    eol = '\n'
+    pilcrow = '\xb6'
 
     @types(Config, Channels)
     def __init__(self, config, channels):
@@ -75,8 +77,7 @@ class LoadSynthDef(SCLangHandler):
                     lines.append("%s = SynthDef(%r)" % (name, name))
         except Exception:
             lines = ["# %s" % l for l in traceback.format_exc().splitlines()]
-        print(self.session, self.window)
-        reply(''.join("%s\n" % l for l in lines).encode('utf_8'))
+        screen.stuff(self.session, self.window, self.eol.join(lines) + self.pilcrow + self.eol)
 
 class NewGroup(SCSynthHandler):
 
