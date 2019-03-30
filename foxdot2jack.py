@@ -32,7 +32,7 @@ from diapyr.start import Started
 del logging
 
 def main():
-    config, di = boot(ConfigName(name = 'foxdot'))
+    config, di = boot(ConfigName('--session', '--window', name = 'foxdot'))
     try:
         di.add(Delay)
         di.add(PLL) # XXX: Can we crank up the updaterate instead? It's 44100/64=689 in SC.
