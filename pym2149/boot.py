@@ -25,8 +25,16 @@ def boot(configname):
     di.add(configname)
     di.add(di)
     config = configname.newloader(di).load()
-    for key in config.repr:
-        print(repr(getattr(config, key)))
+    def lines():
+        for key in config.repr:
+            yield repr(getattr(config, key))
+    if '-' == config.log:
+        for line in lines():
+            print(line)
+    else:
+        with open(config.log, 'a') as f:
+            for line in lines():
+                print(line, file = f)
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
