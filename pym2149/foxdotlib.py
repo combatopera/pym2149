@@ -27,9 +27,9 @@ log = logging.getLogger(__name__)
 
 class Delay(delay.Delay):
 
-    @types()
-    def __init__(self):
-        super().__init__()
+    @types(Config)
+    def __init__(self, config):
+        super().__init__(config.profile)
 
 class Handler:
 
@@ -115,6 +115,7 @@ class FoxDotClient:
 class FoxDotListen(SimpleBackground):
 
     def __init__(self, config, handlers):
+        super().__init__(config.profile)
         self.config = config
         self.handlers = {a: h for h in handlers for a in h.addresses}
 
