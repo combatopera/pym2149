@@ -146,6 +146,7 @@ class MidiListen(SimpleBackground):
 
     @types(Config, PLL)
     def __init__(self, config, pll):
+        super().__init__(config.profile)
         self.pllignoremidichans = set(config.performancechannels)
         log.info("MIDI channels not significant for PLL: {%s}", ', '.join(str(c) for c in sorted(self.pllignoremidichans)))
         self.config = config
