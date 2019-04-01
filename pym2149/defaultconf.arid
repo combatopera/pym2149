@@ -100,7 +100,7 @@ chipchannels = 3
 Profile = $global(splut.bg.Profile)
 
 profile = $py[None]
-: If not None, must be a Profile object.
+: If not None, must be a config.Profile object.
 
 trace = $py[None]
 : If not None, the number of seconds worth of trace data to collect.
