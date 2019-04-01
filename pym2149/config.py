@@ -115,8 +115,8 @@ class ConfigLoader:
 
 class ConfigSubscription(SimpleBackground):
 
-    def __init__(self, configname, di, consumer):
-        super().__init__()
+    def __init__(self, profile, configname, di, consumer):
+        super().__init__(profile)
         self.configname = configname
         self.di = di
         self.consumer = consumer
