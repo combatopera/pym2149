@@ -17,12 +17,11 @@
 
 from . import osctrl
 from .channels import Channels
-from .foxdotlib import SCSynthHandler, SCLangHandler, ClickEvent, SCSynth, SCLang
+from .foxdotlib import SCSynthHandler, SCLangHandler, ClickEvent, SCSynth, SCLang, Delay
 from .iface import Config
 from .midi import ProgramChange, NoteOn, NoteOff
 from .pll import PLL
 from .program import Note, Unpitched
-from splut.delay import Delay
 from diapyr import types
 from types import SimpleNamespace
 import logging, re, inspect, traceback, screen

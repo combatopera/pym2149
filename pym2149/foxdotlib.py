@@ -17,12 +17,19 @@
 
 from . import osctrl
 from .iface import Config
+from splut import delay
 from splut.bg import SimpleBackground
 from diapyr import types
 from collections import namedtuple
 import logging, socket
 
 log = logging.getLogger(__name__)
+
+class Delay(delay.Delay):
+
+    @types()
+    def __init__(self):
+        super().__init__()
 
 class Handler:
 
