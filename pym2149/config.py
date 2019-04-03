@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
-from splut.bg import SimpleBackground
+from splut.bg import SimpleBackground, Sleeper
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
@@ -124,7 +124,7 @@ class ConfigSubscription(SimpleBackground):
     def start(self):
         self.loader = self.configname.newloader(self.di)
         self.consumer(self.loader.load())
-        super().start(self.bg, self.Sleeper())
+        super().start(self.bg, Sleeper())
 
     def bg(self, sleeper):
         while True:
