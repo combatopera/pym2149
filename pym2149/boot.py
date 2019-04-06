@@ -19,25 +19,17 @@ from diapyr import DI
 from .ym2149 import ClockInfo, YM2149
 from .out import StereoInfo, FloatStream
 from . import minblep
-import os
+import os, sys
 
 def boot(configname):
     di = DI()
     di.add(configname)
     di.add(di)
     config = configname.newloader(di).load()
-    def lines():
+    if config.repr:
         for key in config.repr:
-            yield repr(getattr(config, key))
-    if '-' == config.log:
-        for line in lines():
-            print(line)
-    else:
-        partial = config.log + '.part'
-        with open(partial, 'w') as f:
-            for line in lines():
-                print(line, file = f)
-        os.replace(partial, config.log)
+            print(repr(getattr(config, key)))
+        sys.exit()
     di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
