@@ -19,7 +19,7 @@ from diapyr import DI
 from .ym2149 import ClockInfo, YM2149
 from .out import StereoInfo, FloatStream
 from . import minblep
-import os, sys
+import sys
 
 def boot(configname):
     di = DI()
