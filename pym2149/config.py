@@ -99,7 +99,7 @@ class ConfigLoader:
         with Repl(context) as repl:
             path = self.mark()
             repl.printf("cwd = %s", path.parent)
-            repl.printf(". %s", path.name)
+            repl.printf("pym2149 . %s", path.name)
             settings = Path.home() / '.settings.arid'
             if settings.exists():
                 repl.printf(". %s", settings)
@@ -146,4 +146,4 @@ class ConfigImpl(Config):
             raise AttributeError(name)
 
     def __getitem__(self, path):
-        return self.pRiVaTe.resolved(*path)
+        return self.pRiVaTe.resolved(*('pym2149',) + path)
