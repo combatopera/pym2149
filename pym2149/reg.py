@@ -28,7 +28,7 @@ class Link:
                 upstreamvals = [r.value for r in self.upstream]
             except AttributeError:
                 return
-            self.reg.setimpl(self.xform(*upstreamvals))
+            self.reg.set(self.xform(*upstreamvals))
 
 class Reg(object):
 
@@ -57,9 +57,6 @@ class Reg(object):
             object.__setattr__(self, name, value)
 
     def set(self, value):
-        self.setimpl(value)
-
-    def setimpl(self, value):
         if self.minval is not None:
             value = max(self.minval, value)
         if self.maxval is not None:
@@ -78,8 +75,8 @@ class VersionReg(Reg):
         self.version = 0
         super().__init__(**kwargs)
 
-    def setimpl(self, value):
-        super().setimpl(value)
+    def set(self, value):
+        super().set(value)
         self.version += 1
 
 def regproperty(reg):
