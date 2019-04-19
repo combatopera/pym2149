@@ -58,8 +58,7 @@ class JackStream(Stream, Node, metaclass = AmpScale):
         for syschanindex in range(self.systemchannelcount):
             chanindex = syschanindex % self.chancount
             self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
-        self.outbuf = self.client.current_output_buffer()
-        self.cursor = 0
+        self._newbuf(self.client.current_output_buffer)
 
     def callimpl(self):
         outbufs = [self.chain(wav) for wav in self.wavs]
@@ -72,8 +71,12 @@ class JackStream(Stream, Node, metaclass = AmpScale):
             self.cursor += m
             i += m
             if self.cursor == self.client.buffersize:
-                self.outbuf = self.client.send_and_get_output_buffer()
-                self.cursor = 0
+                self._newbuf(self.client.send_and_get_output_buffer)
+
+    def _newbuf(self, factory):
+        self.outbuf = factory().view()
+        self.outbuf.shape = self.chancount, self.client.buffersize
+        self.cursor = 0
 
     def flush(self):
         pass # Nothing to be done.
