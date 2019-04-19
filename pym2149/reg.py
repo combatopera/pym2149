@@ -50,24 +50,20 @@ class Reg(object):
         negmask = ~mask
         self.link(lambda *args: (negmask & self.value) | (mask & xform(*args)), *upstream)
 
-    def __setattr__(self, name, value):
-        if 'value' == name:
-            self.set(value)
-        else:
-            object.__setattr__(self, name, value)
-
     def set(self, value):
         if self.minval is not None:
             value = max(self.minval, value)
         if self.maxval is not None:
             value = min(self.maxval, value)
-        object.__setattr__(self, 'value', value)
-        object.__setattr__(self, 'idle', False) # Significantly faster than going via __setattr__.
+        self._value = value
+        self.idle = False
         try:
             for link in self.links:
                 link.update()
         finally:
-            object.__setattr__(self, 'idle', True)
+            self.idle = True
+
+    value = property(lambda self: self._value, lambda self, value: self.set(value))
 
 class VersionReg(Reg):
 
