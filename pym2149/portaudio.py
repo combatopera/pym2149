@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import AmpScale, Platform, Stream
+from .iface import AmpScale, Platform, Stream, Config
 from .jackclient import BufferFiller
 from .nod import Node
 from .out import FloatStream, StereoInfo
@@ -26,14 +26,14 @@ import numpy as np
 
 class PortAudioClient(Platform):
 
-    @types(StereoInfo)
-    def __init__(self, stereoinfo):
+    @types(Config, StereoInfo)
+    def __init__(self, config, stereoinfo):
+        self.outputrate = config.PortAudio['outputrate'] # TODO: Find best rate supported by system.
+        self.buffersize = config.PortAudio['buffersize']
         self.chancount = stereoinfo.getoutchans.size
 
     def start(self):
         self.p = PyAudio()
-        self.outputrate = 44100 # TODO: Use native rate.
-        self.buffersize = 1024 # TODO: Use native size.
         self.stream = self.p.open(
                 rate = self.outputrate,
                 channels = self.chancount,

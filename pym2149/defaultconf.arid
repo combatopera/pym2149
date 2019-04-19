@@ -141,3 +141,7 @@ FoxDot
     scsynth port = 57110
     sclang port = 57120
     bufsize = 4096
+
+PortAudio
+    outputrate = $(wavrate)
+    buffersize = 1024
