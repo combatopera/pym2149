@@ -41,7 +41,7 @@ class StereoInfo:
             if config.midipan:
                 self.getoutchans = self.getmidioutchans
             else:
-                self.maxpan = config.maxpan
+                self.maxpan = float(config.maxpan)
                 self.getoutchans = self.getstaticoutchans
         else:
             self.getoutchans = self.gettrivialoutchans
