@@ -58,31 +58,41 @@ class JackStream(Stream, Node, metaclass = AmpScale):
         for syschanindex in range(self.systemchannelcount):
             chanindex = syschanindex % self.chancount
             self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
-        self._newbuf(self.client.current_output_buffer)
+        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
 
     def callimpl(self):
-        outbufs = [self.chain(wav) for wav in self.wavs]
-        n = len(outbufs[0])
-        i = 0
-        while i < n:
-            m = min(n - i, self.client.buffersize - self.cursor)
-            for chanindex in range(self.chancount):
-                outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
-            self.cursor += m
-            i += m
-            if self.cursor == self.client.buffersize:
-                self._newbuf(self.client.send_and_get_output_buffer)
-
-    def _newbuf(self, factory):
-        self.outbuf = factory().view()
-        self.outbuf.shape = self.chancount, self.client.buffersize
-        self.cursor = 0
+        self.filler([self.chain(wav) for wav in self.wavs])
 
     def flush(self):
         pass # Nothing to be done.
 
     def stop(self):
         self.client.deactivate()
+
+class BufferFiller:
+
+    def __init__(self, chancount, buffersize, init, flip):
+        self.chancount = chancount
+        self.buffersize = buffersize
+        self._newbuf(init)
+        self.flip = flip
+
+    def __call__(self, outbufs):
+        n = len(outbufs[0])
+        i = 0
+        while i < n:
+            m = min(n - i, self.buffersize - self.cursor)
+            for chanindex in range(self.chancount):
+                outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
+            self.cursor += m
+            i += m
+            if self.cursor == self.buffersize:
+                self._newbuf(self.flip)
+
+    def _newbuf(self, factory):
+        self.outbuf = factory().view()
+        self.outbuf.shape = self.chancount, self.buffersize
+        self.cursor = 0
 
 def configure(di):
     di.add(JackStream)
