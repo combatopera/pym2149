@@ -71,9 +71,10 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
 class BufferFiller:
 
-    def __init__(self, chancount, buffersize, init, flip):
+    def __init__(self, chancount, buffersize, init, flip, interleaved = False):
         self.chancount = chancount
         self.buffersize = buffersize
+        self.interleaved = interleaved
         self._newbuf(init)
         self.flip = flip
 
@@ -83,15 +84,20 @@ class BufferFiller:
         while i < n:
             m = min(n - i, self.buffersize - self.cursor)
             for chanindex in range(self.chancount):
-                outbufs[chanindex].partcopyintonp(i, i + m, self.outbuf[chanindex, self.cursor:self.cursor + m])
+                self.outbuf[chanindex, self.cursor:self.cursor + m] = outbufs[chanindex].buf[i:i + m]
             self.cursor += m
             i += m
             if self.cursor == self.buffersize:
                 self._newbuf(self.flip)
 
     def _newbuf(self, factory):
-        self.outbuf = factory().view()
-        self.outbuf.shape = self.chancount, self.buffersize
+        outbuf = factory().view()
+        if self.interleaved:
+            outbuf.shape = self.buffersize, self.chancount
+            self.outbuf = outbuf.T
+        else:
+            outbuf.shape = self.chancount, self.buffersize
+            self.outbuf = outbuf
         self.cursor = 0
 
 def configure(di):
