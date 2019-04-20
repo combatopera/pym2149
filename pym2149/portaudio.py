@@ -42,11 +42,12 @@ class Ring: # There is a very similar ring impl in outjack, not sure if possible
         with self.lock:
             self.unconsumed[self.writecursor] = True
             self.writecursor = (self.writecursor + 1) % self.size
-            if self.unconsumed[self.writecursor]:
-                if not self.coupling:
-                    log.error('Overrun!') # Log exactly once per overrun.
-                while self.unconsumed[self.writecursor]: # Use while in case of spurious wakeup.
-                    self.cv.wait()
+            logoverrun = not self.coupling
+            while self.unconsumed[self.writecursor]: # Use while in case of spurious wakeup.
+                if logoverrun:
+                    log.error('Overrun!')
+                    logoverrun = False
+                self.cv.wait()
             # FIXME: PortAudio may still be reading from this outbuf.
             return self.outbufs[self.writecursor]
 
