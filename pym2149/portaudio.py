@@ -21,16 +21,54 @@ from .nod import Node
 from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
-from pyaudio import PyAudio, paFloat32
-import numpy as np
+from pyaudio import PyAudio, paFloat32, paContinue
+import numpy as np, logging, threading
+
+log = logging.getLogger(__name__)
+
+class Ring: # There is a very similar ring impl in outjack, not sure if possible to unduplicate.
+
+    def __init__(self, ringsize, bufsize, coupling):
+        # The last one should be zeros for quiet initial underrun:
+        self.outbufs = [np.zeros(bufsize, dtype = floatdtype) for _ in range(ringsize)]
+        self.unconsumed = [False] * ringsize
+        self.lock = threading.Lock()
+        self.cv = threading.Condition(self.lock)
+        self.readcursor = self.writecursor = 0
+        self.size = ringsize
+        self.coupling = coupling
+
+    def flip(self):
+        with self.lock:
+            self.unconsumed[self.writecursor] = True
+            self.writecursor = (self.writecursor + 1) % self.size
+            if self.unconsumed[self.writecursor]:
+                if not self.coupling:
+                    log.error('Overrun!') # Log exactly once per overrun.
+                while self.unconsumed[self.writecursor]: # Use while in case of spurious wakeup.
+                    self.cv.wait()
+            # FIXME: PortAudio may still be reading from this outbuf.
+            return self.outbufs[self.writecursor]
+
+    def consume(self):
+        with self.lock:
+            if self.unconsumed[self.readcursor]:
+                self.unconsumed[self.readcursor] = False
+                self.readcursor = (self.readcursor + 1) % self.size
+                self.cv.notify()
+            else:
+                log.warning('Underrun!') # Return same outbuf again,
+            return self.outbufs[(self.readcursor - 1) % self.size]
 
 class PortAudioClient(Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
-        self.outputrate = config.PortAudio['outputrate'] # TODO: Find best rate supported by system.
-        self.buffersize = config.PortAudio['buffersize']
+        config = config.PortAudio
+        self.outputrate = config['outputrate'] # TODO: Find best rate supported by system.
+        self.buffersize = config['buffersize']
         self.chancount = stereoinfo.getoutchans.size
+        self.ring = Ring(config['ringsize'], self.chancount * self.buffersize, config['coupling'])
 
     def start(self):
         self.p = PyAudio()
@@ -39,15 +77,17 @@ class PortAudioClient(Platform):
                 channels = self.chancount,
                 format = paFloat32,
                 output = True,
-                frames_per_buffer = self.buffersize)
-        self.outbuf = np.empty(self.chancount * self.buffersize, dtype = floatdtype)
+                frames_per_buffer = self.buffersize,
+                stream_callback = self._callback)
 
     def initial(self):
-        return self.outbuf
+        return self.ring.outbufs[0]
 
     def flip(self):
-        self.stream.write(self.outbuf, self.buffersize)
-        return self.outbuf # TODO: Ring of these.
+        return self.ring.flip()
+
+    def _callback(self, in_data, frame_count, time_info, status_flags):
+        return self.ring.consume(), paContinue
 
     def stop(self):
         self.stream.stop_stream()

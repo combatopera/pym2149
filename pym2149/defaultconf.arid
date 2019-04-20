@@ -145,3 +145,5 @@ FoxDot
 PortAudio
     outputrate = $(wavrate)
     buffersize = 1024
+    ringsize = $(jackringsize)
+    coupling = $(jackcoupling)
