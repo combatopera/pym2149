@@ -75,13 +75,13 @@ class PortAudioClient(Platform):
 
     def start(self):
         self.p = PyAudio()
-        # XXX: Defer start to avoid initial underrun?
         self.stream = self.p.open(
                 rate = self.outputrate,
                 channels = self.chancount,
                 format = paFloat32,
                 output = True,
                 frames_per_buffer = self.buffersize,
+                start = False,
                 stream_callback = self._callback)
 
     def initial(self):
@@ -96,7 +96,6 @@ class PortAudioClient(Platform):
         return self.port, paContinue
 
     def stop(self):
-        self.stream.stop_stream()
         self.stream.close()
         self.p.terminate()
 
@@ -113,6 +112,7 @@ class PortAudioStream(Node, Stream, metaclass = AmpScale):
 
     def start(self):
         self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.initial, self.client.flip, True)
+        self.client.stream.start_stream()
 
     def callimpl(self):
         self.filler([self.chain(wav) for wav in self.wavs])
@@ -121,4 +121,4 @@ class PortAudioStream(Node, Stream, metaclass = AmpScale):
         pass
 
     def stop(self):
-        pass
+        self.client.stream.stop_stream()
