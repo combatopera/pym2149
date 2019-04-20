@@ -28,9 +28,8 @@ log = logging.getLogger(__name__)
 
 class Ring: # There is a very similar ring impl in outjack, not sure if possible to unduplicate.
 
-    def __init__(self, ringsize, bufsize, coupling):
-        # The last one should be zeros for quiet initial underrun:
-        self.outbufs = [np.zeros(bufsize, dtype = floatdtype) for _ in range(ringsize)]
+    def __init__(self, ringsize, newbuf, coupling):
+        self.outbufs = [newbuf(np.empty) for _ in range(ringsize)]
         self.unconsumed = [False] * ringsize
         self.lock = threading.Lock()
         self.cv = threading.Condition(self.lock)
@@ -48,18 +47,17 @@ class Ring: # There is a very similar ring impl in outjack, not sure if possible
                     log.error('Overrun!')
                     logoverrun = False
                 self.cv.wait()
-            # FIXME: PortAudio may still be reading from this outbuf.
             return self.outbufs[self.writecursor]
 
-    def consume(self):
+    def consume(self, port):
         with self.lock:
             if self.unconsumed[self.readcursor]:
+                np.copyto(port, self.outbufs[self.readcursor])
                 self.unconsumed[self.readcursor] = False
                 self.readcursor = (self.readcursor + 1) % self.size
                 self.cv.notify()
             else:
-                log.warning('Underrun!') # Return same outbuf again,
-            return self.outbufs[(self.readcursor - 1) % self.size]
+                log.warning('Underrun!')
 
 class PortAudioClient(Platform):
 
@@ -69,10 +67,15 @@ class PortAudioClient(Platform):
         self.outputrate = config['outputrate'] # TODO: Find best rate supported by system.
         self.buffersize = config['buffersize']
         self.chancount = stereoinfo.getoutchans.size
-        self.ring = Ring(config['ringsize'], self.chancount * self.buffersize, config['coupling'])
+        self.ring = Ring(config['ringsize'], self._newbuf, config['coupling'])
+        self.port = self._newbuf(np.zeros) # Use zeros so initial underrun doesn't sound terrible.
+
+    def _newbuf(self, constructor):
+        return constructor(self.chancount * self.buffersize, dtype = floatdtype)
 
     def start(self):
         self.p = PyAudio()
+        # XXX: Defer start to avoid initial underrun?
         self.stream = self.p.open(
                 rate = self.outputrate,
                 channels = self.chancount,
@@ -88,7 +91,9 @@ class PortAudioClient(Platform):
         return self.ring.flip()
 
     def _callback(self, in_data, frame_count, time_info, status_flags):
-        return self.ring.consume(), paContinue
+        # Upstream immediately copies what we return, so assuming single thread a single port is fine:
+        self.ring.consume(self.port)
+        return self.port, paContinue
 
     def stop(self):
         self.stream.stop_stream()
