@@ -28,7 +28,9 @@ projects +=
 branch
     pyrbo = py3
     mynblep = py3
-deps += mock
+deps +=
+    mock
+    pyaudio
 years +=
     2014
     2018
