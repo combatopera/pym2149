@@ -29,10 +29,10 @@ log = logging.getLogger(__name__)
 
 class ChanNote:
 
-    def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx):
+    def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx, normvel):
         self.program = program
         with self._guard():
-            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx)
+            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx, normvel)
         self.onframe = onframe
         self.chip = chip
         self.chipindex = chipindex
@@ -131,8 +131,12 @@ class Channels:
         for chipchan in range(config.chipchannels):
             self.newnote(NullNote, (None, 60), 0x7f, throwawayfx, chipchan)
 
+    @staticmethod
+    def normvel(vel):
+        return max(0, (vel - 1) / 0x7e)
+
     def newnote(self, program, midipair, vel, fx, chipchan):
-        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx)
+        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx, self.normvel(vel))
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms

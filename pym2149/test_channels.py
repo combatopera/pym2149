@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from .channels import ControlPair
+from .channels import ControlPair, Channels
 
 class TestControlPair(unittest.TestCase):
 
@@ -45,3 +45,11 @@ class TestControlPair(unittest.TestCase):
         cp.setlsb(1, 0x7f)
         cp.setmsb(1, 0x3f)
         self.assertEqual([0, -1, 1, 1, -1], self.v[1:])
+
+class TestChannels(unittest.TestCase):
+
+    def test_normvel(self):
+        self.assertEqual(0, Channels.normvel(0))
+        self.assertEqual(0, Channels.normvel(1))
+        self.assertEqual(.5, Channels.normvel(0x40))
+        self.assertEqual(1, Channels.normvel(0x7f))

@@ -105,7 +105,7 @@ class Note(Unpitched):
     def programformidinote(cls, midinote):
         return cls
 
-    def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx):
+    def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx, normvel):
         self.toneperiodreg = chip.toneperiods[chipchan]
         self.toneflagreg = chip.toneflags[chipchan]
         self.timer = chip.timers[chipchan]
@@ -124,6 +124,7 @@ class Note(Unpitched):
         self.pitch = pitch
         self.voladj = voladj
         self.fx = fx
+        self.velocity = normvel
 
     def noteon(self): pass
 
