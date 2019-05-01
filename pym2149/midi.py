@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .const import clientname
-from .iface import Config, Stream, Chip
+from .iface import Config, Stream
 from .pll import PLL
 from .channels import Channels
 from .timer import Timer
@@ -170,8 +170,8 @@ class NullSpeedDetector:
 
 class EventPump(MainBackground):
 
-    @types(Config, Channels, Stream, Chip, Timer, PLL)
-    def __init__(self, config, channels, stream, chip, timer, pll):
+    @types(Config, Channels, Stream, Timer, PLL)
+    def __init__(self, config, channels, stream, timer, pll):
         super().__init__(config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
@@ -179,7 +179,6 @@ class EventPump(MainBackground):
         self.speeddetector = SpeedDetector(10) if config.speeddetector else NullSpeedDetector
         self.channels = channels
         self.stream = stream
-        self.chip = chip
         self.timer = timer
         self.pll = pll
 
