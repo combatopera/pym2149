@@ -19,7 +19,6 @@ from .const import clientname
 from .iface import Config, Stream, Chip
 from .pll import PLL
 from .channels import Channels
-from .minblep import MinBleps
 from .timer import Timer
 from .util import EMA, singleton
 from .speed import SpeedDetector
@@ -171,15 +170,14 @@ class NullSpeedDetector:
 
 class EventPump(MainBackground):
 
-    @types(Config, Channels, MinBleps, Stream, Chip, Timer, PLL)
-    def __init__(self, config, channels, minbleps, stream, chip, timer, pll):
+    @types(Config, Channels, Stream, Chip, Timer, PLL)
+    def __init__(self, config, channels, stream, chip, timer, pll):
         super().__init__(config)
         self.updaterate = config.updaterate
         self.performancemidichans = set(config.performancechannels)
         self.skipenabled = config.inputskipenabled
         self.speeddetector = SpeedDetector(10) if config.speeddetector else NullSpeedDetector
         self.channels = channels
-        self.minbleps = minbleps
         self.stream = stream
         self.chip = chip
         self.timer = timer
