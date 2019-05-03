@@ -23,7 +23,7 @@ from .timer import Timer
 from .util import EMA, singleton
 from .speed import SpeedDetector
 from .native import calsa
-from splut.bg import SimpleBackground, MainBackground
+from bg import SimpleBackground, MainBackground
 from diapyr import types
 import logging, time
 

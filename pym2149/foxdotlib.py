@@ -17,11 +17,10 @@
 
 from . import osctrl
 from .iface import Config
-from splut import delay
-from splut.bg import SimpleBackground
+from bg import SimpleBackground
 from diapyr import types
 from collections import namedtuple
-import logging, socket
+import logging, socket, delay
 
 log = logging.getLogger(__name__)
 
