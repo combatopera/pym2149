@@ -133,54 +133,54 @@ class MidiOutChannel(Node):
 
 class FloatStream(list):
 
-  @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, Channels)
-  def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, channels = None):
-    naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]
-    for naive in naives:
-      self.append(WavBuf(clockinfo, naive, minbleps))
+    @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, Channels)
+    def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, channels = None):
+        naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]
+        for naive in naives:
+            self.append(WavBuf(clockinfo, naive, minbleps))
 
 class WavBuf(Node):
 
-  @staticmethod
-  @types(FloatStream, this = Multiplexed)
-  def multi(wavs):
-    if 1 == len(wavs):
-      wav, = wavs
-    else:
-      wav = Multiplexer(floatdtype, wavs)
-    return wav
+    @staticmethod
+    @types(FloatStream, this = Multiplexed)
+    def multi(wavs):
+        if 1 == len(wavs):
+            wav, = wavs
+        else:
+            wav = Multiplexer(floatdtype, wavs)
+        return wav
 
-  def __init__(self, clockinfo, naive, minbleps):
-    super().__init__()
-    self.diffmaster = MasterBuf(dtype = floatdtype)
-    self.outmaster = MasterBuf(dtype = floatdtype)
-    # Need space for a whole mixin in case it is rooted at sample outcount:
-    self.overflowsize = minbleps.mixinsize
-    self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
-    self.naivex = 0
-    self.dc = floatdtype(0) # Last naive value of previous block.
-    self.carrybuf.fill_same(self.dc) # Initial carry can be the initial dc level.
-    self.naive = naive
-    self.naiverate = clockinfo.implclock
-    self.minbleps = minbleps
+    def __init__(self, clockinfo, naive, minbleps):
+        super().__init__()
+        self.diffmaster = MasterBuf(dtype = floatdtype)
+        self.outmaster = MasterBuf(dtype = floatdtype)
+        # Need space for a whole mixin in case it is rooted at sample outcount:
+        self.overflowsize = minbleps.mixinsize
+        self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
+        self.naivex = 0
+        self.dc = floatdtype(0) # Last naive value of previous block.
+        self.carrybuf.fill_same(self.dc) # Initial carry can be the initial dc level.
+        self.naive = naive
+        self.naiverate = clockinfo.implclock
+        self.minbleps = minbleps
 
-  def callimpl(self):
-    # TODO: Unit-test that results do not depend on block size.
-    naivebuf = self.chain(self.naive)
-    diffbuf = self.diffmaster.ensureandcrop(len(naivebuf))
-    diffbuf.differentiate(self.dc, naivebuf)
-    outcount = self.minbleps.getoutcount(self.naivex, self.block.framecount)
-    # Make space for all samples we can output plus overflow:
-    outsize = outcount + self.overflowsize
-    outbuf = self.outmaster.ensureandcrop(outsize)
-    # Paste in the carry followed by the carried dc level:
-    outbuf.copyasprefix(self.overflowsize, self.carrybuf)
-    outbuf.fillpart(self.overflowsize, outsize, self.dc)
-    self.minbleps.paste(self.naivex, diffbuf, outbuf)
-    self.carrybuf.copywindow(outbuf, outcount, outsize)
-    self.naivex = (self.naivex + self.block.framecount) % self.naiverate
-    self.dc = naivebuf.last()
-    return self.outmaster.ensureandcrop(outcount)
+    def callimpl(self):
+        # TODO: Unit-test that results do not depend on block size.
+        naivebuf = self.chain(self.naive)
+        diffbuf = self.diffmaster.ensureandcrop(len(naivebuf))
+        diffbuf.differentiate(self.dc, naivebuf)
+        outcount = self.minbleps.getoutcount(self.naivex, self.block.framecount)
+        # Make space for all samples we can output plus overflow:
+        outsize = outcount + self.overflowsize
+        outbuf = self.outmaster.ensureandcrop(outsize)
+        # Paste in the carry followed by the carried dc level:
+        outbuf.copyasprefix(self.overflowsize, self.carrybuf)
+        outbuf.fillpart(self.overflowsize, outsize, self.dc)
+        self.minbleps.paste(self.naivex, diffbuf, outbuf)
+        self.carrybuf.copywindow(outbuf, outcount, outsize)
+        self.naivex = (self.naivex + self.block.framecount) % self.naiverate
+        self.dc = naivebuf.last()
+        return self.outmaster.ensureandcrop(outcount)
 
 class WavPlatform(Platform):
 

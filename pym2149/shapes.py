@@ -24,13 +24,13 @@ floatdtype = floatdtype
 log2 = math.log(2)
 
 def level5toamp(level):
-  return 2 ** ((level - 31) / 4)
+    return 2 ** ((level - 31) / 4)
 
 def amptolevel5(amp):
-  return 31 + 4 * math.log(amp) / log2
+    return 31 + 4 * math.log(amp) / log2
 
 def amptolevel4(amp):
-  return 15 + 2 * math.log(amp) / log2
+    return 15 + 2 * math.log(amp) / log2
 
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.

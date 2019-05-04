@@ -22,58 +22,58 @@ log = logging.getLogger(__name__)
 
 class Block:
 
-  def __init__(self, framecount):
-    # If it's a numpy type it can cause overflow in osc module, so ensure arbitrary precision:
-    self.framecount = int(framecount)
+    def __init__(self, framecount):
+        # If it's a numpy type it can cause overflow in osc module, so ensure arbitrary precision:
+        self.framecount = int(framecount)
 
-  def __repr__(self):
-    return "%s(%r)" % (type(self).__name__, self.framecount)
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.framecount)
 
 class Node:
 
-  def __init__(self):
-    self.block = None
+    def __init__(self):
+        self.block = None
 
-  def call(self, block): # I think we don't default masked to False to ensure it is propagated.
-    return self(block, False)
+    def call(self, block): # I think we don't default masked to False to ensure it is propagated.
+        return self(block, False)
 
-  def __call__(self, block, masked):
-    if self.block != block:
-      self.block = block
-      self.masked = masked
-      self.result = self.callimpl()
-    elif not masked and self.masked:
-      log.warning("This node has already executed masked: %s", self)
-    return self.result
+    def __call__(self, block, masked):
+        if self.block != block:
+            self.block = block
+            self.masked = masked
+            self.result = self.callimpl()
+        elif not masked and self.masked:
+            log.warning("This node has already executed masked: %s", self)
+        return self.result
 
-  def chain(self, node):
-    return node(self.block, self.masked)
+    def chain(self, node):
+        return node(self.block, self.masked)
 
 class Container(Node):
 
-  def __init__(self, nodes):
-    super().__init__()
-    self.nodes = nodes
+    def __init__(self, nodes):
+        super().__init__()
+        self.nodes = nodes
 
-  def callimpl(self):
-    return [self.chain(node) for node in self.nodes]
+    def callimpl(self):
+        return [self.chain(node) for node in self.nodes]
 
-  def __len__(self):
-    return len(self.nodes)
+    def __len__(self):
+        return len(self.nodes)
 
 class BufNode(Node):
 
-  def __init__(self, dtype, channels = 1):
-    super().__init__()
-    self.masterbuf = MasterBuf(dtype)
-    self.dtype = dtype
-    self.channels = channels
-    self.realcallimpl = self.callimpl
-    self.callimpl = self.makeresult
+    def __init__(self, dtype, channels = 1):
+        super().__init__()
+        self.masterbuf = MasterBuf(dtype)
+        self.dtype = dtype
+        self.channels = channels
+        self.realcallimpl = self.callimpl
+        self.callimpl = self.makeresult
 
-  def makeresult(self):
-    self.blockbuf = self.masterbuf.ensureandcrop(self.block.framecount * self.channels)
-    resultornone = self.realcallimpl()
-    if resultornone is not None:
-      return resultornone
-    return self.blockbuf
+    def makeresult(self):
+        self.blockbuf = self.masterbuf.ensureandcrop(self.block.framecount * self.channels)
+        resultornone = self.realcallimpl()
+        if resultornone is not None:
+            return resultornone
+        return self.blockbuf

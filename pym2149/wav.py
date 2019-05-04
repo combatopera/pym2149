@@ -20,63 +20,63 @@ import numpy as np
 
 class Wave16:
 
-  bytespersample = 2
-  hugefilesize = 0x80000000
-  dtype = np.int16
-  formats = {2: '<H', 4: '<I'}
+    bytespersample = 2
+    hugefilesize = 0x80000000
+    dtype = np.int16
+    formats = {2: '<H', 4: '<I'}
 
-  def __init__(self, path, rate, channels):
-    if '-' == path:
-      self.f = sys.stdout
-    else:
-      self.f = open(path, 'wb') # Binary.
-    self.f.write(b'RIFF')
-    self.riffsizeoff = 4
-    self.writeriffsize(self.hugefilesize)
-    self.f.write(b'WAVEfmt ') # Observe trailing space.
-    self.writen(16) # Chunk data size.
-    self.writen(1, 2) # PCM (uncompressed).
-    self.writen(channels, 2)
-    self.writen(rate)
-    bytesperframe = self.bytespersample * channels
-    self.writen(rate * bytesperframe) # Bytes per second.
-    self.writen(bytesperframe, 2)
-    self.writen(self.bytespersample * 8, 2) # Bits per sample.
-    self.f.write(b'data')
-    self.datasizeoff = 40
-    self.writedatasize(self.hugefilesize)
-    self.adjustsizes()
+    def __init__(self, path, rate, channels):
+        if '-' == path:
+            self.f = sys.stdout
+        else:
+            self.f = open(path, 'wb') # Binary.
+        self.f.write(b'RIFF')
+        self.riffsizeoff = 4
+        self.writeriffsize(self.hugefilesize)
+        self.f.write(b'WAVEfmt ') # Observe trailing space.
+        self.writen(16) # Chunk data size.
+        self.writen(1, 2) # PCM (uncompressed).
+        self.writen(channels, 2)
+        self.writen(rate)
+        bytesperframe = self.bytespersample * channels
+        self.writen(rate * bytesperframe) # Bytes per second.
+        self.writen(bytesperframe, 2)
+        self.writen(self.bytespersample * 8, 2) # Bits per sample.
+        self.f.write(b'data')
+        self.datasizeoff = 40
+        self.writedatasize(self.hugefilesize)
+        self.adjustsizes()
 
-  def writeriffsize(self, filesize):
-    self.writen(filesize - (self.riffsizeoff + 4))
+    def writeriffsize(self, filesize):
+        self.writen(filesize - (self.riffsizeoff + 4))
 
-  def writedatasize(self, filesize):
-    self.writen(filesize - (self.datasizeoff + 4))
+    def writedatasize(self, filesize):
+        self.writen(filesize - (self.datasizeoff + 4))
 
-  def writen(self, n, size = 4):
-    self.f.write(struct.pack(self.formats[size], n))
+    def writen(self, n, size = 4):
+        self.f.write(struct.pack(self.formats[size], n))
 
-  def block(self, buf):
-    buf.tofile(self.f)
-    self.adjustsizes()
+    def block(self, buf):
+        buf.tofile(self.f)
+        self.adjustsizes()
 
-  def adjustsizes(self):
-    try:
-      filesize = self.f.tell()
-      if not filesize:
-        return # It's probably /dev/null so give up.
-    except IOError as e:
-      if errno.ESPIPE != e.errno:
-        raise
-      return # Leave huge sizes.
-    self.f.seek(self.riffsizeoff)
-    self.writeriffsize(filesize)
-    self.f.seek(self.datasizeoff)
-    self.writedatasize(filesize)
-    self.f.seek(filesize)
+    def adjustsizes(self):
+        try:
+            filesize = self.f.tell()
+            if not filesize:
+                return # It's probably /dev/null so give up.
+        except IOError as e:
+            if errno.ESPIPE != e.errno:
+                raise
+            return # Leave huge sizes.
+        self.f.seek(self.riffsizeoff)
+        self.writeriffsize(filesize)
+        self.f.seek(self.datasizeoff)
+        self.writedatasize(filesize)
+        self.f.seek(filesize)
 
-  def flush(self):
-    self.f.flush()
+    def flush(self):
+        self.f.flush()
 
-  def close(self):
-    self.f.close()
+    def close(self):
+        self.f.close()
