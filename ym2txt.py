@@ -30,11 +30,13 @@ log = logging.getLogger(__name__)
 
 class PlatformImpl(Platform, metaclass = AmpScale):
 
+    # Neither of these is significant for this script:
     outputrate = 44100
     log2maxpeaktopeak = 1
 
     @types()
-    def __init__(self): pass
+    def __init__(self):
+        pass
 
 @types(YMFile, Chip, Roll, this = Started)
 def ymdump(ymfile, chip, roll):
@@ -47,10 +49,10 @@ def main():
     try:
         config.ignoreloop = True
         config.pianorollheight = None
-        di.add(YMOpen)
-        di.add(Roll)
-        di.add(ymdump)
         di.add(PlatformImpl)
+        di.add(Roll)
+        di.add(YMOpen)
+        di.add(ymdump)
         di.all(Started)
     finally:
         di.discardall()
