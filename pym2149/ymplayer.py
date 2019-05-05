@@ -49,16 +49,3 @@ class Player(MainBackground):
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
         self.stream.flush()
-
-class YMDump:
-
-    @types(YMFile, Chip, Roll)
-    def __init__(self, ymfile, chip, roll):
-        self.ym = ymfile.ym
-        self.chip = chip
-        self.roll = roll
-
-    def __call__(self):
-        for frame in self.ym:
-            frame(self.chip)
-            self.roll.update(print)

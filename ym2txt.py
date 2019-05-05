@@ -20,10 +20,9 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.iface import Platform, AmpScale
+from pym2149.iface import Platform, AmpScale, Chip, YMFile
 from pym2149.vis import Roll
 from pym2149.ymformat import YMOpen
-from pym2149.ymplayer import YMDump
 from diapyr import types
 from diapyr.start import Started
 
@@ -37,6 +36,12 @@ class PlatformImpl(Platform, metaclass = AmpScale):
     @types()
     def __init__(self): pass
 
+@types(YMFile, Chip, Roll, this = Started)
+def ymdump(ymfile, chip, roll):
+    for frame in ymfile.ym:
+        frame(chip)
+        roll.update(print)
+
 def main():
     config, di = boot(ConfigName('inpath'))
     try:
@@ -44,10 +49,9 @@ def main():
         config.pianorollheight = None
         di.add(YMOpen)
         di.add(Roll)
-        di.add(YMDump)
+        di.add(ymdump)
         di.add(PlatformImpl)
         di.all(Started)
-        di(YMDump)()
     finally:
         di.discardall()
 
