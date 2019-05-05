@@ -18,6 +18,7 @@
 from .pitch import Period, Freq
 from diapyr import types
 from .iface import Chip, Config
+from functools import partial
 import sys
 
 class Roll:
@@ -35,7 +36,7 @@ class Roll:
     self.shapeversion = None
     self.chip = chip
 
-  def update(self):
+  def update(self, print = partial(print, file = sys.stderr)):
     if self.line == self.height:
       sys.stderr.write(self.jump)
       self.line = 0
@@ -85,5 +86,5 @@ class Roll:
         vals.append('')
         vals.append('')
         vals.append('')
-    print(self.format % tuple(vals), file=sys.stderr)
+    print(self.format % tuple(vals))
     self.line += 1
