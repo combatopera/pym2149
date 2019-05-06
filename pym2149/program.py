@@ -105,7 +105,7 @@ class Note(Unpitched):
     def programformidinote(cls, midinote):
         return cls
 
-    def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx, normvel, tuning):
+    def __init__(self, nomclock, chip, chipchan, pitch, voladj, fx, normvel):
         self.toneperiodreg = chip.toneperiods[chipchan]
         self.toneflagreg = chip.toneflags[chipchan]
         self.timer = chip.timers[chipchan]
@@ -117,7 +117,7 @@ class Note(Unpitched):
         self.tonefreqreg = Reg()
         self.toneperiodreg.link(lambda f: f.toneperiod(nomclock), self.tonefreqreg) # No reverse link.
         self.tonepitchreg = Reg()
-        self.tonefreqreg.link(lambda p: tuning.freq(p + fx.bendsemitones()), self.tonepitchreg)
+        self.tonefreqreg.link(lambda p: (p + fx.bendsemitones()).freq(), self.tonepitchreg)
         self.nomclock = nomclock
         self.chip = chip
         self.chipchan = chipchan

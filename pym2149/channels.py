@@ -31,8 +31,11 @@ class ChanNote:
 
     def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx, normvel, tuning):
         self.program = program
+        class TunedPitch(Pitch):
+            def freq(self):
+                return tuning.freq(self)
         with self._guard():
-            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx, normvel, tuning)
+            self.note = program(nomclock, chip, chipindex, TunedPitch(midipair[1]), voladj, fx, normvel)
         self.onframe = onframe
         self.chip = chip
         self.chipindex = chipindex
