@@ -19,7 +19,7 @@ from .pitch import Pitch
 from .program import FX, NullNote
 from .const import midichannelcount
 from .mediation import Mediation
-from .iface import Chip, Config
+from .iface import Chip, Config, Tuning
 from .config import ConfigSubscription, ConfigName
 from diapyr import types, DI
 from contextlib import contextmanager
@@ -29,10 +29,10 @@ log = logging.getLogger(__name__)
 
 class ChanNote:
 
-    def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx, normvel):
+    def __init__(self, onframe, program, nomclock, chip, chipindex, midipair, voladj, fx, normvel, tuning):
         self.program = program
         with self._guard():
-            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx, normvel)
+            self.note = program(nomclock, chip, chipindex, Pitch(midipair[1]), voladj, fx, normvel, tuning)
         self.onframe = onframe
         self.chip = chip
         self.chipindex = chipindex
@@ -103,8 +103,8 @@ class Channels:
         di.add(cls)
         di.add(ChannelsConfigSubscription)
 
-    @types(Config, Chip, Mediation)
-    def __init__(self, config, chip, mediation):
+    @types(Config, Chip, Mediation, Tuning)
+    def __init__(self, config, chip, mediation, tuning):
         self.nomclock = config.nominalclock
         neutralvel = config.neutralvelocity
         velperlevel = config.velocityperlevel
@@ -115,6 +115,7 @@ class Channels:
         self.fxfactory = lambda midichan: FX(config, midichan in self.slidemidichans)
         self.midichantofx = {c: self.fxfactory(c) for c in range(config.midichannelbase, config.midichannelbase + midichannelcount)}
         self.mediation = mediation
+        self.tuning = tuning
         self.zerovelisnoteoffmidichans = set(config.zerovelocityisnoteoffchannels)
         self.monophonicmidichans = set(config.monophonicchannels)
         self.controllers = {}
@@ -136,7 +137,7 @@ class Channels:
         return max(0, (vel - 1) / 0x7e)
 
     def newnote(self, program, midipair, vel, fx, chipchan):
-        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx, self.normvel(vel))
+        self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx, self.normvel(vel), self.tuning)
 
     def reconfigure(self, config):
         self.midiprograms = config.midiprograms
