@@ -42,7 +42,7 @@ class PlatformImpl(Platform, metaclass = AmpScale):
 def ymdump(ymfile, chip, roll):
     for frame in ymfile.ym:
         frame(chip)
-        roll.update(print)
+        roll.update(print, 1)
 
 def main():
     config, di = boot(ConfigName('inpath'))

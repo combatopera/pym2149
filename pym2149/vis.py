@@ -36,11 +36,13 @@ class Roll:
     self.shapeversion = None
     self.chip = chip
 
-  def update(self, print = partial(print, file = sys.stderr)):
+  def update(self, print = partial(print, file = sys.stderr), mincents = 10):
     if self.line == self.height:
       sys.stderr.write(self.jump)
       self.line = 0
     vals = []
+    def appendpitch(freq):
+      vals.append(freq.pitch().str(mincents))
     for c in range(self.channels):
       tone = self.chip.toneflags[c].value
       noise = self.chip.noiseflags[c].value
@@ -51,7 +53,7 @@ class Roll:
       timereffect = self.chip.timers[c].effect.value is not None
       rhs = env or level
       if tone and rhs:
-        vals.append(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock).pitch())
+        appendpitch(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock))
       else:
         vals.append('')
       if tone and noise and rhs:
@@ -72,12 +74,12 @@ class Roll:
         else:
           vals.append(level)
         vals.append('')
-        vals.append(Freq(self.chip.timers[c].getfreq()).pitch())
+        appendpitch(Freq(self.chip.timers[c].getfreq()))
       elif env:
         shape = self.chip.envshape
         vals.append(self.shapes[shape])
         vals.append(('', '~')[newshape])
-        vals.append(Period(self.chip.envperiod).envfreq(self.nomclock, shape).pitch())
+        appendpitch(Period(self.chip.envperiod).envfreq(self.nomclock, shape))
       elif level:
         vals.append(level)
         vals.append('')

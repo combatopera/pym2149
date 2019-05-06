@@ -34,6 +34,9 @@ class Pitch(float):
         return type(self)(float.__sub__(self, that))
 
     def __str__(self):
+        return self.str(10)
+
+    def str(self, mincents):
         nearest = int(math.ceil(self - .5))
         octave = nearest // 12
         note = nearest % 12
@@ -45,10 +48,10 @@ class Pitch(float):
         octavestr = str(octave)
         if len(octavestr) < 2:
             octavestr = '.' + octavestr
-        if abs(cents) < 10:
+        if abs(cents) < mincents:
             centsstr = ' ' * 3
         else:
-            centsstr = "%+d" % cents
+            centsstr = "%+3d" % cents
         return notestr + octavestr + centsstr
 
 @singleton
