@@ -24,8 +24,8 @@ class EqualTemperament(Tuning):
 
     @types(Config)
     def __init__(self, config):
-        self.reffreq = config.referencefrequency
-        self.refmidi = config.referencemidinote
+        self.reffreq = float(config.referencefrequency)
+        self.refmidi = float(config.referencemidinote)
 
     def freq(self, pitch):
         return Freq(self.reffreq * (2 ** ((pitch - self.refmidi) / 12)))
