@@ -18,6 +18,12 @@
 prerecorded = $resolve(.iface.Prerecorded)
 ymfile = $resolve(.iface.YMFile)
 
+referencefrequency = 440
+: The frequency of referencemidinote.
+
+referencemidinote = 69
+: The MIDI note that has referencefrequency.
+
 wavrate = 44100
 : The rate for WAV output, ignored when JACK is the target.
 

@@ -18,6 +18,7 @@
 from diapyr import DI
 from .ym2149 import ClockInfo, YM2149
 from .out import StereoInfo, FloatStream
+from .pitch import EqualTemperament
 from . import minblep
 import sys
 
@@ -36,4 +37,5 @@ def boot(configname):
     di.add(YM2149)
     di.add(minblep.loadorcreate)
     di.add(FloatStream)
+    di.add(EqualTemperament)
     return config, di

@@ -15,17 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .iface import Config, Tuning
 from .util import singleton
+from diapyr import types
 import math
+
+class EqualTemperament(Tuning):
+
+    @types(Config)
+    def __init__(self, config):
+        self.reffreq = config.referencefrequency
+        self.refmidi = config.referencemidinote
+
+    def freq(self, pitch):
+        return Freq(self.reffreq * (2 ** ((pitch - self.refmidi) / 12)))
+
+    def pitch(self, freq):
+        return Pitch(self.refmidi + 12 * math.log(freq / self.reffreq, 2))
 
 class Pitch(float):
 
-    a4freq = 440
-    a4midi = 69
     names = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
-
-    def freq(self):
-        return Freq(self.a4freq * (2 ** ((self - self.a4midi) / 12)))
 
     def __add__(self, that):
         return type(self)(float.__add__(self, that))
@@ -76,9 +86,6 @@ class Freq(float):
 
     def envperiod(self, clock, shape):
         return self.periodimpl(clock, shapescale(shape))
-
-    def pitch(self):
-        return Pitch(Pitch.a4midi + 12 * math.log(self / Pitch.a4freq, 2))
 
     def __mul__(self, that):
         return type(self)(float.__mul__(self, that))

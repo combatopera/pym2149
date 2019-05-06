@@ -17,7 +17,7 @@
 
 from .pitch import Period, Freq
 from diapyr import types
-from .iface import Chip, Config
+from .iface import Chip, Config, Tuning
 from functools import partial
 import sys
 
@@ -25,8 +25,8 @@ class Roll:
 
   shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
 
-  @types(Config, Chip)
-  def __init__(self, config, chip):
+  @types(Config, Chip, Tuning)
+  def __init__(self, config, chip, tuning):
     self.height = config.pianorollheight
     self.nomclock = config.nominalclock
     self.channels = config.chipchannels
@@ -35,6 +35,7 @@ class Roll:
     self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
     self.shapeversion = None
     self.chip = chip
+    self.tuning = tuning
 
   def update(self, print = partial(print, file = sys.stderr), mincents = 10):
     if self.line == self.height:
@@ -42,7 +43,7 @@ class Roll:
       self.line = 0
     vals = []
     def appendpitch(freq):
-      vals.append(freq.pitch().str(mincents))
+      vals.append(self.tuning.pitch(freq).str(mincents))
     for c in range(self.channels):
       tone = self.chip.toneflags[c].value
       noise = self.chip.noiseflags[c].value

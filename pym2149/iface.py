@@ -30,3 +30,5 @@ class YMFile(Prerecorded): pass
 class Platform: pass
 
 class Config: pass
+
+class Tuning: pass
