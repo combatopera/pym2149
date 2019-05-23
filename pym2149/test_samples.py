@@ -23,6 +23,8 @@ wordpattern = re.compile(r'\S+')
 statetobatterypower = dict(charging = False, discharging = True)
 
 def batterypower():
+    if 'true' == os.environ.get('CONTINUOUS_INTEGRATION'):
+        return
     def states():
         for line in upower('--show-info', '/org/freedesktop/UPower/devices/battery_C173').stdout.decode().splitlines():
             words = wordpattern.findall(line)
