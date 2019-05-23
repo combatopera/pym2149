@@ -17,7 +17,7 @@
 
 from .config import ConfigName
 from system import upower
-import unittest, samples, re
+import unittest, samples, re, os
 
 wordpattern = re.compile(r'\S+')
 statetobatterypower = dict(charging = False, discharging = True)
