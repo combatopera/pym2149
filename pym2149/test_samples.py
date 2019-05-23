@@ -20,7 +20,7 @@ from system import upower
 import unittest, samples, re
 
 wordpattern = re.compile(r'\S+')
-statetobatterypower = dict(discharging = True)
+statetobatterypower = dict(charging = False, discharging = True)
 
 def batterypower():
     def states():
