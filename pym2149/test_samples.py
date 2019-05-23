@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigName
-import unittest, samples, re, os
+import unittest, samples, re
 
 wordpattern = re.compile(r'\S+')
 statetobatterypower = dict(charging = False, discharging = True)
