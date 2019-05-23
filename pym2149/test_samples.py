@@ -16,9 +16,24 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigName
-import unittest, samples
+from system import upower
+import unittest, samples, re
+
+wordpattern = re.compile(r'\S+')
+statetobatterypower = dict(discharging = True)
+
+def batterypower():
+    def states():
+        for line in upower('--show-info', '/org/freedesktop/UPower/devices/battery_C173').stdout.decode().splitlines():
+            words = wordpattern.findall(line)
+            if 2 == len(words) and 'state:' == words[0]:
+                yield words[1]
+    state, = states()
+    return statetobatterypower[state]
 
 class TestSamples(unittest.TestCase):
 
     def test_samples(self):
+        if batterypower():
+            return
         samples.mainimpl(ConfigName(args = []))

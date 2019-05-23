@@ -20,6 +20,7 @@ from .nod import Node, Block
 from .buf import Buf
 from .out import WavWriter, WavBuf, floatdtype
 from .minblep import MinBleps
+from .test_samples import batterypower
 from collections import namedtuple
 
 class MinPeriodTone(Node):
@@ -65,9 +66,13 @@ class TestWavWriter(unittest.TestCase):
             self.assertTrue(eval(expression))
 
     def test_minperiodperformancesmallblocks(self):
+        if batterypower():
+            return
         for strictlimitornone in None, 1:
             self.minperiodperformance(False, strictlimitornone)
 
     def test_minperiodperformancebigblocks(self):
+        if batterypower():
+            return
         for strictlimitornone in None, .1: # Wow!
             self.minperiodperformance(True, strictlimitornone)
