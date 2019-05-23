@@ -16,15 +16,16 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigName
-from system import upower
 import unittest, samples, re, os
 
 wordpattern = re.compile(r'\S+')
 statetobatterypower = dict(charging = False, discharging = True)
 
 def batterypower():
-    if 'true' == os.environ.get('CONTINUOUS_INTEGRATION'):
-        return
+    try:
+        from system import upower
+    except ImportError:
+        return # Run all tests.
     def states():
         for line in upower('--show-info', '/org/freedesktop/UPower/devices/battery_C173').stdout.decode().splitlines():
             words = wordpattern.findall(line)
