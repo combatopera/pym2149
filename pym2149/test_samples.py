@@ -19,7 +19,7 @@ from .config import ConfigName
 import unittest, samples, re
 
 wordpattern = re.compile(r'\S+')
-statetobatterypower = dict(charging = False, discharging = True)
+statetobatterypower = {'charging': False, 'fully-charged': False, 'discharging': True}
 
 def batterypower():
     try:
