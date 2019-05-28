@@ -17,7 +17,7 @@
 
 from .timer import Timer, SimpleTimer
 from .vis import Roll
-from .iface import Chip, Stream, YMFile, Config
+from .iface import Chip, Stream, Prerecorded, Config
 from .ym2149 import ClockInfo
 from bg import MainBackground
 from diapyr import types
@@ -30,11 +30,11 @@ class SimpleChipTimer(SimpleTimer):
 
 class Player(MainBackground):
 
-    @types(Config, YMFile, Chip, Roll, Timer, Stream)
-    def __init__(self, config, ymfile, chip, roll, timer, stream):
+    @types(Config, Prerecorded, Chip, Roll, Timer, Stream)
+    def __init__(self, config, prerecorded, chip, roll, timer, stream):
         super().__init__(config)
         self.updaterate = config.updaterate
-        self.ym = ymfile.ym
+        self.ym = prerecorded.ym
         self.chip = chip
         self.roll = roll
         self.timer = timer
