@@ -20,7 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.iface import Platform, AmpScale, Chip, YMFile
+from pym2149.iface import Platform, AmpScale, Chip, Prerecorded
 from pym2149.vis import Roll
 from pym2149.ymformat import YMOpen
 from diapyr import types
@@ -38,9 +38,9 @@ class PlatformImpl(Platform, metaclass = AmpScale):
     def __init__(self):
         pass
 
-@types(YMFile, Chip, Roll, this = Started)
-def ymdump(ymfile, chip, roll):
-    for frame in ymfile.ym:
+@types(Prerecorded, Chip, Roll, this = Started)
+def ymdump(prerecorded, chip, roll):
+    for frame in prerecorded.ym:
         frame(chip)
         roll.update(print, 1)
 
