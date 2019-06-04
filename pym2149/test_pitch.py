@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .pitch import Pitch, Meantone
+from .pitch import Pitch, Meantone, FiveLimit
 from types import SimpleNamespace
 import unittest, math
 
@@ -76,6 +76,23 @@ class TestMeantone(unittest.TestCase):
     def test_meantoneminor(self):
         m = Meantone(SimpleNamespace(referencefrequency = 440, referencemidinote = 69, meantoneflats = 2, meantonecomma = 1 / 3))
         self.assertEqual(9, sum(1 for p in range(60, 72) if math.isclose(6 / 5, m.freq(p + 3) / m.freq(p))))
+
+class TestFiveLimit(unittest.TestCase):
+
+    def test_asymmetric(self):
+        t = FiveLimit(SimpleNamespace(referencefrequency = 440, referencemidinote = 69))
+        self.assertAlmostEqual(440, t.freq(69))
+        self.assertAlmostEqual(440 * 16 / 15, t.freq(70))
+        self.assertAlmostEqual(440 * 9 / 8, t.freq(71))
+        self.assertAlmostEqual(440 * 6 / 5, t.freq(72))
+        self.assertAlmostEqual(440 * 5 / 4, t.freq(73))
+        self.assertAlmostEqual(440 * 4 / 3, t.freq(74))
+        self.assertAlmostEqual(440 * 45 / 32, t.freq(75))
+        self.assertAlmostEqual(440 * 3 / 2, t.freq(76))
+        self.assertAlmostEqual(440 * 8 / 5, t.freq(77))
+        self.assertAlmostEqual(440 * 5 / 3, t.freq(78))
+        self.assertAlmostEqual(440 * 9 / 5, t.freq(79))
+        self.assertAlmostEqual(440 * 15 / 8, t.freq(80))
 
 class TestPitch(unittest.TestCase):
 

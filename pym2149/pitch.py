@@ -35,27 +35,15 @@ class EqualTemperament(Tuning):
     def pitch(self, freq):
         return Pitch(self.refmidi + 12 * math.log(freq / self.reffreq, 2))
 
-class Meantone(Tuning):
-    'Including Pythagorean as a special case when meantonecomma is zero.'
+class Unequal(Tuning):
 
-    syntonic = 81 / 80
-
-    @types(Config)
-    def __init__(self, config):
-        reffreq = float(config.referencefrequency)
-        self.refmidi = float(config.referencemidinote)
-        flats = config.meantoneflats
-        fifthratio = 1.5 / self.syntonic ** float(config.meantonecomma)
-        self.freqs = [None] * 12
-        for fifth in range(-flats, 12 - flats):
-            pitch = fifth * 7
-            self.freqs[pitch % 12] = reffreq * fifthratio ** fifth / 2 ** (pitch // 12)
-        self.factors = [math.log(g / f, 2) for f, g in zip(self.freqs, self.freqs[1:] + [self.freqs[0] * 2])]
-        wolfpitch = Pitch(self.refmidi + 11 - flats)
-        log.debug("The fifth %s to %s is a wolf interval.", wolfpitch, wolfpitch + 7)
+    def __init__(self, refpitch, freqs):
+        self.factors = [math.log(g / f, 2) for f, g in zip(freqs, freqs[1:] + [freqs[0] * 2])]
+        self.refpitch = refpitch
+        self.freqs = freqs
 
     def freq(self, pitch):
-        pitch -= self.refmidi
+        pitch -= self.refpitch
         pitchindex = math.floor(pitch) % 12
         return Freq(self.freqs[pitchindex] * 2 ** (self.factors[pitchindex] * (pitch % 1) + pitch // 12))
 
@@ -64,7 +52,42 @@ class Meantone(Tuning):
         freq /= 2 ** octave
         pitchindex = bisect.bisect(self.freqs, freq) - 1 # FIXME LATER: Handle out of range.
         x = math.log(freq / self.freqs[pitchindex], 2) / self.factors[pitchindex]
-        return Pitch(self.refmidi + octave * 12 + pitchindex + x)
+        return Pitch(self.refpitch + octave * 12 + pitchindex + x)
+
+class Meantone(Unequal):
+    'Including Pythagorean as a special case when meantonecomma is zero.'
+
+    syntonic = 81 / 80
+
+    @types(Config)
+    def __init__(self, config):
+        reffreq = float(config.referencefrequency)
+        refpitch = float(config.referencemidinote)
+        flats = config.meantoneflats
+        fifthratio = 1.5 / self.syntonic ** float(config.meantonecomma)
+        freqs = [None] * 12
+        for fifth in range(-flats, 12 - flats):
+            pitch = fifth * 7
+            freqs[pitch % 12] = reffreq * fifthratio ** fifth / 2 ** (pitch // 12)
+        super().__init__(refpitch, freqs)
+        wolfpitch = Pitch(refpitch + 11 - flats)
+        log.debug("The fifth %s to %s is a wolf interval.", wolfpitch, wolfpitch + 7)
+
+class FiveLimit(Unequal):
+    'Asymmetric variant.'
+
+    @types(Config)
+    def __init__(self, config):
+        reffreq = float(config.referencefrequency)
+        refpitch = float(config.referencemidinote)
+        freqs = [None] * 12
+        for p5 in range(-1, 2):
+            for p3 in range(-1, 3): # Skip first column for asymmetric.
+                ratio = 3 ** p3 * 5 ** p5
+                ratio /= 2 ** math.floor(math.log(ratio, 2))
+                index = round(math.log(ratio, 2) * 12)
+                freqs[index] = reffreq * ratio
+        super().__init__(refpitch, freqs)
 
 class Pitch(float):
 
