@@ -18,7 +18,9 @@
 from .iface import Config, Tuning
 from .util import singleton
 from diapyr import types
-import math
+import math, bisect, logging
+
+log = logging.getLogger(__name__)
 
 class EqualTemperament(Tuning):
 
@@ -28,10 +30,41 @@ class EqualTemperament(Tuning):
         self.refmidi = float(config.referencemidinote)
 
     def freq(self, pitch):
-        return Freq(self.reffreq * (2 ** ((pitch - self.refmidi) / 12)))
+        return Freq(self.reffreq * 2 ** ((pitch - self.refmidi) / 12))
 
     def pitch(self, freq):
         return Pitch(self.refmidi + 12 * math.log(freq / self.reffreq, 2))
+
+class Meantone(Tuning):
+    'Including Pythagorean as a special case when meantonecomma is zero.'
+
+    syntonic = 81 / 80
+
+    @types(Config)
+    def __init__(self, config):
+        reffreq = float(config.referencefrequency)
+        self.refmidi = float(config.referencemidinote)
+        flats = config.meantoneflats
+        fifthratio = 1.5 / self.syntonic ** float(config.meantonecomma)
+        self.freqs = [None] * 12
+        for fifth in range(-flats, 12 - flats):
+            pitch = fifth * 7
+            self.freqs[pitch % 12] = reffreq * fifthratio ** fifth / 2 ** (pitch // 12)
+        self.factors = [math.log(g / f, 2) for f, g in zip(self.freqs, self.freqs[1:] + [self.freqs[0] * 2])]
+        wolfpitch = Pitch(self.refmidi + 11 - flats)
+        log.debug("The fifth %s to %s is a wolf interval.", wolfpitch, wolfpitch + 7)
+
+    def freq(self, pitch):
+        pitch -= self.refmidi
+        pitchindex = math.floor(pitch) % 12
+        return Freq(self.freqs[pitchindex] * 2 ** (self.factors[pitchindex] * (pitch % 1) + pitch // 12))
+
+    def pitch(self, freq):
+        octave = math.floor(math.log(freq / self.freqs[0], 2))
+        freq /= 2 ** octave
+        pitchindex = bisect.bisect(self.freqs, freq) - 1 # FIXME LATER: Handle out of range.
+        x = math.log(freq / self.freqs[pitchindex], 2) / self.factors[pitchindex]
+        return Pitch(self.refmidi + octave * 12 + pitchindex + x)
 
 class Pitch(float):
 
