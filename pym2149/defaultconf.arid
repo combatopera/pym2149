@@ -159,3 +159,6 @@ meantoneflats = 2
 
 meantonecomma = .25
 : Fraction of syntonic comma by which fifths are lowered in meantone temperament. Common values are 0 for Pythagorean tuning, 1/4 for just major thirds and 1/3 for just minor thirds. Other options include 2/7, 1/5.
+
+showperiods = false
+: If true, show periods in visualisation instead of MIDI notes.

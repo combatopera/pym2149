@@ -30,6 +30,7 @@ class Roll:
         self.height = config.pianorollheight
         self.nomclock = config.nominalclock
         self.channels = config.chipchannels
+        self.periods = config.showperiods # TODO LATER: Command line arg isn't converted to boolean.
         self.line = 0
         self.jump = "\x1b[%sA" % self.height
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
@@ -54,7 +55,10 @@ class Roll:
             timereffect = self.chip.timers[c].effect.value is not None
             rhs = env or level
             if tone and rhs:
-                appendpitch(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock))
+                if self.periods:
+                    vals.append(self.chip.toneperiods[c].value)
+                else:
+                    appendpitch(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock))
             else:
                 vals.append('')
             if tone and noise and rhs:
@@ -80,7 +84,10 @@ class Roll:
                 shape = self.chip.envshape
                 vals.append(self.shapes[shape])
                 vals.append(('', '~')[newshape])
-                appendpitch(Period(self.chip.envperiod).envfreq(self.nomclock, shape))
+                if self.periods:
+                    vals.append(self.chip.envperiod)
+                else:
+                    appendpitch(Period(self.chip.envperiod).envfreq(self.nomclock, shape))
             elif level:
                 vals.append(level)
                 vals.append('')

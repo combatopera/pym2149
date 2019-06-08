@@ -45,7 +45,7 @@ def ymdump(prerecorded, chip, roll):
         roll.update(print, 1)
 
 def main():
-    config, di = boot(ConfigName('inpath'))
+    config, di = boot(ConfigName('inpath', '--showperiods'))
     try:
         config.ignoreloop = True
         config.pianorollheight = None
