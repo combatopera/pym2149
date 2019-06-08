@@ -96,7 +96,6 @@ class ConfigLoader:
         context['enter',] = Function(self.enter)
         context['py',] = Function(lambda *args: self.py(config, *args))
         context['resolve',] = Function(self.resolve)
-        self.configname.applyitems(context)
         with Repl(context) as repl:
             path = self.mark()
             repl.printf("cwd = %s", path.parent)
@@ -104,6 +103,7 @@ class ConfigLoader:
             settings = Path.home() / '.settings.arid'
             if settings.exists():
                 repl.printf(". %s", settings)
+        self.configname.applyitems(context)
         config = ConfigImpl(context)
         return config
 
