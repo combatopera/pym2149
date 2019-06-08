@@ -25,6 +25,7 @@ from pathlib import Path
 import sys, logging, numbers, importlib, argparse
 
 log = logging.getLogger(__name__)
+namespace = 'pym2149'
 
 class ConfigName:
 
@@ -38,7 +39,7 @@ class ConfigName:
 
     def applyitems(self, context):
         for name, value in self.additems.__dict__.items():
-            context[name,] = wrap(value)
+            context[namespace, name] = wrap(value)
 
     def newloader(self, di):
         return ConfigLoader(self, di)
@@ -99,7 +100,7 @@ class ConfigLoader:
         with Repl(context) as repl:
             path = self.mark()
             repl.printf("cwd = %s", path.parent)
-            repl.printf("pym2149 . %s", path.name)
+            repl.printf("%s . %s", namespace, path.name)
             settings = Path.home() / '.settings.arid'
             if settings.exists():
                 repl.printf(". %s", settings)
@@ -146,4 +147,4 @@ class ConfigImpl(Config):
             raise AttributeError(name)
 
     def __getitem__(self, path):
-        return self.pRiVaTe.resolved(*('pym2149',) + path)
+        return self.pRiVaTe.resolved(*(namespace,) + path)
