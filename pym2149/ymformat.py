@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import struct, logging, os, tempfile, shutil, sys
+from .dac import PWMEffect, SinusEffect
+from .iface import YMFile, Config
 from .ym2149 import stclock
 from diapyr import types
-from .iface import YMFile, Config
-from .dac import PWMEffect, SinusEffect
+import struct, logging, os, tempfile, shutil, sys
 
 log = logging.getLogger(__name__)
 
@@ -264,9 +264,9 @@ class YM6(YM56):
         super().__init__(*args, **kwargs)
         self.logsyncbuzzer = True
 
-impls = {i.formatid.encode(): i for i in [YM2, YM3, YM3b, YM5, YM6]}
-
 class YMOpen(YMFile):
+
+    impls = {i.formatid.encode(): i for i in [YM2, YM3, YM3b, YM5, YM6]}
 
     @types(Config)
     def __init__(self, config):
@@ -284,7 +284,7 @@ class YMOpen(YMFile):
         self.f = open(self.path, 'rb')
         try:
             if 'YM' == self.f.read(2):
-                self.ym = impls['YM' + self.f.read(2)](self.f, self.once)
+                self.ym = self.impls['YM' + self.f.read(2)](self.f, self.once)
                 return
         except:
             self.f.close()
@@ -292,7 +292,7 @@ class YMOpen(YMFile):
         self.f.close()
         self.f = UnpackedFile(self.path)
         try:
-            self.ym = impls[self.f.read(4)](self.f, self.once)
+            self.ym = self.impls[self.f.read(4)](self.f, self.once)
             # return
         except:
             self.f.close()
