@@ -40,8 +40,8 @@ class PlatformImpl(Platform, metaclass = AmpScale):
 
 @types(Prerecorded, Chip, Roll, this = Started)
 def ymdump(prerecorded, chip, roll):
-    for frame in prerecorded.ym:
-        frame(chip)
+    for frame in prerecorded.frames(chip):
+        frame()
         roll.update(print, 1)
 
 def main():

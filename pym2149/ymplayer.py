@@ -34,17 +34,17 @@ class Player(MainBackground):
     def __init__(self, config, prerecorded, chip, roll, timer, stream):
         super().__init__(config)
         self.updaterate = config.updaterate
-        self.ym = prerecorded.ym
+        self.prerecorded = prerecorded
         self.chip = chip
         self.roll = roll
         self.timer = timer
         self.stream = stream
 
     def __call__(self):
-        for frame in self.ym:
+        for frame in self.prerecorded.frames(self.chip):
             if self.quit:
                 break
-            frame(self.chip)
+            frame()
             self.roll.update()
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)

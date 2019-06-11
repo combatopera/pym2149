@@ -19,6 +19,7 @@ from .dac import PWMEffect, SinusEffect
 from .iface import YMFile, Config
 from .ym2149 import stclock
 from diapyr import types
+from functools import partial
 import struct, logging, os, tempfile, shutil, sys
 
 log = logging.getLogger(__name__)
@@ -297,6 +298,10 @@ class YMOpen(YMFile):
         except:
             self.f.close()
             raise
+
+    def frames(self, chip):
+        for frame in self.ym:
+            yield partial(frame, chip)
 
     def stop(self):
         self.f.close()
