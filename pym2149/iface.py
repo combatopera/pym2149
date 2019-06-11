@@ -32,3 +32,5 @@ class Platform: pass
 class Config: pass
 
 class Tuning: pass
+
+class Context: pass

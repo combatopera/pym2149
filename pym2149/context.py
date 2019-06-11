@@ -15,28 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import ContextImpl
-from .ym2149 import ClockInfo, YM2149
-from .out import StereoInfo, FloatStream
-from . import minblep, pitch
-from diapyr import DI
-import sys
+from .iface import Context
+from .pitch import EqualTemperament
+from diapyr import types
 
-def boot(configname):
-    di = DI()
-    di.add(configname)
-    di.add(di)
-    config = configname.newloader(di).load()
-    if config.repr:
-        for key in config.repr:
-            print(repr(getattr(config, key)))
-        sys.exit()
-    di.add(config)
-    di.add(ClockInfo)
-    di.add(StereoInfo)
-    di.add(YM2149)
-    di.add(minblep.loadorcreate)
-    di.add(FloatStream)
-    pitch.configure(di)
-    di.add(ContextImpl)
-    return config, di
+class ContextImpl(Context):
+
+    @types()
+    def __init__(self):
+        self._dict = {
+            '__name__': 'pym2149.context',
+            'tuning': EqualTemperament,
+        }
+
+    def _update(self, text):
+        snapshot = self._dict.copy()
+        exec(text, self._dict)
+        return {name: obj for name, obj in self._dict.items()
+                if name not in snapshot or obj is not snapshot[name]}
+
+    def __getattr__(self, name):
+        try:
+            return self._dict[name]
+        except KeyError:
+            raise AttributeError(name)

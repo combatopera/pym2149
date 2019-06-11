@@ -18,7 +18,7 @@
 from . import osctrl
 from .channels import Channels
 from .foxdotlib import SCSynthHandler, SCLangHandler, ClickEvent, SCSynth, SCLang, Delay
-from .iface import Config
+from .iface import Config, Context
 from .midi import ProgramChange, NoteOn, NoteOff
 from .pll import PLL
 from .program import Note, Unpitched
@@ -55,20 +55,17 @@ class LoadSynthDef(SCLangHandler):
     eol = '\n'
     pilcrow = '\xb6'
 
-    @types(Config, Channels)
-    def __init__(self, config, channels):
+    @types(Config, Channels, Context)
+    def __init__(self, config, channels, context):
         self.session = config.session
         self.window = config.window
-        self.context = {'__name__': 'pym2149.context'}
+        self.context = context
         self.channels = channels
 
     def __call__(self, timetags, message, reply):
         try:
             text, = message.args
-            snapshot = self.context.copy()
-            exec(text, self.context)
-            context = {name: obj for name, obj in self.context.items()
-                    if name not in snapshot or obj is not snapshot[name]}
+            context = self.context._update(text)
             lines = ["# Add/update: %s" % ', '.join(context.keys())]
             for name, obj in context.items():
                 if obj != Note and obj != Unpitched and inspect.isclass(obj) and issubclass(obj, Unpitched):

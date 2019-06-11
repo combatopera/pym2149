@@ -15,14 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Config, Tuning
+from .iface import Config, Tuning, Context
 from .util import singleton
-from diapyr import types
+from diapyr import types, DI
 import math, bisect, logging
 
 log = logging.getLogger(__name__)
 
-class EqualTemperament(Tuning):
+class ContextTuning(Tuning):
+
+    @types(Context, DI)
+    def __init__(self, context, di):
+        self.context = context
+        self.di = di
+
+    def __getattr__(self, name):
+        return getattr(self.di(self.context.tuning), name)
+
+    def dispose(self):
+        pass
+
+class EqualTemperament:
 
     @types(Config)
     def __init__(self, config):
@@ -35,7 +48,7 @@ class EqualTemperament(Tuning):
     def pitch(self, freq):
         return Pitch(self.refmidi + 12 * math.log(freq / self.reffreq, 2))
 
-class Unequal(Tuning):
+class Unequal:
 
     def __init__(self, refpitch, freqs):
         self.factors = [math.log(g / f, 2) for f, g in zip(freqs, freqs[1:] + [freqs[0] * 2])]
@@ -88,6 +101,12 @@ class FiveLimit(Unequal):
                 index = round(math.log(ratio, 2) * 12)
                 freqs[index] = reffreq * ratio
         super().__init__(refpitch, freqs)
+
+def configure(di):
+    di.add(ContextTuning)
+    di.add(EqualTemperament)
+    di.add(Meantone)
+    di.add(FiveLimit)
 
 class Pitch(float):
 
