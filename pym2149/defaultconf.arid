@@ -154,6 +154,9 @@ PortAudio
     ringsize = $(jackringsize)
     coupling = $(jackcoupling)
 
+tuning = $global(pym2149.pitch.EqualTemperament)
+: The mapping between MIDI note and frequency, other options include Meantone and FiveLimit.
+
 meantoneflats = 2
 : The number of times we descend a fifth from referencemidinote between 0 and 11 inclusive, this can be used to change the location of the wolf fifth. Use 2 for classic Pythagorean tuning or 5 for a late-medieval modification.
 

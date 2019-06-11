@@ -15,17 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Context
+from .iface import Context, Config
 from .pitch import EqualTemperament
 from diapyr import types
 
 class ContextImpl(Context):
 
-    @types()
-    def __init__(self):
+    @types(Config)
+    def __init__(self, config):
         self._dict = {
             '__name__': 'pym2149.context',
-            'tuning': EqualTemperament,
+            'tuning': config.tuning,
         }
 
     def _update(self, text):
