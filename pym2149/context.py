@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Context, Config
-from .pitch import EqualTemperament
 from diapyr import types
 
 class ContextImpl(Context):
