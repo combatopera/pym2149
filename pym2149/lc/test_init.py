@@ -132,6 +132,13 @@ class TestV(unittest.TestCase):
         for x, y in outerzip([5, 5.1, 5.2, 5.3, 5.4], [v[i] for i in range(1, 6)]):
             self.assertAlmostEqual(x, y)
 
+    def test_shiftstep(self):
+        v = V('0 1 2', step = 3) >> -1
+        self.assertEqual(0, v[-1])
+        self.assertEqual(1, v[0])
+        self.assertEqual(2, v[1])
+        self.assertEqual(3, v[2])
+
 class TestD(unittest.TestCase):
 
     def test_works(self):

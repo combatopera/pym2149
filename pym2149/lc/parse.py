@@ -40,7 +40,7 @@ class StepScript(Script):
         self.step = sections.step()
 
     def getitem(self, frame, shift):
-        return super().getitem(frame, shift) + frame // self.sections.len * self.step # XXX: Does this handle shift properly?
+        return super().getitem(frame, shift) + (frame - shift) // self.sections.len * self.step
 
 class BadWordException(Exception): pass
 

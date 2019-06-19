@@ -60,7 +60,7 @@ class ChipProxy:
         return self._chans[index]
 
     def topitch(self, degree):
-        scale = self._context.scale
+        scale = self._context.scale >> (1 - self._context.mode)
         return self._context.tonic + float(scale[degree[0] * scale.len + degree[1]] + degree[2])
 
     def toperiod(self, pitch):

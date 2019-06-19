@@ -25,6 +25,7 @@ class ContextImpl(Context):
         self._dict = dict(
             __name__ = 'pym2149.context',
             tuning = config.tuning,
+            mode = 1,
         )
 
     def _update(self, text):
