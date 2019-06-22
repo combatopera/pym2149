@@ -202,7 +202,7 @@ class Binary(Operators):
 
 class Sum(Binary):
 
-    kwargs = {}
+    kwargs = {} # XXX: Can this ever have kwargs? Or replace with bundle mechanism.
 
     @property
     def len(self):
@@ -274,7 +274,7 @@ class Repeat(Operators):
 
 class Of(Operators):
 
-    kwargs = {}
+    kwargs = {} # TODO: Implement.
 
     @property
     def len(self):
@@ -289,7 +289,7 @@ class Of(Operators):
 
 class Concat(Binary):
 
-    kwargs = {} # XXX: Oh yeah?
+    kwargs = {} # TODO LATER: Implement.
 
     @property
     def len(self):
