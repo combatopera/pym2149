@@ -22,10 +22,10 @@ class ContextImpl(Context):
 
     @types(Config)
     def __init__(self, config):
-        self._dict = {
-            '__name__': 'pym2149.context',
-            'tuning': config.tuning,
-        }
+        self._dict = dict(
+            __name__ = 'pym2149.context',
+            tuning = config.tuning,
+        )
 
     def _update(self, text):
         snapshot = self._dict.copy()
