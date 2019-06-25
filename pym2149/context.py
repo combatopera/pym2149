@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Context, Config
+from .lc import unit
 from diapyr import types
 
 class ContextImpl(Context):
@@ -26,6 +27,8 @@ class ContextImpl(Context):
             __name__ = 'pym2149.context',
             tuning = config.tuning,
             mode = 1,
+            speed = 16,
+            sections = [[unit]],
         )
 
     def _update(self, text):
