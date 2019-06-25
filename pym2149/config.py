@@ -42,8 +42,8 @@ class ConfigName:
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
                 with Repl(context) as repl:
-                    repl.printf("%s", namespace)
                     for text in value:
+                        repl.printf("%s", namespace)
                         for line in text.splitlines():
                             repl("\t%s" % line)
             else:
