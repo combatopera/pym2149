@@ -22,6 +22,7 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.iface import Config, Context
+from pym2149.lc import osc as lc_osc
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import awaitinterrupt
@@ -42,6 +43,7 @@ def main():
         di.add(jackclient.JackClient)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
+        lc_osc.configure(di)
         jackclient.configure(di)
         di.add(SyncTimer)
         di.add(Player)
