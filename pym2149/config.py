@@ -32,6 +32,7 @@ class ConfigName:
     def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
         parser = argparse.ArgumentParser()
         parser.add_argument('--repr', action = 'append', default = [])
+        parser.add_argument('--config', action = 'append', default = [])
         for param in params:
             parser.add_argument(param)
         self.additems = parser.parse_args(args)
@@ -39,7 +40,12 @@ class ConfigName:
 
     def applyitems(self, context):
         for name, value in self.additems.__dict__.items():
-            context[namespace, name] = wrap(value)
+            if 'config' == name:
+                with Repl(context) as repl:
+                    for line in value:
+                        repl("%s %s" % (namespace, line))
+            else:
+                context[namespace, name] = wrap(value)
 
     def newloader(self, di):
         return ConfigLoader(self, di)
