@@ -18,7 +18,7 @@
 from . import minblep, pitch
 from .context import ContextImpl
 from .out import StereoInfo, FloatStream
-from .vis import RollImpl
+from .vis import RollImpl, NullRoll
 from .ym2149 import ClockInfo, YM2149
 from diapyr import DI
 import sys
@@ -40,5 +40,5 @@ def boot(configname):
     di.add(FloatStream)
     pitch.configure(di)
     di.add(ContextImpl)
-    di.add(RollImpl)
+    di.add(RollImpl if config.pianorollenabled else NullRoll)
     return config, di

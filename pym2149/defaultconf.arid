@@ -66,6 +66,9 @@ linesperbeat = 4
 pianorollheight = $enter($(prerecorded) $(pianorollheight))
 : You can override the deduced piano roll height here.
 
+pianorollenabled = true
+: Set to false to disable the piano roll.
+
 midichannelbase = 1
 : In case you wanted 0-based channel numbering.
 

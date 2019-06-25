@@ -15,13 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .pitch import Period, Freq
-from diapyr import types
 from .iface import Chip, Config, Tuning, Roll
+from .pitch import Period, Freq
+from .util import singleton
+from diapyr import types
 from functools import partial
 import sys
 
-class NullRoll(Roll): pass
+@singleton
+class NullRoll(Roll):
+
+    def update(self):
+        pass
 
 class RollImpl(Roll):
 
