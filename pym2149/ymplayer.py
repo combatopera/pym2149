@@ -16,8 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .timer import Timer, SimpleTimer
-from .vis import Roll
-from .iface import Chip, Stream, Prerecorded, Config
+from .iface import Chip, Stream, Prerecorded, Config, Roll
 from .ym2149 import ClockInfo
 from bg import MainBackground
 from diapyr import types

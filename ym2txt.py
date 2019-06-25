@@ -20,8 +20,7 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.iface import Platform, AmpScale, Chip, Prerecorded
-from pym2149.vis import Roll
+from pym2149.iface import Platform, AmpScale, Chip, Prerecorded, Roll
 from pym2149.ymformat import YMOpen
 from diapyr import types
 from diapyr.start import Started
@@ -50,7 +49,6 @@ def main():
         config.ignoreloop = True
         config.pianorollheight = None
         di.add(PlatformImpl)
-        di.add(Roll)
         di.add(YMOpen)
         di.add(ymdump)
         di.all(Started)

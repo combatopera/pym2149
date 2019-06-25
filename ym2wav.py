@@ -20,7 +20,6 @@
 from pym2149.initlogging import logging
 from pym2149.ymformat import YMOpen
 from pym2149.config import ConfigName
-from pym2149.vis import Roll
 from pym2149 import out
 from pym2149.boot import boot
 from pym2149.ymplayer import Player
@@ -36,7 +35,6 @@ def main():
         di.add(YMOpen)
         di.all(Started)
         out.configure(di)
-        di.add(Roll)
         di.add(ChipTimer)
         di.all(Started)
         di.add(Player)

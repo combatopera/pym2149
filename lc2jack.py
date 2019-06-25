@@ -25,7 +25,6 @@ from pym2149.iface import Config, Context
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import awaitinterrupt
-from pym2149.vis import Roll
 from pym2149.ymplayer import Player
 from diapyr import types
 from diapyr.start import Started
@@ -44,7 +43,6 @@ def main():
         di.add(loadcontext)
         di.add(LiveCodingBridge)
         jackclient.configure(di)
-        di.add(Roll)
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)

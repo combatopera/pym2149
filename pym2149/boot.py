@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import ContextImpl
-from .ym2149 import ClockInfo, YM2149
-from .out import StereoInfo, FloatStream
 from . import minblep, pitch
+from .context import ContextImpl
+from .out import StereoInfo, FloatStream
+from .vis import RollImpl
+from .ym2149 import ClockInfo, YM2149
 from diapyr import DI
 import sys
 
@@ -39,4 +40,5 @@ def boot(configname):
     di.add(FloatStream)
     pitch.configure(di)
     di.add(ContextImpl)
+    di.add(RollImpl)
     return config, di

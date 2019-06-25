@@ -17,11 +17,13 @@
 
 from .pitch import Period, Freq
 from diapyr import types
-from .iface import Chip, Config, Tuning
+from .iface import Chip, Config, Tuning, Roll
 from functools import partial
 import sys
 
-class Roll:
+class NullRoll(Roll): pass
+
+class RollImpl(Roll):
 
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
 

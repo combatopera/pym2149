@@ -21,7 +21,6 @@ from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.lc.bridge import LiveCodingBridge
-from pym2149.vis import Roll
 from lc2jack import loadcontext
 from ym2txt import PlatformImpl, ymdump
 from diapyr.start import Started
@@ -34,7 +33,6 @@ def main():
         config.ignoreloop = True
         config.pianorollheight = None
         di.add(PlatformImpl)
-        di.add(Roll)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
         di.add(ymdump)
