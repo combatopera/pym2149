@@ -162,13 +162,11 @@ class Event:
         self.note = note
         self.namespace = namespace
 
-    def __call__(self, frame, speed, chipproxy, args, kwargs, context):
+    def __call__(self, frame, speed, chipproxy, kwargs):
         note = self.note.cls() # XXX: Allow a note to maintain state?
         def noteargs(params, shift, **extras):
             for name in params:
-                if name in args:
-                    yield name, args[name]
-                elif name in extras:
+                if name in extras:
                     yield name, extras[name]
                 elif 'frame' == name:
                     yield name, frame - self.absframe * speed + shift

@@ -109,8 +109,7 @@ class LiveCodingBridge(Prerecorded):
                         return section
                     frame -= k
         for proxy, pattern in zip(chipproxies, section()):
-            pattern.of(self.context.speed)[frame](
-                    frame, self.context.speed, proxy, {}, pattern.kwargs, self.context)
+            pattern.of(self.context.speed)[frame](frame, self.context.speed, proxy, pattern.kwargs)
 
     def _sectionframecount(self, section):
         return self.context.speed * max(pattern.len for pattern in section if pattern is not None)
