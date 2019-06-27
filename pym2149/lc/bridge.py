@@ -95,7 +95,6 @@ class LiveCodingBridge(Prerecorded):
         self.chancount = config.chipchannels
         self.tuning = tuning
         self.context = context
-        self.frameindex = 0
 
     def _step(self, frame, sectionframecounts, chipproxies):
         for proxy in chipproxies:
@@ -118,17 +117,18 @@ class LiveCodingBridge(Prerecorded):
 
     def frames(self, chip):
         sectionframecounts = [self._sectionframecount(section) for section in self.context.sections]
+        frameindex = 0
         if self.section is not None:
             section = getattr(self.context, self.section)
             for s, k in zip(self.context.sections, sectionframecounts):
                 if section == s:
                     break
-                self.frameindex += k
+                frameindex += k
             else:
                 raise NoSuchSectionException(self.section) # FIXME: And stop threads.
         chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
                 for chan in range(self.chancount)]
-        while self.loop or self.frameindex < sum(sectionframecounts):
-            frame = partial(self._step, self.frameindex, sectionframecounts, chipproxies)
-            self.frameindex += 1
+        while self.loop or frameindex < sum(sectionframecounts):
+            frame = partial(self._step, frameindex, sectionframecounts, chipproxies)
+            frameindex += 1
             yield frame
