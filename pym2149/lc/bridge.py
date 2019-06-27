@@ -96,20 +96,13 @@ class LiveCodingBridge(Prerecorded):
     def pianorollheight(self):
         return self.context.speed
 
-    def _step(self, chipproxies, sectionframecounts, frame):
+    def _step(self, chipproxies, speed, section, frame):
         for proxy in chipproxies:
             proxy.fixedlevel = 0 # XXX: Also reset levelmode?
             proxy.noiseflag = False
             proxy.toneflag = False
-        def section():
-            nonlocal frame
-            while True:
-                for section, k in zip(self.context.sections, sectionframecounts):
-                    if frame < k:
-                        return section
-                    frame -= k
-        for proxy, pattern in zip(chipproxies, section()):
-            pattern.of(self.context.speed)[frame](frame, self.context.speed, proxy, pattern.kwargs)
+        for proxy, pattern in zip(chipproxies, section):
+            pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
     def _sectionframecount(self, section):
         return self.context.speed * max(pattern.len for pattern in section if pattern is not None)
@@ -127,7 +120,14 @@ class LiveCodingBridge(Prerecorded):
                 raise NoSuchSectionException(self.section) # FIXME: And stop threads.
         chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
                 for chan in range(self.chancount)]
+        def sectionandframe():
+            frame = frameindex
+            while True:
+                for section, k in zip(self.context.sections, sectionframecounts):
+                    if frame < k:
+                        return section, frame
+                    frame -= k
         while self.loop or frameindex < sum(sectionframecounts):
-            frame = partial(self._step, chipproxies, sectionframecounts, frameindex)
+            frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
             frameindex += 1
             yield frame
