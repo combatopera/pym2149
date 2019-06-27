@@ -83,10 +83,6 @@ class NoSuchSectionException(Exception): pass
 
 class LiveCodingBridge(Prerecorded):
 
-    @property
-    def pianorollheight(self):
-        return self.context.speed
-
     @types(Config, Tuning, Context)
     def __init__(self, config, tuning, context):
         self.nomclock = config.nominalclock
@@ -96,9 +92,13 @@ class LiveCodingBridge(Prerecorded):
         self.tuning = tuning
         self.context = context
 
-    def _step(self, frame, sectionframecounts, chipproxies):
+    @property
+    def pianorollheight(self):
+        return self.context.speed
+
+    def _step(self, chipproxies, sectionframecounts, frame):
         for proxy in chipproxies:
-            proxy.fixedlevel = 0
+            proxy.fixedlevel = 0 # XXX: Also reset levelmode?
             proxy.noiseflag = False
             proxy.toneflag = False
         def section():
@@ -129,6 +129,6 @@ class LiveCodingBridge(Prerecorded):
         chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
                 for chan in range(self.chancount)]
         while self.loop or frameindex < sum(sectionframecounts):
-            frame = partial(self._step, frameindex, sectionframecounts, chipproxies)
+            frame = partial(self._step, chipproxies, sectionframecounts, frameindex)
             frameindex += 1
             yield frame
