@@ -19,6 +19,9 @@ from ..iface import Config, Prerecorded, Tuning, Context
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
+import logging
+
+log = logging.getLogger(__name__)
 
 def asprop(reginfo, enc = lambda self: round, dec = lambda self: lambda x: x):
     def fget(self):
@@ -45,9 +48,11 @@ class ChipProxy:
             return reginfo(self._chip, self._chan)
 
     noiseperiod = asprop(lambda chip: chip.noiseperiodreg)
+    onfire = False
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]
+        self._letter = chr(ord('A') + chan)
         self._chip = chip
         self._nomclock = nomclock
         self._tuning = tuning
@@ -102,7 +107,13 @@ class LiveCodingBridge(Prerecorded):
             proxy.noiseflag = False
             proxy.toneflag = False
         for proxy, pattern in zip(chipproxies, section):
-            pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
+            try:
+                pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
+                proxy.onfire = False
+            except Exception:
+                if not proxy.onfire: # TODO: Show error if it has changed.
+                    log.exception("Channel %s update failed:", proxy._letter)
+                    proxy.onfire = True
 
     def _initialframe(self):
         frameindex = 0
