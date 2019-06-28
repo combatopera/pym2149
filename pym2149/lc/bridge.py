@@ -101,22 +101,29 @@ class LiveCodingBridge(Prerecorded):
     def pianorollheight(self):
         return self.context.speed
 
-    def _quiet(self, chipproxies):
-        for proxy in chipproxies:
-            proxy.fixedlevel = 0 # XXX: Also reset levelmode?
-            proxy.noiseflag = False
-            proxy.toneflag = False
+    @innerclass
+    class Session:
 
-    def _step(self, chipproxies, speed, section, frame):
-        self._quiet(chipproxies)
-        for proxy, pattern in zip(chipproxies, section):
-            try:
-                pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
-                proxy.onfire = False
-            except Exception:
-                if not proxy.onfire: # TODO: Show error if it has changed.
-                    log.exception("Channel %s update failed:", proxy._letter)
-                    proxy.onfire = True
+        def __init__(self, chip):
+            self.chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
+                    for chan in range(self.chancount)]
+
+        def _quiet(self):
+            for proxy in self.chipproxies:
+                proxy.fixedlevel = 0 # XXX: Also reset levelmode?
+                proxy.noiseflag = False
+                proxy.toneflag = False
+
+        def _step(self, speed, section, frame):
+            self._quiet()
+            for proxy, pattern in zip(self.chipproxies, section):
+                try:
+                    pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
+                    proxy.onfire = False
+                except Exception:
+                    if not proxy.onfire: # TODO: Show error if it has changed.
+                        log.exception("Channel %s update failed:", proxy._letter)
+                        proxy.onfire = True
 
     def _initialframe(self):
         frameindex = 0
@@ -130,8 +137,7 @@ class LiveCodingBridge(Prerecorded):
         raise NoSuchSectionException(self.section) # FIXME: And stop threads.
 
     def frames(self, chip):
-        chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
-                for chan in range(self.chancount)]
+        session = self.Session(chip)
         frameindex = self._initialframe()
         def sectionandframe():
             frame = frameindex
@@ -143,12 +149,12 @@ class LiveCodingBridge(Prerecorded):
         onfire = False
         while self.loop or frameindex < sum(self.context.sectionframecounts):
             try:
-                frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
+                frame = partial(session._step, self.context.speed, *sectionandframe())
                 frameindex += 1
                 onfire = False
             except Exception:
                 if not onfire:
                     log.exception('Failed to prepare a frame:')
                     onfire = True
-                frame = partial(self._quiet, chipproxies)
+                frame = session._quiet
             yield frame
