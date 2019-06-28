@@ -36,7 +36,7 @@ class Handler:
             context = self.context._update(text)
             log.info("Add/update: %s", ', '.join(context.keys()))
         except Exception:
-            log.exception('Failed:')
+            log.exception('Update failed:')
 
 class Listen(FoxDotListen):
 
