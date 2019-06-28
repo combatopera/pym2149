@@ -23,6 +23,7 @@ class ContextImpl(Context):
 
     @types(Config)
     def __init__(self, config):
+        self._cache = {}
         self._dict = dict(
             __name__ = 'pym2149.context',
             tuning = config.tuning,
@@ -33,6 +34,8 @@ class ContextImpl(Context):
 
     def _update(self, text):
         snapshot = self._dict.copy()
+        # Clear cache before exec in case of partial exec:
+        self._cache.clear() # XXX: Too crude?
         exec(text, self._dict)
         return {name: obj for name, obj in self._dict.items()
                 if name not in snapshot or obj is not snapshot[name]}
@@ -43,7 +46,16 @@ class ContextImpl(Context):
         except KeyError:
             raise AttributeError(name)
 
-    @property
+    def _cachedproperty(f):
+        name = f.__name__
+        def g(self):
+            try:
+                value = self._cache[name]
+            except KeyError:
+                self._cache[name] = value = f(self)
+            return value
+        return property(g)
+
+    @_cachedproperty
     def sectionframecounts(self):
-        # FIXME: Cache this.
         return [self.speed * max(pattern.len for pattern in section if pattern is not None) for section in self.sections]
