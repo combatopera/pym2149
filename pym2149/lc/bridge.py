@@ -127,6 +127,7 @@ class LiveCodingBridge(Prerecorded):
                         return section, frame
                     frame -= k
         while self.loop or frameindex < sum(self.context.sectionframecounts):
+            # FIXME: Do not crash if we can't prepare a frame e.g. because sectionandframe fails.
             frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
             frameindex += 1
             yield frame
