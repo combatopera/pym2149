@@ -42,3 +42,8 @@ class ContextImpl(Context):
             return self._dict[name]
         except KeyError:
             raise AttributeError(name)
+
+    @property
+    def sectionframecounts(self):
+        # FIXME: Cache this.
+        return [self.speed * max(pattern.len for pattern in section if pattern is not None) for section in self.sections]

@@ -104,33 +104,29 @@ class LiveCodingBridge(Prerecorded):
         for proxy, pattern in zip(chipproxies, section):
             pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
-    def _initialframe(self, sectionframecounts):
+    def _initialframe(self):
         frameindex = 0
         if self.section is None:
             return frameindex
         section = getattr(self.context, self.section)
-        for s, k in zip(self.context.sections, sectionframecounts):
+        for s, k in zip(self.context.sections, self.context.sectionframecounts):
             if section == s:
                 return frameindex
             frameindex += k
         raise NoSuchSectionException(self.section) # FIXME: And stop threads.
 
-    def _sectionframecount(self, section):
-        return self.context.speed * max(pattern.len for pattern in section if pattern is not None)
-
     def frames(self, chip):
         chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
                 for chan in range(self.chancount)]
-        sectionframecounts = [self._sectionframecount(section) for section in self.context.sections]
-        frameindex = self._initialframe(sectionframecounts)
+        frameindex = self._initialframe()
         def sectionandframe():
             frame = frameindex
             while True:
-                for section, k in zip(self.context.sections, sectionframecounts):
+                for section, k in zip(self.context.sections, self.context.sectionframecounts):
                     if frame < k:
                         return section, frame
                     frame -= k
-        while self.loop or frameindex < sum(sectionframecounts):
+        while self.loop or frameindex < sum(self.context.sectionframecounts):
             frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
             frameindex += 1
             yield frame
