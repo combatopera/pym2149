@@ -72,4 +72,4 @@ class ContextImpl(Context):
 
     @_cachedproperty
     def sectionframecounts(self):
-        return [self.speed * max(pattern.len for pattern in section if pattern is not None) for section in self.sections]
+        return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
