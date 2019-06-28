@@ -71,7 +71,7 @@ for name, prop in dict(
     noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
     toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
-    # TODO: Use Reg links so that we can read out the same pitch we set.
+    # TODO: Use Reg links so that we can read out an unrounded period for example.
     tonepitch = asprop(lambda chip, chan: chip.toneperiods[chan], lambda self: self.toperiod, None),
 ).items():
     setattr(ChipProxy.ChanProxy, name, prop)
