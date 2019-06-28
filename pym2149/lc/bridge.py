@@ -101,11 +101,14 @@ class LiveCodingBridge(Prerecorded):
     def pianorollheight(self):
         return self.context.speed
 
-    def _step(self, chipproxies, speed, section, frame):
+    def _quiet(self, chipproxies):
         for proxy in chipproxies:
             proxy.fixedlevel = 0 # XXX: Also reset levelmode?
             proxy.noiseflag = False
             proxy.toneflag = False
+
+    def _step(self, chipproxies, speed, section, frame):
+        self._quiet(chipproxies)
         for proxy, pattern in zip(chipproxies, section):
             try:
                 pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
@@ -137,8 +140,15 @@ class LiveCodingBridge(Prerecorded):
                     if frame < k:
                         return section, frame
                     frame -= k
+        onfire = False
         while self.loop or frameindex < sum(self.context.sectionframecounts):
-            # FIXME: Do not crash if we can't prepare a frame e.g. because sectionandframe fails.
-            frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
-            frameindex += 1
+            try:
+                frame = partial(self._step, chipproxies, self.context.speed, *sectionandframe())
+                frameindex += 1
+                onfire = False
+            except Exception:
+                if not onfire:
+                    log.exception('Failed to prepare a frame:')
+                    onfire = True
+                frame = partial(self._quiet, chipproxies)
             yield frame
