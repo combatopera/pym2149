@@ -21,39 +21,53 @@ from diapyr import types
 
 class ContextImpl(Context):
 
+    class Data:
+
+        @classmethod
+        def create(cls, config):
+            return cls(dict(
+                __name__ = 'pym2149.context',
+                tuning = config.tuning,
+                mode = 1,
+                speed = 16,
+                sections = [[unit]],
+            ))
+
+        def __init__(self, data):
+            self.cache = {}
+            self.data = data
+
+        def cached(self, name, factory):
+            try:
+                value = self.cache[name]
+            except KeyError:
+                self.cache[name] = value = factory()
+            return value
+
+        def fork(self, text):
+            data = self.data.copy()
+            exec(text, data) # XXX: Impact of modifying mutable objects?
+            return type(self)(data), {name: obj for name, obj in data.items()
+                    if name not in self.data or obj is not self.data[name]}
+
     @types(Config)
     def __init__(self, config):
-        self._cache = {}
-        self._dict = dict(
-            __name__ = 'pym2149.context',
-            tuning = config.tuning,
-            mode = 1,
-            speed = 16,
-            sections = [[unit]],
-        )
+        self._data = self.Data.create(config)
 
     def _update(self, text):
-        snapshot = self._dict.copy()
-        # Clear cache before exec in case of partial exec:
-        self._cache.clear() # XXX: Too crude?
-        exec(text, self._dict)
-        return {name: obj for name, obj in self._dict.items()
-                if name not in snapshot or obj is not snapshot[name]}
+        self._data, diff = self._data.fork(text)
+        return diff
 
     def __getattr__(self, name):
         try:
-            return self._dict[name]
+            return self._data.data[name]
         except KeyError:
             raise AttributeError(name)
 
     def _cachedproperty(f):
         name = f.__name__
         def g(self):
-            try:
-                value = self._cache[name]
-            except KeyError:
-                self._cache[name] = value = f(self)
-            return value
+            return self._data.cached(name, lambda: f(self))
         return property(g)
 
     @_cachedproperty
