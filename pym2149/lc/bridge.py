@@ -19,6 +19,7 @@ from ..iface import Config, Prerecorded, Tuning, Context
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
+from contextlib import contextmanager
 import logging
 
 log = logging.getLogger(__name__)
@@ -37,7 +38,21 @@ def convenience(name):
         setattr(self[0], name, value)
     return property(fget, fset)
 
-class ChipProxy:
+class ExceptionCatcher:
+
+    _onfire = False
+
+    @contextmanager
+    def catch(self, *args):
+        try:
+            yield
+            self._onfire = False
+        except Exception:
+            if not self._onfire: # TODO: Show error if it has changed.
+                log.exception(*args)
+                self._onfire = True
+
+class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
@@ -48,7 +63,6 @@ class ChipProxy:
             return reginfo(self._chip, self._chan)
 
     noiseperiod = asprop(lambda chip: chip.noiseperiodreg)
-    onfire = False
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]
@@ -117,13 +131,8 @@ class LiveCodingBridge(Prerecorded):
         def _step(self, speed, section, frame):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
-                try:
+                with proxy.catch("Channel %s update failed:", proxy._letter):
                     pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
-                    proxy.onfire = False
-                except Exception:
-                    if not proxy.onfire: # TODO: Show error if it has changed.
-                        log.exception("Channel %s update failed:", proxy._letter)
-                        proxy.onfire = True
 
     def _initialframe(self):
         frameindex = 0
@@ -146,15 +155,10 @@ class LiveCodingBridge(Prerecorded):
                     if frame < k:
                         return section, frame
                     frame -= k
-        onfire = False
+        catcher = ExceptionCatcher()
         while self.loop or frameindex < sum(self.context.sectionframecounts):
-            try:
+            frame = session._quiet
+            with catcher.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, self.context.speed, *sectionandframe())
                 frameindex += 1
-                onfire = False
-            except Exception:
-                if not onfire:
-                    log.exception('Failed to prepare a frame:')
-                    onfire = True
-                frame = session._quiet
             yield frame
