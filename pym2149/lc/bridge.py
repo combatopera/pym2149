@@ -102,7 +102,7 @@ class LiveCodingBridge(Prerecorded):
         return self.context.speed
 
     @innerclass
-    class Session:
+    class Session(ExceptionCatcher):
 
         def __init__(self, chip):
             self.chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
@@ -141,10 +141,9 @@ class LiveCodingBridge(Prerecorded):
                     if frame < k:
                         return section, frame
                     frame -= k
-        catcher = ExceptionCatcher()
         while self.loop or frameindex < sum(self.context.sectionframecounts):
             frame = session._quiet
-            with catcher.catch('Failed to prepare a frame:'):
+            with session.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, self.context.speed, *sectionandframe())
                 frameindex += 1
             yield frame
