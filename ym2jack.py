@@ -38,7 +38,7 @@ def main():
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)
-        awaitinterrupt(config)
+        awaitinterrupt(config) # FIXME: Stop program in ignoreloop case.
     finally:
         di.discardall()
 
