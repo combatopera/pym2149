@@ -125,10 +125,10 @@ class LiveCodingBridge(Prerecorded):
         if self.section is None:
             return frameindex
         section = getattr(self.context, self.section)
-        for s, k in zip(self.context.sections, self.context.sectionframecounts):
+        for s, k in zip(self.context.sections, self.context.sectionlens):
             if section == s:
                 return frameindex
-            frameindex += k
+            frameindex += k * self.context.speed
         raise NoSuchSectionException(self.section) # FIXME: And stop threads.
 
     def frames(self, chip):
@@ -137,11 +137,12 @@ class LiveCodingBridge(Prerecorded):
         def sectionandframe():
             frame = frameindex
             while True:
-                for section, k in zip(self.context.sections, self.context.sectionframecounts):
+                for section, k in zip(self.context.sections, self.context.sectionlens):
+                    k *= self.context.speed
                     if frame < k:
                         return section, frame
                     frame -= k
-        while self.loop or frameindex < sum(self.context.sectionframecounts):
+        while self.loop or frameindex < sum(self.context.sectionlens) * self.context.speed:
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, self.context.speed, *sectionandframe())
