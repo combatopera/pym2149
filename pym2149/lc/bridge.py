@@ -16,10 +16,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..iface import Config, Prerecorded, Tuning, Context
+from ..util import ExceptionCatcher
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-from contextlib import contextmanager
 import logging
 
 log = logging.getLogger(__name__)
@@ -37,20 +37,6 @@ def convenience(name):
     def fset(self, value):
         setattr(self[0], name, value)
     return property(fget, fset)
-
-class ExceptionCatcher:
-
-    _onfire = False
-
-    @contextmanager
-    def catch(self, *args):
-        try:
-            yield
-            self._onfire = False
-        except Exception:
-            if not self._onfire: # TODO: Show error if it has changed.
-                log.exception(*args)
-                self._onfire = True
 
 class ChipProxy(ExceptionCatcher):
 

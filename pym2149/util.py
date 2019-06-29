@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from contextlib import contextmanager
 import time, logging
 
 log = logging.getLogger(__name__)
@@ -66,3 +67,17 @@ def outerzip(*iterables):
         if not running:
             break
         yield values
+
+class ExceptionCatcher:
+
+    _onfire = False
+
+    @contextmanager
+    def catch(self, *args):
+        try:
+            yield
+            self._onfire = False
+        except Exception:
+            if not self._onfire: # TODO: Show error if it has changed.
+                log.exception(*args)
+                self._onfire = True
