@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-def V(script, step = 0):
+def V(script, step = 0, continuous = False):
     from .parse import concat, StepScript, VParse
-    return concat(lambda *args: StepScript(*args, step), VParse(float, step), script, {})
+    return concat(lambda *args: StepScript(*args, step), VParse(float, step, continuous), script, {})
 
 def D(script):
     from .parse import concat, StepScript, VParse, vector
     step = 0
-    return concat(lambda *args: StepScript(*args, step), VParse(vector, step), script, {})
+    return concat(lambda *args: StepScript(*args, step), VParse(vector, step, False), script, {})
 
 def E(cls, script, **kwargs):
     from .parse import concat, Script, EParse, NoteWrapper
@@ -31,7 +31,7 @@ def E(cls, script, **kwargs):
     return concat(Script, EParse(NoteWrapper(cls), namespace), script, kwargs)
 
 unit = E(lambda: None, '1')
-naturalminor = V('0 2 3 5 7 8 10', step = 12)
-harmonicminor = V('0 2 3 5 7 8 11', step = 12)
-major = V('0 2 4 5 7 9 11', step = 12)
-octatonic = V('0 1 3 4 6 7 9 10', step = 12)
+naturalminor = V('0 2 3 5 7 8 10', step = 12, continuous = True)
+harmonicminor = V('0 2 3 5 7 8 11', step = 12, continuous = True)
+major = V('0 2 4 5 7 9 11', step = 12, continuous = True)
+octatonic = V('0 1 3 4 6 7 9 10', step = 12, continuous = True)
