@@ -118,7 +118,7 @@ class LiveCodingBridge(Prerecorded):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
-                    pattern[cursor + .5 / speed](cursor, speed, proxy, pattern.kwargs) # TODO: Review fudge.
+                    pattern[cursor](cursor, speed, proxy, pattern.kwargs)
 
     def _initialcursor(self):
         cursor = 0
@@ -142,7 +142,7 @@ class LiveCodingBridge(Prerecorded):
     def frames(self, chip):
         session = self.Session(chip)
         speed = self.context.speed
-        frameindex = self._initialcursor() * speed
+        frameindex = self._initialcursor() * speed + .5
         while self.loop or frameindex < sum(self.context.sectionlens) * speed:
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
@@ -151,4 +151,4 @@ class LiveCodingBridge(Prerecorded):
             yield frame
             oldspeed, speed = speed, self.context.speed
             if oldspeed != speed:
-                frameindex = frameindex / oldspeed * speed
+                frameindex = (frameindex - .5) / oldspeed * speed + .5

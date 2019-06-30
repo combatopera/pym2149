@@ -20,10 +20,10 @@ class Kick:
 
 class Snare:
 
-    level = V('11 12x13/11,2')
+    level = V('11 14x13//13,0')
     nf = V('1 2x,1')
     tf = V('0 4x1,0')
-    np = V('12/6,10')
+    np = V('12//6,10') << 1
     pitch = V('2x57 54 52 51') + V('.02')
 
     def on(self, frame, chip):
@@ -52,7 +52,7 @@ class Bass:
 
     levels = V('13//12,10'), V('13//5,12')
     timbre = V('12,0') - V('.01')
-    vib = V('5x,/2 5x1/4 -1/2') * V('.145')
+    vib = V('5.5x,/2 5x1/4 -1/2') * V('.145')
 
     def on(self, frame, chip, degree, velocity, vibshift):
         chip.fixedlevel = self.levels[round(velocity[0])][frame]
@@ -62,8 +62,8 @@ class Bass:
 
 class Lead:
 
-    level = V('13 7x12 11/11,0')
-    vib = V('6.25x,/1.25 .1/2.5 -.1/1.25')
+    level = V('13 7x12 11//11,0')
+    vib = V('6.75x,/1.25 .1/2.5 -.1/1.25')
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = self.level[frame]
@@ -73,8 +73,8 @@ class Lead:
 
 class Pluck:
 
-    level = V('13//7,6') - V('1,0')
-    vib = V('.5x,.1/2.5 -.1/2.5')
+    level = V('13//13,0')
+    vib = V('/1.25,.1/2.5 -.1/2.5') << .25
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = self.level[frame]

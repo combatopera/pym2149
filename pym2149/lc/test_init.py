@@ -112,27 +112,27 @@ class TestV(unittest.TestCase):
 
     def test_bias(self):
         v = V('13//12 10/1')
-        self.assertEqual(13.375, v[0])
-        self.assertEqual(13.125, v[1])
-        self.assertEqual(12.875, v[2])
-        self.assertEqual(12.625, v[3])
-        self.assertEqual(10.875, v[10])
-        self.assertEqual(10.625, v[11])
+        self.assertEqual(13.375, v[.5])
+        self.assertEqual(13.125, v[1.5])
+        self.assertEqual(12.875, v[2.5])
+        self.assertEqual(12.625, v[3.5])
+        self.assertEqual(10.875, v[10.5])
+        self.assertEqual(10.625, v[11.5])
         self.assertEqual(10, v[12])
         self.assertEqual(11.5, v[12.5]) # Unbiased.
-        self.assertEqual(13.375, v[13])
-        self.assertEqual(13.125, v[14])
+        self.assertEqual(13.375, v[13.5])
+        self.assertEqual(13.125, v[14.5])
 
     def test_bias2(self):
         v = V('12//5,13')
-        self.assertAlmostEqual(11.6, v[0])
-        self.assertAlmostEqual(11.8, v[1])
-        self.assertAlmostEqual(12, v[2])
-        self.assertAlmostEqual(12.2, v[3])
-        self.assertAlmostEqual(12.4, v[4])
-        self.assertAlmostEqual(13, v[5])
-        self.assertAlmostEqual(13, v[6])
-        self.assertAlmostEqual(13, v[7])
+        self.assertAlmostEqual(11.6, v[.5])
+        self.assertAlmostEqual(11.8, v[1.5])
+        self.assertAlmostEqual(12, v[2.5])
+        self.assertAlmostEqual(12.2, v[3.5])
+        self.assertAlmostEqual(12.4, v[4.5])
+        self.assertAlmostEqual(13, v[5.5])
+        self.assertAlmostEqual(13, v[6.5])
+        self.assertAlmostEqual(13, v[7.5])
         self.assertAlmostEqual(13, v[99])
 
     def test_bias3(self):

@@ -47,7 +47,7 @@ class Section(BaseSection):
 class BiasSection(BaseSection):
 
     def getvalue(self, frame, xadjust):
-        return self.initial + frame * self.perframe + self.bias
+        return self.initial + (frame - .5) * self.perframe + self.bias
 
     def unbiased(self, frame):
         return self.initial + frame * self.perframe
@@ -113,6 +113,9 @@ class Operators:
 
     def __or__(self, that):
         return Then(self, that, self, that)
+
+    def __lshift__(self, frames):
+        return self >> -frames
 
     def __rshift__(self, frames):
         return RShift(self, frames)
