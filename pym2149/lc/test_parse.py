@@ -20,26 +20,30 @@ import unittest
 
 class TestVParse(unittest.TestCase):
 
+    @staticmethod
+    def _perframes(sections):
+        return [getattr(s, 'perframe', None) for s in sections.sections]
+
     def test_works(self):
-        sections = VParse(float, 0)('1 2 .5', None)
+        sections = VParse(float, 0)('1/1 2/1 .5/1', None)
         self.assertEqual([0, 1, 2], sections.frames)
         self.assertEqual(3, sections.len)
         self.assertEqual([1, 2, .5], [s.initial for s in sections.sections])
-        self.assertEqual([1, -1.5, .5], [s.perframe for s in sections.sections])
+        self.assertEqual([1, -1.5, .5], self._perframes(sections))
 
     def test_widths(self):
-        sections = VParse(float, 0)('1x 2x1 .5x2', None) # Default value is 0.
+        sections = VParse(float, 0)('1x/1 2x1/1 .5x2/.5', None) # Default value is 0.
         self.assertEqual([0, 1, 2, 3], sections.frames)
         self.assertEqual(3.5, sections.len)
         self.assertEqual([0, 1, 1, 2], [s.initial for s in sections.sections])
-        self.assertEqual([1, None, 1, -4], [getattr(s, 'perframe', None) for s in sections.sections])
+        self.assertEqual([1, None, 1, -4], self._perframes(sections))
 
     def test_slides(self):
-        sections = VParse(float, 0)('5/.5 4/1 3/2 2', None) # Width of first word still implicitly 1.
+        sections = VParse(float, 0)('5/.5 4/1 3/2 2/1', None) # Width of first word still implicitly 1.
         self.assertEqual([0, .5, 1, 2, 4], sections.frames)
         self.assertEqual(5, sections.len)
         self.assertEqual([5, 5, 4, 3, 2], [s.initial for s in sections.sections])
-        self.assertEqual([None, -2, -1, -.5, 3], [getattr(s, 'perframe', None) for s in sections.sections])
+        self.assertEqual([None, -2, -1, -.5, 3], self._perframes(sections))
 
     def test_x(self):
         with self.assertRaises(BadWordException) as cm:
@@ -52,18 +56,18 @@ class TestVParse(unittest.TestCase):
         self.assertEqual(('/',), cm.exception.args)
 
     def test_combo(self):
-        sections = VParse(float, 0)('3x4/5 0', None) # Total width is biggest explicit number.
+        sections = VParse(float, 0)('3x4/5 0/1', None) # Total width is biggest explicit number.
         self.assertEqual([0, 5], sections.frames)
         self.assertEqual(6, sections.len)
         self.assertEqual([4, 0], [s.initial for s in sections.sections])
-        self.assertEqual([-.8, 4], [s.perframe for s in sections.sections])
+        self.assertEqual([-.8, 4], self._perframes(sections))
 
     def test_halfnotes(self):
-        sections = VParse(float, 0)('2.5x4 0', None) # Implicit slide is still 1.
+        sections = VParse(float, 0)('2.5x4/1 0/1', None) # Implicit slide is still 1.
         self.assertEqual([0, 1.5, 2.5], sections.frames)
         self.assertEqual(3.5, sections.len)
         self.assertEqual([4, 4, 0], [s.initial for s in sections.sections])
-        self.assertEqual([None, -4, 4], [getattr(s, 'perframe', None) for s in sections.sections])
+        self.assertEqual([None, -4, 4], self._perframes(sections))
 
 class TestEParse(unittest.TestCase):
 

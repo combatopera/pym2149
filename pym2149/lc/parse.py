@@ -83,7 +83,7 @@ class VParse(Parse):
             if bias is not None:
                 bias = len(bias) - 1
             slash = m.group(6)
-            slide = min(width, 1) if slash is None else float(slash)
+            slide = 0 if slash is None else float(slash)
             if not self.sections.empty():
                 self._wrap(initial)
             hold = width - slide

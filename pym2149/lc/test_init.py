@@ -34,14 +34,14 @@ class TestV(unittest.TestCase):
         self.assertEqual(2, v[.5])
 
     def test_slide(self):
-        v = V('0 5')
+        v = V('0/1 5/1')
         self.assertEqual(0, v[0])
         self.assertEqual(5, v[1])
         self.assertEqual(2.5, v[.5])
         self.assertEqual(2.5, v[1.5])
 
     def test_slide2(self):
-        v = V('0/5 5')
+        v = V('0/5 5/1')
         self.assertEqual(0, v[0])
         self.assertEqual(1, v[1])
         self.assertEqual(5, v[5])
@@ -49,13 +49,13 @@ class TestV(unittest.TestCase):
         self.assertEqual(2.5, v[5.5])
 
     def test_short(self):
-        v = V('.5x7 8')
+        v = V('.5x7/.5 8')
         self.assertEqual(7, v[0])
         self.assertEqual(7.5, v[.25])
         self.assertEqual(8, v[.5])
 
     def test_mul(self):
-        v = V('5x0 5')
+        v = V('5x0/1 5')
         self.assertEqual(0, v[0])
         self.assertEqual(0, v[4])
         self.assertEqual(2.5, v[4.5])
@@ -76,7 +76,7 @@ class TestV(unittest.TestCase):
         self.assertEqual(5, v[5])
 
     def test_step(self):
-        v = V('1 2 3', step = 5)
+        v = V('1 2 3/1', step = 5)
         self.assertEqual(1, v[0])
         self.assertEqual(3, v[2])
         self.assertEqual(6, v[3])
@@ -92,7 +92,7 @@ class TestV(unittest.TestCase):
         self.assertEqual(-4, v[-3])
 
     def test_loop(self):
-        v = V('1 2,3 4')
+        v = V('1 2,3 4/1')
         self.assertEqual(1, v[0])
         self.assertEqual(2, v[1])
         self.assertEqual(3, v[2])
@@ -111,7 +111,7 @@ class TestV(unittest.TestCase):
         self.assertEqual(6.25, v[100])
 
     def test_bias(self):
-        v = V('13//12 10')
+        v = V('13//12 10/1')
         self.assertEqual(13.375, v[0])
         self.assertEqual(13.125, v[1])
         self.assertEqual(12.875, v[2])
@@ -171,7 +171,7 @@ class TestD(unittest.TestCase):
         self.assertEqual([1, 1, 0], list(d[1]))
 
     def test_inversions(self):
-        invs = D('1 3 1 5').inversions()
+        invs = D('1/1 3/1 1/1 5/1').inversions()
         self.assertEqual(3, len(invs))
         xform = lambda i: [complex(*reversed(invs[i][x / 2][:2])) for x in range(8)]
         self.assertEqual([0, 1, 2, 1, 0, 2, 4, 2], xform(0))
@@ -179,7 +179,7 @@ class TestD(unittest.TestCase):
         self.assertEqual([4, .5j+2, 1j, .5j+2, 4, .5j+3, 1j+2, .5j+3], xform(2))
 
     def test_inversions2(self):
-        invs = D('1 2x3 5 +').inversions()
+        invs = D('1/1 2x3/1 5/1 +/1').inversions()
         self.assertEqual(3, len(invs))
         xform = lambda i: [complex(*reversed(invs[i][x / 2][:2])) for x in range(10)]
         self.assertEqual([0, 1, 2, 2, 2, 3, 4, .5j+2, 1j, .5j], xform(0))
