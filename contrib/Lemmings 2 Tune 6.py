@@ -95,21 +95,21 @@ class Lead:
 
     levels = V('4x15 17x14 6x13,12'), V('4x15,14'), V('4x15,14')
     offlevel = V('5x14 13//24,9')
-    vibs = V('0'), V('0'), V('7.5x /3.5,.30/7 -.30/7')
+    vibs = V('0'), V('0'), V('8x /3.5,.30/7 -.30/7')
 
-    def _common(self, frame, chip, degree, velocity, slide):
+    def _common(self, frame, chip, degree, velocity):
         velocity = round(velocity[0])
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame * slide[0]]) + self.vibs[velocity][frame]
+        chip.tonepitch = chip.topitch(degree[frame]) + self.vibs[velocity][frame]
         return velocity
 
-    def on(self, frame, chip, degree, velocity, slide):
-        velocity = self._common(frame, chip, degree, velocity, slide)
+    def on(self, frame, chip, degree, velocity):
+        velocity = self._common(frame, chip, degree, velocity)
         chip.fixedlevel = self.levels[velocity][frame]
 
-    def off(self, frame, chip, degree, velocity, slide, onframes):
-        self._common(frame, chip, degree, velocity, slide)
+    def off(self, frame, chip, degree, velocity, onframes):
+        self._common(frame, chip, degree, velocity)
         chip.fixedlevel = self.offlevel[frame - onframes]
 
 class Tone:
@@ -144,7 +144,7 @@ class Diarp:
 class Ramp:
 
     level = V('4x15,14')
-    tp = V('-4/4 /4') * V('/128 64')
+    tp = (V('-4/4 /4') * V('/128 64')) >> .5
     vib = .06
 
     def on(self, frame, chip, degree):
@@ -157,8 +157,7 @@ class Ramp:
 def lead1(lastoff):
     return E(Lead, "3x2 2x|4x 2 2x|2 1.5 .5 4x|2 1.5 .5 4x|3x2 2x|4x 4/%s" % lastoff,
             degree = D('2x3 2x2 3x 2|3 5 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x'),
-            velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'),
-            slide = V('16x|5x 1 2x|5x 1 2x|8x|0 1 6x'))
+            velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
 snare1 = E(Snare, '.5 1 .5 1 .5 1 2x.25 6x.5')
 snare2 = E(Snare, '/3.5 4.5')
@@ -209,8 +208,7 @@ lead2 = E(Tone, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2x2/1 4x',
         degree = D('-') + D('2x 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x/.5 .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#-/.5 .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
 lead3 = E(Lead, '6 1 3 1 3 1 3 1 3 2|4 /4',
         degree = D('+') + D('6x/.5 3 3x2 3 3x/.5 3 3x2 3 3x4 2x|8x2'),
-        velocity = V('2'),
-        slide = V('6x1 5x 3x1 18x'))
+        velocity = V('2'))
 lead4 = E(Ping, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 6/5',
         degree = D('++') + D('2x 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x 1.5x3/.5 .5x2 .5x3 .5x2 2x3 1|8x2'),
         velocity = V('26x1 6x'))
