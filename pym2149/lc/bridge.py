@@ -118,7 +118,7 @@ class LiveCodingBridge(Prerecorded):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
-                    pattern[cursor + .5 / speed](cursor, speed, proxy, pattern.kwargs)
+                    pattern[cursor + .5 / speed](cursor, speed, proxy, pattern.kwargs) # TODO: Review fudge.
 
     def _initialcursor(self):
         cursor = 0
@@ -147,7 +147,7 @@ class LiveCodingBridge(Prerecorded):
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, speed, *self._sectionandcursor(speed, frameindex))
-                frameindex += 1
+                frameindex += 1 # TODO: Not when song is empty.
             yield frame
             oldspeed, speed = speed, self.context.speed
             if oldspeed != speed:
