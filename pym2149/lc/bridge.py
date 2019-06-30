@@ -114,11 +114,11 @@ class LiveCodingBridge(Prerecorded):
                 proxy.noiseflag = False
                 proxy.toneflag = False
 
-        def _step(self, speed, section, cursor):
+        def _step(self, speed, section, frame):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
-                    pattern[cursor](cursor * speed, speed, proxy, pattern.kwargs)
+                    pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
     def _initialcursor(self):
         cursor = 0
@@ -131,12 +131,12 @@ class LiveCodingBridge(Prerecorded):
             cursor += k
         raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
 
-    def _sectionandcursor(self, speed, frame):
+    def _sectionandframe(self, speed, frame):
         while True:
             for section, k in zip(self.context.sections, self.context.sectionlens):
                 k *= speed
                 if frame < k:
-                    return section, frame / speed
+                    return section, frame
                 frame -= k
 
     def frames(self, chip):
@@ -146,7 +146,7 @@ class LiveCodingBridge(Prerecorded):
         while self.loop or frameindex < sum(self.context.sectionlens) * speed:
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
-                frame = partial(session._step, speed, *self._sectionandcursor(speed, frameindex))
+                frame = partial(session._step, speed, *self._sectionandframe(speed, frameindex))
                 frameindex += 1 # TODO: Not when song is empty.
             yield frame
             oldspeed, speed = speed, self.context.speed
