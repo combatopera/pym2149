@@ -118,7 +118,7 @@ class LiveCodingBridge(Prerecorded):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
-                    pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
+                    pattern[frame / speed](frame, speed, proxy, pattern.kwargs)
 
     def _initialcursor(self):
         cursor = 0
