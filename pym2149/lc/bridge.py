@@ -92,7 +92,7 @@ class LiveCodingBridge(Prerecorded):
     def __init__(self, config, tuning, context):
         self.nomclock = config.nominalclock
         self.loop = not config.ignoreloop
-        self.section = config.section
+        self.sectionname = config.section
         self.chancount = config.chipchannels
         self.tuning = tuning
         self.context = context
@@ -120,20 +120,20 @@ class LiveCodingBridge(Prerecorded):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
                     pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
-    def _initialframe(self):
-        frameindex = 0
-        if self.section is None:
-            return frameindex
-        section = getattr(self.context, self.section)
+    def _initialcursor(self):
+        cursor = 0
+        if self.sectionname is None:
+            return cursor
+        section = getattr(self.context, self.sectionname)
         for s, k in zip(self.context.sections, self.context.sectionlens):
             if section == s:
-                return frameindex
-            frameindex += k * self.context.speed
-        raise NoSuchSectionException(self.section) # FIXME: And stop threads.
+                return cursor
+            cursor += k
+        raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
 
     def frames(self, chip):
         session = self.Session(chip)
-        frameindex = self._initialframe()
+        frameindex = self._initialcursor() * self.context.speed
         def sectionandframe():
             frame = frameindex
             while True:
