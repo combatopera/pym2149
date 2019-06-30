@@ -297,10 +297,10 @@ class Concat(Binary):
 
     def getitem(self, frame, shift):
         split = self.p1.sections.len
-        if frame < split:
+        if frame - shift < split:
             return self.p1.getitem(frame, shift)
         else:
-            return self.p2.getitem(frame, split)
+            return self.p2.getitem(frame, shift + split)
 
 class Then(Binary):
 
