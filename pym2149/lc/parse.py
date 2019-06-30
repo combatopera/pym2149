@@ -35,9 +35,9 @@ class StepScript(Script):
 
     mulcls = Mul
 
-    def __init__(self, sections, kwargs):
+    def __init__(self, sections, kwargs, step):
         super().__init__(sections, kwargs)
-        self.step = sections.step()
+        self.step = step
 
     def getitem(self, frame, shift):
         return super().getitem(frame, shift) + (frame - shift) // self.sections.len * self.step

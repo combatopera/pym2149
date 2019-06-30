@@ -17,11 +17,12 @@
 
 def V(script, step = 0):
     from .parse import concat, StepScript, VParse
-    return concat(StepScript, VParse(float, step), script, {})
+    return concat(lambda *args: StepScript(*args, step), VParse(float, step), script, {})
 
 def D(script):
     from .parse import concat, StepScript, VParse, vector
-    return concat(StepScript, VParse(vector, 0), script, {})
+    step = 0
+    return concat(lambda *args: StepScript(*args, step), VParse(vector, step), script, {})
 
 def E(cls, script, **kwargs):
     from .parse import concat, Script, EParse, NoteWrapper

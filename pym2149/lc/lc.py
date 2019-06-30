@@ -94,10 +94,6 @@ class Sections:
         sectionframe, section = self.at(bisect.bisect(self.frames, relframe) - 1)
         return section.getvalue(relframe - sectionframe, absframe - relframe + xadjust)
 
-    def step(self):
-        # FIXME: This assumes the last section isn't flat.
-        return self.sections[-1].unbiased(self.len - self.frames[-1]) - self.sections[0].unbiased(0)
-
 class Operators:
 
     def __getitem__(self, frame):
@@ -140,7 +136,7 @@ class Operators:
         for _ in range(len(degrees)):
             sections = Sections()
             sections.init(self.sections, (degrees[index] + np.array([octave, 0, 0]) for index, octave in refs))
-            invs.append(type(self)(sections, self.kwargs))
+            invs.append(type(self)(sections, self.kwargs, self.step))
             degrees.append(degrees.pop(0) + np.array([1, 0, 0]))
         return invs
 
