@@ -83,6 +83,14 @@ class TestV(unittest.TestCase):
         self.assertEqual(4.5, v[2.5])
         self.assertEqual(-4, v[-3])
 
+    def test_step2(self):
+        v = V('1 2 3/0', step = 5)
+        self.assertEqual(1, v[0])
+        self.assertEqual(3, v[2])
+        self.assertEqual(6, v[3])
+        self.assertEqual(4.5, v[2.5])
+        self.assertEqual(-4, v[-3])
+
     def test_loop(self):
         v = V('1 2,3 4')
         self.assertEqual(1, v[0])
