@@ -135,6 +135,18 @@ class TestV(unittest.TestCase):
         self.assertAlmostEqual(13, v[7])
         self.assertAlmostEqual(13, v[99])
 
+    def test_bias3(self):
+        v = V('12//5,13') >> -1
+        self.assertAlmostEqual(11.6, v[-1])
+        self.assertAlmostEqual(11.8, v[0])
+        self.assertAlmostEqual(12, v[1])
+        self.assertAlmostEqual(12.2, v[2])
+        self.assertAlmostEqual(12.4, v[3])
+        self.assertAlmostEqual(13, v[4])
+        self.assertAlmostEqual(13, v[5])
+        self.assertAlmostEqual(13, v[6])
+        self.assertAlmostEqual(13, v[99])
+
     def test_doubleshift(self):
         v = (V('/100 100') >> -5).of(10) >> 1
         for x, y in outerzip([5, 5.1, 5.2, 5.3, 5.4], [v[i] for i in range(1, 6)]):
