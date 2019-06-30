@@ -95,6 +95,7 @@ class Sections:
         return section.getvalue(relframe - sectionframe, absframe - relframe + xadjust)
 
     def step(self):
+        # FIXME: This assumes the last section isn't flat.
         return self.sections[-1].unbiased(self.len - self.frames[-1]) - self.sections[0].unbiased(0)
 
 class Operators:
