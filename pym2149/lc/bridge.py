@@ -88,6 +88,8 @@ class NoSuchSectionException(Exception): pass
 
 class LiveCodingBridge(Prerecorded):
 
+    bias = .5
+
     @types(Config, Tuning, Context)
     def __init__(self, config, tuning, context):
         self.nomclock = config.nominalclock
@@ -120,21 +122,20 @@ class LiveCodingBridge(Prerecorded):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
                     pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
-    def _initialcursor(self):
-        cursor = 0
+    def _initialframe(self):
+        frame = 0
         if self.sectionname is None:
-            return cursor
+            return frame
         section = getattr(self.context, self.sectionname)
-        for s, k in zip(self.context.sections, self.context.sectionlens):
+        for s, k in zip(self.context.sections, self.context.sectionframecounts):
             if section == s:
-                return cursor
-            cursor += k
+                return frame
+            frame += k
         raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
 
     def _sectionandframe(self, speed, frame):
         while True:
-            for section, k in zip(self.context.sections, self.context.sectionlens):
-                k *= speed
+            for section, k in zip(self.context.sections, self.context.sectionframecounts):
                 if frame < k:
                     return section, frame
                 frame -= k
@@ -142,8 +143,8 @@ class LiveCodingBridge(Prerecorded):
     def frames(self, chip):
         session = self.Session(chip)
         speed = self.context.speed
-        frameindex = self._initialcursor() * speed + .5
-        while self.loop or frameindex < sum(self.context.sectionlens) * speed:
+        frameindex = self._initialframe() + self.bias
+        while self.loop or frameindex < sum(self.context.sectionframecounts):
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, speed, *self._sectionandframe(speed, frameindex))
@@ -151,4 +152,4 @@ class LiveCodingBridge(Prerecorded):
             yield frame
             oldspeed, speed = speed, self.context.speed
             if oldspeed != speed:
-                frameindex = (frameindex - .5) / oldspeed * speed + .5
+                frameindex = (frameindex - self.bias) / oldspeed * speed + self.bias

@@ -71,5 +71,5 @@ class ContextImpl(Context):
         return property(g)
 
     @_cachedproperty
-    def sectionlens(self):
-        return [max(pattern.len for pattern in section) for section in self.sections]
+    def sectionframecounts(self):
+        return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
