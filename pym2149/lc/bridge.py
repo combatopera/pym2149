@@ -123,14 +123,14 @@ class LiveCodingBridge(Prerecorded):
                     pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
 
     def _initialframe(self):
-        frame = 0
+        frameindex = 0
         if self.sectionname is None:
-            return frame
+            return frameindex
         section = getattr(self.context, self.sectionname)
         for s, k in zip(self.context.sections, self.context.sectionframecounts):
             if section == s:
-                return frame
-            frame += k
+                return frameindex
+            frameindex += k
         raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
 
     def _sectionandframe(self, speed, frame):
