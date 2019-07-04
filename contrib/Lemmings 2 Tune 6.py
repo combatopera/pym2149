@@ -37,9 +37,9 @@ class Boop(CommonDrum):
     basedegree = D('++')
 
     def on(self, frame, chip, degree, attenuation = V('0'), np = V('21')):
-        if super()._on(frame, chip, np[0]):
-            chip.fixedlevel -= attenuation[0]
-            chip.tonepitch = chip.topitch((self.basedegree + degree)[0])
+        if super()._on(frame, chip, np[frame]):
+            chip.fixedlevel -= attenuation[frame]
+            chip.tonepitch = chip.topitch((self.basedegree + degree)[frame])
 
 class Fill(Boop):
 
@@ -63,7 +63,7 @@ class Side:
         chip.toneflag = self.tf[frame]
         if chip.noiseflag and not any(channel.noiseflag for channel in chip[1:]):
             chip.noiseperiod = self.np
-        chip.tonepitch = chip.topitch(degree[0])
+        chip.tonepitch = chip.topitch(degree[frame])
 
 class Open:
 
@@ -73,11 +73,11 @@ class Open:
     def on(self, frame, chip, attenuation = V('0'), np = V('1')):
         if frame >= 8:
             return
-        chip.fixedlevel = self.level[frame] - attenuation[0]
+        chip.fixedlevel = self.level[frame] - attenuation[frame]
         chip.noiseflag = self.nf[frame]
         chip.toneflag = False
         if chip.noiseflag:
-            chip.noiseperiod = np[0]
+            chip.noiseperiod = np[frame]
 
 class Bass:
 
@@ -86,10 +86,10 @@ class Bass:
     basedegree = D('-')
 
     def on(self, frame, chip, degree, velocity):
-        chip.fixedlevel = self.levels[round(velocity[0])][frame]
+        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
         chip.noiseflag = False
         chip.toneflag = self.tf[frame]
-        chip.tonepitch = chip.topitch((self.basedegree + degree)[0])
+        chip.tonepitch = chip.topitch((self.basedegree + degree)[frame])
 
 class Lead:
 
@@ -98,7 +98,7 @@ class Lead:
     vibs = V('0'), V('0'), V('8x /3.5,.30/7 -.30/7')
 
     def _common(self, frame, chip, degree, velocity):
-        velocity = round(velocity[0])
+        velocity = round(velocity[frame])
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame]) + self.vibs[velocity][frame]
@@ -120,26 +120,26 @@ class Tone:
         chip.fixedlevel = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[0])
+        chip.tonepitch = chip.topitch(degree[frame])
 
 class Ping:
 
     levels = V('12//16,8'), V('14//16,10')
 
     def on(self, frame, chip, degree, velocity):
-        chip.fixedlevel = self.levels[round(velocity[0])][frame]
+        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[0])
+        chip.tonepitch = chip.topitch(degree[frame])
 
 class Diarp:
 
     def on(self, frame, chip, degree0, degree1, level):
-        chip.fixedlevel = level[0]
+        chip.fixedlevel = level[frame]
         chip.noiseflag = False
         chip.toneflag = True
         degree = degree0 if frame % 8 < 4 else degree1
-        chip.tonepitch = chip.topitch(degree[0])
+        chip.tonepitch = chip.topitch(degree[frame])
 
 class Ramp:
 
@@ -151,7 +151,7 @@ class Ramp:
         chip.fixedlevel = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[0]) + self.vib
+        chip.tonepitch = chip.topitch(degree[frame]) + self.vib
         chip.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
@@ -165,20 +165,20 @@ bass1 = E(Bass, '4x1.5 2x',
         degree = D('7x- 7--'),
         velocity = V('0'))
 bass2 = E(Bass, '1 2x.5 2x',
-        degree = D('1 ++/.5 5- 7|1 .5x++ .5x+ 5- 7'),
+        degree = D('1 ++ 5- 7|1 .5x++ .5x+ 5- 7'),
         velocity = V('1'))
 bass3 = bass2 | E(Bass, '1 2x.5 2x',
-        degree = D('6- 6/.5 3- 3|6- 6/.5 3- 3|4- 4/.5 1 4|4- 4/.5 1 4|7- 7/.5 4 7|7- 7/.5 4 7'),
+        degree = D('6- 6 3- 3|6- 6 3- 3|4- 4 1 4|4- 4 1 4|7- 7 4 7|7- 7 4 7'),
         velocity = V('1'))
 bass4 = bass2 | E(Bass, '1 2x.5 2x',
-        degree = D('6- 6/.5 3- 3|6- 6/.5 3- 6|1 ++/.5 5- 7|1 .5x++ .5x+ 5- 7|7- 7/.5 4 7|7- 7/.5 4 7'),
+        degree = D('6- 6 3- 3|6- 6 3- 6|1 ++ 5- 7|1 .5x++ .5x+ 5- 7|7- 7 4 7|7- 7 4 7'),
         velocity = V('1'))
 ramp = E(Ramp, '8',
         degree = D('4'))
 diarp = E(Diarp, '8x4',
         degree0 = D('4x3+ 4x2+'),
         degree1 = D('+'),
-        level = V('16x15 14/12 4x11'))
+        level = V('16x15 14//12 4x11'))
 boop1 = E(Boop, '/3.5 2x2 .5',
         degree = D('3'))
 boop2 = E(Boop, '/11.5 1 2x.5 1 3x.5',
@@ -205,12 +205,12 @@ open4 = E(Open, '.5',
         attenuation = V('1 3 2 1 3 2 1 3 2 1 3 2 1 3 2 4').of(.5),
         np = V('2x1 4x21 1 7x21 2x1').of(.5))
 lead2 = E(Tone, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2x2/1 4x',
-        degree = D('-') + D('2x 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x/.5 .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#-/.5 .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
+        degree = D('-') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#- .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
 lead3 = E(Lead, '6 1 3 1 3 1 3 1 3 2|4 /4',
         degree = D('+') + D('6x/.5 3 3x2 3 3x/.5 3 3x2 3 3x4 2x|8x2'),
         velocity = V('2'))
 lead4 = E(Ping, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 6/5',
-        degree = D('++') + D('2x 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x3/.5 .5x2 .5x3 .5x2 3 1 7-|2x 1.5x3/.5 .5x2 .5x3 .5x2 2x3 1|8x2'),
+        degree = D('++') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x 1.5x3 .5x2 .5x3 .5x2 2x3 1|8x2'),
         velocity = V('26x1 6x'))
 fill = E(Fill, '/28 8x.5',
         degree = D('3 2').of(.5))
