@@ -154,9 +154,9 @@ class Ramp:
         chip.tonepitch = chip.topitch(degree[0]) + self.vib
         chip.toneperiod += self.tp[frame]
 
-def lead1(lastoff):
+def lead1(firstslide, lastoff):
     return E(Lead, "3x2 2x|4x 2 2x|2 1.5 .5 4x|2 1.5 .5 4x|3x2 2x|4x 4/%s" % lastoff,
-            degree = D('2x3 2x2 3x 2|3 5 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x'),
+            degree = D("2x3 2x2 3x 2|3 5/%s 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x" % firstslide),
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
 snare1 = E(Snare, '.5 1 .5 1 .5 1 2x.25 6x.5')
@@ -217,13 +217,13 @@ fill = E(Fill, '/28 8x.5',
 A = snare1, bass1 * 4, boop1 & side1 & open1 & kick
 B = snare1, ramp, boop1 & side1 & open1 & kick
 C = bass2, diarp, boop2 & side2 & open2 & snare2 & kick
-F = bass2, lead1(2), boop2 & side2 & open2 & snare2 & kick
+F = bass2, lead1(0, 2), boop2 & side2 & open2 & snare2 & kick
 G = bass3, lead2 * 2, open3 & snare2 & side3 & kick
 H = lead3 & fill, lead2 * 2, bass3
 I = boop2 & side2 & open2 & snare2 & kick, lead4 * 2, bass4
 J = boop2 & side2 & open2 & snare2 & kick, unit, bass2 * 4
 K = boop1 * 4 & side2[:8] & open2[:8] & snare2 & kick, open4, boop3
-L = boop2 & side2 & open2 & snare2 & kick, side4 * 2 | lead1(1) | side4 * 2, boop4
+L = boop2 & side2 & open2 & snare2 & kick, side4 * 2 | lead1(.25, 1) | side4 * 2, boop4
 sections = A, B, C, F, G, H, I, J, K, L
 tonic = B3
 speed = 16
