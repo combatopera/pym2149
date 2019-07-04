@@ -331,7 +331,7 @@ class Then(Binary):
         else:
             return self.p2.getitem(frame, shift + self.len1.len * (1 + loop))
 
-class Slice:
+class Slice(Operators):
 
     @property
     def kwargs(self):
