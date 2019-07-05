@@ -150,7 +150,7 @@ class EParse(Parse):
 
 class NoteWrapper:
 
-    def __init__(self, cls):
+    def __init__(self, cls, init):
         def params(name):
             try:
                 unbound = getattr(cls, name)
@@ -160,3 +160,7 @@ class NoteWrapper:
         self.onparams = params('on')
         self.offparams = params('off')
         self.cls = cls
+        self.init = init
+
+    def new(self):
+        return self.cls(*self.init)

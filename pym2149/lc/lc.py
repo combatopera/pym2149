@@ -163,7 +163,7 @@ class Event:
         self.namespace = namespace
 
     def __call__(self, frame, speed, chipproxy, kwargs):
-        note = self.note.cls() # XXX: Allow a note to maintain state?
+        note = self.note.new() # XXX: Allow a note to maintain state?
         def noteargs(params, shift, **extras):
             for name in params:
                 if name in extras:

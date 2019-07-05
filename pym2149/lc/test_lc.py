@@ -29,7 +29,7 @@ class TestEvent(unittest.TestCase):
                 calls.append(['on', frame, hmm[0], hmm[frame]])
             def off(self, frame, onframes, hmm):
                 calls.append(['off', frame, hmm[0], hmm[frame], onframes])
-        self.cls = MyNote
+        self.new = MyNote
         self.onparams = ['frame', 'hmm']
         self.offparams = ['frame', 'onframes', 'hmm']
         e = Event(35, None, self, namespace)
