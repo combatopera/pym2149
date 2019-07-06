@@ -7,14 +7,13 @@ class CommonDrum:
     tf = nf = V('4x1,0')
 
     def _on(self, frame, chip, np):
-        if frame >= 4:
-            return
-        chip.fixedlevel = self.level[frame]
-        chip.noiseflag = self.nf[frame]
-        chip.toneflag = self.tf[frame]
-        if chip.noiseflag and not any(channel.noiseflag for channel in chip[1:]):
-            chip.noiseperiod = np
-        return True
+        if frame < 4:
+            chip.fixedlevel = self.level[frame]
+            chip.noiseflag = self.nf[frame]
+            chip.toneflag = self.tf[frame]
+            if chip.noiseflag and not any(channel.noiseflag for channel in chip[1:]):
+                chip.noiseperiod = np
+            return True
 
 class Kick(CommonDrum):
 
