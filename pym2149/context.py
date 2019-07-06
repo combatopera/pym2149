@@ -37,6 +37,12 @@ class ContextImpl(Context):
             self.cache = {}
             self.data = data
 
+        def getattr(self, name):
+            try:
+                return self.data[name]
+            except KeyError:
+                raise AttributeError(name)
+
         def cached(self, name, factory):
             try:
                 value = self.cache[name]
@@ -49,12 +55,6 @@ class ContextImpl(Context):
             exec(text, data) # XXX: Impact of modifying mutable objects?
             return type(self)(data), {name: obj for name, obj in data.items()
                     if name not in self.data or obj is not self.data[name]}
-
-        def getattr(self, name):
-            try:
-                return self.data[name]
-            except KeyError:
-                raise AttributeError(name)
 
     @types(Config)
     def __init__(self, config):
