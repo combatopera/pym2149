@@ -120,7 +120,7 @@ class LiveCodingBridge(Prerecorded):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
-                    pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs)
+                    pattern.of(speed)[frame](frame, speed, proxy, pattern.kwargs, self.context._proxy)
 
     def _initialframe(self):
         frameindex = 0

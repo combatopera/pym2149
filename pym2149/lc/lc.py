@@ -162,7 +162,7 @@ class Event:
         self.note = note
         self.namespace = namespace
 
-    def __call__(self, frame, speed, chipproxy, kwargs):
+    def __call__(self, frame, speed, chipproxy, kwargs, context):
         note = self.note.new() # XXX: Allow a note to maintain state?
         def noteargs(params, shift, **extras):
             for name in params:
@@ -176,11 +176,11 @@ class Event:
                         yield name, (kwargs[key] >> -self.absframe).of(speed) >> shift
         if self.onframes is None:
             if self.note.onparams is not None:
-                note.on(**dict(noteargs(self.note.onparams, 0, chip = chipproxy)))
+                note.on(**dict(noteargs(self.note.onparams, 0, context = context, chip = chipproxy)))
         else:
             if self.note.offparams is not None:
                 onframes = self.onframes * speed
-                note.off(**dict(noteargs(self.note.offparams, onframes, chip = chipproxy, onframes = onframes)))
+                note.off(**dict(noteargs(self.note.offparams, onframes, context = context, chip = chipproxy, onframes = onframes)))
 
 class Overlay:
 
