@@ -24,7 +24,7 @@ class ContextImpl(Context):
     class Snapshot:
 
         @classmethod
-        def create(cls, config):
+        def _create(cls, config):
             return cls(dict(
                 __name__ = 'pym2149.context',
                 tuning = config.tuning,
@@ -34,34 +34,34 @@ class ContextImpl(Context):
             ))
 
         def __init__(self, data):
-            self.cache = {}
-            self.data = data
+            self._cache = {}
+            self._data = data
 
         def getattr(self, name):
             try:
-                return self.data[name]
+                return self._data[name]
             except KeyError:
                 raise AttributeError(name)
 
-        def cached(self, name, factory):
+        def _cached(self, name, factory):
             try:
-                value = self.cache[name]
+                value = self._cache[name]
             except KeyError:
-                self.cache[name] = value = factory()
+                self._cache[name] = value = factory()
             return value
 
-        def fork(self, text):
-            data = self.data.copy()
+        def _fork(self, text):
+            data = self._data.copy()
             exec(text, data) # XXX: Impact of modifying mutable objects?
             return type(self)(data), {name: obj for name, obj in data.items()
-                    if name not in self.data or obj is not self.data[name]}
+                    if name not in self._data or obj is not self._data[name]}
 
     @types(Config)
     def __init__(self, config):
-        self._snapshot = self.Snapshot.create(config)
+        self._snapshot = self.Snapshot._create(config)
 
     def _update(self, text):
-        self._snapshot, diff = self._snapshot.fork(text)
+        self._snapshot, diff = self._snapshot._fork(text)
         return diff
 
     def __getattr__(self, name):
@@ -70,7 +70,7 @@ class ContextImpl(Context):
     def _cachedproperty(f):
         name = f.__name__
         def g(self):
-            return self._snapshot.cached(name, lambda: f(self))
+            return self._snapshot._cached(name, lambda: f(self))
         return property(g)
 
     @_cachedproperty
