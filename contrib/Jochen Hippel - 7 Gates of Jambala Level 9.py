@@ -83,24 +83,26 @@ class Arp:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame])
 
-def bass(degreestr):
-    return E(Bass, '1', degree = D(degreestr),
+def bass(degree):
+    return E(Bass, '1', degree = degree,
             velocity = V('1 2x 3x1 0 2x1 2x 2x1 2x 1'),
             vibshift = V('0 6 7x 6 3x 6 2x'))
 
 drums = E(Kick, '3 2x 2 1|3 1 3 1') & E(Snare, '4/3') >> 2
-bass1 = bass('1 2x+ 1 + 1 7 1|4 2x4+ 4 3x4+ 3|7- 2x7 7- 7 7- 1 7-|1 2x+ 1 3x+ 5-')
-bass2 = bass('1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1|7- 2x7 7- 7 7- 4- 7-|7- 2x7 7- 3x7 7-')
+chords1 = D('1 4 7- 1').of(8)
+chords2 = D('1 7-').of(16)
+bass1 = bass(chords1 + D('1 2x+ 1 + 1 7 1|1 2x+ 1 3x+ 7-|1 2x+ 1 + 1 2 1|1 2x+ 1 3x+ 5-'))
+bass2 = bass(chords2 + D('1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1|1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1'))
 arp1 = E(Arp, '1',
-        degree = D('8x 8x4- 8x7- 8x'),
+        degree = D('8x 8x- 16x') + chords1,
         inv = V('8x 8x2 16x'))
 arp2 = E(Arp, '1',
-        degree = D('16x+ 16x7'),
+        degree = D('+') + chords2,
         velocity = V('0'))
 lead = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
-        degree = D('+') + D('4x 5- 2x7- 6x 5- 7- 5-|2x4 2x3 4 2x3 9x|5x7- 4- 6- 7x7- 1 2|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
+        degree = D('+') + chords1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
 pluck = E(Pluck, '.5',
-        degree = D('+ 1 - 2+ 2 - 3+ 3 3- 2+ 2 2- 3+ 3 3- 4+|5+ 5 5- 4+ 4 4- 3+ 3 3- 2+ 2 2- 3+ 3 3- 2+|7 7- 7-- + 1 7-- 2+ 2 2- + 1 - 2+ 2 2- 3+|4+ 4 4- 3+ 3 3- 2+ 2 2- + 1 - 2+ 2 2- +').of(.5))
+        degree = chords2 + D('+ 1 - 2+ 2 - 3+ 3 3- 2+ 2 2- 3+ 3 3- 4+|5+ 5 5- 4+ 4 4- 3+ 3 3- 2+ 2 2- 3+ 3 3- 2+|+ 1 - 2+ 2 - 3+ 3 3- 2+ 2 2- 3+ 3 3- 4+|5+ 5 5- 4+ 4 4- 3+ 3 3- 2+ 2 2- 3+ 3 3- 2+').of(.5))
 hat = E(Hat, '.5')
 A = arp1, bass1 & drums
 B = lead, bass1 & drums, arp1
