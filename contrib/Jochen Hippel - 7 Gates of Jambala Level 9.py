@@ -53,38 +53,35 @@ class Bass:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.timbre)[frame]) + self.vib[frame + vibshift[frame]]
 
-class Lead:
+class Simple:
+
+    def on(self, frame, chip, degree):
+        chip.fixedlevel = self.level[frame]
+        chip.noiseflag = False
+        chip.toneflag = True
+        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
+
+class Lead(Simple):
 
     level = V('13 7x12 11//11,0')
     vib = V('6.75x,/1.25 .1/2.5 -.1/1.25')
 
-    def on(self, frame, chip, degree):
-        chip.fixedlevel = self.level[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
-
-class Pluck:
+class Pluck(Simple):
 
     level = V('13//13,0')
     vib = V('/1.25,.1/2.5 -.1/2.5') << .25
 
-    def on(self, frame, chip, degree):
-        chip.fixedlevel = self.level[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
-
 class Arp:
 
-    levels = [V('13//14,6') - V(text) for text in ['1', '0']]
+    levels = [V('12//14,5')]
+    levels.append(levels[0] + V('1'))
     chords = D('1 3 5 +').inversions()
 
     def on(self, frame, chip, degree, inv, velocity):
         chip.fixedlevel = self.levels[round(velocity[frame])][frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame] + self.chords[round(inv[frame])][frame])
+        chip.tonepitch = chip.topitch((degree + self.chords[round(inv[frame])])[frame])
 
 def bass(degree):
     return E(Bass, '1', degree = D('--') + D(degree),
