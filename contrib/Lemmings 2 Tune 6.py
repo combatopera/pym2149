@@ -78,7 +78,7 @@ class Bass:
     tf = V('8x1,0')
     basedegree = D('-')
 
-    def on(self, frame, chip, degree, velocity):
+    def on(self, frame, chip, degree, velocity = V('1')):
         chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = self.tf[frame]
@@ -155,14 +155,11 @@ bass1 = E(Bass, '4x1.5 2x',
         degree = D('7x- 7--'),
         velocity = V('0'))
 bass2 = E(Bass, '1 2x.5 2x',
-        degree = D('1 ++ 5- 7|1 .5x++ .5x+ 5- 7'),
-        velocity = V('1'))
+        degree = D('1 ++ 5- 7|1 .5x++ .5x+ 5- 7'))
 bass3 = bass2 | E(Bass, '1 2x.5 2x',
-        degree = D('6- 6 3- 3|6- 6 3- 3|4- 4 1 4|4- 4 1 4|7- 7 4 7|7- 7 4 7'),
-        velocity = V('1'))
+        degree = D('6- 6 3- 3|6- 6 3- 3|4- 4 1 4|4- 4 1 4|7- 7 4 7|7- 7 4 7'))
 bass4 = bass2 | E(Bass, '1 2x.5 2x',
-        degree = D('6- 6 3- 3|6- 6 3- 6|1 ++ 5- 7|1 .5x++ .5x+ 5- 7|7- 7 4 7|7- 7 4 7'),
-        velocity = V('1'))
+        degree = D('6- 6 3- 3|6- 6 3- 6|1 ++ 5- 7|1 .5x++ .5x+ 5- 7|7- 7 4 7|7- 7 4 7'))
 ramp = E(Ramp, '8',
         degree = D('4'))
 diarp = E(Diarp, '8x4',
