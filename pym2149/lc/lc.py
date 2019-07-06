@@ -120,7 +120,7 @@ class Operators:
     def __rshift__(self, frames):
         return RShift(self, frames)
 
-    def of(self, beat): # XXX: Misleading naming?
+    def of(self, beat):
         return Of(self, beat)
 
     def inversions(self):
