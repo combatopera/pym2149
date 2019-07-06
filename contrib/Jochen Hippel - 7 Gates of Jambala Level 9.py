@@ -77,7 +77,7 @@ class Arp:
     levels.append(levels[0] + V('1'))
     chords = D('1 3 5 +').inversions()
 
-    def on(self, frame, chip, degree, inv, velocity):
+    def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
         chip.fixedlevel = self.levels[round(velocity[frame])][frame]
         chip.noiseflag = False
         chip.toneflag = True
@@ -93,11 +93,9 @@ bass1 = bass('1 2x+ 1 + 1 7 1|4 2x4+ 4 3x4+ 3|7- 2x7 7- 7 7- 1 7-|1 2x+ 1 3x+ 5-
 bass2 = bass('1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1|7- 2x7 7- 7 7- 4- 7-|7- 2x7 7- 3x7 7-')
 arp1 = E(Arp, '1',
         degree = D('8x 8x4- 8x7- 8x'),
-        inv = V('8x 8x2 16x'),
-        velocity = V('1'))
+        inv = V('8x 8x2 16x'))
 arp2 = E(Arp, '1',
         degree = D('16x+ 16x7'),
-        inv = V('0'),
         velocity = V('0'))
 lead = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
         degree = D('+') + D('4x 5- 2x7- 6x 5- 7- 5-|2x4 2x3 4 2x3 9x|5x7- 4- 6- 7x7- 1 2|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
