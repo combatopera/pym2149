@@ -56,6 +56,16 @@ class ContextImpl(Context):
             return type(self)(data), {name: obj for name, obj in data.items()
                     if name not in self._data or obj is not self._data[name]}
 
+        def _cachedproperty(f):
+            name = f.__name__
+            def g(self):
+                return self._cached(name, lambda: f(self))
+            return property(g)
+
+        @_cachedproperty
+        def sectionframecounts(self):
+            return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
+
     @types(Config)
     def __init__(self, config):
         self._snapshot = self.Snapshot._create(config)
@@ -66,13 +76,3 @@ class ContextImpl(Context):
 
     def __getattr__(self, name):
         return getattr(self._snapshot, name)
-
-    def _cachedproperty(f):
-        name = f.__name__
-        def g(self):
-            return self._snapshot._cached(name, lambda: f(self))
-        return property(g)
-
-    @_cachedproperty
-    def sectionframecounts(self):
-        return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
