@@ -64,15 +64,12 @@ class Side:
 class Open:
 
     level = V('15//6,12')
-    nf = V('8x1,0')
 
     def on(self, frame, chip, attenuation = V('0'), np = V('1')):
-        if frame >= 8:
-            return
-        chip.fixedlevel = self.level[frame] - attenuation[frame]
-        chip.noiseflag = self.nf[frame]
-        chip.toneflag = False
-        if chip.noiseflag:
+        if frame < 8:
+            chip.fixedlevel = self.level[frame] - attenuation[frame]
+            chip.noiseflag = True
+            chip.toneflag = False
             chip.noiseperiod = np[frame]
 
 class Bass:
