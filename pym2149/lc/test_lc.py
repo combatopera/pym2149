@@ -36,11 +36,11 @@ class TestEvent(unittest.TestCase):
         f = Event(40, 5, self, namespace)
         speed = 10
         kwargs = {(namespace, 'hmm'): V('20/80 100')}
-        e(350, speed, self, kwargs)
-        e(360, speed, self, kwargs)
-        e(390, speed, self, kwargs)
-        f(400, speed, self, kwargs)
-        f(410, speed, self, kwargs)
+        e(350, speed, self, kwargs, None)
+        e(360, speed, self, kwargs, None)
+        e(390, speed, self, kwargs, None)
+        f(400, speed, self, kwargs, None)
+        f(410, speed, self, kwargs, None)
         self.assertEqual([
             ['on', 0, 55, 55],
             ['on', 10, 55, 56],
