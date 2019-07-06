@@ -44,14 +44,14 @@ class Hat:
 class Bass:
 
     levels = V('13//12,10'), V('13//5,12')
-    timbre = V('12,0') - V('.01')
-    vib = V('5.5x,/2 5x1/4 -1/2') * V('.145')
+    timbre = D('+,1')
+    vib = V('5.5x,/2 5x1/4 -1/2') * V('.145') - V('.01')
 
     def on(self, frame, chip, degree, velocity, vibshift):
         chip.fixedlevel = self.levels[round(velocity[frame])][frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.timbre[frame] + self.vib[frame + vibshift[frame]]
+        chip.tonepitch = chip.topitch((degree + self.timbre)[frame]) + self.vib[frame + vibshift[frame]]
 
 class Lead:
 
