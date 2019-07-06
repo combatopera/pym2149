@@ -43,13 +43,6 @@ class ContextImpl(Context):
             except KeyError:
                 raise AttributeError(name)
 
-        def _cached(self, name, factory):
-            try:
-                value = self._cache[name]
-            except KeyError:
-                self._cache[name] = value = factory()
-            return value
-
         def _fork(self, text):
             data = self._data.copy()
             exec(text, data) # XXX: Impact of modifying mutable objects?
@@ -59,7 +52,11 @@ class ContextImpl(Context):
         def _cachedproperty(f):
             name = f.__name__
             def g(self):
-                return self._cached(name, lambda: f(self))
+                try:
+                    value = self._cache[name]
+                except KeyError:
+                    self._cache[name] = value = f(self)
+                return value
             return property(g)
 
         @_cachedproperty
