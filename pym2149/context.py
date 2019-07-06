@@ -21,7 +21,7 @@ from diapyr import types
 
 class ContextImpl(Context):
 
-    class Data:
+    class Snapshot:
 
         @classmethod
         def create(cls, config):
@@ -52,22 +52,22 @@ class ContextImpl(Context):
 
     @types(Config)
     def __init__(self, config):
-        self._data = self.Data.create(config)
+        self._snapshot = self.Snapshot.create(config)
 
     def _update(self, text):
-        self._data, diff = self._data.fork(text)
+        self._snapshot, diff = self._snapshot.fork(text)
         return diff
 
     def __getattr__(self, name):
         try:
-            return self._data.data[name]
+            return self._snapshot.data[name]
         except KeyError:
             raise AttributeError(name)
 
     def _cachedproperty(f):
         name = f.__name__
         def g(self):
-            return self._data.cached(name, lambda: f(self))
+            return self._snapshot.cached(name, lambda: f(self))
         return property(g)
 
     @_cachedproperty
