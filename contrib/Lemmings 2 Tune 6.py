@@ -88,7 +88,7 @@ class Lead:
 
     levels = V('4x15 17x14 6x13,12'), V('4x15,14'), V('4x15,14')
     offlevel = V('5x14 13//24,9')
-    vibs = V('0'), V('0'), V('8x /3.5,.30/7 -.30/7')
+    vibs = V('0'), V('0'), V('8x /3.5,.3/7 -.3/7')
 
     def _common(self, frame, chip, degree, velocity):
         chip.noiseflag = False
@@ -101,7 +101,7 @@ class Lead:
 
     def off(self, frame, chip, degree, velocity, onframes):
         self._common(frame, chip, degree, velocity)
-        chip.fixedlevel = self.offlevel[frame - onframes]
+        chip.fixedlevel = (self.offlevel >> onframes)[frame]
 
 class Tone:
 
