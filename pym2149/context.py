@@ -50,6 +50,12 @@ class ContextImpl(Context):
             return type(self)(data), {name: obj for name, obj in data.items()
                     if name not in self.data or obj is not self.data[name]}
 
+        def getattr(self, name):
+            try:
+                return self.data[name]
+            except KeyError:
+                raise AttributeError(name)
+
     @types(Config)
     def __init__(self, config):
         self._snapshot = self.Snapshot.create(config)
@@ -59,10 +65,7 @@ class ContextImpl(Context):
         return diff
 
     def __getattr__(self, name):
-        try:
-            return self._snapshot.data[name]
-        except KeyError:
-            raise AttributeError(name)
+        return self._snapshot.getattr(name)
 
     def _cachedproperty(f):
         name = f.__name__
