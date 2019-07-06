@@ -33,8 +33,8 @@ class Handler:
     def __call__(self, timetags, message, reply):
         try:
             text, = message.args
-            context = self.context._update(text)
-            log.info("Add/update: %s", ', '.join(context.keys()))
+            diff = self.context._update(text)
+            log.info("Add/update: %s", ', '.join(diff.keys()))
         except Exception:
             log.exception('Update failed:')
 

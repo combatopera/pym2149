@@ -65,9 +65,9 @@ class LoadSynthDef(SCLangHandler):
     def __call__(self, timetags, message, reply):
         try:
             text, = message.args
-            context = self.context._update(text)
-            lines = ["# Add/update: %s" % ', '.join(context.keys())]
-            for name, obj in context.items():
+            diff = self.context._update(text)
+            lines = ["# Add/update: %s" % ', '.join(diff.keys())]
+            for name, obj in diff.items():
                 if obj != Note and obj != Unpitched and inspect.isclass(obj) and issubclass(obj, Unpitched):
                     self.channels.midiprograms[name] = obj
                     lines.append("%s = SynthDef(%r)" % (name, name))
