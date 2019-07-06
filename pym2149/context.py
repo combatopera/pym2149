@@ -28,7 +28,7 @@ class ContextImpl(Context):
                 __name__ = 'pym2149.context',
                 tuning = config.tuning,
                 mode = 1,
-                speed = 16,
+                speed = 16, # XXX: Needed when sections is empty?
                 sections = (),
             ))
 
