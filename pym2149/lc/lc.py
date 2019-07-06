@@ -47,13 +47,13 @@ class Section(BaseSection):
 class BiasSection(BaseSection):
 
     def getvalue(self, frame, xadjust):
-        return self.initial + (frame - .5) * self.perframe + self.bias # XXX: Can this be simplified?
+        return self.initial + frame * self.perframe + self.bias
 
     def unbiased(self, frame):
         return self.initial + frame * self.perframe
 
     def wrap(self, perframe):
-        self.bias = (perframe - float(np.sign(perframe))) / 2
+        self.bias = float(np.sign(perframe)) / -2
         self.perframe = perframe
 
 class Sections:
