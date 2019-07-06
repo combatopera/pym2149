@@ -16,11 +16,9 @@ class CommonDrum:
 
 class Kick(CommonDrum):
 
-    pitch = C2 - .11
-
     def on(self, frame, chip):
         if super()._on(frame, chip, 21):
-            chip.tonepitch = self.pitch
+            chip.tonepitch = C2 - .11
 
 class Snare(CommonDrum):
 
