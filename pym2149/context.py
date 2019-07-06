@@ -43,6 +43,10 @@ class ContextImpl(Context):
             return type(self)(data), {name: obj for name, obj in data.items()
                     if name not in self._data or obj is not self._data[name]}
 
+        def _put(self, name, value):
+            self._data[name] = value
+            self._cache.clear()
+
         def __getattr__(self, name):
             try:
                 return self._data[name]
@@ -80,19 +84,12 @@ class ContextImpl(Context):
 
     def _flip(self):
         self._snapshot = self._pending
-        self._proxy = SnapshotProxy(self._snapshot)
 
     def __getattr__(self, name):
         return getattr(self._snapshot, name)
-
-class SnapshotProxy:
-
-    def __init__(self, snapshot):
-        self._snapshot = snapshot
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
             super().__setattr__(name, value)
         else:
-            self._snapshot._data[name] = value
-            self._snapshot._cache.clear()
+            self._snapshot._put(name, value)
