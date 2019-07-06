@@ -143,7 +143,7 @@ class LiveCodingBridge(Prerecorded):
     def frames(self, chip):
         session = self.Session(chip)
         frameindex = self._initialframe() + self.bias
-        while self.loop or frameindex < sum(self.context.sectionframecounts):
+        while self.loop or frameindex < self.context.totalframecount:
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
                 frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))

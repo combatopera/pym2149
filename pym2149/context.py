@@ -63,6 +63,10 @@ class ContextImpl(Context):
         def sectionframecounts(self):
             return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
 
+        @_cachedproperty
+        def totalframecount(self):
+            return sum(self.sectionframecounts)
+
     @types(Config)
     def __init__(self, config):
         self._pending = self.Snapshot._create(config)
