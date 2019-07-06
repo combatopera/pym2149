@@ -133,7 +133,7 @@ class LiveCodingBridge(Prerecorded):
             frameindex += k
         raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
 
-    def _sectionandframe(self, speed, frame):
+    def _sectionandframe(self, frame):
         while True:
             for section, k in zip(self.context.sections, self.context.sectionframecounts):
                 if frame < k:
@@ -147,7 +147,7 @@ class LiveCodingBridge(Prerecorded):
         while self.loop or frameindex < sum(self.context.sectionframecounts):
             frame = session._quiet
             with session.catch('Failed to prepare a frame:'):
-                frame = partial(session._step, speed, *self._sectionandframe(speed, frameindex))
+                frame = partial(session._step, speed, *self._sectionandframe(frameindex))
                 frameindex += 1 # TODO: Not when song is empty.
             yield frame
             oldspeed, speed = speed, self.context.speed
