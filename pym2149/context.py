@@ -37,7 +37,7 @@ class ContextImpl(Context):
             self._cache = {}
             self._data = data
 
-        def getattr(self, name):
+        def __getattr__(self, name):
             try:
                 return self._data[name]
             except KeyError:
@@ -65,7 +65,7 @@ class ContextImpl(Context):
         return diff
 
     def __getattr__(self, name):
-        return self._snapshot.getattr(name)
+        return getattr(self._snapshot, name)
 
     def _cachedproperty(f):
         name = f.__name__
