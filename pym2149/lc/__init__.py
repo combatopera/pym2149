@@ -20,9 +20,8 @@ def V(script, step = 0, continuous = False):
     return concat(lambda *args: StepScript(*args, step), VParse(float, step, continuous), script, {})
 
 def D(script):
-    from .parse import concat, StepScript, VParse, vector
-    step = 0
-    return concat(lambda *args: StepScript(*args, step), VParse(vector, step, False), script, {})
+    from .parse import concat, Script, VParse, vector
+    return concat(Script, VParse(vector, 0, False), script, {})
 
 def E(cls, script, initargs = (), **kwargs):
     from .parse import concat, Script, EParse, NoteWrapper

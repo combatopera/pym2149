@@ -48,7 +48,7 @@ class Bass:
     vib = V('5.5x,/2 5x1/4 -1/2') * V('.145') - V('.01')
 
     def on(self, frame, chip, degree, velocity, vibshift):
-        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
+        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.timbre)[frame]) + self.vib[frame + vibshift[frame]]
@@ -78,10 +78,10 @@ class Arp:
     chords = D('1 3 5 +').inversions()
 
     def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
-        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
+        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch((degree + self.chords[round(inv[frame])])[frame])
+        chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame])
 
 def bass(degree):
     return E(Bass, '1', degree = D('--') + D(degree),

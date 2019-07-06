@@ -139,7 +139,7 @@ class Operators:
         for _ in range(len(degrees)):
             sections = Sections()
             sections.init(self.sections, (degrees[index] + np.array([octave, 0, 0]) for index, octave in refs))
-            invs.append(type(self)(sections, self.kwargs, self.step))
+            invs.append(type(self)(sections, self.kwargs))
             degrees.append(degrees.pop(0) + np.array([1, 0, 0]))
         return invs
 

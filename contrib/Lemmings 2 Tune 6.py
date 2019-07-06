@@ -86,7 +86,7 @@ class Bass:
     basedegree = D('-')
 
     def on(self, frame, chip, degree, velocity):
-        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
+        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = self.tf[frame]
         chip.tonepitch = chip.topitch((self.basedegree + degree)[frame])
@@ -98,15 +98,13 @@ class Lead:
     vibs = V('0'), V('0'), V('8x /3.5,.30/7 -.30/7')
 
     def _common(self, frame, chip, degree, velocity):
-        velocity = round(velocity[frame])
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vibs[velocity][frame]
-        return velocity
+        chip.tonepitch = chip.topitch(degree[frame]) + velocity[frame].pick(self.vibs)[frame]
 
     def on(self, frame, chip, degree, velocity):
-        velocity = self._common(frame, chip, degree, velocity)
-        chip.fixedlevel = self.levels[velocity][frame]
+        self._common(frame, chip, degree, velocity)
+        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
 
     def off(self, frame, chip, degree, velocity, onframes):
         self._common(frame, chip, degree, velocity)
@@ -127,7 +125,7 @@ class Ping:
     levels = V('12//16,8'), V('14//16,10')
 
     def on(self, frame, chip, degree, velocity):
-        chip.fixedlevel = self.levels[round(velocity[frame])][frame]
+        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame])

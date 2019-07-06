@@ -40,7 +40,12 @@ class StepScript(Script):
         self.step = step
 
     def getitem(self, frame, shift):
-        return super().getitem(frame, shift) + (frame - shift) // self.sections.len * self.step
+        return Value(super().getitem(frame, shift) + (frame - shift) // self.sections.len * self.step)
+
+class Value(float):
+
+    def pick(self, sequence):
+        return sequence[round(self)]
 
 class BadWordException(Exception): pass
 
