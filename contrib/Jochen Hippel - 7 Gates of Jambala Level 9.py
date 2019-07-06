@@ -5,18 +5,16 @@ class Kick:
 
     level = V('11,13')
     nf = V('1,0')
-    tf = V('0 3x1,0')
-    np = V('12')
+    tf = V('0,1')
     pitch = V('2x44.01 36 32.01')
 
     def on(self, frame, chip):
-        if frame >= 4:
-            return
-        chip.fixedlevel = self.level[frame]
-        chip.noiseflag = self.nf[frame]
-        chip.toneflag = self.tf[frame]
-        chip.noiseperiod = self.np[frame]
-        chip.tonepitch = self.pitch[frame]
+        if frame < 4:
+            chip.fixedlevel = self.level[frame]
+            chip.noiseflag = self.nf[frame]
+            chip.toneflag = self.tf[frame]
+            chip.noiseperiod = 12
+            chip.tonepitch = self.pitch[frame]
 
 class Snare:
 
@@ -24,7 +22,7 @@ class Snare:
     nf = V('1 2x,1')
     tf = V('0 4x1,0')
     np = V('12//6,10') << 1
-    pitch = V('2x57 54 52 51') + V('.02')
+    pitch = V('.02') + V('57 54 52 51') >> 1
 
     def on(self, frame, chip):
         chip.fixedlevel = self.level[frame]
@@ -36,17 +34,12 @@ class Snare:
 
 class Hat:
 
-    level = 10
-    nf = V('1,0')
-    np = 12
-
     def on(self, frame, chip):
-        if frame >= 1:
-            return
-        chip.fixedlevel = self.level
-        chip.noiseflag = self.nf[frame]
-        chip.toneflag = False
-        chip.noiseperiod = self.np
+        if frame < 1:
+            chip.fixedlevel = 10
+            chip.noiseflag = True
+            chip.toneflag = False
+            chip.noiseperiod = 12
 
 class Bass:
 
