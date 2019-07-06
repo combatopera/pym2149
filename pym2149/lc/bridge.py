@@ -145,9 +145,10 @@ class LiveCodingBridge(Prerecorded):
         frameindex = self._initialframe() + self.bias
         while self.loop or frameindex < self.context.totalframecount:
             frame = session._quiet
-            with session.catch('Failed to prepare a frame:'):
-                frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
-                frameindex += 1 # TODO: Not when song is empty.
+            if self.context.totalframecount: # Otherwise freeze until there is something to play.
+                with session.catch('Failed to prepare a frame:'):
+                    frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
+                    frameindex += 1
             yield frame
             oldspeed = self.context.speed
             self.context._flip()

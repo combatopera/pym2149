@@ -30,7 +30,7 @@ class ContextImpl(Context):
                 tuning = config.tuning,
                 mode = 1,
                 speed = 16,
-                sections = [[unit]],
+                sections = (),
             ))
 
         def __init__(self, data):
