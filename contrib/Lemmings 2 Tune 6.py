@@ -136,13 +136,12 @@ class Ramp:
 
     level = V('4x15,14')
     tp = (V('-4/4 /4') * V('/128 64')) >> .5
-    vib = .06
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vib
+        chip.tonepitch = chip.topitch(degree[frame]) + .06
         chip.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
@@ -151,7 +150,7 @@ def lead1(firstslide, lastoff):
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
 snare1 = E(Snare, '.5 1 .5 1 .5 1 2x.25 6x.5')
-snare2 = E(Snare, '/3.5 4.5')
+snare2 = E(Snare, '8') >> 3.5
 bass1 = E(Bass, '4x1.5 2x',
         degree = D('7x- 7--'),
         velocity = V('0'))
