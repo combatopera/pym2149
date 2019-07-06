@@ -37,17 +37,17 @@ class ContextImpl(Context):
             self._cache = {}
             self._data = data
 
-        def __getattr__(self, name):
-            try:
-                return self._data[name]
-            except KeyError:
-                raise AttributeError(name)
-
         def _fork(self, text):
             data = self._data.copy()
             exec(text, data) # XXX: Impact of modifying mutable objects?
             return type(self)(data), {name: obj for name, obj in data.items()
                     if name not in self._data or obj is not self._data[name]}
+
+        def __getattr__(self, name):
+            try:
+                return self._data[name]
+            except KeyError:
+                raise AttributeError(name)
 
         def _cachedproperty(f):
             name = f.__name__
