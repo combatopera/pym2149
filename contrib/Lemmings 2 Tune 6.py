@@ -1,6 +1,9 @@
 from pym2149.lc import V, D, E, naturalminor, unit
 from pym2149.pitches import B3, C2
 
+def noisepriority(chip):
+    return not any(channel.noiseflag for channel in chip[1:])
+
 class CommonDrum:
 
     level = V('2x15,14')
@@ -10,7 +13,7 @@ class CommonDrum:
             chip.fixedlevel = self.level[frame]
             chip.noiseflag = True
             chip.toneflag = True
-            if not any(channel.noiseflag for channel in chip[1:]):
+            if noisepriority(chip):
                 chip.noiseperiod = np
             return True
 
@@ -48,18 +51,15 @@ class Fill(Boop):
 class Side:
 
     level = V('15//6,12')
-    tf = nf = V('8x1,0')
-    np = 21
 
     def on(self, frame, chip, degree):
-        if frame >= 8:
-            return
-        chip.fixedlevel = self.level[frame]
-        chip.noiseflag = self.nf[frame]
-        chip.toneflag = self.tf[frame]
-        if chip.noiseflag and not any(channel.noiseflag for channel in chip[1:]):
-            chip.noiseperiod = self.np
-        chip.tonepitch = chip.topitch(degree[frame])
+        if frame < 8:
+            chip.fixedlevel = self.level[frame]
+            chip.noiseflag = True
+            chip.toneflag = True
+            if noisepriority(chip):
+                chip.noiseperiod = 21
+            chip.tonepitch = chip.topitch(degree[frame])
 
 class Open:
 
