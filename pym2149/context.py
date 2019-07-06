@@ -65,11 +65,17 @@ class ContextImpl(Context):
 
     @types(Config)
     def __init__(self, config):
-        self._snapshot = self.Snapshot._create(config)
+        self._pending = self.Snapshot._create(config)
+        self._flip()
 
-    def _update(self, text):
-        self._snapshot, diff = self._snapshot._fork(text)
+    def _update(self, text, flip):
+        self._pending, diff = self._pending._fork(text)
+        if flip:
+            self._flip()
         return diff
+
+    def _flip(self):
+        self._snapshot = self._pending
 
     def __getattr__(self, name):
         return getattr(self._snapshot, name)

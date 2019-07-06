@@ -65,7 +65,7 @@ class LoadSynthDef(SCLangHandler):
     def __call__(self, timetags, message, reply):
         try:
             text, = message.args
-            diff = self.context._update(text)
+            diff = self.context._update(text, True) # TODO: Do not flip here.
             lines = ["# Add/update: %s" % ', '.join(diff.keys())]
             for name, obj in diff.items():
                 if obj != Note and obj != Unpitched and inspect.isclass(obj) and issubclass(obj, Unpitched):

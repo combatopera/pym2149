@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 @types(Config, Context, this = Started)
 def loadcontext(config, context):
     with open(config.inpath) as f:
-        context._update(f.read())
+        context._update(f.read(), True)
 
 def main():
     config, di = boot(ConfigName('inpath', '--section'))
