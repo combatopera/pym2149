@@ -18,12 +18,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.ymformat import YMOpen
-from pym2149.config import ConfigName
 from pym2149 import out
 from pym2149.boot import boot
-from pym2149.ymplayer import Player
+from pym2149.config import ConfigName
 from pym2149.timerimpl import ChipTimer
+from pym2149.ymformat import YMOpen
+from pym2149.ymplayer import Player
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
