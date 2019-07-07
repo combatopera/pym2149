@@ -18,6 +18,7 @@
 from .iface import Context, Config
 from diapyr import types
 
+# TODO: Tests, refactor to enable global directive.
 class ContextImpl(Context):
 
     class Snapshot:
