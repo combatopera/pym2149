@@ -278,6 +278,10 @@ class Of(Operators):
     def len(self):
         return self.p.len * self.beat
 
+    @property
+    def mulcls(self):
+        return self.p.mulcls
+
     def __init__(self, p, beat):
         self.p = p
         self.beat = beat
