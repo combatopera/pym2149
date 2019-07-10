@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import osctrl
 from .channels import Channels
 from .foxdotlib import SCSynthHandler, SCLangHandler, ClickEvent, SCSynth, SCLang, Delay
 from .iface import Config, Context
@@ -24,7 +23,7 @@ from .pll import PLL
 from .program import Note, Unpitched
 from diapyr import types
 from types import SimpleNamespace
-import logging, re, inspect, traceback, screen
+import logging, re, inspect, traceback, screen, timelyOSC
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class GetInfo(SCLangHandler):
     buffers = 1024
 
     def __call__(self, timetags, message, reply):
-        reply(osctrl.Message('/foxdot/info', [0, 0, 0, 0,
+        reply(timelyOSC.Message('/foxdot/info', [0, 0, 0, 0,
                 self.audiochans, 0,
                 self.inputchans,
                 self.outputchans,

@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import osctrl
 from .iface import Config
 from bg import SimpleBackground
 from diapyr import types
 from collections import namedtuple
-import logging, socket, delay
+import logging, socket, delay, timelyOSC
 
 log = logging.getLogger(__name__)
 
@@ -88,7 +87,7 @@ class FoxDotClient:
     def pumponeortimeout(self):
         try:
             bytes, address = self.sock.recvfrom(self.bufsize)
-            self._message(address, [], osctrl.parse(bytes))
+            self._message(address, [], timelyOSC.parse(bytes))
         except socket.timeout:
             pass
         except Exception:

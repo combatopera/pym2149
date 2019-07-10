@@ -25,6 +25,7 @@ projects +=
     mynblep
     system
     splut
+    timelyOSC
 branch
     pyrbo = py3
     mynblep = py3
