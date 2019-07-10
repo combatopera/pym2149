@@ -341,6 +341,10 @@ class Slice(Operators):
     def kwargs(self):
         return self.p.kwargs
 
+    @property
+    def mulcls(self):
+        return self.p.mulcls
+
     def __init__(self, p, slice):
         self.start = 0 if slice.start is None else slice.start
         self.stop = p.len if slice.stop is None else slice.stop # XXX: Even if bigger?
