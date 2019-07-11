@@ -16,16 +16,19 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-import unittest, subprocess
+import subprocess
 
-class TestExpected(unittest.TestCase):
+project = Path(__file__).parent.parent
+expected = project / 'expected'
 
-    def test_expected(self):
-        project = Path(__file__).parent.parent
-        # FIXME: Instead of overriding channels, do not load personal config.
-        command = [project / 'lc2txt.py', '--config', 'chipchannels = 3']
-        expected = project / 'expected'
-        for path in expected.glob('**/*'):
-            if not path.is_dir():
-                with path.open() as f:
-                    self.assertEqual(f.read(), subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode())
+def test_expected():
+    for path in expected.glob('**/*'):
+        if not path.is_dir():
+            yield _compare, path
+
+def _compare(path):
+    # FIXME: Instead of overriding channels, do not load personal config.
+    command = [project / 'lc2txt.py', '--config', 'chipchannels = 3']
+    actual = subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode()
+    with path.open() as f:
+        assert f.read() == actual
