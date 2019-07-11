@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-import subprocess, unittest
+import subprocess, unittest, sys
 
 project = Path(__file__).parent.parent
 expected = project / 'expected'
@@ -28,7 +28,7 @@ def test_expected():
 
 def _compare(path):
     # FIXME: Instead of overriding channels, do not load personal config.
-    command = [project / 'lc2txt.py', '--config', 'chipchannels = 3']
+    command = [sys.executable, project / 'lc2txt.py', '--config', 'chipchannels = 3']
     actual = subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode()
     with path.open() as f:
         unittest.TestCase().assertEqual(f.read(), actual)
