@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .util import outerzip
 from pathlib import Path
 import unittest, subprocess
 
@@ -29,5 +28,4 @@ class TestExpected(unittest.TestCase):
         for path in expected.glob('**/*'):
             if not path.is_dir():
                 with path.open() as f:
-                    for e, a in outerzip(f.read().splitlines(), subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode().splitlines()):
-                        self.assertEqual(e, a)
+                    self.assertEqual(f.read(), subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode())
