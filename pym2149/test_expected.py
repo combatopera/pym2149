@@ -22,6 +22,7 @@ class TestExpected(unittest.TestCase):
 
     def test_expected(self):
         project = Path(__file__).parent.parent
+        # FIXME: Instead of overriding channels, do not load personal config.
         command = [project / 'lc2txt.py', '--config', 'chipchannels = 3']
         expected = project / 'expected'
         for path in expected.glob('**/*'):
