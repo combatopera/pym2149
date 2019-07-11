@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-import subprocess
+import subprocess, unittest
 
 project = Path(__file__).parent.parent
 expected = project / 'expected'
@@ -31,4 +31,4 @@ def _compare(path):
     command = [project / 'lc2txt.py', '--config', 'chipchannels = 3']
     actual = subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode()
     with path.open() as f:
-        assert f.read() == actual
+        unittest.TestCase().assertEqual(f.read(), actual)
