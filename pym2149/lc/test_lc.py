@@ -52,16 +52,31 @@ class TestEvent(unittest.TestCase):
 class TestSlice(unittest.TestCase):
 
     def test_initial(self):
-        v = V('0/100 100')[:5]
-        self.assertEqual(5, v.len)
-        self.assertEqual(.5, v[.5])
-        self.assertEqual(4.5, v[4.5])
-        self.assertEqual(.5, v[5.5])
+        for end in 5, -96:
+            v = V('0/100 100')[:end]
+            self.assertEqual(5, v.len)
+            self.assertEqual(.5, v[.5])
+            self.assertEqual(4.5, v[4.5])
+            self.assertEqual(.5, v[5.5])
 
     def test_terminal(self):
-        v = V('0/100 100')[-6:]
-        self.assertEqual(6, v.len)
-        self.assertEqual(95.5, v[.5])
-        self.assertEqual(99.5, v[4.5])
-        self.assertEqual(100, v[5.5])
-        self.assertEqual(95.5, v[6.5])
+        for start in 95,:
+            v = V('0/100 100')[start:]
+            self.assertEqual(6, v.len)
+            self.assertEqual(95.5, v[.5])
+            self.assertEqual(99.5, v[4.5])
+            self.assertEqual(100, v[5.5])
+            self.assertEqual(95.5, v[6.5])
+
+    def test_embiggen(self):
+        v = V('5/4 9')[-1:11]
+        self.assertEqual(12, v.len)
+        self.assertEqual(9, v[.5])
+        self.assertEqual(5.5, v[1.5])
+        self.assertEqual(8.5, v[4.5])
+        self.assertEqual(9, v[5.5])
+        self.assertEqual(9, v[10.5])
+        self.assertEqual(5.5, v[11.5])
+        self.assertEqual(9, v[12.5])
+        self.assertEqual(5.5, v[13.5])
+        self.assertEqual(6.5, v[14.5])

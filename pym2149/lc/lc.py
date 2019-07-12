@@ -349,10 +349,15 @@ class Slice(Operators):
         if slice.start is None:
             self.start = 0
         elif slice.start < 0:
-            self.start = p.len + slice.start
+            self.start = 0 + slice.start
         else:
             self.start = slice.start
-        self.stop = p.len if slice.stop is None else slice.stop # XXX: Even if bigger?
+        if slice.stop is None:
+            self.stop = p.len
+        elif slice.stop < 0:
+            self.stop = p.len + slice.stop
+        else:
+            self.stop = slice.stop
         # TODO: Use step.
         self.len = self.stop - self.start
         self.p = p
