@@ -346,7 +346,12 @@ class Slice(Operators):
         return self.p.mulcls
 
     def __init__(self, p, slice):
-        self.start = 0 if slice.start is None else slice.start
+        if slice.start is None:
+            self.start = 0
+        elif slice.start < 0:
+            self.start = p.len + slice.start
+        else:
+            self.start = slice.start
         self.stop = p.len if slice.stop is None else slice.stop # XXX: Even if bigger?
         # TODO: Use step.
         self.len = self.stop - self.start
@@ -354,4 +359,4 @@ class Slice(Operators):
 
     def getitem(self, frame, shift):
         loop = (frame - shift) // self.len
-        return self.p.getitem(frame, shift - (self.p.len - self.len) * loop)
+        return self.p.getitem(frame, shift - self.start - (self.p.len - self.len) * loop)

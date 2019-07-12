@@ -57,3 +57,11 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(.5, v[.5])
         self.assertEqual(4.5, v[4.5])
         self.assertEqual(.5, v[5.5])
+
+    def test_terminal(self):
+        v = V('0/100 100')[-6:]
+        self.assertEqual(6, v.len)
+        self.assertEqual(95.5, v[.5])
+        self.assertEqual(99.5, v[4.5])
+        self.assertEqual(100, v[5.5])
+        self.assertEqual(95.5, v[6.5])
