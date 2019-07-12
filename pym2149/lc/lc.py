@@ -354,4 +354,4 @@ class Slice(Operators):
 
     def getitem(self, frame, shift):
         loop = (frame - shift) // self.len
-        return self.p.getitem(frame, shift + (self.p.len - self.len) * loop)
+        return self.p.getitem(frame, shift - (self.p.len - self.len) * loop)

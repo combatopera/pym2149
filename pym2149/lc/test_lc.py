@@ -48,3 +48,12 @@ class TestEvent(unittest.TestCase):
             ['off', 50, 55, 60, 50],
             ['off', 60, 55, 61, 50],
         ], calls)
+
+class TestSlice(unittest.TestCase):
+
+    def test_initial(self):
+        v = V('0/100 100')[:5]
+        self.assertEqual(5, v.len)
+        self.assertEqual(.5, v[.5])
+        self.assertEqual(4.5, v[4.5])
+        self.assertEqual(.5, v[5.5])
