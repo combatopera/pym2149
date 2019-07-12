@@ -346,18 +346,10 @@ class Slice(Operators):
         return self.p.mulcls
 
     def __init__(self, p, slice):
-        if slice.start is None:
-            self.start = 0
-        elif slice.start < 0:
-            self.start = 0 + slice.start
-        else:
-            self.start = slice.start
-        if slice.stop is None:
-            self.stop = p.len
-        elif slice.stop < 0:
-            self.stop = p.len + slice.stop
-        else:
-            self.stop = slice.stop
+        def readslice(ref, adj):
+            return ref if adj is None else (ref + adj if adj < 0 else adj)
+        self.start = readslice(0, slice.start)
+        self.stop = readslice(p.len, slice.stop)
         # TODO: Use step.
         self.len = self.stop - self.start
         self.p = p
