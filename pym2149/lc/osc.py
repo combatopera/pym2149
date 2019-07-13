@@ -58,6 +58,8 @@ class OSCClient:
         for element in elements:
             self._message(udpaddr, timetags, element)
 
+class Handler: pass
+
 class OSCListen(SimpleBackground):
 
     def __init__(self, config, handlers):
@@ -76,7 +78,7 @@ class OSCListen(SimpleBackground):
         while not self.quit:
             client.pumponeortimeout()
 
-class Handler:
+class LCHandler(Handler):
 
     addresses = '/lc',
 
@@ -99,5 +101,5 @@ class Listen(OSCListen):
         super().__init__(config, handlers)
 
 def configure(di):
-    di.add(Handler)
+    di.add(LCHandler)
     di.add(Listen)
