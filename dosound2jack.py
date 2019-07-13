@@ -36,7 +36,6 @@ def main():
         with open(config.inpath) as f:
             di.add(readbytecode(f, config.srclabel))
         di.add(jackclient.JackClient)
-        di.all(Started)
         jackclient.configure(di)
         di.all(Started)
         di.add(ChipTimer)
