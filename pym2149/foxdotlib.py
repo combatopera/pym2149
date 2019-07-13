@@ -28,14 +28,13 @@ class Handler:
 
 class FoxDotClient:
 
-    def __init__(self, host, port, bufsize, handlers, label):
+    def __init__(self, host, port, bufsize, handlers):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
         # TODO LATER: Send self an interrupt message instead of relying on timeout.
         self.sock.settimeout(.1) # For polling the open flag.
         self.sock.bind((host, port))
         self.bufsize = bufsize
         self.handlers = handlers
-        self.label = label
 
     def pumponeortimeout(self):
         try:
@@ -55,7 +54,7 @@ class FoxDotClient:
         try:
             handler = self.handlers[addrpattern]
         except KeyError:
-            log.warning("Unhandled %s message: %s", self.label, message)
+            log.warning("Unhandled message: %s", message)
             return
         handler(timetags, message, lambda reply: self.sock.sendto(reply, udpaddr))
 
@@ -77,7 +76,6 @@ class FoxDotListen(SimpleBackground):
         config = self.config['OSC', self.configkey]
         client = FoxDotClient(
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
-                self.handlers,
-                self.configkey)
+                self.handlers)
         while not self.quit:
             client.pumponeortimeout()
