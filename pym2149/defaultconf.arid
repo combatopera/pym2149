@@ -147,7 +147,7 @@ mediation = $global(.mediation.DynamicMediation)
 
 OSC
     host = 127.0.0.1
-    pym2149 port = 2149
+    port = 2149
     bufsize = 4096
 
 PortAudio

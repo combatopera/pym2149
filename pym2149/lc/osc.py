@@ -40,8 +40,6 @@ class Handler:
 
 class Listen(FoxDotListen):
 
-    configkey = 'pym2149'
-
     @types(Config, [Handler])
     def __init__(self, config, handlers):
         super().__init__(config, handlers)
