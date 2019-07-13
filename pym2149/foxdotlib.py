@@ -26,7 +26,7 @@ class Handler:
     @types()
     def __init__(self): pass
 
-class FoxDotClient:
+class OSCClient:
 
     def __init__(self, host, port, bufsize, handlers):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
@@ -74,7 +74,7 @@ class FoxDotListen(SimpleBackground):
 
     def bg(self):
         config = self.config['OSC',]
-        client = FoxDotClient(
+        client = OSCClient(
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
                 self.handlers)
         while not self.quit:
