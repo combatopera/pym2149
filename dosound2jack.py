@@ -24,18 +24,12 @@ from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149 import jackclient
 from pym2149.boot import boot
-from pym2149.iface import Stream, Prerecorded, Unit
+from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
 from diapyr import types
 
 log = logging.getLogger(__name__)
-
-class PrerecordedImpl(Prerecorded):
-
-    @types()
-    def __init__(self):
-        pass
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
@@ -43,7 +37,6 @@ def main():
         with open(config.inpath) as f:
             di.add(readbytecode(f, config.srclabel))
         di.add(jackclient.JackClient)
-        di.add(PrerecordedImpl)
         di.all(Started)
         jackclient.configure(di)
         di.all(Started)

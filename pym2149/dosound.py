@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Unit
+from .iface import Chip, Stream, Unit, Prerecorded
 from .timer import Timer
 from diapyr import types
 
 class BadCommandException(Exception): pass
 
-class Bytecode:
+class Bytecode(Prerecorded):
 
     def __init__(self, bytes):
         self.bytes = bytes
