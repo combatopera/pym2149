@@ -88,7 +88,7 @@ class NoSuchSectionException(Exception): pass
 
 class LiveCodingBridge(Prerecorded):
 
-    bias = .5
+    bias = .5 # TODO: Make configurable for predictable swing in odd speed case.
 
     @types(Config, Tuning, Context)
     def __init__(self, config, tuning, context):
