@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..iface import Config, Context
-from ..foxdotlib import FoxDotListen
+from ..foxdotlib import OSCListen
 from diapyr import types
 import logging
 
@@ -38,7 +38,7 @@ class Handler:
         except Exception:
             log.exception('Update failed:')
 
-class Listen(FoxDotListen):
+class Listen(OSCListen):
 
     @types(Config, [Handler])
     def __init__(self, config, handlers):

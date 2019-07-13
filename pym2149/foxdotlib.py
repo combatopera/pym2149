@@ -62,7 +62,7 @@ class OSCClient:
         for element in elements:
             self._message(udpaddr, timetags, element)
 
-class FoxDotListen(SimpleBackground):
+class OSCListen(SimpleBackground):
 
     def __init__(self, config, handlers):
         super().__init__(config.profile)
