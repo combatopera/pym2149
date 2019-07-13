@@ -73,7 +73,7 @@ class FoxDotListen(SimpleBackground):
         super().start(self.bg)
 
     def bg(self):
-        config = self.config['OSC']
+        config = self.config['OSC',]
         client = FoxDotClient(
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
                 self.handlers)
