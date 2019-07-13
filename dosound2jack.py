@@ -27,7 +27,6 @@ from pym2149.boot import boot
 from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
-from diapyr import types
 
 log = logging.getLogger(__name__)
 
