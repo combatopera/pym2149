@@ -145,10 +145,8 @@ speeddetector = true
 
 mediation = $global(.mediation.DynamicMediation)
 
-FoxDot
+OSC
     host = 127.0.0.1
-    scsynth port = 57110
-    sclang port = 57120
     pym2149 port = 2149
     bufsize = 4096
 
