@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyven
 
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
@@ -68,7 +68,7 @@ class Data:
             ticks -= part
 
     def save(self, f):
-        w = lambda v: f.write(''.join(chr(x) for x in v))
+        w = lambda v: f.write(bytes(v))
         w([self.totalticks >> 8, self.totalticks & 0xff])
         w(self.bytecode)
         w([0x82, 0])
