@@ -19,11 +19,10 @@
 
 from pym2149.initlogging import logging
 from pym2149.dosound import dosound, Bytecode
-from pym2149.timer import Timer
 from pym2149.config import ConfigName
 from pym2149 import out
 from pym2149.boot import boot
-from pym2149.iface import Chip, Stream
+from pym2149.iface import Stream, Exhausted
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
 
@@ -34,14 +33,14 @@ def main():
     try:
         with open(config.inpath, 'rb') as f:
             log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-            bytecode = Bytecode(f.read())
+            di.add(Bytecode(f.read()))
         out.configure(di)
         di.add(out.WavPlatform)
-        chip = di(Chip)
         di.all(Started)
         di.add(ChipTimer)
         stream = di(Stream)
-        dosound(bytecode, chip, di(Timer), stream)
+        di.add(dosound)
+        di(Exhausted)
         stream.flush()
     finally:
         di.discardall()
