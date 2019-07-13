@@ -62,6 +62,7 @@ class Handler: pass
 
 class OSCListen(SimpleBackground):
 
+    @types(Config, [Handler])
     def __init__(self, config, handlers):
         super().__init__(config.profile)
         self.config = config
@@ -94,12 +95,6 @@ class LCHandler(Handler):
         except Exception:
             log.exception('Update failed:')
 
-class Listen(OSCListen):
-
-    @types(Config, [Handler])
-    def __init__(self, config, handlers):
-        super().__init__(config, handlers)
-
 def configure(di):
     di.add(LCHandler)
-    di.add(Listen)
+    di.add(OSCListen)
