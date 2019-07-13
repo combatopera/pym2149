@@ -21,11 +21,6 @@ import logging, socket, timelyOSC
 
 log = logging.getLogger(__name__)
 
-class Handler:
-
-    @types()
-    def __init__(self): pass
-
 class OSCClient:
 
     def __init__(self, host, port, bufsize, handlers):
