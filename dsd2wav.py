@@ -38,10 +38,9 @@ def main():
         di.add(out.WavPlatform)
         di.all(Started)
         di.add(ChipTimer)
-        stream = di(Stream)
         di.add(dosound)
         di(Unit)
-        stream.flush()
+        di(Stream).flush()
     finally:
         di.discardall()
 
