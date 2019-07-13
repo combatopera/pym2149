@@ -24,7 +24,7 @@ from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149 import jackclient
 from pym2149.boot import boot
-from pym2149.iface import Stream, Prerecorded, Exhausted
+from pym2149.iface import Stream, Prerecorded, Unit
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
 from diapyr import types
@@ -51,7 +51,7 @@ def main():
         timer = di(Timer)
         stream = di(Stream)
         di.add(dosound)
-        di(Exhausted)
+        di(Unit)
         log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
         for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
             stream.call(b)
