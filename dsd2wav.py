@@ -18,10 +18,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.dosound import dosound, Bytecode
-from pym2149.config import ConfigName
 from pym2149 import out
 from pym2149.boot import boot
+from pym2149.config import ConfigName
+from pym2149.dosound import dosound, Bytecode
 from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
 from diapyr.start import Started
