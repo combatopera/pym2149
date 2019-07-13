@@ -37,7 +37,7 @@ class Label:
 
 def readlabeltobytecode(f):
     labels = {}
-    bytecode = Bytecode(True)
+    bytecode = BytecodeBuilder(True)
     for line in map(Line, f):
         if line.label is not None:
             labels[line.label] = bytecode.startingnow() # Last one wins.
@@ -51,7 +51,7 @@ def readbytecode(f, findlabel):
     bytecode = None
     for line in map(Line, f):
         if bytecode is None and findlabel == line.label: # XXX: Support terminating colon?
-            bytecode = Bytecode(False) # And fall through to next clause if there is a directive.
+            bytecode = BytecodeBuilder(False) # And fall through to next clause if there is a directive.
         if bytecode is not None and line.directive is not None:
             bytecode.process(line)
             if bytecode.hasterminator():
@@ -62,7 +62,7 @@ def readbytecode(f, findlabel):
 
 class UnsupportedDirectiveException(Exception): pass
 
-class Bytecode:
+class BytecodeBuilder:
 
     @staticmethod
     def number(s):
