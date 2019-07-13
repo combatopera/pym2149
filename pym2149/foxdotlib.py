@@ -15,63 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Config
 from bg import SimpleBackground
 from diapyr import types
-from collections import namedtuple
-import logging, socket, delay, timelyOSC
+import logging, socket, timelyOSC
 
 log = logging.getLogger(__name__)
-
-class Delay(delay.Delay):
-
-    @types(Config)
-    def __init__(self, config):
-        super().__init__(config.profile)
 
 class Handler:
 
     @types()
     def __init__(self): pass
-
-class SCSynthHandler(Handler): pass
-
-class SCLangHandler(Handler): pass
-
-class ClickEvent:
-
-    def __init__(self, midichan):
-        self.midichan = midichan
-
-    def __call__(self, channels):
-        pass
-
-    def __str__(self):
-        return "+ %s" % self.midichan
-
-class MidiNote(namedtuple('BaseMidiNote', 'whole micro')):
-
-    @classmethod
-    def of(cls, midinote):
-        x = round(midinote * cls.microsteps)
-        whole, micro = x // cls.microsteps, x % cls.microsteps
-        return cls(whole, micro) if micro else whole
-
-    def __float__(self):
-        return self.whole + self.micro / self.microsteps
-
-    def __str__(self):
-        return "%s.%s" % (self.whole, self.microformat(self.micro))
-
-class MidiNote100(MidiNote):
-
-    microsteps = 100
-    microformat = staticmethod(lambda micro: "%02d" % micro)
-
-class MidiNote128(MidiNote):
-
-    microsteps = 128
-    microformat = staticmethod(lambda micro: "%02X" % (micro * 2))
 
 class FoxDotClient:
 
@@ -128,19 +81,3 @@ class FoxDotListen(SimpleBackground):
                 self.configkey)
         while not self.quit:
             client.pumponeortimeout()
-
-class SCSynth(FoxDotListen):
-
-    configkey = 'scsynth'
-
-    @types(Config, [SCSynthHandler])
-    def __init__(self, config, handlers):
-        super().__init__(config, handlers)
-
-class SCLang(FoxDotListen):
-
-    configkey = 'sclang'
-
-    @types(Config, [SCLangHandler])
-    def __init__(self, config, handlers):
-        super().__init__(config, handlers)
