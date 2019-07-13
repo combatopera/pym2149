@@ -18,7 +18,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.dosound import dosound
+from pym2149.dosound import dosound, Bytecode
 from pym2149.timer import Timer
 from pym2149.config import ConfigName
 from pym2149 import out
@@ -34,7 +34,7 @@ def main():
     try:
         with open(config.inpath, 'rb') as f:
             log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-            bytecode = f.read()
+            bytecode = Bytecode(f.read())
         out.configure(di)
         di.add(out.WavPlatform)
         chip = di(Chip)

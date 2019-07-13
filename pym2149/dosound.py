@@ -17,8 +17,13 @@
 
 class BadCommandException(Exception): pass
 
+class Bytecode:
+
+    def __init__(self, bytes):
+        self.bytes = bytes
+
 def dosound(bytecode, chip, timer, stream):
-    for _ in _dosound(bytecode, chip):
+    for _ in _dosound(bytecode.bytes, chip):
         for b in timer.blocksforperiod(50): # Authentic period.
             stream.call(b)
 
