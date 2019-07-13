@@ -58,7 +58,7 @@ def readbytecode(f, findlabel):
                 break
     if bytecode is None:
         raise NoSuchLabelException(findlabel)
-    return bytecode.bytes
+    return bytecode
 
 class UnsupportedDirectiveException(Exception): pass
 

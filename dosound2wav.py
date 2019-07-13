@@ -42,7 +42,7 @@ def main():
         di.add(ChipTimer)
         timer = di(Timer)
         stream = di(Stream)
-        dosound(bytecode, chip, timer, stream)
+        dosound(bytecode.bytes, chip, timer, stream)
         log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
         for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
             stream.call(b)
