@@ -24,6 +24,7 @@ from pym2149.iface import Platform, AmpScale, Chip, Prerecorded, Roll
 from pym2149.ymformat import YMOpen
 from diapyr import types
 from diapyr.start import Started
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -41,13 +42,15 @@ class PlatformImpl(Platform, metaclass = AmpScale):
 def ymdump(prerecorded, chip, roll):
     for frame in prerecorded.frames(chip):
         frame()
-        roll.update(print, 1)
+        roll.update()
 
 def main():
     config, di = boot(ConfigName('inpath', '--showperiods'))
     try:
         config.ignoreloop = True
         config.pianorollheight = None
+        config.rollstream = sys.stdout
+        config.rollmincents = 1
         di.add(PlatformImpl)
         di.add(YMOpen)
         di.add(ymdump)

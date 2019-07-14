@@ -19,8 +19,6 @@ from .iface import Chip, Config, Tuning, Roll
 from .pitch import Period, Freq
 from .util import singleton
 from diapyr import types
-from functools import partial
-import sys
 
 @singleton
 class NullRoll(Roll):
@@ -38,6 +36,8 @@ class RollImpl(Roll):
         self.nomclock = config.nominalclock
         self.channels = config.chipchannels
         self.periods = config.showperiods # TODO LATER: Command line arg isn't converted to boolean.
+        self.stream = config.rollstream
+        self.mincents = config.rollmincents
         self.line = 0
         self.jump = "\x1b[%sA" % self.height
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
@@ -45,13 +45,13 @@ class RollImpl(Roll):
         self.chip = chip
         self.tuning = tuning
 
-    def update(self, print = partial(print, file = sys.stderr), mincents = 10):
+    def update(self):
         if self.line == self.height:
-            sys.stderr.write(self.jump)
+            self.stream.write(self.jump)
             self.line = 0
         vals = []
         def appendpitch(freq):
-            vals.append(self.tuning.pitch(freq).str(mincents))
+            vals.append(self.tuning.pitch(freq).str(self.mincents))
         for c in range(self.channels):
             tone = self.chip.toneflags[c].value
             noise = self.chip.noiseflags[c].value
@@ -103,5 +103,5 @@ class RollImpl(Roll):
                 vals.append('')
                 vals.append('')
                 vals.append('')
-        print(self.format % tuple(vals))
+        print(self.format % tuple(vals), file = self.stream)
         self.line += 1

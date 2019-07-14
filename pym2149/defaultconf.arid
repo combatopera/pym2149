@@ -69,6 +69,10 @@ pianorollheight = $enter($(prerecorded) $(pianorollheight))
 pianorollenabled = true
 : Set to false to disable the piano roll.
 
+rollstream = $global(sys.stderr)
+
+rollmincents = 10
+
 midichannelbase = 1
 : In case you wanted 0-based channel numbering.
 

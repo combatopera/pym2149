@@ -24,6 +24,7 @@ from pym2149.lc.bridge import LiveCodingBridge
 from lc2jack import loadcontext
 from ym2txt import PlatformImpl, ymdump
 from diapyr.start import Started
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +33,8 @@ def main():
     try:
         config.ignoreloop = True
         config.pianorollheight = None
+        config.rollstream = sys.stdout
+        config.rollmincents = 1
         di.add(PlatformImpl)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
