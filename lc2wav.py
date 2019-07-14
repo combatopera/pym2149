@@ -24,6 +24,7 @@ from pym2149.config import ConfigName
 from pym2149.lc import osc as lc_osc
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
 from pym2149.ymplayer import Player
 from lc2jack import loadcontext
 from diapyr.start import Started
@@ -39,11 +40,9 @@ def main():
         lc_osc.configure(di)
         out.configure(di)
         di.add(ChipTimer)
-        di.all(Started)
         di.add(Player)
-        player = di(Player)
-        player.quit = False
-        player()
+        di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
