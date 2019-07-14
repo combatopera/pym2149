@@ -22,6 +22,7 @@ from pym2149 import out
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
 from pym2149.ymformat import YMOpen
 from pym2149.ymplayer import Player
 from diapyr.start import Started
@@ -35,11 +36,9 @@ def main():
         di.add(YMOpen)
         out.configure(di)
         di.add(ChipTimer)
-        di.all(Started)
         di.add(Player)
-        player = di(Player)
-        player.quit = False
-        player()
+        di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
