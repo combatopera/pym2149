@@ -20,13 +20,21 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
+from pym2149.iface import Chip, Prerecorded, Roll
 from pym2149.lc.bridge import LiveCodingBridge
 from lc2jack import loadcontext
-from ym2txt import PlatformImpl, ymdump
+from ym2txt import PlatformImpl
+from diapyr import types
 from diapyr.start import Started
 import sys
 
 log = logging.getLogger(__name__)
+
+@types(Prerecorded, Chip, Roll, this = Started)
+def ymdump(prerecorded, chip, roll):
+    for frame in prerecorded.frames(chip):
+        frame()
+        roll.update()
 
 def main():
     config, di = boot(ConfigName('inpath', '--section', '--showperiods'))

@@ -20,8 +20,11 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.iface import Platform, AmpScale, Chip, Prerecorded, Roll
+from pym2149.iface import Platform, AmpScale, Stream
+from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
 from pym2149.ymformat import YMOpen
+from pym2149.ymplayer import Player
 from diapyr import types
 from diapyr.start import Started
 import sys
@@ -38,11 +41,17 @@ class PlatformImpl(Platform, metaclass = AmpScale):
     def __init__(self):
         pass
 
-@types(Prerecorded, Chip, Roll, this = Started)
-def ymdump(prerecorded, chip, roll):
-    for frame in prerecorded.frames(chip):
-        frame()
-        roll.update()
+class NullStream(Stream):
+
+    @types()
+    def __init__(self):
+        pass
+
+    def call(self, block):
+        pass
+
+    def flush(self):
+        pass
 
 def main():
     config, di = boot(ConfigName('inpath', '--showperiods'))
@@ -53,8 +62,11 @@ def main():
         config.rollmincents = 1
         di.add(PlatformImpl)
         di.add(YMOpen)
-        di.add(ymdump)
+        di.add(NullStream)
+        di.add(ChipTimer)
+        di.add(Player)
         di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
