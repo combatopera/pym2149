@@ -38,7 +38,7 @@ def main():
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)
-        di(MainThread).sleep() # FIXME: Stop program in ignoreloop case.
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
