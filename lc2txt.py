@@ -20,21 +20,16 @@
 from pym2149.initlogging import logging
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.iface import Chip, Prerecorded, Roll
 from pym2149.lc.bridge import LiveCodingBridge
+from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
+from pym2149.ymplayer import Player
 from lc2jack import loadcontext
-from ym2txt import PlatformImpl
-from diapyr import types
+from ym2txt import PlatformImpl, NullStream
 from diapyr.start import Started
 import sys
 
 log = logging.getLogger(__name__)
-
-@types(Prerecorded, Chip, Roll, this = Started)
-def ymdump(prerecorded, chip, roll):
-    for frame in prerecorded.frames(chip):
-        frame()
-        roll.update()
 
 def main():
     config, di = boot(ConfigName('inpath', '--section', '--showperiods'))
@@ -46,8 +41,11 @@ def main():
         di.add(PlatformImpl)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
-        di.add(ymdump)
+        di.add(NullStream)
+        di.add(ChipTimer)
+        di.add(Player)
         di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
