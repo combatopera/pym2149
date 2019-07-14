@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
+from bg import Sleeper
 from diapyr import types
 from contextlib import contextmanager
 import time, logging
@@ -31,6 +32,10 @@ class MainThread:
     def __init__(self, config):
         self.profile = config.profile
         self.trace = config.trace
+        self.sleeper = Sleeper()
+
+    def endofdata(self):
+        self.sleeper.interrupt()
 
     def sleep(self):
         if self.profile or self.trace:
@@ -41,8 +46,8 @@ class MainThread:
         else:
             log.debug('Continue until interrupt.')
             try:
-                while True:
-                    time.sleep(1)
+                self.sleeper.sleep()
+                log.debug('End of data, shutting down.')
             except KeyboardInterrupt:
                 log.debug('Caught interrupt, shutting down.')
 
