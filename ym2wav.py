@@ -33,7 +33,6 @@ def main():
     try:
         di.add(out.WavPlatform)
         di.add(YMOpen)
-        di.all(Started)
         out.configure(di)
         di.add(ChipTimer)
         di.all(Started)
