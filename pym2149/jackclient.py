@@ -101,4 +101,5 @@ class BufferFiller:
         self.cursor = 0
 
 def configure(di):
+    di.add(JackClient)
     di.add(JackStream)

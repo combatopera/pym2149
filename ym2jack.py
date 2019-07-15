@@ -32,7 +32,6 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('inpath'))
     try:
-        di.add(jackclient.JackClient)
         di.add(YMOpen)
         jackclient.configure(di)
         di.add(SyncTimer)

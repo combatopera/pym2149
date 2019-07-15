@@ -34,9 +34,8 @@ def main():
     config, di = boot(ConfigName())
     try:
         di.add(PLL)
-        di.add(jackclient.JackClient)
-        di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         jackclient.configure(di)
+        di.all(Started) # TODO: Reorder starts to avoid initial underruns.
         di.add(config.mediation)
         Channels.configure(di)
         di.all(Started)

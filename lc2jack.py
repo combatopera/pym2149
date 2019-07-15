@@ -40,7 +40,6 @@ def loadcontext(config, context):
 def main():
     config, di = boot(ConfigName('inpath', '--section'))
     try:
-        di.add(jackclient.JackClient)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
         lc_osc.configure(di)

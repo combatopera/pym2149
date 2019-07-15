@@ -34,7 +34,6 @@ def main():
     try:
         with open(config.inpath) as f:
             di.add(readbytecode(f, config.srclabel))
-        di.add(jackclient.JackClient)
         jackclient.configure(di)
         di.all(Started)
         di.add(ChipTimer) # XXX: Not SyncTimer?
