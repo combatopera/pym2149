@@ -33,18 +33,19 @@ class Bytecode(Prerecorded):
 @types(Config, Bytecode, Chip, Timer, Stream, this = Unit)
 def dosound(config, bytecode, chip, timer, stream):
     extraseconds = config.dosoundextraseconds
-    for _ in _dosound(bytecode.bytes, chip):
+    for _ in _dosound(bytecode.bytes, chip, extraseconds):
         for b in timer.blocksforperiod(refreshrate):
             stream.call(b)
+    stream.flush()
+
+def _dosound(bytecode, chip, extraseconds):
+    yield from _dosoundimpl(bytecode, chip)
     if extraseconds:
         n = math.ceil(extraseconds * refreshrate)
         log.info("Streaming %.3f extra seconds.", n / refreshrate)
-        for _ in range(n):
-            for b in timer.blocksforperiod(refreshrate):
-                stream.call(b)
-    stream.flush()
+        yield from range(n)
 
-def _dosound(bytecode, chip):
+def _dosoundimpl(bytecode, chip):
     def g():
         for b in bytecode:
             yield b & 0xff # It's supposed to be bytecode.
