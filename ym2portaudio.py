@@ -18,13 +18,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from pym2149.initlogging import logging
-from pym2149.ymformat import YMOpen
-from pym2149.portaudio import PortAudioClient, PortAudioStream
-from pym2149.config import ConfigName
+from pym2149 import portaudio
 from pym2149.boot import boot
-from pym2149.util import MainThread
-from pym2149.ymplayer import Player
+from pym2149.config import ConfigName
 from pym2149.timerimpl import SyncTimer
+from pym2149.util import MainThread
+from pym2149.ymformat import YMOpen
+from pym2149.ymplayer import Player
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -32,9 +32,8 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('inpath'))
     try:
-        di.add(PortAudioClient)
         di.add(YMOpen)
-        di.add(PortAudioStream)
+        portaudio.configure(di)
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)

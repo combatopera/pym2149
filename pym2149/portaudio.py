@@ -122,3 +122,7 @@ class PortAudioStream(Node, Stream, metaclass = AmpScale):
 
     def stop(self):
         self.client.stream.stop_stream()
+
+def configure(di):
+    di.add(PortAudioClient)
+    di.add(PortAudioStream)
