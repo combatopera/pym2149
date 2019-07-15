@@ -39,6 +39,7 @@ def dosound(config, bytecode, chip, timer, stream):
         log.info("Streaming %.3f extra seconds.", extraseconds)
         for b in timer.blocksforperiod(1 / extraseconds):
             stream.call(b)
+    stream.flush()
 
 def _dosound(bytecode, chip):
     def g():
