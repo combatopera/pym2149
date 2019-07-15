@@ -24,12 +24,13 @@ from pym2149.config import ConfigName
 from pym2149.dosound import dosound, Bytecode
 from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
+from dosound2wav import extra
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName('inpath', 'outpath'))
+    config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
     try:
         with open(config.inpath, 'rb') as f:
             log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
@@ -39,7 +40,8 @@ def main():
         di.all(Started)
         di.add(ChipTimer)
         di.add(dosound)
-        di(Unit)
+        di.add(extra)
+        di.all(Unit)
         di(Stream).flush()
     finally:
         di.discardall()

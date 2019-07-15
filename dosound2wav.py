@@ -33,9 +33,11 @@ log = logging.getLogger(__name__)
 
 @types(Config, Timer, Stream, this = Unit)
 def extra(config, timer, stream):
-    log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
-    for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
-        stream.call(b)
+    seconds = config.dosoundextraseconds
+    if seconds:
+        log.info("Streaming %.3f extra seconds.", seconds)
+        for b in timer.blocksforperiod(1 / seconds):
+            stream.call(b)
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
