@@ -42,11 +42,10 @@ class Player(MainBackground):
         self.mainthread = mainthread
 
     def __call__(self):
-        for frame in self.prerecorded.frames(self.chip):
+        for _ in self.prerecorded.frames(self.chip):
             if self.quit:
                 exhausted = False
                 break
-            frame()
             self.roll.update()
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)

@@ -149,7 +149,8 @@ class LiveCodingBridge(Prerecorded):
                 with session.catch('Failed to prepare a frame:'):
                     frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
                     frameindex += 1
-            yield frame
+            frame()
+            yield
             oldspeed = self.context.speed
             self.context._flip()
             if oldspeed != self.context.speed:
