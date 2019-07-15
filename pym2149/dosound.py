@@ -15,11 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Prerecorded, Config
-from .timer import Timer
-from .util import MainThread
-from bg import MainBackground
-from diapyr import types
+from .iface import Prerecorded
 import logging, math
 
 log = logging.getLogger(__name__)
@@ -28,6 +24,8 @@ refreshrate = 50 # Authentic period.
 class BadCommandException(Exception): pass
 
 class Bytecode(Prerecorded):
+
+    pianorollheight = refreshrate
 
     def __init__(self, bytes, extraseconds):
         self.bytes = bytes
@@ -39,30 +37,6 @@ class Bytecode(Prerecorded):
             n = math.ceil(self.extraseconds * refreshrate)
             log.info("Streaming %.3f extra seconds.", n / refreshrate)
             yield from range(n)
-
-class DosoundPlayer(MainBackground):
-
-    @types(Config, Bytecode, Chip, Timer, Stream, MainThread)
-    def __init__(self, config, bytecode, chip, timer, stream, mainthread):
-        super().__init__(config)
-        self.bytecode = bytecode
-        self.chip = chip
-        self.timer = timer
-        self.stream = stream
-        self.mainthread = mainthread
-
-    def __call__(self):
-        for _ in self.bytecode.frames(self.chip):
-            if self.quit:
-                exhausted = False
-                break
-            for b in self.timer.blocksforperiod(refreshrate):
-                self.stream.call(b)
-        else:
-            exhausted = True
-        self.stream.flush()
-        if exhausted:
-            self.mainthread.endofdata()
 
 def _dosoundimpl(bytecode, chip):
     def g():
