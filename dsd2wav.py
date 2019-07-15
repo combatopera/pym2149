@@ -21,9 +21,9 @@ from pym2149.initlogging import logging
 from pym2149 import out
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.dosound import dosound, Bytecode
-from pym2149.iface import Unit
+from pym2149.dosound import DosoundPlayer, Bytecode
 from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -35,10 +35,10 @@ def main():
             log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
             di.add(Bytecode(f.read()))
         out.configure(di)
-        di.all(Started)
         di.add(ChipTimer)
-        di.add(dosound)
-        di.all(Unit)
+        di.add(DosoundPlayer)
+        di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 

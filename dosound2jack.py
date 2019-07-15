@@ -22,9 +22,9 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
-from pym2149.dosound import dosound
-from pym2149.iface import Unit
+from pym2149.dosound import DosoundPlayer
 from pym2149.timerimpl import ChipTimer
+from pym2149.util import MainThread
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -35,10 +35,10 @@ def main():
         with open(config.inpath) as f:
             di.add(readbytecode(f, config.srclabel))
         jackclient.configure(di)
-        di.all(Started)
         di.add(ChipTimer) # XXX: Not SyncTimer?
-        di.add(dosound)
-        di.all(Unit)
+        di.add(DosoundPlayer)
+        di.all(Started)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 

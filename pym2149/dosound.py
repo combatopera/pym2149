@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Unit, Prerecorded, Config
+from .iface import Chip, Stream, Prerecorded, Config
 from .timer import Timer
+from .util import MainThread
+from bg import MainBackground
 from diapyr import types
 import logging, math
 
@@ -30,13 +32,30 @@ class Bytecode(Prerecorded):
     def __init__(self, bytes):
         self.bytes = bytes
 
-@types(Config, Bytecode, Chip, Timer, Stream, this = Unit)
-def dosound(config, bytecode, chip, timer, stream):
-    extraseconds = config.dosoundextraseconds
-    for _ in _dosound(bytecode.bytes, chip, extraseconds):
-        for b in timer.blocksforperiod(refreshrate):
-            stream.call(b)
-    stream.flush()
+class DosoundPlayer(MainBackground):
+
+    @types(Config, Bytecode, Chip, Timer, Stream, MainThread)
+    def __init__(self, config, bytecode, chip, timer, stream, mainthread):
+        super().__init__(config)
+        self.extraseconds = config.dosoundextraseconds
+        self.bytes = bytecode.bytes
+        self.chip = chip
+        self.timer = timer
+        self.stream = stream
+        self.mainthread = mainthread
+
+    def __call__(self):
+        for _ in _dosound(self.bytes, self.chip, self.extraseconds):
+            if self.quit:
+                exhausted = False
+                break
+            for b in self.timer.blocksforperiod(refreshrate):
+                self.stream.call(b)
+        else:
+            exhausted = True
+        self.stream.flush()
+        if exhausted:
+            self.mainthread.endofdata()
 
 def _dosound(bytecode, chip, extraseconds):
     yield from _dosoundimpl(bytecode, chip)
