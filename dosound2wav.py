@@ -35,7 +35,6 @@ def main():
         with open(config.inpath) as f:
             di.add(readbytecode(f, config.srclabel))
         out.configure(di)
-        di.add(out.WavPlatform)
         di.all(Started)
         di.add(ChipTimer)
         di.add(dosound)

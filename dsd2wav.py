@@ -35,7 +35,6 @@ def main():
             log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
             di.add(Bytecode(f.read()))
         out.configure(di)
-        di.add(out.WavPlatform)
         di.all(Started)
         di.add(ChipTimer)
         di.add(dosound)

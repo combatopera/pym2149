@@ -32,7 +32,6 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('inpath', 'outpath'))
     try:
-        di.add(out.WavPlatform)
         di.add(YMOpen)
         out.configure(di)
         di.add(ChipTimer)

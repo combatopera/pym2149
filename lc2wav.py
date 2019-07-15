@@ -34,7 +34,6 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('inpath', '--section', 'outpath'))
     try:
-        di.add(out.WavPlatform)
         di.add(loadcontext)
         di.add(LiveCodingBridge)
         lc_osc.configure(di)

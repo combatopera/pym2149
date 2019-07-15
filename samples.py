@@ -156,7 +156,6 @@ class Target:
         log.info(path)
         config, di = boot(self.configname)
         try:
-            di.add(out.WavPlatform)
             config.midichanneltoprogram = {} # We'll use programchange as necessary.
             config.outpath = path + '.wav'
             config.freqclamp = False # I want to see the very low periods.

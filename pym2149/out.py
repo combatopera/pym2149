@@ -189,5 +189,6 @@ class WavPlatform(Platform):
         self.outputrate = config.wavrate
 
 def configure(di):
+    di.add(WavPlatform)
     di.add(WavWriter)
     di.add(WavBuf.multi)
