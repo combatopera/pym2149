@@ -29,23 +29,23 @@ class BadCommandException(Exception): pass
 
 class Bytecode(Prerecorded):
 
-    def __init__(self, bytes):
+    def __init__(self, bytes, extraseconds):
         self.bytes = bytes
+        self.extraseconds = extraseconds
 
 class DosoundPlayer(MainBackground):
 
     @types(Config, Bytecode, Chip, Timer, Stream, MainThread)
     def __init__(self, config, bytecode, chip, timer, stream, mainthread):
         super().__init__(config)
-        self.extraseconds = config.dosoundextraseconds
-        self.bytes = bytecode.bytes
+        self.bytecode = bytecode
         self.chip = chip
         self.timer = timer
         self.stream = stream
         self.mainthread = mainthread
 
     def __call__(self):
-        for _ in _dosound(self.bytes, self.chip, self.extraseconds):
+        for _ in _dosound(self.bytecode.bytes, self.chip, self.bytecode.extraseconds):
             if self.quit:
                 exhausted = False
                 break

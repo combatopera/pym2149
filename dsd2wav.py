@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 def bytecodefactory(config):
     with open(config.inpath, 'rb') as f:
         log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-        return Bytecode(f.read())
+        return Bytecode(f.read(), config.dosoundextraseconds)
 
 def main():
     config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
