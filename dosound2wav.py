@@ -20,11 +20,11 @@
 from pym2149.initlogging import logging
 from pym2149 import out
 from pym2149.boot import boot
-from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149.dosound import DosoundPlayer
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
+from dosound2jack import bytecodefactory
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -32,8 +32,7 @@ log = logging.getLogger(__name__)
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
     try:
-        with open(config.inpath) as f:
-            di.add(readbytecode(f, config.srclabel))
+        di.add(bytecodefactory)
         out.configure(di)
         di.add(ChipTimer)
         di.add(DosoundPlayer)

@@ -22,18 +22,24 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
-from pym2149.dosound import DosoundPlayer
+from pym2149.dosound import DosoundPlayer, Bytecode
+from pym2149.iface import Config
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
+from diapyr import types
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
+@types(Config, this = Bytecode)
+def bytecodefactory(config):
+    with open(config.inpath) as f:
+        return readbytecode(f, config.srclabel)
+
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
     try:
-        with open(config.inpath) as f:
-            di.add(readbytecode(f, config.srclabel))
+        di.add(bytecodefactory)
         jackclient.configure(di)
         di.add(ChipTimer) # XXX: Not SyncTimer?
         di.add(DosoundPlayer)
