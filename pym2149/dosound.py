@@ -18,9 +18,10 @@
 from .iface import Chip, Stream, Unit, Prerecorded, Config
 from .timer import Timer
 from diapyr import types
-import logging
+import logging, math
 
 log = logging.getLogger(__name__)
+refreshrate = 50 # Authentic period.
 
 class BadCommandException(Exception): pass
 
@@ -33,12 +34,14 @@ class Bytecode(Prerecorded):
 def dosound(config, bytecode, chip, timer, stream):
     extraseconds = config.dosoundextraseconds
     for _ in _dosound(bytecode.bytes, chip):
-        for b in timer.blocksforperiod(50): # Authentic period.
+        for b in timer.blocksforperiod(refreshrate):
             stream.call(b)
     if extraseconds:
-        log.info("Streaming %.3f extra seconds.", extraseconds)
-        for b in timer.blocksforperiod(1 / extraseconds):
-            stream.call(b)
+        n = math.ceil(extraseconds * refreshrate)
+        log.info("Streaming %.3f extra seconds.", n / refreshrate)
+        for _ in range(n):
+            for b in timer.blocksforperiod(refreshrate):
+                stream.call(b)
     stream.flush()
 
 def _dosound(bytecode, chip):
