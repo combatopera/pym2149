@@ -32,12 +32,8 @@ import sys
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName('inpath', '--section', '--showperiods'))
+    config, di = boot(ConfigName('inpath', '--section', '--showperiods', name = 'txt'))
     try:
-        config.ignoreloop = True
-        config.pianorollheight = None
-        config.rollstream = sys.stdout
-        config.rollmincents = 1
         di.add(PlatformImpl)
         di.add(loadcontext)
         di.add(LiveCodingBridge)

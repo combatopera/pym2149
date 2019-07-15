@@ -54,12 +54,8 @@ class NullStream(Stream):
         pass
 
 def main():
-    config, di = boot(ConfigName('inpath', '--showperiods'))
+    config, di = boot(ConfigName('inpath', '--showperiods', name = 'txt'))
     try:
-        config.ignoreloop = True
-        config.pianorollheight = None
-        config.rollstream = sys.stdout
-        config.rollmincents = 1
         di.add(PlatformImpl)
         di.add(YMOpen)
         di.add(NullStream)
