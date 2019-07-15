@@ -22,18 +22,24 @@ from pym2149 import out
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.dosound import DosoundPlayer, Bytecode
+from pym2149.iface import Config
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
+from diapyr import types
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
+@types(Config, this = Bytecode)
+def bytecodefactory(config):
+    with open(config.inpath, 'rb') as f:
+        log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
+        return Bytecode(f.read())
+
 def main():
     config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
     try:
-        with open(config.inpath, 'rb') as f:
-            log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-            di.add(Bytecode(f.read()))
+        di.add(bytecodefactory)
         out.configure(di)
         di.add(ChipTimer)
         di.add(DosoundPlayer)
