@@ -25,7 +25,7 @@ from pym2149.iface import Config, Context
 from pym2149.lc import osc as lc_osc
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SyncTimer
-from pym2149.util import awaitinterrupt
+from pym2149.util import MainThread
 from pym2149.ymplayer import Player
 from diapyr import types
 from diapyr.start import Started
@@ -48,7 +48,7 @@ def main():
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)
-        awaitinterrupt(config)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 

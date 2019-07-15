@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .iface import Config
+from diapyr import types
 from contextlib import contextmanager
 import time, logging
 
@@ -23,19 +25,26 @@ log = logging.getLogger(__name__)
 def singleton(t):
     return t()
 
-def awaitinterrupt(config):
-    if config.profile or config.trace:
-        sleeptime = config.profile.time if config.profile else config.trace
-        log.debug("Continue for %.3f seconds.", sleeptime)
-        time.sleep(sleeptime)
-        log.debug('End of profile, shutting down.')
-    else:
-        log.debug('Continue until interrupt.')
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            log.debug('Caught interrupt, shutting down.')
+class MainThread:
+
+    @types(Config)
+    def __init__(self, config):
+        self.profile = config.profile
+        self.trace = config.trace
+
+    def sleep(self):
+        if self.profile or self.trace:
+            sleeptime = self.profile.time if self.profile else self.trace
+            log.debug("Continue for %.3f seconds.", sleeptime)
+            time.sleep(sleeptime)
+            log.debug('End of profile, shutting down.')
+        else:
+            log.debug('Continue until interrupt.')
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                log.debug('Caught interrupt, shutting down.')
 
 class EMA:
 

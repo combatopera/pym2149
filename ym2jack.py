@@ -22,7 +22,7 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import SyncTimer
-from pym2149.util import awaitinterrupt
+from pym2149.util import MainThread
 from pym2149.ymformat import YMOpen
 from pym2149.ymplayer import Player
 from diapyr.start import Started
@@ -38,7 +38,7 @@ def main():
         di.add(SyncTimer)
         di.add(Player)
         di.all(Started)
-        awaitinterrupt(config) # FIXME: Stop program in ignoreloop case.
+        di(MainThread).sleep() # FIXME: Stop program in ignoreloop case.
     finally:
         di.discardall()
 

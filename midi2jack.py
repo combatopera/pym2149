@@ -23,7 +23,7 @@ from pym2149.midi import MidiListen, EventPump
 from pym2149.config import ConfigName
 from pym2149.channels import Channels
 from pym2149.boot import boot
-from pym2149.util import awaitinterrupt
+from pym2149.util import MainThread
 from pym2149.pll import PLL
 from pym2149.timerimpl import SyncTimer
 from diapyr.start import Started
@@ -45,7 +45,7 @@ def main():
         di.add(EventPump)
         di.add(MidiListen)
         di.all(Started)
-        awaitinterrupt(config)
+        di(MainThread).sleep()
     finally:
         di.discardall()
 
