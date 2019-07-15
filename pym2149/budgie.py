@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .dosound import issleepcommand, Bytecode
+from .dosound import issleepcommand
 import re, itertools
 
 class Line:
@@ -58,11 +58,11 @@ def readbytecode(f, findlabel):
                 break
     if bytecode is None:
         raise NoSuchLabelException(findlabel)
-    return bytecode
+    return bytecode.bytes
 
 class UnsupportedDirectiveException(Exception): pass
 
-class BytecodeBuilder(Bytecode):
+class BytecodeBuilder:
 
     @staticmethod
     def number(s):
@@ -74,7 +74,7 @@ class BytecodeBuilder(Bytecode):
             return int(s) # XXX: Could it be octal?
 
     def __init__(self, aligned):
-        super().__init__([])
+        self.bytes = []
         self.aligned = aligned
 
     def startingnow(self):

@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 @types(Config, this = Bytecode)
 def bytecodefactory(config):
     with open(config.inpath) as f:
-        return readbytecode(f, config.srclabel)
+        return Bytecode(readbytecode(f, config.srclabel))
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
