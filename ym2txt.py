@@ -27,7 +27,6 @@ from pym2149.ymformat import YMOpen
 from pym2149.ymplayer import Player
 from diapyr import types
 from diapyr.start import Started
-import sys
 
 log = logging.getLogger(__name__)
 

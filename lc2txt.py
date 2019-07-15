@@ -27,7 +27,6 @@ from pym2149.ymplayer import Player
 from lc2jack import loadcontext
 from ym2txt import PlatformImpl, NullStream
 from diapyr.start import Started
-import sys
 
 log = logging.getLogger(__name__)
 
