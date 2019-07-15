@@ -25,10 +25,9 @@ log = logging.getLogger(__name__)
 class OSCClient:
 
     def __init__(self, host, port, bufsize, handlers):
+        self.address = host, port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # XXX: Close it?
-        # TODO LATER: Send self an interrupt message instead of relying on timeout.
-        self.sock.settimeout(.1) # For polling the open flag.
-        self.sock.bind((host, port))
+        self.sock.bind(self.address)
         self.bufsize = bufsize
         self.handlers = handlers
 
@@ -58,6 +57,10 @@ class OSCClient:
         for element in elements:
             self._message(udpaddr, timetags, element)
 
+    def interrupt(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.sendto(timelyOSC.Message('/interrupt', []).ser(), self.address)
+
 class Handler: pass
 
 class OSCListen(SimpleBackground):
@@ -69,13 +72,12 @@ class OSCListen(SimpleBackground):
         self.handlers = {a: h for h in handlers for a in h.addresses}
 
     def start(self):
-        super().start(self.bg)
-
-    def bg(self):
         config = self.config['OSC',]
-        client = OSCClient(
+        super().start(self.bg, OSCClient(
                 *(config.resolved(name).unravel() for name in ['host', 'port', 'bufsize']),
-                self.handlers)
+                self.handlers))
+
+    def bg(self, client):
         while not self.quit:
             client.pumponeortimeout()
 
@@ -95,6 +97,18 @@ class LCHandler(Handler):
         except Exception:
             log.exception('Update failed:')
 
+class InterruptHandler(Handler):
+
+    addresses = '/interrupt',
+
+    @types()
+    def __init__(self):
+        pass
+
+    def __call__(self, timetags, message, reply):
+        pass # Do nothing.
+
 def configure(di):
     di.add(LCHandler)
+    di.add(InterruptHandler)
     di.add(OSCListen)
