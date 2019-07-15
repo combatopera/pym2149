@@ -33,6 +33,13 @@ class Bytecode(Prerecorded):
         self.bytes = bytes
         self.extraseconds = extraseconds
 
+    def frames(self, chip):
+        yield from _dosoundimpl(self.bytes, chip)
+        if self.extraseconds:
+            n = math.ceil(self.extraseconds * refreshrate)
+            log.info("Streaming %.3f extra seconds.", n / refreshrate)
+            yield from range(n)
+
 class DosoundPlayer(MainBackground):
 
     @types(Config, Bytecode, Chip, Timer, Stream, MainThread)
@@ -45,7 +52,7 @@ class DosoundPlayer(MainBackground):
         self.mainthread = mainthread
 
     def __call__(self):
-        for _ in _dosound(self.bytecode.bytes, self.chip, self.bytecode.extraseconds):
+        for _ in self.bytecode.frames(self.chip):
             if self.quit:
                 exhausted = False
                 break
@@ -56,13 +63,6 @@ class DosoundPlayer(MainBackground):
         self.stream.flush()
         if exhausted:
             self.mainthread.endofdata()
-
-def _dosound(bytecode, chip, extraseconds):
-    yield from _dosoundimpl(bytecode, chip)
-    if extraseconds:
-        n = math.ceil(extraseconds * refreshrate)
-        log.info("Streaming %.3f extra seconds.", n / refreshrate)
-        yield from range(n)
 
 def _dosoundimpl(bytecode, chip):
     def g():
