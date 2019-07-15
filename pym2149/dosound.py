@@ -15,9 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Unit, Prerecorded
+from .iface import Chip, Stream, Unit, Prerecorded, Config
 from .timer import Timer
 from diapyr import types
+import logging
+
+log = logging.getLogger(__name__)
 
 class BadCommandException(Exception): pass
 
@@ -26,10 +29,15 @@ class Bytecode(Prerecorded):
     def __init__(self, bytes):
         self.bytes = bytes
 
-@types(Bytecode, Chip, Timer, Stream, this = Unit)
-def dosound(bytecode, chip, timer, stream):
+@types(Config, Bytecode, Chip, Timer, Stream, this = Unit)
+def dosound(config, bytecode, chip, timer, stream):
+    extraseconds = config.dosoundextraseconds
     for _ in _dosound(bytecode.bytes, chip):
         for b in timer.blocksforperiod(50): # Authentic period.
+            stream.call(b)
+    if extraseconds:
+        log.info("Streaming %.3f extra seconds.", extraseconds)
+        for b in timer.blocksforperiod(1 / extraseconds):
             stream.call(b)
 
 def _dosound(bytecode, chip):

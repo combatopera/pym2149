@@ -23,21 +23,11 @@ from pym2149.boot import boot
 from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149.dosound import dosound
-from pym2149.iface import Stream, Unit, Config
-from pym2149.timer import Timer
+from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
-from diapyr import types
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
-
-@types(Config, Timer, Stream, this = Unit)
-def extra(config, timer, stream):
-    seconds = config.dosoundextraseconds
-    if seconds:
-        log.info("Streaming %.3f extra seconds.", seconds)
-        for b in timer.blocksforperiod(1 / seconds):
-            stream.call(b)
 
 def main():
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
@@ -49,7 +39,6 @@ def main():
         di.all(Started)
         di.add(ChipTimer)
         di.add(dosound)
-        di.add(extra)
         di.all(Unit)
         di(Stream).flush()
     finally:

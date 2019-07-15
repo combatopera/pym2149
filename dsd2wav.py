@@ -24,7 +24,6 @@ from pym2149.config import ConfigName
 from pym2149.dosound import dosound, Bytecode
 from pym2149.iface import Stream, Unit
 from pym2149.timerimpl import ChipTimer
-from dosound2wav import extra
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -40,7 +39,6 @@ def main():
         di.all(Started)
         di.add(ChipTimer)
         di.add(dosound)
-        di.add(extra)
         di.all(Unit)
         di(Stream).flush()
     finally:
