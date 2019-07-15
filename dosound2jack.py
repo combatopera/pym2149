@@ -24,8 +24,8 @@ from pym2149.budgie import readbytecode
 from pym2149.config import ConfigName
 from pym2149.dosound import dosound
 from pym2149.iface import Stream, Unit
-from pym2149.timer import Timer
 from pym2149.timerimpl import ChipTimer
+from dosound2wav import extra
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -39,14 +39,10 @@ def main():
         jackclient.configure(di)
         di.all(Started)
         di.add(ChipTimer) # XXX: Not SyncTimer?
-        timer = di(Timer)
-        stream = di(Stream)
         di.add(dosound)
-        di(Unit)
-        log.info("Streaming %.3f extra seconds.", config.dosoundextraseconds)
-        for b in timer.blocksforperiod(1 / config.dosoundextraseconds):
-            stream.call(b)
-        stream.flush()
+        di.add(extra)
+        di.all(Unit)
+        di(Stream).flush()
     finally:
         di.discardall()
 
