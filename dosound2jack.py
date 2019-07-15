@@ -38,7 +38,7 @@ def main():
         di.add(jackclient.JackClient)
         jackclient.configure(di)
         di.all(Started)
-        di.add(ChipTimer)
+        di.add(ChipTimer) # XXX: Not SyncTimer?
         timer = di(Timer)
         stream = di(Stream)
         di.add(dosound)
