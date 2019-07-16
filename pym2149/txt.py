@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -17,29 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
-from pym2149 import txt
-from pym2149.boot import boot
-from pym2149.config import ConfigName
-from pym2149.timerimpl import ChipTimer
-from pym2149.util import MainThread
-from pym2149.ymformat import YMOpen
-from pym2149.ymplayer import Player
-from diapyr.start import Started
+from .iface import Platform, AmpScale, Stream
+from diapyr import types
 
-log = logging.getLogger(__name__)
+class TxtPlatform(Platform, metaclass = AmpScale):
 
-def main():
-    config, di = boot(ConfigName('inpath', '--showperiods', name = 'txt'))
-    try:
-        di.add(YMOpen)
-        txt.configure(di)
-        di.add(ChipTimer)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-    finally:
-        di.discardall()
+    # Neither of these is significant for this script:
+    outputrate = 44100
+    log2maxpeaktopeak = 1
 
-if '__main__' == __name__:
-    main()
+    @types()
+    def __init__(self):
+        pass
+
+class NullStream(Stream):
+
+    @types()
+    def __init__(self):
+        pass
+
+    def call(self, block):
+        pass
+
+    def flush(self):
+        pass
+
+def configure(di):
+    di.add(TxtPlatform)
+    di.add(NullStream)
