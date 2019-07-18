@@ -48,3 +48,9 @@ class ChipTimer(MinBlockRateTimer):
     @types(ClockInfo)
     def __init__(self, clockinfo):
         super().__init__(clockinfo.implclock, 100)
+
+class SimpleChipTimer(SimpleTimer):
+
+    @types(ClockInfo)
+    def __init__(self, clockinfo):
+        super().__init__(clockinfo.implclock)

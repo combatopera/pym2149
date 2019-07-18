@@ -19,13 +19,13 @@
 
 from pym2149.initlogging import logging
 from pym2149 import out
-from pym2149.midi import MidiListen, EventPump
-from pym2149.config import ConfigName
-from pym2149.channels import Channels
 from pym2149.boot import boot
-from pym2149.util import MainThread
+from pym2149.channels import Channels
+from pym2149.config import ConfigName
+from pym2149.midi import MidiListen, EventPump
 from pym2149.pll import PLL
-from pym2149.ymplayer import SimpleChipTimer
+from pym2149.timerimpl import SimpleChipTimer
+from pym2149.util import MainThread
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)

@@ -16,17 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Chip, Stream, Prerecorded, Config, Roll, Timer
-from .timer import SimpleTimer
 from .util import MainThread
-from .ym2149 import ClockInfo
 from bg import MainBackground
 from diapyr import types
-
-class SimpleChipTimer(SimpleTimer):
-
-    @types(ClockInfo)
-    def __init__(self, clockinfo):
-        super().__init__(clockinfo.implclock)
 
 class Player(MainBackground):
 
@@ -53,4 +45,4 @@ class Player(MainBackground):
             exhausted = True
         self.stream.flush()
         if exhausted:
-            self.mainthread.endofdata()
+            self.mainthread.endofdata() # TODO: Use a Future instead.
