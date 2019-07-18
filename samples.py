@@ -20,10 +20,10 @@
 from pym2149.initlogging import logging
 from pym2149.pitch import Freq
 from pym2149.config import ConfigName
-from pym2149.timer import Timer, SimpleTimer
+from pym2149.timer import SimpleTimer
 from pym2149 import out
 from pym2149.boot import boot
-from pym2149.iface import Stream, Config, Chip
+from pym2149.iface import Stream, Config, Chip, Timer
 from pym2149.program import Note
 from pym2149.mediation import SimpleMediation
 from pym2149.channels import Channels

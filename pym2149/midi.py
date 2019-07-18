@@ -16,10 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .const import clientname
-from .iface import Config, Stream
+from .iface import Config, Stream, Timer
 from .pll import PLL
 from .channels import Channels
-from .timer import Timer
 from .util import EMA, singleton
 from .speed import SpeedDetector
 from .native import calsa

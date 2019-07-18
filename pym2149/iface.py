@@ -36,3 +36,5 @@ class Tuning: pass
 class Context: pass
 
 class Roll: pass
+
+class Timer: pass

@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Prerecorded, Config, Roll
-from .timer import Timer, SimpleTimer
+from .iface import Chip, Stream, Prerecorded, Config, Roll, Timer
+from .timer import SimpleTimer
 from .util import MainThread
 from .ym2149 import ClockInfo
 from bg import MainBackground
