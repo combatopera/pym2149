@@ -51,6 +51,7 @@ class ChipTimer(MinBlockRateTimer):
         super().__init__(clockinfo.implclock, 100)
 
 class SimpleChipTimer(SimpleTimer):
+    'One block per update.'
 
     @types(ClockInfo)
     def __init__(self, clockinfo):

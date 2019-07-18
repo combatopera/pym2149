@@ -40,7 +40,7 @@ def main():
         di.all(Started)
         channels = di(Channels)
         log.info(channels)
-        di.add(SimpleChipTimer) # One block per update.
+        di.add(SimpleChipTimer)
         di.add(EventPump)
         di.add(MidiListen)
         di.all(Started)
