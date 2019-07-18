@@ -23,6 +23,7 @@ from pym2149.nod import Block
 from pym2149.minblep import MinBleps
 
 class SyncTimer(SimpleTimer):
+    'Fill platform buffer most efficiently.'
 
     @types(Platform, MinBleps, ClockInfo)
     def __init__(self, platform, minbleps, clockinfo):
