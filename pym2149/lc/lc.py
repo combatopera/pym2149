@@ -229,6 +229,11 @@ class Mul(Binary):
 
 class Merge(Binary):
 
+    @property
+    def mulcls(self):
+        mulcls, = set(p.mulcls for p in [self.p1, self.p2])
+        return mulcls
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.len = max(self.p1.len, self.p2.len)
@@ -240,6 +245,10 @@ class Merge(Binary):
         return Overlay(x, y)
 
 class RShift(Operators):
+
+    @property
+    def mulcls(self):
+        return self.p.mulcls
 
     @property
     def kwargs(self):
@@ -257,6 +266,10 @@ class RShift(Operators):
         return self.p.getitem(frame, self.frames + shift)
 
 class Repeat(Operators):
+
+    @property
+    def mulcls(self):
+        return self.p.mulcls
 
     @property
     def kwargs(self):
@@ -310,6 +323,11 @@ class Concat(Binary):
             return self.p2.getitem(frame, shift + split)
 
 class Then(Binary):
+
+    @property
+    def mulcls(self):
+        mulcls, = set(p.mulcls for p in [self.p1, self.p2])
+        return mulcls
 
     @property
     def len(self):
