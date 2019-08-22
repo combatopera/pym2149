@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-def V(script, step = 0, continuous = False):
+def V(*script, step = 0, continuous = False):
     from .parse import concat, StepScript, VParse
     return concat(lambda *args: StepScript(*args, step), VParse(float, step, continuous), script, {})
 
-def D(script):
+def D(*script):
     from .parse import concat, Script, VParse, vector
     return concat(Script, VParse(vector, 0, False), script, {})
 
-def E(cls, script, initargs = (), **kwargs):
+def E(cls, *script, initargs = (), **kwargs):
     from .parse import concat, Script, EParse, NoteWrapper
     namespace = object()
     kwargs = {(namespace, name): value for name, value in kwargs.items()}

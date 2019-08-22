@@ -112,10 +112,17 @@ class VParse(Parse):
 def vector(d = None):
     return np.array([0, 0 if d is None else float(d) - 1, 0])
 
-def concat(scriptcls, parser, script, kwargs):
+def _flatten(scriptforest):
+    for textorseq in scriptforest:
+        if isinstance(textorseq, str):
+            yield textorseq
+        else:
+            yield from _flatten(textorseq)
+
+def concat(scriptcls, parser, scriptforest, kwargs):
     scripts = []
     successor = None
-    for segment in reversed(script.split(',')):
+    for segment in reversed(' '.join(_flatten(scriptforest)).split(',')):
         successor = scriptcls(parser(segment, successor), kwargs)
         scripts.insert(0, successor)
     return scripts[0] if 1 == len(scripts) else Concat(*scripts)
