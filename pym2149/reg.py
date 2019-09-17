@@ -30,7 +30,7 @@ class Link:
                 return
             self.reg.set(self.xform(*upstreamvals))
 
-class Reg(object):
+class Reg:
 
     def __init__(self, **kwargs):
         self.links = []
@@ -67,9 +67,7 @@ class Reg(object):
 
 class VersionReg(Reg):
 
-    def __init__(self, **kwargs):
-        self.version = 0
-        super().__init__(**kwargs)
+    version = 0
 
     def set(self, value):
         super().set(value)
