@@ -66,7 +66,9 @@ class LogicalRegisters:
     envperiod = regproperty(lambda regs: regs.envperiodreg)
     envshape = regproperty(lambda regs: regs.envshapereg)
 
-    def __init__(self, clockinfo, confchannels):
+    @types(Config, clockinfo)
+    def __init__(self, config, clockinfo):
+        confchannels = config.chipchannels
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
         self.noiseperiodreg = Reg(minval = 1)
         self.toneflags = [Reg() for _ in range(confchannels)]
@@ -135,7 +137,7 @@ class YM2149(LogicalRegisters, Container, Chip):
         channels = config.chipchannels
         self.oscpause = config.oscpause
         self.clock = clockinfo.implclock
-        LogicalRegisters.__init__(self, clockinfo, channels)
+        LogicalRegisters.__init__(self, config, clockinfo)
         # Chip-wide signals:
         noise = NoiseOsc(self.scale, self.noiseperiodreg, self.noiseshape)
         env = EnvOsc(self.scale, self.envperiodreg, self.envshapereg)
