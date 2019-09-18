@@ -66,7 +66,7 @@ class LogicalRegisters:
     envperiod = regproperty(lambda regs: regs.envperiodreg)
     envshape = regproperty(lambda regs: regs.envshapereg)
 
-    @types(Config, clockinfo)
+    @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
         confchannels = config.chipchannels
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
