@@ -20,7 +20,7 @@ from .context import ContextImpl
 from .out import StereoInfo, FloatStream
 from .util import MainThread
 from .vis import RollImpl, NullRoll
-from .ym2149 import ClockInfo, YM2149
+from .ym2149 import ClockInfo, YM2149, PhysicalRegisters
 from diapyr import DI
 import sys
 
@@ -37,6 +37,7 @@ def boot(configname):
     di.add(ClockInfo)
     di.add(StereoInfo)
     di.add(YM2149)
+    di.add(PhysicalRegisters)
     di.add(minblep.loadorcreate)
     di.add(FloatStream)
     pitch.configure(di)

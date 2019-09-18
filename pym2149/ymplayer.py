@@ -15,26 +15,47 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Stream, Prerecorded, Config, Roll, Timer
+from .iface import Stream, Prerecorded, Config, Roll, Timer
 from .util import MainThread
+from .ym2149 import LogicalRegisters, PhysicalRegisters
 from bg import MainBackground
 from diapyr import types
 
+class Bundle:
+
+    def __init__(self, prerecorded, registers):
+        self.prerecorded = prerecorded
+        self.registers = registers
+
+    def __iter__(self):
+        yield from self.prerecorded.frames(self.registers)
+
+class LogicalBundle(Bundle):
+
+    @types(Prerecorded, LogicalRegisters)
+    def __init__(self, prerecorded, registers):
+        super().__init__(prerecorded, registers)
+
+class PhysicalBundle(Bundle):
+
+    @types(Prerecorded, PhysicalRegisters)
+    def __init__(self, prerecorded, registers):
+        super().__init__(prerecorded, registers)
+
 class Player(MainBackground):
 
-    @types(Config, Prerecorded, Chip, Roll, Timer, Stream, MainThread)
-    def __init__(self, config, prerecorded, chip, roll, timer, stream, mainthread):
+    @types(Config, Bundle, Roll, Timer, Stream, MainThread)
+    def __init__(self, config, bundle, roll, timer, stream, mainthread):
         super().__init__(config)
         self.updaterate = config.updaterate
-        self.prerecorded = prerecorded
-        self.chip = chip
+        self.bundle = bundle
         self.roll = roll
         self.timer = timer
         self.stream = stream
         self.mainthread = mainthread
 
     def __call__(self):
-        for _ in self.prerecorded.frames(self.chip):
+        for _ in self.bundle:
             if self.quit:
                 exhausted = False
                 break

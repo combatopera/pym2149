@@ -34,56 +34,71 @@ spectrumclock = spectrum128crystal // 10
 defaultscale = 8
 ym2149nzdegrees = 17, 14
 
-class MixerFlag:
+class LogicalRegisters:
 
-    def __init__(self, bit):
-        self.mask = 0x01 << bit
-
-    def __call__(self, m):
-        return not (m & self.mask)
-
-class Registers:
-
-    supportedchannels = 3
+    # TODO: Retire regproperty.
     noiseperiod = regproperty(lambda regs: regs.noiseperiodreg)
     envperiod = regproperty(lambda regs: regs.envperiodreg)
     envshape = regproperty(lambda regs: regs.envshapereg)
 
     def __init__(self, clockinfo, confchannels):
-        # TODO: Add reverse wiring.
-        # Like the real thing we have 16 registers, this impl ignores the last 2:
-        self.R = tuple(Reg() for _ in range(16))
-        # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
-        # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
-        TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
-        NP = lambda p: p & 0x1f
-        EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
-        clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
-        for c in range(clampedchannels):
-            self.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
-        self.noiseperiodreg = Reg(minval = 1).link(NP, self.R[0x6])
+        self.noiseperiodreg = Reg(minval = 1)
         self.toneflags = [Reg() for _ in range(confchannels)]
         self.noiseflags = [Reg() for _ in range(confchannels)]
         self.fixedlevels = [Reg() for _ in range(confchannels)]
         self.levelmodes = [Reg() for _ in range(confchannels)]
-        for c in range(clampedchannels):
-            self.toneflags[c].link(MixerFlag(c), self.R[0x7])
-            self.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
-            self.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
-            self.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
-        self.envperiodreg = Reg(minval = 1).link(EP, self.R[0xB], self.R[0xC])
-        self.envshapereg = VersionReg().link(lambda s: s & 0x0f, self.R[0xD])
-        for r in self.R:
-            r.value = 0
-        for c in range(self.supportedchannels, confchannels):
-            # These won't have been inited via the registers:
-            self.toneperiods[c].value = TP(0, 0)
-            self.toneflags[c].value = MixerFlag(0)(0)
-            self.noiseflags[c].value = MixerFlag(0)(0)
+        self.envperiodreg = Reg(minval = 1)
+        self.envshapereg = VersionReg()
+        for c in range(confchannels):
+            self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
+            self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
+            self.noiseflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
             self.fixedlevels[c].value = 0
             self.levelmodes[c].value = False
+        self.noiseperiodreg.value = 0
+        self.envperiodreg.value = 0
+        self.envshapereg.value = 0
         self.timers = tuple(MFPTimer() for _ in range(confchannels))
+
+class PhysicalRegisters:
+
+    class MixerFlag:
+
+        def __init__(self, bit):
+            self.mask = 0x01 << bit
+
+        def __call__(self, m):
+            return not (m & self.mask)
+
+    supportedchannels = 3
+    # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
+    # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
+    TP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0x0f) << 8))
+    NP = staticmethod(lambda p: p & 0x1f)
+    EP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0xff) << 8))
+    timers = property(lambda self: self.logical.timers)
+
+    @types(Config, LogicalRegisters)
+    def __init__(self, config, logical):
+        confchannels = config.chipchannels
+        # TODO: Add reverse wiring.
+        # Like the real thing we have 16 registers, this impl ignores the last 2:
+        self.R = tuple(Reg() for _ in range(16))
+        clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
+        for c in range(clampedchannels):
+            logical.toneperiods[c].link(self.TP, self.R[c * 2], self.R[c * 2 + 1])
+        logical.noiseperiodreg.link(self.NP, self.R[0x6])
+        for c in range(clampedchannels):
+            logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
+            logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
+            logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
+            logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
+        logical.envperiodreg.link(self.EP, self.R[0xB], self.R[0xC])
+        logical.envshapereg.link(lambda s: s & 0x0f, self.R[0xD])
+        for r in self.R:
+            r.value = 0
+        self.logical = logical
 
 class ClockInfo:
 
@@ -110,7 +125,7 @@ class ClockInfo:
         # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
         return (self.implclock - 1) // (self.scale * outrate)
 
-class YM2149(Registers, Container, Chip):
+class YM2149(LogicalRegisters, Container, Chip):
 
     noiseshape = Shape(Lfsr(ym2149nzdegrees))
 
@@ -120,7 +135,7 @@ class YM2149(Registers, Container, Chip):
         channels = config.chipchannels
         self.oscpause = config.oscpause
         self.clock = clockinfo.implclock
-        Registers.__init__(self, clockinfo, channels)
+        LogicalRegisters.__init__(self, clockinfo, channels)
         # Chip-wide signals:
         noise = NoiseOsc(self.scale, self.noiseperiodreg, self.noiseshape)
         env = EnvOsc(self.scale, self.envperiodreg, self.envshapereg)

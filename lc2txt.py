@@ -24,7 +24,7 @@ from pym2149.config import ConfigName
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SimpleChipTimer
 from pym2149.util import MainThread
-from pym2149.ymplayer import Player
+from pym2149.ymplayer import Player, LogicalBundle
 from lc2jack import loadcontext
 from diapyr.start import Started
 
@@ -37,6 +37,7 @@ def main():
         di.add(LiveCodingBridge)
         txt.configure(di)
         di.add(SimpleChipTimer)
+        di.add(LogicalBundle)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()

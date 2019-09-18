@@ -24,7 +24,7 @@ from pym2149.config import ConfigName
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
 from pym2149.ymformat import YMOpen
-from pym2149.ymplayer import Player
+from pym2149.ymplayer import Player, PhysicalBundle
 from diapyr.start import Started
 
 log = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ def main():
         di.add(YMOpen)
         out.configure(di)
         di.add(ChipTimer)
+        di.add(PhysicalBundle)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()

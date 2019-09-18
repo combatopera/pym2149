@@ -26,7 +26,7 @@ from pym2149.lc import osc as lc_osc
 from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import MainThread
-from pym2149.ymplayer import Player
+from pym2149.ymplayer import Player, LogicalBundle
 from diapyr import types
 from diapyr.start import Started
 
@@ -45,6 +45,7 @@ def main():
         lc_osc.configure(di)
         jackclient.configure(di)
         di.add(SyncTimer)
+        di.add(LogicalBundle)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()

@@ -23,7 +23,7 @@ from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
-from pym2149.ymplayer import Player
+from pym2149.ymplayer import Player, PhysicalBundle
 from dosound2jack import bytecodefactory
 from diapyr.start import Started
 
@@ -35,6 +35,7 @@ def main():
         di.add(bytecodefactory)
         out.configure(di)
         di.add(ChipTimer)
+        di.add(PhysicalBundle)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
