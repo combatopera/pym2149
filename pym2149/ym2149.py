@@ -34,6 +34,31 @@ spectrumclock = spectrum128crystal // 10
 defaultscale = 8
 ym2149nzdegrees = 17, 14
 
+class ClockInfo:
+
+    @types(Config, Platform, YMFile)
+    def __init__(self, config, platform, ymfile = None):
+        if config.nominalclock % config.underclock:
+            raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
+        self.implclock = config.nominalclock // config.underclock
+        if ymfile is not None and config.nominalclock != ymfile.nominalclock:
+            log.info("Context clock %s overridden to: %s", ymfile.nominalclock, config.nominalclock)
+        if self.implclock != config.nominalclock:
+            log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
+        if config.underclock < 1 or defaultscale % config.underclock:
+            raise Exception("underclock must be a factor of %s." % defaultscale)
+        self.scale = defaultscale // config.underclock
+        if config.freqclamp:
+            # The 0 case just means that 1 is audible:
+            self.mintoneperiod = max(1, self.toneperiodclampor0(platform.outputrate))
+            log.debug("Minimum tone period: %s", self.mintoneperiod)
+        else:
+            self.mintoneperiod = 1
+
+    def toneperiodclampor0(self, outrate):
+        # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
+        return (self.implclock - 1) // (self.scale * outrate)
+
 class LogicalRegisters:
 
     # TODO: Retire regproperty.
@@ -99,31 +124,6 @@ class PhysicalRegisters:
         for r in self.R:
             r.value = 0
         self.logical = logical
-
-class ClockInfo:
-
-    @types(Config, Platform, YMFile)
-    def __init__(self, config, platform, ymfile = None):
-        if config.nominalclock % config.underclock:
-            raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
-        self.implclock = config.nominalclock // config.underclock
-        if ymfile is not None and config.nominalclock != ymfile.nominalclock:
-            log.info("Context clock %s overridden to: %s", ymfile.nominalclock, config.nominalclock)
-        if self.implclock != config.nominalclock:
-            log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
-        if config.underclock < 1 or defaultscale % config.underclock:
-            raise Exception("underclock must be a factor of %s." % defaultscale)
-        self.scale = defaultscale // config.underclock
-        if config.freqclamp:
-            # The 0 case just means that 1 is audible:
-            self.mintoneperiod = max(1, self.toneperiodclampor0(platform.outputrate))
-            log.debug("Minimum tone period: %s", self.mintoneperiod)
-        else:
-            self.mintoneperiod = 1
-
-    def toneperiodclampor0(self, outrate):
-        # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
-        return (self.implclock - 1) // (self.scale * outrate)
 
 class YM2149(LogicalRegisters, Container, Chip):
 
