@@ -73,7 +73,7 @@ class WavWriter(Stream, Node, metaclass = AmpScale):
 
   @types(Config, Multiplexed, StereoInfo, Platform)
   def __init__(self, config, wav, stereoinfo, platform):
-    Node.__init__(self)
+    super().__init__()
     fclass = Wave16
     self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
     self.roundmaster = MasterBuf(dtype = floatdtype)
