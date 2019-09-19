@@ -19,8 +19,9 @@ from .pitch import Pitch
 from .program import FX, NullNote
 from .const import midichannelcount
 from .mediation import Mediation
-from .iface import Chip, Config, Tuning
+from .iface import Config, Tuning
 from .config import ConfigSubscription, ConfigName
+from .ym2149 import LogicalRegisters
 from diapyr import types, DI
 from contextlib import contextmanager
 import logging
@@ -106,7 +107,7 @@ class Channels:
         di.add(cls)
         di.add(ChannelsConfigSubscription)
 
-    @types(Config, Chip, Mediation, Tuning)
+    @types(Config, LogicalRegisters, Mediation, Tuning)
     def __init__(self, config, chip, mediation, tuning):
         self.nomclock = config.nominalclock
         neutralvel = config.neutralvelocity
