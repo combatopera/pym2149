@@ -133,28 +133,27 @@ class PhysicalRegisters:
             r.value = 0
         self.logical = logical
 
-class YM2149(LogicalRegisters, Container):
+class YM2149(Container):
 
     noiseshape = Shape(Lfsr(ym2149nzdegrees))
 
-    @types(Config, ClockInfo, AmpScale)
-    def __init__(self, config, clockinfo, ampscale):
+    @types(Config, ClockInfo, AmpScale, LogicalRegisters)
+    def __init__(self, config, clockinfo, ampscale, logical):
         self.scale = clockinfo.scale
         channels = config.chipchannels
         self.oscpause = config.oscpause
         self.clock = clockinfo.implclock
-        LogicalRegisters.__init__(self, config, clockinfo)
         # Chip-wide signals:
-        noise = NoiseOsc(self.scale, self.noiseperiodreg, self.noiseshape)
-        env = EnvOsc(self.scale, self.envperiodreg, self.envshapereg)
+        noise = NoiseOsc(self.scale, logical.noiseperiodreg, self.noiseshape)
+        env = EnvOsc(self.scale, logical.envperiodreg, logical.envshapereg)
         # Digital channels from binary to level in [0, 31]:
-        tones = [ToneOsc(self.scale, self.toneperiods[c]) for c in range(channels)]
-        rtones = [RToneOsc(mfpclock, self.clock, self.timers[c]) for c in range(channels)]
+        tones = [ToneOsc(self.scale, logical.toneperiods[c]) for c in range(channels)]
+        rtones = [RToneOsc(mfpclock, self.clock, logical.timers[c]) for c in range(channels)]
         # XXX: Add rtones to maskables?
         self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
-        binchans = [BinMix(tones[c], noise, self.toneflags[c], self.noiseflags[c]) for c in range(channels)]
-        levels = [Level(self.levelmodes[c], self.fixedlevels[c], env, binchans[c], rtones[c], self.timers[c].effect) for c in range(channels)]
-        Container.__init__(self, [Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
+        binchans = [BinMix(tones[c], noise, logical.toneflags[c], logical.noiseflags[c]) for c in range(channels)]
+        levels = [Level(logical.levelmodes[c], logical.fixedlevels[c], env, binchans[c], rtones[c], logical.timers[c].effect) for c in range(channels)]
+        super().__init__([Dac(level, ampscale.log2maxpeaktopeak, channels) for level in levels])
 
     def callimpl(self):
         result = super().callimpl()
