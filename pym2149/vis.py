@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip, Config, Tuning, Roll
+from .iface import Config, Tuning, Roll
 from .pitch import Period, Freq
 from .util import singleton
+from .ym2149 import LogicalRegisters
 from diapyr import types
 
 @singleton
@@ -30,7 +31,7 @@ class RollImpl(Roll):
 
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
 
-    @types(Config, Chip, Tuning)
+    @types(Config, LogicalRegisters, Tuning)
     def __init__(self, config, chip, tuning):
         self.height = config.pianorollheight
         self.nomclock = config.nominalclock
