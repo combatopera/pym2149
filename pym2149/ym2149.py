@@ -20,7 +20,7 @@ from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
 from .dac import Level, Dac
 from .mix import BinMix
 from .nod import Container
-from .iface import AmpScale, Chip, YMFile, Config, Platform
+from .iface import AmpScale, YMFile, Config, Platform
 from diapyr import types
 from .mfp import MFPTimer, mfpclock
 from .lfsr import Lfsr
@@ -133,7 +133,7 @@ class PhysicalRegisters:
             r.value = 0
         self.logical = logical
 
-class YM2149(LogicalRegisters, Container, Chip):
+class YM2149(LogicalRegisters, Container):
 
     noiseshape = Shape(Lfsr(ym2149nzdegrees))
 
