@@ -23,12 +23,13 @@ from pym2149.config import ConfigName
 from pym2149.timer import SimpleTimer
 from pym2149 import out
 from pym2149.boot import boot
-from pym2149.iface import Stream, Config, Chip, Timer
+from pym2149.iface import Stream, Config, Timer
 from pym2149.program import Note
 from pym2149.mediation import SimpleMediation
 from pym2149.channels import Channels
 from pym2149.dac import PWMEffect, SinusEffect
 from pym2149.timerimpl import ChipTimer
+from pym2149.ym2149 import LogicalRegisters
 from diapyr import types
 from diapyr.start import Started
 import os, time
@@ -109,7 +110,7 @@ class ProgramIds(dict): pass
 
 class Player:
 
-    @types(Config, Timer, Stream, Channels, Frames, ProgramIds, Chip)
+    @types(Config, Timer, Stream, Channels, Frames, ProgramIds, LogicalRegisters)
     def __init__(self, config, timer, stream, channels, frames, programids, chip):
         self.updaterate = config.updaterate
         self.neutralvel = config.neutralvelocity
