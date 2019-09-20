@@ -1,9 +1,8 @@
-/var/
 #gclean
 /target/
 *.pyc
-/pym2149/native/*.pyxbldc
-/pym2149/native/*.c
-/pym2149/native/*.so
+pym2149/native/*.pyxbldc
+pym2149/native/*.c
+pym2149/native/*.so
 *_turbo/
 *.dsd
