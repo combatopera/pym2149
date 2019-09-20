@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.timer import MinBlockRateTimer, SimpleTimer
-from pym2149.iface import Platform
+from .iface import Platform
+from .minblep import MinBleps
+from .nod import Block
+from .timer import MinBlockRateTimer, SimpleTimer
+from .ym2149 import ClockInfo
 from diapyr import types
-from pym2149.ym2149 import ClockInfo
-from pym2149.nod import Block
-from pym2149.minblep import MinBleps
 
 class SyncTimer(SimpleTimer):
     'Fill platform buffer most efficiently.'
