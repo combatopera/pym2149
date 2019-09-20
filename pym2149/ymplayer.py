@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Stream, Prerecorded, Config, Roll, Timer
-from .util import MainThread
 from .ym2149 import LogicalRegisters, PhysicalRegisters
 from bg import MainBackground
 from diapyr import types
@@ -44,26 +43,20 @@ class PhysicalBundle(Bundle):
 
 class Player(MainBackground):
 
-    @types(Config, Bundle, Roll, Timer, Stream, MainThread)
-    def __init__(self, config, bundle, roll, timer, stream, mainthread):
+    @types(Config, Bundle, Roll, Timer, Stream)
+    def __init__(self, config, bundle, roll, timer, stream):
         super().__init__(config)
         self.updaterate = config.updaterate
         self.bundle = bundle
         self.roll = roll
         self.timer = timer
         self.stream = stream
-        self.mainthread = mainthread
 
     def __call__(self):
         for _ in self.bundle:
             if self.quit:
-                exhausted = False
                 break
             self.roll.update()
             for b in self.timer.blocksforperiod(self.updaterate):
                 self.stream.call(b)
-        else:
-            exhausted = True
         self.stream.flush()
-        if exhausted:
-            self.mainthread.endofdata() # TODO: Use a Future instead.

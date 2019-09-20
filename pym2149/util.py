@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
-from bg import Sleeper, Quit
+from bg import MainBackground
 from diapyr import types
 from contextlib import contextmanager
 import time, logging
@@ -28,15 +28,11 @@ def singleton(t):
 
 class MainThread:
 
-    @types(Config)
-    def __init__(self, config):
+    @types(Config, MainBackground)
+    def __init__(self, config, player):
         self.profile = config.profile
         self.trace = config.trace
-        self.sleeper = Sleeper()
-        self.quit = Quit([self.sleeper.interrupt])
-
-    def endofdata(self):
-        self.quit.fire()
+        self.player = player
 
     def sleep(self):
         if self.profile or self.trace:
@@ -47,8 +43,7 @@ class MainThread:
         else:
             log.debug('Continue until end of data or interrupt.')
             try:
-                while not self.quit:
-                    self.sleeper.sleep(10)
+                self.player.future.result()
                 log.debug('End of data, shutting down.')
             except KeyboardInterrupt:
                 log.debug('Caught interrupt, shutting down.')
