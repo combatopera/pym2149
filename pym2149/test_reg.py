@@ -75,6 +75,16 @@ class TestReg(unittest.TestCase):
         self.pair.value = 3, 4
         self.assertEqual((3, 4, -1), self.leaf.value)
 
+    def test_multipath(self):
+        source = Reg()
+        middle = Reg().link(lambda x: x * 2, source)
+        target1 = Reg().link(lambda x: x * 3, source).link(lambda x: x * 5, middle)
+        target2 = Reg().link(lambda x: x * 7, middle).link(lambda x: x * 11, source)
+        source.value = 1
+        # These values have overwritten via-middle values:
+        self.assertEqual(3, target1.value)
+        self.assertEqual(11, target2.value)
+
     def test_initversionreg(self):
         self.assertEqual(0, VersionReg().version)
         self.assertEqual(1, VersionReg(value = 123).version)
