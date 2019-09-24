@@ -33,12 +33,18 @@ class ConfigName:
         parser = argparse.ArgumentParser()
         parser.add_argument('--repr', action = 'append', default = [])
         parser.add_argument('--config', action = 'append', default = [])
+        parser.add_argument('--ignore-settings', action = 'store_true')
         for param in params:
             parser.add_argument(param)
         self.additems = parser.parse_args(args)
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
 
     def applyitems(self, context):
+        if not self.additems.ignore_settings:
+            settings = Path.home() / '.settings.arid'
+            if settings.exists():
+                with Repl(context) as repl:
+                    repl.printf(". %s", settings)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
                 with Repl(context) as repl:
@@ -108,9 +114,6 @@ class ConfigLoader:
             path = self.mark()
             repl.printf("cwd = %s", path.parent)
             repl.printf("%s . %s", namespace, path.name)
-            settings = Path.home() / '.settings.arid'
-            if settings.exists():
-                repl.printf(". %s", settings)
         self.configname.applyitems(context)
         config = ConfigImpl(context)
         return config

@@ -27,8 +27,7 @@ def test_expected():
             yield _compare, path
 
 def _compare(path):
-    # FIXME: Instead of overriding channels, do not load personal config.
-    command = [sys.executable, project / 'lc2txt.py', '--config', 'chipchannels = 3']
+    command = [sys.executable, project / 'lc2txt.py', '--ignore-settings']
     actual = subprocess.check_output(command + ["%s.py" % (project / path.relative_to(expected))]).decode()
     with path.open() as f:
         unittest.TestCase().assertEqual(f.read(), actual)
