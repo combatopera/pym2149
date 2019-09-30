@@ -20,7 +20,7 @@ class Arp:
 
     level = V('14//15 18x9 8 2x7 6//24,0')
     chords = D('1 3 5').inversions()
-    vib = V('15.5x,0/3 -.4/6 .4/3')
+    vib = V('15.5x,/3 -.4/6 .4/3')
 
     def on(self, frame, chip, degree, inv = V('0')):
         chip.fixedlevel = self.level[frame]
