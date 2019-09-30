@@ -78,7 +78,7 @@ class ChipProxy(ExceptionCatcher):
         return self._tuning.freq(pitch).toneperiod(self._nomclock)
 
     def toenvperiod(self, pitch):
-        return self._tuning.freq(pitch).envperiod(self._nomclock, self.envshape)
+        return self._tuning.freq(pitch).envperiod(self._nomclock, self._chip.envshapereg.value)
 
 for name, prop in dict(
     fixedlevel = asprop(lambda chip, chan: chip.fixedlevels[chan]),
