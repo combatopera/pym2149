@@ -3,12 +3,16 @@ from pym2149.pitches import F4
 
 class Bass:
 
+    envshape = 0x0a
+
     def on(self, frame, chip, degree):
         chip.fixedlevel = 15
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame])
         chip.envflag = True
+        if chip.envshape != self.envshape:
+            chip.envshape = self.envshape
 
 class Kick:
 
