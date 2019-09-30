@@ -81,6 +81,7 @@ for name, prop in dict(
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
     # TODO: Use Reg links so that we can read out an unrounded period for example.
     tonepitch = asprop(lambda chip, chan: chip.toneperiods[chan], lambda self: self.toperiod, None),
+    envflag = asprop(lambda chip, chan: chip.levelmodes[chan]),
 ).items():
     setattr(ChipProxy.ChanProxy, name, prop)
     setattr(ChipProxy, name, convenience(name))
@@ -115,7 +116,8 @@ class LiveCodingBridge(Prerecorded):
 
         def _quiet(self):
             for proxy in self.chipproxies:
-                proxy.fixedlevel = 0 # XXX: Also reset levelmode?
+                proxy.envflag = False
+                proxy.fixedlevel = 0
                 proxy.noiseflag = False
                 proxy.toneflag = False
 

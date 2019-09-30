@@ -8,6 +8,7 @@ class Bass:
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame])
+        chip.envflag = True
 
 class Kick:
 
