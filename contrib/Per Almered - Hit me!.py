@@ -43,10 +43,10 @@ class Arp:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
 
-bass = E(Bass, 2 * ['1/.5 1/.5 .5 1/.5 1/.5 .5 1/.5 .5 1.5/1|1/.5 1/.5 .5 1/.5 1/.5 .5 1/.5 4x.5'],
+bass = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'),
         hard = V('1,0'))
-bass2 = E(Bass, '1/.5 1/.5 .5 1/.5 1/.5 .5 1/.5 4x.5|1/.5 1/.5 .5 1/.5 9x.5',
+bass2 = E(Bass, '/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5|/.5 /.5 .5 /.5 9x.5',
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x5-- .5x5-|6-- 6- .5x5- 6- 6-- .5x6- .5x7-- .5x7- .5x- .5x .5x#- .5x#'))
 kick = E(Kick, '2')
 kick2 = E(Kick, '12x .5/.5 2x.25 2x.5 .25 .5 .25 .5 2x.25')
