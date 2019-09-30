@@ -14,7 +14,7 @@ class Bass:
         chip.envflag = True
         if frame < 1 and hard[frame]:
             chip.envshape = self.envshape
-        chip.envperiod = chip.toenvperiod(chip.topitch((self.envpitch + degree)[frame]))
+        chip.envpitch = chip.topitch((self.envpitch + degree)[frame])
 
 class Kick:
 
