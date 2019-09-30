@@ -50,6 +50,7 @@ class ChipProxy(ExceptionCatcher):
 
     noiseperiod = asprop(lambda chip: chip.noiseperiodreg)
     envshape = asprop(lambda chip: chip.envshapereg)
+    envperiod = asprop(lambda chip: chip.envperiodreg)
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]
@@ -74,6 +75,9 @@ class ChipProxy(ExceptionCatcher):
 
     def toperiod(self, pitch):
         return self._tuning.freq(pitch).toneperiod(self._nomclock)
+
+    def toenvperiod(self, pitch):
+        return self._tuning.freq(pitch).envperiod(self._nomclock, self.envshape)
 
 for name, prop in dict(
     fixedlevel = asprop(lambda chip, chan: chip.fixedlevels[chan]),

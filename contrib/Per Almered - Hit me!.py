@@ -4,6 +4,7 @@ from pym2149.pitches import F4
 class Bass:
 
     envshape = 0x0a
+    envpitch = D('2x++,+')
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = 15
@@ -13,6 +14,7 @@ class Bass:
         chip.envflag = True
         if chip.envshape != self.envshape:
             chip.envshape = self.envshape
+        chip.envperiod = chip.toenvperiod(chip.topitch((self.envpitch + degree)[frame]))
 
 class Kick:
 
