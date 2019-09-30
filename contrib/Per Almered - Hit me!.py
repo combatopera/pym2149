@@ -1,6 +1,21 @@
 from pym2149.lc import V, D, E, major
 from pym2149.pitches import F4
 
+class Kick:
+
+    level = V('13 3x15 13//3 10')
+    nf = V('1,0')
+    tf = V('0,1')
+    pitch = V('2x47 43 40 32 3x24')
+
+    def on(self, frame, chip):
+        if frame < 8:
+            chip.fixedlevel = self.level[frame]
+            chip.noiseflag = self.nf[frame]
+            chip.toneflag = self.tf[frame]
+            chip.noiseperiod = 7
+            chip.tonepitch = self.pitch[frame]
+
 class Arp:
 
     level = V('14//15 18x9 8 2x7 6//24,0')
@@ -13,10 +28,11 @@ class Arp:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
 
+kick = E(Kick, '2')
 arp = E(Arp, '1.5 6.5',
         degree = D('1.5x 6.5x4'),
         inv = V('1.5x2 6.5x1'))
-A = arp, arp, arp
+A = kick, kick, arp
 sections = A,
 scale = major
 tonic = F4
