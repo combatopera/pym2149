@@ -1,6 +1,14 @@
 from pym2149.lc import V, D, E, major
 from pym2149.pitches import F4
 
+class Bass:
+
+    def on(self, frame, chip, degree):
+        chip.fixedlevel = 15
+        chip.noiseflag = False
+        chip.toneflag = True
+        chip.tonepitch = chip.topitch(degree[frame])
+
 class Kick:
 
     level = V('13 3x15 13//3 10')
@@ -28,11 +36,13 @@ class Arp:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
 
+bass = E(Bass, '1/.5 1/.5 .5 1/.5 1/.5 .5 1/.5 .5 1.5/1',
+        degree = D('---') + D('2 2+ .5x+ 2+ 1.5x2 2+ .5x+ 1.5x2+'))
 kick = E(Kick, '2')
 arp = E(Arp, '1.5 6.5',
         degree = D('1.5x 6.5x4'),
         inv = V('1.5x2 6.5x1'))
-A = kick, kick, arp
+A = bass, kick, arp
 sections = A,
 scale = major
 tonic = F4
