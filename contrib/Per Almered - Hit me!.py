@@ -49,12 +49,12 @@ class Snare:
 
 class Arp:
 
-    level = V('14//15 18x9 8 2x7 6//24,0')
+    levels = V('10'), V('14//15 18x9 8 2x7 6//24,0')
     chords = D('1 3 5').inversions()
     vib = V('15.5x,/3 -.4/6 .4/3')
 
-    def on(self, frame, chip, degree, inv = V('0')):
-        chip.fixedlevel = self.level[frame]
+    def on(self, frame, chip, degree, inv = V('0'), vel = V('1')):
+        chip.fixedlevel = vel[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
@@ -77,9 +77,10 @@ snare3 = E(Snare, '/1 2 2 2 .75 1.25/1 2 2 1.25 .75 .5 2x.25')
 arp1 = E(Arp, '1.5 6.5',
         degree = D('1.5x 6.5x4 1.5x5 6.5x'),
         inv = V('1.5x2 6.5x1 1.5x 6.5x2'))
-arp4 = E(Arp, '.25/.25 /.5 .25 .75/.5 5x/.5 .75/.25|.25/.25 /.5 .25 .75/.5 3x/.5 1.25/.75 2x.75/.5',
+arp4 = E(Arp, '.25/.25 /.5 .25 .75/.5 7x/.5 .25 .75/.5 3x/.5 1.25/.75 2x.75/.5',
         degree = D('1.5x 6.5x4 1.5x5 6.5x'),
-        inv = V('1.5x2 6.5x1 1.5x 6.5x2'))
+        inv = V('1.5x2 6.5x1 1.5x 6.5x2'),
+        vel = V('0'))
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
