@@ -34,10 +34,18 @@ class Kick:
 class Snare:
 
     level = V('4x13 11 10'), V('4x15 13 11')
+    nf = V('1 3x,1')
+    np = V('17,13')
+    tf = V('4x1,0')
+    pitch = V('64 60 57 55')
 
     def on(self, frame, chip, vel = V('1')):
         if frame < 6:
             chip.fixedlevel = vel[frame].pick(self.level)[frame]
+            chip.noiseflag = self.nf[frame]
+            chip.noiseperiod = self.np[frame]
+            chip.toneflag = self.tf[frame]
+            chip.tonepitch = self.pitch[frame]
 
 class Arp:
 
@@ -57,7 +65,7 @@ bass = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.
 bass2 = E(Bass, '/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5|/.5 /.5 .5 /.5 9x.5',
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x5-- .5x5-|6-- 6- .5x5- 6- 6-- .5x6- .5x7-- .5x7- .5x- .5x .5x#- .5x#'))
 kick = E(Kick, '2')
-kick2 = E(Kick, '12x .5/.5 .25 .75 3.5')
+kick2 = E(Kick, '12x .5/.5 .25 .75 2.5')
 snare2 = E(Snare, '/13 1 .25 .5 .25 .5 2x.25',
         vel = V('14.25x1 .75x .5x1 .25x .25x1'))
 arp = E(Arp, '1.5 6.5',
