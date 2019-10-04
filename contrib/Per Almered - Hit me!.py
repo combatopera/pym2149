@@ -62,11 +62,12 @@ class Arp:
 class Lead:
 
     level = V('3x15 14 2x13,12')
+    vib = V('40.5x,/3 -.4/6 .4/3')
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = self.level[frame]
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame])
+        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
 
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'),
