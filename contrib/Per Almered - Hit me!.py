@@ -65,6 +65,8 @@ class Lead:
 
     def on(self, frame, chip, degree):
         chip.fixedlevel = self.level[frame]
+        chip.toneflag = True
+        chip.tonepitch = chip.topitch(degree[frame])
 
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'),
@@ -89,7 +91,7 @@ arp4 = E(Arp, '.25/.25 /.5 .25 .75/.5 7x/.5 .25 .75/.5 3x/.5 1.25/.75 2x.75/.5',
         inv = V('1.5x2 6.5x1 1.5x 6.5x2'),
         vel = V('0'))
 lead4 = E(Lead, '2x.75 5/.25 3x.5|2x.75 4.5 2x',
-        degree = D('1'))
+        degree = D('.75x2 .75x6 5.5x2+ .5x+ .5x2+|.75x3+ .75x+ 4.5x6 + 6'))
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
