@@ -26,6 +26,7 @@ projects +=
     lagoon
     splut
     timelyOSC
+    pyven
 branch
     pyrbo = py3
     mynblep = py3
