@@ -6,3 +6,8 @@ pym2149/native/*.c
 pym2149/native/*.so
 *_turbo/
 *.dsd
+/build/
+/dist/
+/pym2149.egg-info/
+/setup.cfg
+/setup.py
