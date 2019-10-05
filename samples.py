@@ -142,7 +142,7 @@ class Player:
 class Target:
 
     try:
-        from system import sox
+        from lagoon import sox
     except ImportError:
         log.warning("sox is not available, spectrograms won't be created.")
 

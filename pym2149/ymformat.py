@@ -311,7 +311,7 @@ class UnpackedFile:
     def __init__(self, path):
         self.tmpdir = tempfile.mkdtemp()
         try:
-            from system import lha
+            from lagoon import lha
             # Observe we redirect stdout so it doesn't get played:
             lha('x', os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
             name, = os.listdir(self.tmpdir)
