@@ -27,9 +27,6 @@ projects +=
     splut
     timelyOSC
     pyven
-branch
-    pyrbo = py3
-    mynblep = py3
 deps +=
     mock
     pyaudio
