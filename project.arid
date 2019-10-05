@@ -23,6 +23,9 @@ projects +=
     aridity
     outjack
     mynblep
+branch
+    pyrbo = py2
+    mynblep = py2
 deps += mock
 years += 2014
 pyversions += 2
