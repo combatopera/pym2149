@@ -1,4 +1,6 @@
 # pym2149
+YM2149 emulator supporting YM files, OSC, MIDI to JACK, PortAudio, WAV.
+
 [![Build Status](https://travis-ci.org/combatopera/pym2149.svg?branch=master)](https://travis-ci.org/combatopera/pym2149)
 
 ## Install latest release
