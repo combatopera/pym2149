@@ -225,6 +225,20 @@ class TestE(unittest.TestCase):
         self.assertEqual(1, e[2.4].absframe)
         self.assertEqual(2.5, e[2.5].absframe)
 
+    def test_rests(self):
+        e = E(None, '.5/ 1.5/ /')
+        self.assertEqual(0, e[0].onframes)
+        self.assertEqual(0, e[.5].onframes)
+        self.assertEqual(0, e[2].onframes)
+        self.assertEqual(0, e[3].onframes)
+        self.assertEqual(0, e[0].absframe)
+        self.assertEqual(0, e[.4].absframe)
+        self.assertEqual(.5, e[.5].absframe)
+        self.assertEqual(.5, e[1.9].absframe)
+        self.assertEqual(2, e[2].absframe)
+        self.assertEqual(2, e[2.9].absframe)
+        self.assertEqual(3, e[3].absframe)
+
     def test_absframe(self):
         e = E(None, '1 1 1')
         self.assertEqual(0, e[.5].absframe)

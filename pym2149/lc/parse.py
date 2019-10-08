@@ -129,7 +129,7 @@ def concat(scriptcls, parser, scriptforest, kwargs):
 
 class EParse(Parse):
 
-    pattern = re.compile('(?:([0-9]+)x)?(-?[0-9.]+)?(?:/([0-9.]+))?')
+    pattern = re.compile('(?:([0-9]+)x)?(-?[0-9.]+)?(?:/([0-9.]*))?')
 
     def __init__(self, note, namespace):
         self.note = note
@@ -149,7 +149,7 @@ class EParse(Parse):
             width = m.group(2)
             width = 1 if width is None else float(width)
             slash = m.group(3)
-            offwidth = 0 if slash is None else float(slash)
+            offwidth = 0 if slash is None else (float(slash) if slash else width)
             onwidth = max(0, width - offwidth)
             for _ in range(count):
                 if onwidth:
