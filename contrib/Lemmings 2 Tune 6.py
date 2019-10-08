@@ -145,7 +145,7 @@ class Ramp:
         chip.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
-    return E(Lead, "3x2 2x|4x 2 2x|2 1.5 .5 4x|2 1.5 .5 4x|3x2 2x|4x 4/%s" % lastoff,
+    return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, "3x2 2x|4x 4/%s" % lastoff,
             degree = D("2x3 2x2 3x 2|3 5/%s 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x" % firstslide),
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
@@ -191,12 +191,12 @@ open3 = E(Open, '.5/ 2 .5 1.5 2 3x.5')
 open4 = E(Open, '.5',
         attenuation = V('1 3 2 1 3 2 1 3 2 1 3 2 1 3 2 4').of(.5),
         np = V('2x1 4x21 1 7x21 2x1').of(.5))
-lead2 = E(Tone, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2x2/1 4x',
+lead2 = E(Tone, ['2/1 1 4x.5 3x'] * 3, '2x2/1 4x',
         degree = D('-') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#- .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
-lead3 = E(Lead, '6 1 3 1 3 1 3 1 3 2|4 4/',
+lead3 = E(Lead, '6', ['1 3'] * 4, '2|4 4/',
         degree = D('+') + D('6x/.5 3 3x2 3 3x/.5 3 3x2 3 3x4 2x|8x2'),
         velocity = V('2'))
-lead4 = E(Ping, '2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 1 4x.5 3x|2/1 6/5',
+lead4 = E(Ping, ['2/1 1 4x.5 3x'] * 3, '2/1 6/5',
         degree = D('++') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x 1.5x3 .5x2 .5x3 .5x2 2x3 1|8x2'),
         velocity = V('26x1 6x'))
 fill = E(Fill, '28/ 8x.5',
