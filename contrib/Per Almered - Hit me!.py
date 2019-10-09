@@ -4,7 +4,7 @@ from pym2149.pitches import F4
 class Bass:
 
     envshape = 0x0a
-    envpitches = D('2x++,+'), D('2x++ 5x+,1')
+    envpitches = D('2x++,+'), D('2x++ 5x+,1'), D('+')
 
     def on(self, frame, chip, degree, slap = V('0'), hard = V('0')):
         chip.fixedlevel = 15
@@ -112,6 +112,9 @@ bass3a = E(Bass, ['.75/ .25'] * 7, '/',
         degree = D('---') + D('5x2 3 2x4|5x6- 7- 2x'))
 bass6 = E(Bass, '56x.5',
         degree = D('---') + D(['1 +'] * 4, '2 2+ 2 2+ 2 2+ 1 +', ['7- 7'] * 4, '1 + 1 + 5- 5 5#- 5#', '6- 6 6- 6 6- 6 1 +|2 2+ 2 2+ 7- 7 2 2+|2x3 3+ 3 2+ 3+ 7 2+').of(.5))
+bass7 = E(Bass, '.75/.25 3x/.25 .25',
+        degree = D('2'),
+        slap = V('2'))
 kick1 = E(Kick, '2')
 kick2 = E(Kick, '12x .5/ .25 .75 2.5')
 kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75',
@@ -146,7 +149,7 @@ C = bass3 * 2, kick1 & snare3 & bass3a, arp1
 F = bass3, kick1 & snare3 & bass3a & arp4, lead4
 G = bass3, kick1 & snare3 & bass3a, arp1 & lead5 * 4
 H = bass6, kick1 & arp6[:-4] & snare6, lead6
-I = kick7, arp6[28:] & snare7
+I = kick7, arp6[28:] & snare7, bass7
 sections = A, B, C, F, G, H, I
 scale = major
 tonic = F4
