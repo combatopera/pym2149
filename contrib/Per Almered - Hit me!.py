@@ -61,7 +61,7 @@ class Arp:
 
 class Arp2:
 
-    level = V('2x13 3x12 2x11,10')
+    level = V('2x13 3x12 2x11 6x10,9')
 
     def on(self, frame, chip, degree1, degree2, degree3):
         chip.fixedlevel = self.level[frame]
@@ -129,10 +129,10 @@ arp4 = E(Arp, '.25/ /.5 .25 .75/.5 7x/.5 .25 .75/.5 3x/.5 1.25/.75 2x.75/.5',
         degree = D('1.5x 6.5x4 1.5x5 6.5x'),
         inv = V('1.5x2 6.5x1 1.5x 6.5x2'),
         vel = V('0'))
-arp6 = E(Arp2, '.5/ .5',
-        degree1 = D('4x 8x6- 4x|5x 7- 2x6- 2x7- 2x6-'),
-        degree2 = D('12x2 4x3|5x3 7x2'),
-        degree3 = D('6x5 6x4# 4x5|7x5 4# 3x5 4#'))
+arp6 = E(Arp2, ['.5/ .5'] * 27, '.5/ .75 3.75/',
+        degree1 = D('4x 8x6- 4x|5x 7- 2x6- 2x7- 6x6-'),
+        degree2 = D('12x2 4x3|5x3 11x2'),
+        degree3 = D('6x5 6x4# 4x5|7x5 4# 3x5 5x4#'))
 lead4 = E(Lead, '2x.75 5/.25 3x.5|2x.75 4.5 2x|1.5 3 .5 4x.25 .5 .25 3x.5 .25 2x.5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 1',
         degree = D('.75x2 .75x6 .5x+/.5 5x2+ .5x+ 2+/.5 .25x3+ .75x+ 4.5x6 + 6|2x+/.5 3x2+ .25x+ .25x6 .25x5 .25x4 .5x5 .25x4 .5x5 .5x6 .5x4 1.25x2 .25x .5x2 .25x# .5x2# .25x2 .5x3 .25x2# .5x4 .25x3 .5x4# .25x4 .5x5 .25x4# .5x5# .25x5 6'),
         att = V('16x|10.25x .75x1 .75x2 .75x3 .75x4 .75x5 .75x6 1.25x7'))
@@ -145,8 +145,8 @@ B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
 F = bass3, kick1 & snare3 & bass3a & arp4, lead4
 G = bass3, kick1 & snare3 & bass3a, arp1 & lead5 * 4
-H = bass6, kick1 & arp6 & snare6, lead6
-I = kick7, snare7
+H = bass6, kick1 & arp6[:-4] & snare6, lead6
+I = kick7, arp6[28:] & snare7
 sections = A, B, C, F, G, H, I
 scale = major
 tonic = F4
