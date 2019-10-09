@@ -33,15 +33,15 @@ class Kick:
 
 class Snare:
 
-    level = V('4x13 11 10'), V('4x15 13 11')
+    level = V('4x15 13 11'), None, V('4x13 11 10')
     nf = V('1 3x,1')
     np = V('17,13')
     tf = V('4x1,0')
     pitch = V('64 60 57 55')
 
-    def on(self, frame, chip, vel = V('1')):
+    def on(self, frame, chip, att = V('0')):
         if frame < 6:
-            chip.fixedlevel = vel[frame].pick(self.level)[frame]
+            chip.fixedlevel = att[frame].pick(self.level)[frame]
             chip.noiseflag = self.nf[frame]
             chip.noiseperiod = self.np[frame]
             chip.toneflag = self.tf[frame]
@@ -117,7 +117,7 @@ kick2 = E(Kick, '12x .5/ .25 .75 2.5')
 kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75',
         att = V('.5x 1.5x1 .5x .75x1 .75x'))
 snare2 = E(Snare, '13/ 1 .25 .5 .25 .5 2x.25',
-        vel = V('14.25x1 .75x .5x1 .25x .25x1'))
+        att = V('14.25x .75x2 .5x .25x2 .25x'))
 snare3 = E(Snare, '/ 3x2 .75 1.25/1 2x2 1.25 .75 .5 2x.25')
 snare6 = E(Snare, '/ 7x2 .75 .25')
 arp1 = E(Arp, '1.5 6.5',
