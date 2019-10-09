@@ -23,9 +23,9 @@ class Kick:
     tf = V('0,1')
     pitch = V('2x47 43 40 32 3x24')
 
-    def on(self, frame, chip):
+    def on(self, frame, chip, att = V('0')):
         if frame < 8:
-            chip.fixedlevel = self.level[frame]
+            chip.fixedlevel = self.level[frame] - att[frame]
             chip.noiseflag = self.nf[frame]
             chip.toneflag = self.tf[frame]
             chip.noiseperiod = 7
@@ -114,7 +114,8 @@ bass6 = E(Bass, '56x.5',
         degree = D('---') + D(['1 +'] * 4, '2 2+ 2 2+ 2 2+ 1 +', ['7- 7'] * 4, '1 + 1 + 5- 5 5#- 5#', '6- 6 6- 6 6- 6 1 +|2 2+ 2 2+ 7- 7 2 2+|2x3 3+ 3 2+ 3+ 7 2+').of(.5))
 kick1 = E(Kick, '2')
 kick2 = E(Kick, '12x .5/ .25 .75 2.5')
-kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75')
+kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75',
+        att = V('.5x 1.5x1 .5x .75x1 .75x'))
 snare2 = E(Snare, '13/ 1 .25 .5 .25 .5 2x.25',
         vel = V('14.25x1 .75x .5x1 .25x .25x1'))
 snare3 = E(Snare, '/ 3x2 .75 1.25/1 2x2 1.25 .75 .5 2x.25')
