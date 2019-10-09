@@ -90,6 +90,16 @@ class Bright:
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.arp)[frame])
 
+class Luke:
+
+    level = V('11 12 13 11 9 6 4 2x3 2 1,0')
+    arp = D('1 +')
+
+    def on(self, frame, chip, degree):
+        chip.fixedlevel = self.level[frame]
+        chip.toneflag = True
+        chip.tonepitch = chip.topitch((degree + self.arp)[frame])
+
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'),
         hard = V('1,0'))
@@ -124,12 +134,14 @@ lead4 = E(Lead, '2x.75 5/.25 3x.5|2x.75 4.5 2x|1.5 3 .5 4x.25 .5 .25 3x.5 .25 2x
         att = V('16x|10.25x .75x1 .75x2 .75x3 .75x4 .75x5 .75x6 1.25x7'))
 lead5 = E(Bright, '3.75/ .5 .25 .5 .25 3x.5 .25 2x.5|3.75/ .5 .25 .5 .25 .5 .25 .5 .25 .5 3x.25',
         degree = D('4.25x2+ .25x6 .5x+ .25x5 .5x6 .5x4 .5x5 .25x6 .5x5 .5x2|4.5x2+ .5x+ .25x6 .5x5 .25x4 .5x5 .25x6 .5x5 .25x4 .25x2 .25x'))
+lead6 = E(Luke, '.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 .25 3x.5 .25 .75|.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 3x.25 2x.5 .25 .5 .25',
+        degree = D('5'))
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
 F = bass3, kick1 & snare3 & bass3a & arp4, lead4
 G = bass3, kick1 & snare3 & bass3a, arp1 & lead5 * 4
-H = bass6, kick1 & arp6 & snare6
+H = bass6, kick1 & arp6 & snare6, lead6
 sections = A, B, C, F, G, H
 scale = major
 tonic = F4
