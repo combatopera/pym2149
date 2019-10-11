@@ -43,7 +43,8 @@ class Snare:
         if frame < 6:
             chip.fixedlevel = att[frame].pick(self.level)[frame]
             chip.noiseflag = self.nf[frame]
-            chip.noiseperiod = self.np[frame]
+            if chip.noisepriority():
+                chip.noiseperiod = self.np[frame]
             chip.toneflag = self.tf[frame]
             chip.tonepitch = self.pitch[frame]
 
