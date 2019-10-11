@@ -143,6 +143,9 @@ class Operators:
             degrees.append(degrees.pop(0) + np.array([1, 0, 0]))
         return invs
 
+    def apply(self, speed, frame, chip, context):
+        self.of(speed)[frame](frame, speed, chip, self.kwargs, context)
+
 class EventSection:
 
     def __init__(self, relframe, onframes, note, namespace):
@@ -356,10 +359,6 @@ class Then(Binary):
 class Slice(Operators):
 
     @property
-    def kwargs(self):
-        return self.p.kwargs
-
-    @property
     def mulcls(self):
         return self.p.mulcls
 
@@ -370,6 +369,7 @@ class Slice(Operators):
         self.stop = readslice(p.len, slice.stop)
         # TODO: Use step.
         self.len = self.stop - self.start
+        self.kwargs = {name: Slice(v, slice) for name, v in p.kwargs.items()}
         self.p = p
 
     def getitem(self, frame, shift):

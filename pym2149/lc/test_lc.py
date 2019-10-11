@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import V
+from . import V, E
 from .lc import Event
 import unittest
 
@@ -80,3 +80,14 @@ class TestSlice(unittest.TestCase):
         self.assertEqual(9, v[12.5])
         self.assertEqual(5.5, v[13.5])
         self.assertEqual(6.5, v[14.5])
+
+    def test_patternkwargs(self):
+        vals = []
+        class Note:
+            def on(self, val, frame):
+                vals.append(val[frame])
+        p = E(Note, '10x', val = V('/9 9'))[-6:]
+        p.apply(1, .5, None, None)
+        p.apply(1, 4.5, None, None)
+        p.apply(1, 5.5, None, None)
+        self.assertEqual([4.5, 8.5, 9], vals)
