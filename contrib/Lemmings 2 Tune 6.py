@@ -1,9 +1,6 @@
 from pym2149.lc import V, D, E, naturalminor, unit
 from pym2149.pitches import B3, C2
 
-def noisepriority(chip):
-    return not any(channel.noiseflag for channel in chip[1:])
-
 class CommonDrum:
 
     level = V('2x15,14')
@@ -13,7 +10,7 @@ class CommonDrum:
             chip.fixedlevel = self.level[frame]
             chip.noiseflag = True
             chip.toneflag = True
-            if noisepriority(chip):
+            if chip.noisepriority():
                 chip.noiseperiod = np
             return True
 
@@ -57,7 +54,7 @@ class Side:
             chip.fixedlevel = self.level[frame]
             chip.noiseflag = True
             chip.toneflag = True
-            if noisepriority(chip):
+            if chip.noisepriority():
                 chip.noiseperiod = 21
             chip.tonepitch = chip.topitch(degree[frame])
 

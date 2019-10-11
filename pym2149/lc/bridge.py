@@ -64,6 +64,9 @@ class ChipProxy(ExceptionCatcher):
     def __getitem__(self, index):
         return self._chans[index]
 
+    def noisepriority(self):
+        return not any(chan.noiseflag for chan in self[1:])
+
     def topitch(self, degree):
         scale = self._context.scale >> (1 - self._context.mode)
         return self._context.tonic + float(scale[degree[0] * scale.len + degree[1]] + degree[2])
