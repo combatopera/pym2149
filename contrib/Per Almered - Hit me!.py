@@ -47,6 +47,15 @@ class Snare:
                 chip.noiseperiod = self.np[frame]
             chip.toneflag = self.tf[frame]
             chip.tonepitch = self.pitch[frame]
+            return True
+
+class Snare2(Snare):
+
+    np2 = V('17,1'), Snare.np
+
+    def on(self, frame, chip, att):
+        if super().on(frame, chip, att) and chip.noisepriority():
+            chip.noiseperiod = att[frame].pick(self.np2)[frame]
 
 class Arp:
 
@@ -124,7 +133,7 @@ snare2 = E(Snare, '13/ 1 .25 .5 .25 .5 2x.25',
         att = V('14.25x .75x2 .5x .25x2 .25x'))
 snare3 = E(Snare, '/ 3x2 .75 1.25/1 2x2 1.25 .75 .5 2x.25')
 snare6 = E(Snare, '/ 7x2 .75 .25')
-snare7 = E(Snare, '.25/ 2x.75 .5 .75 .5 2x.25',
+snare7 = E(Snare2, '.25/ 2x.75 .5 .75 .5 2x.25',
         att = V('3.5x .25x1 .25x'))
 arp1 = E(Arp, '1.5 6.5',
         degree = D('1.5x 6.5x4 1.5x5 6.5x'),
