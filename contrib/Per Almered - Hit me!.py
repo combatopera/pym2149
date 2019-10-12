@@ -1,4 +1,4 @@
-from pym2149.lc import V, D, E, major
+from pym2149.lc import V, D, E, major, unit
 from pym2149.pitches import F4
 
 class Bass:
@@ -153,6 +153,8 @@ lead5 = E(Bright, '3.75/ .5 .25 .5 .25 3x.5 .25 2x.5|3.75/ .5 .25 .5 .25 .5 .25 
         degree = D('4.25x2+ .25x6 .5x+ .25x5 .5x6 .5x4 .5x5 .25x6 .5x5 .5x2|4.5x2+ .5x+ .25x6 .5x5 .25x4 .5x5 .25x6 .5x5 .25x4 .25x2 .25x'))
 lead6 = E(Luke, ['.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 .25 %s 2x.5 .25 .75|.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 3x.25 2x.5 .25 .5 .25' % x for x in ['.5', '2x.25']],
         degree = D(['1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 %s 1.25x5 .75x6|1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 .25x3 .25x5 .5x6# .5x6 .25x5 .5x6 .25x5' % x for x in ['.5x3', '.25x3 .25x2']]))[:-4]
+lead8 = E(Luke, ['63x.25'],
+        degree = D('2+'))
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
@@ -160,7 +162,7 @@ F = bass3, kick1 & snare3 & bass3a & arp4, lead4
 G = bass3, kick1 & snare3 & bass3a, arp1 & lead5 * 4
 H = bass6, kick1 & arp6[:-4] & snare6, lead6
 I = kick7, arp6[28:] & snare7, bass7[:-.25]
-J = bass3, kick1 & snare3 & bass3a, bass7[4:]
+J = bass3, kick1 & snare3 & bass3a, bass7[4:] | (unit * 15.75) & (lead8 >> .25)
 sections = A, B, C, F, G, H, I, J
 scale = major
 tonic = F4
