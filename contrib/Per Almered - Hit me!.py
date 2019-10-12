@@ -6,13 +6,13 @@ class Bass:
     envshape = 0x0a
     envpitches = D('2x++,+'), D('2x++ 5x+,1'), D('+')
 
-    def on(self, frame, chip, degree, slap = V('0'), hard = V('0')):
+    def on(self, frame, chip, degree, slap = V('0')):
         chip.fixedlevel = 15
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame])
         chip.envflag = True
-        if frame < 1 and hard[frame]:
+        if chip.envshape != self.envshape:
             chip.envshape = self.envshape
         chip.envpitch = chip.topitch((slap[frame].pick(self.envpitches) + degree)[frame])
 
@@ -111,8 +111,7 @@ class Luke:
         chip.tonepitch = chip.topitch((degree + self.arp)[frame])
 
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
-        degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'),
-        hard = V('1,0'))
+        degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'))
 bass2 = E(Bass, '/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5|/.5 /.5 .5 /.5 9x.5',
         degree = D('---') + D('2 2+ .5x+ 2+ 1.5x2 2+ .5x+ .5x2+ .5x5- .5x5|6- 6 .5x5 6 6- .5x6 .5x7- .5x7 .5x .5x+ .5x# .5x#+'))
 bass3 = E(Bass, '32x.5',
