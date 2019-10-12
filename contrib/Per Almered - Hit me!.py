@@ -85,10 +85,10 @@ class Lead:
     levels = hilevel, hilevel - V('1'), hilevel - V('2'), V('3x12 11,10'), lolevel, lolevel - V('1'), lolevel - V('2'), lolevel - V('3')
     vib = V('40.5x,/3 -.4/6 .4/3')
 
-    def on(self, frame, chip, degree, att = V('0')):
+    def on(self, frame, chip, degree, att = V('0'), vibshift = V('0')):
         chip.fixedlevel = att[frame].pick(self.levels)[frame]
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
+        chip.tonepitch = chip.topitch(degree[frame]) + (self.vib << vibshift[frame])[frame]
 
 class Bright:
 
@@ -159,7 +159,8 @@ lead8 = E(Luke, ['64x.25'],
         att = V('30x//30 2x10').of(.25),
         degree = D(['2+ 6+ 2++'] * 10, '2+ 6+', ['+ 5+ ++'] * 10, '+ ++').of(.25))
 lead9 = E(Lead, ['2x.75 1 3x.5'] * 2, '1.5 6.5',
-        degree = D('.35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x6- .35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x4 .75x4/.75 .75x5 6.5x6'))
+        degree = D('.35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x6- .35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x4 .75x4/.75 .75x5 6.5x6'),
+        vibshift = V('9.5x 6.5x34'))
 luke9 = E(Luke, '12/ 16x.25',
         degree = D('1'),
         att = V('15x//15 3').of(.25))
