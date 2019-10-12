@@ -102,7 +102,7 @@ class Bright:
 
 class Luke:
 
-    level = None, V('11 12 13 11 9 6 4 2x3 2 1,0')
+    level = V('12 13 14 12,9'), V('11 12 13 11 9 6 4 2x3 2 1,0')
     arp = D('1 +')
 
     def on(self, frame, chip, degree, att = V('1')):
@@ -156,6 +156,7 @@ lead5 = E(Bright, '3.75/ .5 .25 .5 .25 3x.5 .25 2x.5|3.75/ .5 .25 .5 .25 .5 .25 
 lead6 = E(Luke, ['.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 .25 %s 2x.5 .25 .75|.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 3x.25 2x.5 .25 .5 .25' % x for x in ['.5', '2x.25']],
         degree = D(['1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 %s 1.25x5 .75x6|1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 .25x3 .25x5 .5x6# .5x6 .25x5 .5x6 .25x5' % x for x in ['.5x3', '.25x3 .25x2']]))[:-4]
 lead8 = E(Luke, ['63x.25'],
+        att = V('30x//30 2x10|30x//30 10').of(.25),
         degree = D('2+'))
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
