@@ -23,12 +23,12 @@ class Kick:
     tf = V('0,1')
     pitch = V('2x47 43 40 32 3x24')
 
-    def on(self, frame, chip, att = V('0')):
+    def on(self, frame, chip, att = V('0'), np = V('7')):
         if frame < 8:
             chip.fixedlevel = self.level[frame] - att[frame]
             chip.noiseflag = self.nf[frame]
             chip.toneflag = self.tf[frame]
-            chip.noiseperiod = 7
+            chip.noiseperiod = np[frame]
             chip.tonepitch = self.pitch[frame]
 
 class Snare:
@@ -126,6 +126,8 @@ bass7 = E(Bass, '.75/.25 3x/.25 .5',
         degree = D('2'),
         slap = V('2'))
 kick1 = E(Kick, '2')
+kick1a = E(Kick, '2',
+        np = V('1,7'))
 kick2 = E(Kick, '12x .5/ .25 .75 2.5')
 kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75',
         att = V('.5x 1.5x1 .5x .75x1 .75x'))
@@ -162,7 +164,7 @@ F = bass3, kick1 & snare3 & bass3a & arp4, lead4
 G = bass3, kick1 & snare3 & bass3a, arp1 & lead5 * 4
 H = bass6, kick1 & arp6[:-4] & snare6, lead6
 I = kick7, arp6[28:] & snare7, bass7[:-.25]
-J = bass3, kick1 & snare3 & bass3a, bass7[4:] | (unit * 15.75) & (lead8 >> .25)
+J = bass3, kick1a & snare3 & bass3a, bass7[4:] | (unit * 15.75) & (lead8 >> .25)
 sections = A, B, C, F, G, H, I, J
 scale = major
 tonic = F4
