@@ -102,11 +102,11 @@ class Bright:
 
 class Luke:
 
-    level = V('11 12 13 11 9 6 4 2x3 2 1,0')
+    level = None, V('11 12 13 11 9 6 4 2x3 2 1,0')
     arp = D('1 +')
 
-    def on(self, frame, chip, degree):
-        chip.fixedlevel = self.level[frame]
+    def on(self, frame, chip, degree, att = V('1')):
+        chip.fixedlevel = att[frame].pick(self.level)[frame]
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.arp)[frame])
 
