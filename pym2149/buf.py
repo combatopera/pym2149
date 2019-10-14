@@ -111,7 +111,8 @@ class Buf(metaclass = generic):
         self.buf[:] = that.buf
 
     def tofile(self, fileobj):
-        self.buf.tofile(fileobj)
+        # TODO LATER: Reinstate tofile when fixed upstream, see https://github.com/numpy/numpy/issues/7380 for details.
+        fileobj.write(self.buf.tobytes())
 
     def differentiate(self, lastofprev, that):
         self.copybuf(that)

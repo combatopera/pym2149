@@ -27,7 +27,7 @@ class Wave16:
 
     def __init__(self, path, rate, channels):
         if '-' == path:
-            self.f = sys.stdout
+            self.f = sys.stdout.buffer
         else:
             self.f = open(path, 'wb') # Binary.
         self.f.write(b'RIFF')
