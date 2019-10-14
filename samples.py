@@ -36,55 +36,6 @@ import os, time
 
 log = logging.getLogger(__name__)
 
-class BaseTone(Note):
-
-    def noteon(self):
-        self.toneflag = True
-        self.fixedlevel = 15
-        self.toneperiod = self.period
-
-class Tone(BaseTone):
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.period = Freq(self.freq).toneperiod(self.nomclock)
-
-class Noise(Note):
-
-    def noteon(self):
-        self.noiseflag = True
-        self.fixedlevel = 15
-        self.chip.noiseperiod = Freq(self.freq).noiseperiod(self.nomclock)
-
-class Both(Note):
-
-    def noteon(self):
-        self.toneflag = True
-        self.noiseflag = True
-        self.fixedlevel = 15
-        self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.chip.noiseperiod = Freq(self.nfreq).noiseperiod(self.nomclock)
-
-class Env(Note):
-
-    def noteon(self):
-        self.levelmode = 1
-        self.chip.envperiod = Freq(self.freq).envperiod(self.nomclock, self.shape)
-        self.chip.envshape = self.shape
-
-class All(Note):
-
-    tfreq, nfreq, efreq, shape = 1000, 5000, 1, 0x0e
-
-    def noteon(self):
-        self.toneflag = True
-        self.noiseflag = True
-        self.levelmode = 1
-        self.toneperiod = Freq(self.tfreq).toneperiod(self.nomclock)
-        self.chip.noiseperiod = Freq(self.nfreq).noiseperiod(self.nomclock)
-        self.chip.envperiod = Freq(self.efreq).envperiod(self.nomclock, self.shape)
-        self.chip.envshape = self.shape
-
 class PWM(Note):
 
     def noteon(self):
@@ -196,45 +147,13 @@ def main():
     mainimpl(ConfigName())
 
 def mainimpl(configname):
-    class T250(Tone): freq = 250
-    class T1k(Tone): freq = 1000
-    class T1k5(Tone): freq = 1500
-    class N5k(Noise): freq = 5000
-    class N125k(Noise): freq = 125000
-    class T1kN5k(Both): tfreq, nfreq = 1000, 5000
-    class T1N5k(Both):
-        nfreq = 5000
-        def __init__(self, *args):
-            super().__init__(*args)
-            self.tfreq = self.nomclock // 16
-    class Saw600(Env): freq, shape = 600, 0x08
     class Sin1k(Sinus): freq = 1000
-    class Tri650(Env): freq, shape = 650, 0x0a
-    class T2k(Tone): freq = 2000
-    class T3k(Tone): freq = 3000
-    class T4k(Tone): freq = 4000
     class PWM250(PWM): tfreq, rtfreq = 250, 250
     class PWM100(PWM): tfreq, rtfreq = 100, 101 # Necessarily detune.
-    tones = []
-    for p in range(1, 9):
-        class t(BaseTone): period = p
-        tones.append(t)
     target = Target(configname)
-    target.dump(2, [T250, 0, 0], 'tone250')
-    target.dump(2, [T1k, 0, 0], 'tone1k')
-    target.dump(2, [T1k5, 0, 0], 'tone1k5')
-    target.dump(2, [N5k, 0, 0], 'noise5k')
-    target.dump(2, [N125k, 0, 0], 'noise125k')
-    target.dump(2, [T1kN5k, 0, 0], 'tone1k+noise5k')
-    target.dump(2, [T1N5k, 0, 0], 'noise5k+tone1')
-    target.dump(2, [Saw600, 0, 0], 'saw600')
     target.dump(2, [Sin1k, 0, 0, 0], 'sin1k')
-    target.dump(2, [Tri650, 0, 0], 'tri650')
-    target.dump(2, [All, 0, 0], 'tone1k+noise5k+tri1')
-    target.dump(4, [T1k, T2k, T3k, T4k], 'tone1k,2k,3k,4k')
     target.dump(2, [PWM250, 0, 0], 'pwm250')
     target.dump(2, [PWM100, 0, 0], 'pwm100')
-    target.dump(8, tones, 'tone1-8')
 
 if '__main__' == __name__:
     main()
