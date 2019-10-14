@@ -42,6 +42,7 @@ def _comparepng(path):
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with tempfile.NamedTemporaryFile() as wavfile:
         subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
+                '--config', 'freqclamp = false', # I want to see the very low periods.
                 "%s.py" % str(project / path.relative_to(expected))[:-len(pngsuffix)], wavfile.name])
         subprocess.check_call(['sox', wavfile.name, '-n', 'spectrogram', '-o', actualpath])
     with path.open('rb') as f:
