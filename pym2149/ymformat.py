@@ -214,7 +214,7 @@ class Frame5(Frame56):
             tcr = (self.data[0x6] & 0xe0) >> 5
             if tcr:
                 tdr = self.data[0xE]
-                chip.timers[chan].update(tcr, tdr, PWMEffect(chip.fixedlevels[chan]))
+                chip.timers[chan].update(tcr, tdr, PWMEffect(chip.R[chip.levelbase + chan]))
         if self.flags.logdigidrum and (self.data[0x3] & 0x30):
             log.warning("Digi-drum at frame %s.", self.index)
             self.flags.logdigidrum = False
@@ -232,7 +232,7 @@ class Frame6(Frame56):
                     tcr = (self.data[rr] & 0xe0) >> 5
                     if tcr:
                         tdr = self.data[rrr]
-                        chip.timers[chan].update(tcr, tdr, PWMEffect(chip.fixedlevels[chan]))
+                        chip.timers[chan].update(tcr, tdr, PWMEffect(chip.R[chip.levelbase + chan]))
                         timerchans.add(chan)
                 if self.flags.logdigidrum and 0x40 == fx:
                     log.warning("Digi-drum at frame %s.", self.index)
@@ -241,7 +241,7 @@ class Frame6(Frame56):
                     tcr = (self.data[rr] & 0xe0) >> 5
                     if tcr:
                         tdr = self.data[rrr]
-                        chip.timers[chan].update(tcr, tdr, SinusEffect(chip.fixedlevels[chan]))
+                        chip.timers[chan].update(tcr, tdr, SinusEffect(chip.R[chip.levelbase + chan]))
                         timerchans.add(chan)
                 if self.flags.logsyncbuzzer and 0xc0 == fx:
                     log.warning("Sync-buzzer at frame %s.", self.index)

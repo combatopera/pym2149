@@ -110,6 +110,7 @@ class PhysicalRegisters:
     NP = staticmethod(lambda p: p & 0x1f)
     EP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0xff) << 8))
     timers = property(lambda self: self.logical.timers)
+    levelbase = 0x8
 
     @types(Config, LogicalRegisters)
     def __init__(self, config, logical):
@@ -124,8 +125,8 @@ class PhysicalRegisters:
         for c in range(clampedchannels):
             logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
             logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
-            logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[0x8 + c])
-            logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[0x8 + c])
+            logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[self.levelbase + c])
+            logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[self.levelbase + c])
         logical.envperiodreg.link(self.EP, self.R[0xB], self.R[0xC])
         logical.envshapereg.link(lambda s: s & 0x0f, self.R[0xD])
         for r in self.R:
