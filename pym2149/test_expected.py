@@ -22,7 +22,7 @@ import subprocess, unittest, sys, tempfile
 
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
-actualdir = project / 'target'
+actualdir = project / 'actual'
 pngsuffix = '.png'
 
 def test_expected():

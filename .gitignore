@@ -1,5 +1,5 @@
 #gclean
-/target/
+/actual/
 *.pyc
 pym2149/native/*.pyxbldc
 pym2149/native/*.c
