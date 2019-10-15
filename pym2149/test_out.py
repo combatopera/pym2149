@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np, time, sys, os
-from .nod import Node, Block
 from .buf import Buf
-from .out import WavWriter, WavBuf, floatdtype
 from .minblep import MinBleps
-from .test_samples import batterypower
+from .nod import Node, Block
+from .out import WavWriter, WavBuf, floatdtype
+from .power import batterypower
 from collections import namedtuple
+import unittest, numpy as np, time, sys, os
 
 class MinPeriodTone(Node):
 
