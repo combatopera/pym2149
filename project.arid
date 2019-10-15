@@ -30,6 +30,7 @@ projects +=
 deps +=
     mock
     pyaudio
+    pillow
 years +=
     2014
     2018
