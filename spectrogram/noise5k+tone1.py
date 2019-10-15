@@ -17,7 +17,6 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class T1N5k:
 
@@ -26,7 +25,7 @@ class T1N5k:
         chip.noiseflag = True
         chip.fixedlevel = 15
         chip.toneperiod = 1
-        chip.noiseperiod = Freq(5000).noiseperiod(chip._nomclock)
+        chip.noisefreq = 5000
 
 A = E(T1N5k, '3'), silence, silence
 sections = A,

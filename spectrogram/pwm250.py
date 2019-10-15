@@ -18,14 +18,13 @@
 from spectrogram import silence
 from pym2149.dac import PWMEffect
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class PWM250:
 
     def on(self, chip, frame):
         chip.toneflag = True
         chip.fixedlevel = 15
-        chip.toneperiod = Freq(250).toneperiod(chip._nomclock)
+        chip.tonefreq = 250
         if frame < 1:
             chan = chip[0]._chan
             timer = chip._chip.timers[chan]

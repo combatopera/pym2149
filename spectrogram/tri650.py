@@ -17,7 +17,6 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class Tri650:
 
@@ -25,9 +24,9 @@ class Tri650:
 
     def on(self, chip):
         chip.envflag = True
-        chip.envperiod = Freq(650).envperiod(chip._nomclock, self.shape)
         if chip.envshape != self.shape:
             chip.envshape = self.shape
+        chip.envfreq = 650
 
 A = E(Tri650, '3'), silence, silence
 sections = A,

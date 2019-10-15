@@ -17,7 +17,6 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class All:
 
@@ -27,11 +26,11 @@ class All:
         chip.toneflag = True
         chip.noiseflag = True
         chip.envflag = True
-        chip.toneperiod = Freq(1000).toneperiod(chip._nomclock)
-        chip.noiseperiod = Freq(5000).noiseperiod(chip._nomclock)
-        chip.envperiod = Freq(1).envperiod(chip._nomclock, self.shape)
+        chip.tonefreq = 1000
+        chip.noisefreq = 5000
         if chip.envshape != self.shape:
             chip.envshape = self.shape
+        chip.envfreq = 1
 
 A = E(All, '3'), silence, silence
 sections = A,

@@ -22,6 +22,7 @@ from .mfp import MFPTimer, mfpclock
 from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
+from .pitch import Freq
 from .reg import Reg, VersionReg, regproperty
 from diapyr import types
 import logging
@@ -68,14 +69,19 @@ class LogicalRegisters:
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
         confchannels = config.chipchannels
-        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
-        self.noiseperiodreg = Reg(minval = 1)
+        nomclock = config.nominalclock
+        self.tonefreqs = [Reg() for _ in range(confchannels)]
+        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod).link(lambda f: Freq(f).toneperiod(nomclock), freq)
+                for freq in self.tonefreqs]
+        self.noisefreq = Reg()
+        self.noiseperiodreg = Reg(minval = 1).link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreq)
         self.toneflags = [Reg() for _ in range(confchannels)]
         self.noiseflags = [Reg() for _ in range(confchannels)]
         self.fixedlevels = [Reg() for _ in range(confchannels)]
         self.levelmodes = [Reg() for _ in range(confchannels)]
-        self.envperiodreg = Reg(minval = 1)
+        self.envfreq = Reg()
         self.envshapereg = VersionReg()
+        self.envperiodreg = Reg(minval = 1).link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreq, self.envshapereg)
         for c in range(confchannels):
             self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
             self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)

@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..iface import Config, Prerecorded, Tuning, Context
+from ..reg import regproperty
 from ..util import ExceptionCatcher
 from diapyr import types
 from diapyr.util import innerclass
@@ -42,6 +43,8 @@ class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
+        tonefreq = regproperty(lambda self: self._chip.tonefreqs[self._chan])
+
         def __init__(self, chan):
             self._chan = chan
 
@@ -52,6 +55,9 @@ class ChipProxy(ExceptionCatcher):
     envshape = asprop(lambda chip: chip.envshapereg)
     envperiod = asprop(lambda chip: chip.envperiodreg)
     envpitch = asprop(lambda chip: chip.envperiodreg, lambda self: self.toenvperiod, None)
+    tonefreq = convenience('tonefreq')
+    noisefreq = regproperty(lambda self: self._chip.noisefreq)
+    envfreq = regproperty(lambda self: self._chip.envfreq)
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]

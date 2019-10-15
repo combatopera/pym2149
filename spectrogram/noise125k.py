@@ -17,14 +17,13 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class N125k:
 
     def on(self, chip):
         chip.noiseflag = True
         chip.fixedlevel = 15
-        chip.noiseperiod = Freq(125000).noiseperiod(chip._nomclock)
+        chip.noisefreq = 125000
 
 A = E(N125k, '3'), silence, silence
 sections = A,

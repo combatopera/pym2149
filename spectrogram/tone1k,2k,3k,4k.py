@@ -17,14 +17,13 @@
 
 from spectrogram import silence
 from pym2149.lc import E, V
-from pym2149.pitch import Freq
 
 class T:
 
     def on(self, chip, freq, frame):
         chip.toneflag = True
         chip.fixedlevel = 15
-        chip.toneperiod = Freq(freq[frame]).toneperiod(chip._nomclock)
+        chip.tonefreq = freq[frame]
 
 A = E(T, '1', freq = V('1000 2000 3000 4000')), silence, silence
 sections = A,

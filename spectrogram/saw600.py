@@ -17,7 +17,6 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class Saw600:
 
@@ -25,9 +24,9 @@ class Saw600:
 
     def on(self, chip):
         chip.envflag = True
-        chip.envperiod = Freq(600).envperiod(chip._nomclock, self.shape)
         if chip.envshape != self.shape:
             chip.envshape = self.shape
+        chip.envfreq = 600
 
 A = E(Saw600, '3'), silence, silence
 sections = A,

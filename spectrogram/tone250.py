@@ -17,14 +17,13 @@
 
 from spectrogram import silence
 from pym2149.lc import E
-from pym2149.pitch import Freq
 
 class T250:
 
     def on(self, chip):
         chip.toneflag = True
         chip.fixedlevel = 15
-        chip.toneperiod = Freq(250).toneperiod(chip._nomclock)
+        chip.tonefreq = 250
 
 A = E(T250, '3'), silence, silence
 sections = A,
