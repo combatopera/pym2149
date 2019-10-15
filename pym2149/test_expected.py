@@ -21,31 +21,32 @@ from pathlib import Path
 import subprocess, unittest, sys, tempfile
 
 project = Path(__file__).parent.parent
-expected = project / 'expected'
-target = project / 'target'
+expecteddir = project / 'expected'
+actualdir = project / 'target'
 pngsuffix = '.png'
 
 def test_expected():
     if batterypower():
         return
-    for path in expected.glob('**/*'):
+    for path in expecteddir.glob('**/*'):
         if not path.is_dir():
             yield (_comparepng if path.name.endswith(pngsuffix) else _comparetxt), path
 
 def _comparetxt(path):
     actual = subprocess.check_output([sys.executable, project / 'lc2txt.py', '--ignore-settings',
-            "%s.py" % (project / path.relative_to(expected))], universal_newlines = True)
+            "%s.py" % (project / path.relative_to(expecteddir))], universal_newlines = True)
     with path.open() as f:
         unittest.TestCase().assertEqual(f.read(), actual)
 
 def _comparepng(path):
-    actualpath = target / path.relative_to(expected)
+    relpath = path.relative_to(expecteddir)
+    actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with tempfile.NamedTemporaryFile() as wavfile:
         subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                "%s.py" % str(project / path.relative_to(expected))[:-len(pngsuffix)], wavfile.name])
+                "%s.py" % str(project / relpath)[:-len(pngsuffix)], wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     with path.open('rb') as f:
         with actualpath.open('rb') as g:
