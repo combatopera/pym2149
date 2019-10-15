@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from spectrogram import Silence
+from spectrogram import silence
 from pym2149.lc import E, V
 
 class T:
@@ -25,7 +25,6 @@ class T:
         chip.fixedlevel = 15
         chip.toneperiod = period[frame]
 
-silence = E(Silence, '1')
 A = E(T, '1', period = V('1 2 3 4 5 6 7 8')), silence, silence
 sections = A,
 speed = 50/8

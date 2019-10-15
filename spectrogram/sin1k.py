@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from spectrogram import Silence
+from spectrogram import silence
 from pym2149.dac import SinusEffect
 from pym2149.lc import E
 
@@ -30,7 +30,6 @@ class Sin1k:
             timer.effect.value = SinusEffect(chip._chip.fixedlevels[chan])
             timer.freq.value = 1000 * 4 # FIXME: It should know wavelength from effect.
 
-silence = E(Silence, '4')
 A = E(Sin1k, '4'), silence, silence
 sections = A,
 speed = 25

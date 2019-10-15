@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from spectrogram import Silence
+from spectrogram import silence
 from pym2149.lc import E
 from pym2149.pitch import Freq
 
@@ -26,7 +26,6 @@ class T1k5:
         chip.fixedlevel = 15
         chip.toneperiod = Freq(1500).toneperiod(chip._nomclock)
 
-silence = E(Silence, '3')
 A = E(T1k5, '3'), silence, silence
 sections = A,
 speed = 25
