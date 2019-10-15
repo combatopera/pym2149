@@ -25,5 +25,5 @@ class T1k:
         chip.fixedlevel = 15
         chip.tonefreq = 1000
 
-sections = [[E(T1k, '3'), silence, silence]]
-speed = 25
+sections = [[E(T1k, '1.5'), silence, silence]]
+speed = 50

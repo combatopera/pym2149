@@ -28,5 +28,5 @@ class Saw600:
             chip.envshape = self.shape
         chip.envfreq = 600
 
-sections = [[E(Saw600, '3'), silence, silence]]
-speed = 25
+sections = [[E(Saw600, '1.5'), silence, silence]]
+speed = 50

@@ -31,5 +31,5 @@ class PWM250:
             timer.effect.value = PWMEffect(chip._chip.fixedlevels[chan])
             timer.freq.value = 250
 
-sections = [[E(PWM250, '3'), silence, silence]]
-speed = 25
+sections = [[E(PWM250, '1.5'), silence, silence]]
+speed = 50

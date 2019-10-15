@@ -32,5 +32,5 @@ class All:
             chip.envshape = self.shape
         chip.envfreq = 1
 
-sections = [[E(All, '3'), silence, silence]]
-speed = 25
+sections = [[E(All, '1.5'), silence, silence]]
+speed = 50

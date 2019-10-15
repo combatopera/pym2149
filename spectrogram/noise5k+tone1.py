@@ -27,5 +27,5 @@ class T1N5k:
         chip.toneperiod = 1
         chip.noisefreq = 5000
 
-sections = [[E(T1N5k, '3'), silence, silence]]
-speed = 25
+sections = [[E(T1N5k, '1.5'), silence, silence]]
+speed = 50

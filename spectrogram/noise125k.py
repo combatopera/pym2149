@@ -25,5 +25,5 @@ class N125k:
         chip.fixedlevel = 15
         chip.noisefreq = 125000
 
-sections = [[E(N125k, '3'), silence, silence]]
-speed = 25
+sections = [[E(N125k, '1.5'), silence, silence]]
+speed = 50

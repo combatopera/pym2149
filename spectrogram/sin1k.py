@@ -30,5 +30,5 @@ class Sin1k:
             timer.effect.value = SinusEffect(chip._chip.fixedlevels[chan])
             timer.freq.value = 1000 * 4 # FIXME: It should know wavelength from effect.
 
-sections = [[E(Sin1k, '4'), silence, silence]]
-speed = 25
+sections = [[E(Sin1k, '2'), silence, silence]]
+speed = 50
