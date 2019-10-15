@@ -4,6 +4,7 @@ addons:
     - python3-pyparsing
     - portaudio19-dev
     - sox
+    - python3-pil
 install:
 - git clone https://github.com/combatopera/aridity.git ../aridity
 - git clone https://github.com/combatopera/pyven.git ../pyven
