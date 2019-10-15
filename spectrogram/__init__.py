@@ -18,4 +18,4 @@
 class Silence:
 
     def on(self, chip):
-        chip.fixedlevel = 13
+        chip.fixedlevel = 13 # Neutral DC.

@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .test_samples import batterypower
+from lagoon import sox
 from pathlib import Path
 import subprocess, unittest, sys, tempfile
 
@@ -45,7 +46,7 @@ def _comparepng(path):
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
                 "%s.py" % str(project / path.relative_to(expected))[:-len(pngsuffix)], wavfile.name])
-        subprocess.check_call(['sox', wavfile.name, '-n', 'spectrogram', '-o', actualpath])
+        sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     with path.open('rb') as f:
         with actualpath.open('rb') as g:
             unittest.TestCase().assertEqual(f.read(), g.read())

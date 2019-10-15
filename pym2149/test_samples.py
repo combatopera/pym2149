@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .config import ConfigName
-import unittest, samples, re
+import re
 
 wordpattern = re.compile(r'\S+')
 statetobatterypower = {'charging': False, 'fully-charged': False, 'discharging': True}
@@ -33,10 +32,3 @@ def batterypower():
                 yield words[1]
     state, = states()
     return statetobatterypower[state]
-
-class TestSamples(unittest.TestCase):
-
-    def test_samples(self):
-        if batterypower():
-            return
-        samples.mainimpl(ConfigName(args = []))
