@@ -46,7 +46,7 @@ def _comparepng(path):
         subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                "%s.py" % str(project / relpath)[:-len(pngsuffix)], wavfile.name])
+                project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)]), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     with path.open('rb') as f:
         with actualpath.open('rb') as g:
