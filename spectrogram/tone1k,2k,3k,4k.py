@@ -25,6 +25,5 @@ class T:
         chip.fixedlevel = 15
         chip.tonefreq = freq[frame]
 
-A = E(T, '1', freq = V('1000 2000 3000 4000')), silence, silence
-sections = A,
+sections = [[E(T, '1', freq = V('1000 2000 3000 4000')), silence, silence]]
 speed = 50/4

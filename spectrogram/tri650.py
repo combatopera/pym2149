@@ -28,6 +28,5 @@ class Tri650:
             chip.envshape = self.shape
         chip.envfreq = 650
 
-A = E(Tri650, '3'), silence, silence
-sections = A,
+sections = [[E(Tri650, '3'), silence, silence]]
 speed = 25

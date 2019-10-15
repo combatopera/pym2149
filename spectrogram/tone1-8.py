@@ -25,6 +25,5 @@ class T:
         chip.fixedlevel = 15
         chip.toneperiod = period[frame]
 
-A = E(T, '1', period = V('1 2 3 4 5 6 7 8')), silence, silence
-sections = A,
+sections = [[E(T, '1', period = V('1 2 3 4 5 6 7 8')), silence, silence]]
 speed = 50/8

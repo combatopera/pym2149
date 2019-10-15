@@ -25,6 +25,5 @@ class N5k:
         chip.fixedlevel = 15
         chip.noisefreq = 5000
 
-A = E(N5k, '3'), silence, silence
-sections = A,
+sections = [[E(N5k, '3'), silence, silence]]
 speed = 25

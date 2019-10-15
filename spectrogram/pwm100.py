@@ -31,6 +31,5 @@ class PWM100:
             timer.effect.value = PWMEffect(chip._chip.fixedlevels[chan])
             timer.freq.value = 101 # Necessarily detune.
 
-A = E(PWM100, '3'), silence, silence
-sections = A,
+sections = [[E(PWM100, '3'), silence, silence]]
 speed = 25

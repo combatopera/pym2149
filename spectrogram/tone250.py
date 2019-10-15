@@ -25,6 +25,5 @@ class T250:
         chip.fixedlevel = 15
         chip.tonefreq = 250
 
-A = E(T250, '3'), silence, silence
-sections = A,
+sections = [[E(T250, '3'), silence, silence]]
 speed = 25
