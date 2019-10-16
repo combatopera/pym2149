@@ -49,6 +49,8 @@ def _comparepng(path):
                 '--config', 'pianorollenabled = false',
                 project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)]), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
-    if ImageChops.difference(*map(Image.open, [path, actualpath])).getbbox() is not None:
+    h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
+    if any(h[1:]):
+        print('HISTO', h)
         with actualpath.open('rb') as f:
             unittest.TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
