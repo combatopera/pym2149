@@ -19,7 +19,7 @@ from .power import batterypower
 from lagoon import sox
 from PIL import Image, ImageChops
 from pathlib import Path
-import subprocess, unittest, sys, tempfile
+import subprocess, unittest, sys, tempfile, base64
 
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
@@ -49,7 +49,6 @@ def _comparepng(path):
                 '--config', 'pianorollenabled = false',
                 project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)]), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
-    expected = Image.open(path)
-    actual = Image.open(actualpath)
-    diff = ImageChops.difference(expected, actual)
-    unittest.TestCase().assertIs(None, diff.getbbox())
+    if ImageChops.difference(*map(Image.open, [path, actualpath])).getbbox() is not None:
+        with actualpath.open('rb') as f:
+            unittest.TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
