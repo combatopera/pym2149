@@ -50,7 +50,8 @@ def _comparepng(path):
                 project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)]), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
-    if any(h[1:]):
-        print('HISTO', h)
+    def frac(limit):
+        return sum(h[:limit]) / sum(h)
+    if frac(24) < 1 or frac(12) < .99:
         with actualpath.open('rb') as f:
             unittest.TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
