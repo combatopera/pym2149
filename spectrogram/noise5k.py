@@ -22,7 +22,7 @@ class N5k:
 
     def on(self, chip):
         chip.noiseflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.noisefreq = 5000
 
 sections = [[E(N5k, '1.5'), silence, silence]]

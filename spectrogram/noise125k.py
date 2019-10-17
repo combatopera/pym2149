@@ -22,7 +22,7 @@ class N125k:
 
     def on(self, chip):
         chip.noiseflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.noisefreq = 125000
 
 sections = [[E(N125k, '1.5'), silence, silence]]

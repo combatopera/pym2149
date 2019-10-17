@@ -87,7 +87,7 @@ class ChipProxy(ExceptionCatcher):
         return self._tuning.freq(pitch).envperiod(self._nomclock, self._chip.envshapereg.value)
 
 for name, prop in dict(
-    fixedlevel = asprop(lambda chip, chan: chip.fixedlevels[chan]),
+    level = asprop(lambda chip, chan: chip.fixedlevels[chan]),
     noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
     toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
@@ -128,10 +128,10 @@ class LiveCodingBridge(Prerecorded):
 
         def _quiet(self):
             for proxy in self.chipproxies:
-                proxy.envflag = False
-                proxy.fixedlevel = 0
                 proxy.noiseflag = False
                 proxy.toneflag = False
+                proxy.envflag = False
+                proxy.level = 0
 
         def _step(self, speed, section, frame):
             self._quiet()

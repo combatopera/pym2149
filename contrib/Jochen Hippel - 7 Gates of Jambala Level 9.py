@@ -10,7 +10,7 @@ class Kick:
 
     def on(self, frame, chip):
         if frame < 4:
-            chip.fixedlevel = self.level[frame]
+            chip.level = self.level[frame]
             chip.noiseflag = self.nf[frame]
             chip.toneflag = self.tf[frame]
             chip.noiseperiod = 12
@@ -25,7 +25,7 @@ class Snare:
     pitch = V('.02') + V('57 54 52 51') >> 1
 
     def on(self, frame, chip):
-        chip.fixedlevel = self.level[frame]
+        chip.level = self.level[frame]
         chip.noiseflag = self.nf[frame]
         chip.toneflag = self.tf[frame]
         if chip.noiseflag:
@@ -36,7 +36,7 @@ class Hat:
 
     def on(self, frame, chip):
         if frame < 1:
-            chip.fixedlevel = 10
+            chip.level = 10
             chip.noiseflag = True
             chip.toneflag = False
             chip.noiseperiod = 12
@@ -48,7 +48,7 @@ class Bass:
     vib = V('5.5x,/2 5x1/4 -1/2') * V('.145') - V('.01')
 
     def on(self, frame, chip, degree, velocity, vibshift):
-        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
+        chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.timbre)[frame]) + (self.vib << vibshift[frame])[frame]
@@ -56,7 +56,7 @@ class Bass:
 class Simple:
 
     def on(self, frame, chip, degree):
-        chip.fixedlevel = self.level[frame]
+        chip.level = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
@@ -78,7 +78,7 @@ class Arp:
     chords = D('1 3 5 +').inversions()
 
     def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
-        chip.fixedlevel = velocity[frame].pick(self.levels)[frame]
+        chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame])

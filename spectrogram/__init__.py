@@ -20,6 +20,6 @@ from pym2149.lc import E
 class Silence:
 
     def on(self, chip):
-        chip.fixedlevel = 13 # Neutral DC.
+        chip.level = 13 # Neutral DC.
 
 silence = E(Silence, '1')

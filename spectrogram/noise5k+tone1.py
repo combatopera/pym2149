@@ -23,7 +23,7 @@ class T1N5k:
     def on(self, chip):
         chip.toneflag = True
         chip.noiseflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.toneperiod = 1
         chip.noisefreq = 5000
 

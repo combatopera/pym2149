@@ -23,7 +23,7 @@ from pym2149.lc import E
 class Sin1k:
 
     def on(self, chip, frame):
-        chip.fixedlevel = max(0, 15 - frame // 5) # FIXME: Implement clamping already.
+        chip.level = max(0, 15 - frame // 5) # FIXME: Implement clamping already.
         if frame < 1:
             chan = chip[0]._chan
             timer = chip._chip.timers[chan]

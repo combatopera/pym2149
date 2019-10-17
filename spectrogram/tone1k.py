@@ -22,7 +22,7 @@ class T1k:
 
     def on(self, chip):
         chip.toneflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.tonefreq = 1000
 
 sections = [[E(T1k, '1.5'), silence, silence]]

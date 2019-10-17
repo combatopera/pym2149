@@ -7,7 +7,7 @@ class Bass:
     envpitches = D('2x++,+'), D('2x++ 5x+,1'), D('+')
 
     def on(self, frame, chip, degree, slap = V('0')):
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame])
@@ -25,7 +25,7 @@ class Kick:
 
     def on(self, frame, chip, att = V('0'), np = V('7')):
         if frame < 8:
-            chip.fixedlevel = self.level[frame] - att[frame]
+            chip.level = self.level[frame] - att[frame]
             chip.noiseflag = self.nf[frame]
             chip.toneflag = self.tf[frame]
             chip.noiseperiod = np[frame]
@@ -41,7 +41,7 @@ class Snare:
 
     def on(self, frame, chip, att = V('0')):
         if frame < 6:
-            chip.fixedlevel = att[frame].pick(self.level)[frame]
+            chip.level = att[frame].pick(self.level)[frame]
             chip.noiseflag = self.nf[frame]
             if chip.noisepriority():
                 chip.noiseperiod = self.np[frame]
@@ -64,7 +64,7 @@ class Arp:
     vib = V('15.5x,/3 -.4/6 .4/3')
 
     def on(self, frame, chip, degree, inv = V('0'), vel = V('1')):
-        chip.fixedlevel = vel[frame].pick(self.levels)[frame]
+        chip.level = vel[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
@@ -74,7 +74,7 @@ class Arp2:
     level = V('2x13 3x12 2x11 6x10,9')
 
     def on(self, frame, chip, degree1, degree2, degree3):
-        chip.fixedlevel = self.level[frame]
+        chip.level = self.level[frame]
         chip.toneflag = True
         chip.tonepitch = chip.topitch((frame % 3).pick([degree1, degree2, degree3])[frame])
 
@@ -86,7 +86,7 @@ class Lead:
     vib = V('40.5x,/3 -.4/6 .4/3')
 
     def on(self, frame, chip, degree, att = V('0'), vibshift = V('0')):
-        chip.fixedlevel = att[frame].pick(self.levels)[frame]
+        chip.level = att[frame].pick(self.levels)[frame]
         chip.toneflag = True
         chip.tonepitch = chip.topitch(degree[frame]) + (self.vib << vibshift[frame])[frame]
 
@@ -96,7 +96,7 @@ class Bright:
     arp = D(['++ + 1'] * 2, '+,1')
 
     def on(self, frame, chip, degree):
-        chip.fixedlevel = self.level[frame]
+        chip.level = self.level[frame]
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.arp)[frame])
 
@@ -106,7 +106,7 @@ class Luke:
     arp = D('1 +')
 
     def on(self, frame, chip, degree, att = V('1')):
-        chip.fixedlevel = att[frame].pick(self.level)[frame]
+        chip.level = att[frame].pick(self.level)[frame]
         chip.toneflag = True
         chip.tonepitch = chip.topitch((degree + self.arp)[frame])
 

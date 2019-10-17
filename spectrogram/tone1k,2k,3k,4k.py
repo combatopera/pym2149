@@ -22,7 +22,7 @@ class T:
 
     def on(self, chip, freq, frame):
         chip.toneflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.tonefreq = freq[frame]
 
 sections = [[E(T, '.25', freq = V('1000 2000 3000 4000').of(.25)), silence, silence]]

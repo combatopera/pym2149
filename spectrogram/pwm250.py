@@ -23,7 +23,7 @@ class PWM250:
 
     def on(self, chip, frame):
         chip.toneflag = True
-        chip.fixedlevel = 15
+        chip.level = 15
         chip.tonefreq = 250
         if frame < 1:
             chan = chip[0]._chan
