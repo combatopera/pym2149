@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import bisect, numpy as np
+import bisect, numpy as np, math
 
 class BaseSection:
 
@@ -172,7 +172,7 @@ class Event:
                 if name in extras:
                     yield name, extras[name]
                 elif 'frame' == name:
-                    yield name, frame - self.absframe * speed + shift
+                    yield name, Frame(frame - self.absframe * speed + shift)
                 else:
                     key = self.namespace, name
                     if key in kwargs:
@@ -184,6 +184,14 @@ class Event:
             if self.note.offparams is not None:
                 onframes = self.onframes * speed
                 note.off(**dict(noteargs(self.note.offparams, onframes, context = context, chip = chipproxy, onframes = onframes)))
+
+class Frame(float):
+
+    def pick(self, v):
+        return v[math.floor(self)]
+
+    def __mod__(self, other):
+        return type(self)(super().__mod__(other))
 
 class Overlay:
 

@@ -76,7 +76,7 @@ class Arp2:
     def on(self, frame, chip, degree1, degree2, degree3):
         chip.fixedlevel = self.level[frame]
         chip.toneflag = True
-        chip.tonepitch = chip.topitch([degree1, degree2, degree3][int(frame) % 3][frame])
+        chip.tonepitch = chip.topitch((frame % 3).pick([degree1, degree2, degree3])[frame])
 
 class Lead:
 
