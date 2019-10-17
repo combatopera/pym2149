@@ -74,7 +74,7 @@ class RollImpl(Roll):
             else:
                 vals.append('')
             if noise and rhs:
-                vals.append(self.chip.noiseperiod)
+                vals.append(self.chip.noiseperiodreg.value)
             else:
                 vals.append('')
             if (tone or noise) and rhs:
@@ -83,19 +83,19 @@ class RollImpl(Roll):
                 vals.append('')
             if timereffect and (env or level):
                 if env:
-                    vals.append(self.shapes[self.chip.envshape])
+                    vals.append(self.shapes[self.chip.envshapereg.value])
                 else:
                     vals.append(level)
                 vals.append('')
                 appendpitch(Freq(self.chip.timers[c].getfreq()))
             elif env:
-                shape = self.chip.envshape
+                shape = self.chip.envshapereg.value
                 vals.append(self.shapes[shape])
                 vals.append(('', '~')[newshape])
                 if self.periods:
-                    vals.append(self.chip.envperiod)
+                    vals.append(self.chip.envperiodreg.value)
                 else:
-                    appendpitch(Period(self.chip.envperiod).envfreq(self.nomclock, shape))
+                    appendpitch(Period(self.chip.envperiodreg.value).envfreq(self.nomclock, shape))
             elif level:
                 vals.append(level)
                 vals.append('')

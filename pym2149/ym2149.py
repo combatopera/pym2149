@@ -23,7 +23,7 @@ from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
 from .pitch import Freq
-from .reg import Reg, VersionReg, regproperty
+from .reg import Reg, VersionReg
 from diapyr import types
 import logging
 
@@ -60,11 +60,6 @@ class ClockInfo:
         return (self.implclock - 1) // (self.scale * outrate)
 
 class LogicalRegisters:
-
-    # TODO: Retire regproperty.
-    noiseperiod = regproperty(lambda regs: regs.noiseperiodreg)
-    envperiod = regproperty(lambda regs: regs.envperiodreg)
-    envshape = regproperty(lambda regs: regs.envshapereg)
 
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
