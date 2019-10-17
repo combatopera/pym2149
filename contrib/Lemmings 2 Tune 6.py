@@ -122,12 +122,11 @@ class Ping:
 
 class Diarp:
 
-    def on(self, frame, chip, degree0, degree1, level):
+    def on(self, frame, chip, degree1, degree2, level):
         chip.fixedlevel = level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        degree = degree0 if frame % 8 < 4 else degree1
-        chip.tonepitch = chip.topitch(degree[frame])
+        chip.tonepitch = chip.topitch((degree2 if frame % 8 < 4 else degree1)[frame])
 
 class Ramp:
 
@@ -160,8 +159,8 @@ bass4 = bass2 | E(Bass, '1 2x.5 2x',
 ramp = E(Ramp, '8',
         degree = D('4'))
 diarp = E(Diarp, '8x4',
-        degree0 = D('4x3+ 4x2+'),
         degree1 = D('+'),
+        degree2 = D('4x3+ 4x2+'),
         level = V('16x15 14//12 4x11'))
 boop1 = E(Boop, '3.5/ 2x2 .5',
         degree = D('3'))
