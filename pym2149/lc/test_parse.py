@@ -51,9 +51,11 @@ class TestVParse(unittest.TestCase):
         self.assertEqual(('x',), cm.exception.args)
 
     def test_slash(self):
-        with self.assertRaises(BadWordException) as cm:
-            VParse(float, 0, False)('/', None)
-        self.assertEqual(('/',), cm.exception.args)
+        sections = VParse(float, 0, False)('/ 7', None)
+        self.assertEqual([0, 1], sections.frames)
+        self.assertEqual(2, sections.len)
+        self.assertEqual([0, 7], [s.initial for s in sections.sections])
+        self.assertEqual([7, None], self._perframes(sections))
 
     def test_combo(self):
         sections = VParse(float, 0, False)('3x4/5 0/1', None) # Total width is biggest explicit number.
