@@ -92,8 +92,7 @@ class LCHandler(Handler):
     def __call__(self, timetags, message, reply):
         try:
             text, = message.args
-            diff = self.context._update(text, False)
-            log.info("Add/update: %s", ', '.join(diff.keys()))
+            self.context._update(text, False)
         except Exception:
             log.exception('Update failed:')
 
