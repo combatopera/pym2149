@@ -36,11 +36,11 @@ class TestEvent(unittest.TestCase):
         f = Event(40, 5, self, namespace)
         speed = 10
         kwargs = {(namespace, 'hmm'): V('20/80 100')}
-        e(350, speed, self, kwargs, None)
-        e(360, speed, self, kwargs, None)
-        e(390, speed, self, kwargs, None)
-        f(400, speed, self, kwargs, None)
-        f(410, speed, self, kwargs, None)
+        e(350, speed, self, kwargs)
+        e(360, speed, self, kwargs)
+        e(390, speed, self, kwargs)
+        f(400, speed, self, kwargs)
+        f(410, speed, self, kwargs)
         self.assertEqual([
             ['on', 0, 55, 55],
             ['on', 10, 55, 56],
@@ -87,7 +87,7 @@ class TestSlice(unittest.TestCase):
             def on(self, val, frame):
                 vals.append(val[frame])
         p = E(Note, '10x', val = V('/9 9'))[-6:]
-        p.apply(1, .5, None, None)
-        p.apply(1, 4.5, None, None)
-        p.apply(1, 5.5, None, None)
+        p.apply(1, .5, None)
+        p.apply(1, 4.5, None)
+        p.apply(1, 5.5, None)
         self.assertEqual([4.5, 8.5, 9], vals)

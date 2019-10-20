@@ -143,8 +143,8 @@ class Operators:
             degrees.append(degrees.pop(0) + np.array([1, 0, 0]))
         return invs
 
-    def apply(self, speed, frame, chip, context):
-        self.of(speed)[frame](frame, speed, chip, self.kwargs, context)
+    def apply(self, speed, frame, chip):
+        self.of(speed)[frame](frame, speed, chip, self.kwargs)
 
 class EventSection:
 
@@ -165,7 +165,7 @@ class Event:
         self.note = note
         self.namespace = namespace
 
-    def __call__(self, frame, speed, chipproxy, kwargs, context):
+    def __call__(self, frame, speed, chipproxy, kwargs):
         note = self.note.new() # XXX: Allow a note to maintain state?
         def noteargs(params, shift, **extras):
             for name in params:
@@ -179,11 +179,11 @@ class Event:
                         yield name, (kwargs[key] >> -self.absframe).of(speed) >> shift
         if self.onframes is None:
             if self.note.onparams is not None:
-                note.on(**dict(noteargs(self.note.onparams, 0, context = context, chip = chipproxy)))
+                note.on(**dict(noteargs(self.note.onparams, 0, chip = chipproxy)))
         else:
             if self.note.offparams is not None:
                 onframes = self.onframes * speed
-                note.off(**dict(noteargs(self.note.offparams, onframes, context = context, chip = chipproxy, onframes = onframes)))
+                note.off(**dict(noteargs(self.note.offparams, onframes, chip = chipproxy, onframes = onframes)))
 
 class Frame(float):
 
