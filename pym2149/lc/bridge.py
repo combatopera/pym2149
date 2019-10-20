@@ -148,7 +148,7 @@ class LiveCodingBridge(Prerecorded):
             if section == s:
                 return frameindex
             frameindex += k
-        raise NoSuchSectionException(self.sectionname) # FIXME: And stop threads.
+        raise NoSuchSectionException(self.sectionname)
 
     def _sectionandframe(self, frame):
         while True:
