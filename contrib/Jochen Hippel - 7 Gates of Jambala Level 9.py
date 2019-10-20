@@ -43,12 +43,12 @@ class Hat:
 
 class Bass:
 
-    levels = V('13//12,10'), V('13//5,12')
+    levels = V('13//5,12'), V('13//12,10')
     timbre = D('-,--')
     vib = V('5.5x,/2 5x1/4 -1/2') * V('.145') - V('.01')
 
-    def on(self, frame, chip, degree, velocity, vibshift):
-        chip.level = velocity[frame].pick(self.levels)[frame]
+    def on(self, frame, chip, degree, att, vibshift):
+        chip.level = att[frame].pick(self.levels)[frame]
         chip.toneflag = True
         chip.tonepitch = topitch((degree + self.timbre)[frame]) + (self.vib << vibshift[frame])[frame]
 
@@ -81,7 +81,7 @@ class Arp:
 
 def bass(degree):
     return E(Bass, '1', degree = degree,
-            velocity = V('1 2x 3x1 0 2x1 2x 2x1 2x 1'),
+            att = V('0 2x1 3x 1 2x 2x1 2x 2x1 0'),
             vibshift = V('0 6 7x 6 3x 6 2x'))
 
 drums = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '4/3') >> 2
