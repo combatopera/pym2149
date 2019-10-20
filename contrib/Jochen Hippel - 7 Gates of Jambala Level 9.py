@@ -71,11 +71,11 @@ class Pluck(Simple):
 
 class Arp:
 
-    levels = [V('13//14,6') - V(l) for l in '10']
+    levels = [V('13//14,6') - V(l) for l in '01']
     chords = D('1 3 5 +').inversions()
 
-    def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
-        chip.level = velocity[frame].pick(self.levels)[frame]
+    def on(self, frame, chip, degree, inv = V('0'), att = V('0')):
+        chip.level = att[frame].pick(self.levels)[frame]
         chip.toneflag = True
         chip.tonepitch = topitch((degree + inv[frame].pick(self.chords))[frame])
 
@@ -94,7 +94,7 @@ arp1 = E(Arp, '1',
         inv = V('8x 8x2 16x'))
 arp2 = E(Arp, '1',
         degree = D('+') + chords2,
-        velocity = V('0'))
+        att = V('1'))
 lead = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
         degree = D('+') + chords1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
 pluck = E(Pluck, '.5',
