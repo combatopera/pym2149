@@ -61,7 +61,7 @@ class Parse:
 
 class VParse(Parse):
 
-    pattern = re.compile('(?:([0-9.]+)x)?(-?[0-9.]+)?(#+|b+)?([+]+|-+)?(?:(/{1,2})([0-9.]+))?')
+    pattern = re.compile('(?:([0-9.]+)x)?(-?[0-9.]+)?(#+|b+)?([+]+|-+)?(?:(/{1,2})([0-9.]*))?')
 
     def __init__(self, type, step, continuous):
         self.type = type
@@ -89,7 +89,7 @@ class VParse(Parse):
             if bias is not None:
                 bias = len(bias) - 1
             slash = m.group(6)
-            slide = (width if self.continuous else 0) if slash is None else float(slash)
+            slide = (width if self.continuous else 0) if slash is None else (float(slash) if slash else width)
             if not self.sections.empty():
                 self._wrap(initial)
             hold = width - slide

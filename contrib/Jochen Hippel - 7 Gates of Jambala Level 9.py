@@ -21,7 +21,7 @@ class Snare:
     level = V('11 14x13//13,0')
     nf = V('1 2x,1')
     tf = V('0 4x1,0')
-    np = V('12//6,10') << 1
+    np = V('6x12//,10') << 1
     pitch = V('.02') + V('57 54 52 51') >> 1
 
     def on(self, frame, chip):
@@ -43,9 +43,9 @@ class Hat:
 
 class Bass:
 
-    levels = V('13//5,12'), V('13//12,10')
+    levels = V('5x13//,12'), V('12x13//,10')
     timbre = D('-,--')
-    vib = V('5.5x,/2 5x1/4 -1/2') * V('.145') - V('.01')
+    vib = V('5.5x,2x/ 5x1/4 2x-1/') * V('.145') - V('.01')
 
     def on(self, frame, chip, degree, att, vibshift):
         chip.level = att[frame].pick(self.levels)[frame]
@@ -61,17 +61,17 @@ class Simple:
 
 class Lead(Simple):
 
-    level = V('13 7x12 11//11,0')
-    vib = V('6.75x,/1.25 .1/2.5 -.1/1.25')
+    level = V('13 7x12 11x11//,0')
+    vib = V('6.75x,1.25x/ 2.5x.1/ 1.25x-.1/')
 
 class Pluck(Simple):
 
-    level = V('13//13,0')
-    vib = V('/1.25,.1/2.5 -.1/2.5') << .25
+    level = V('13x13//,0')
+    vib = V('1.25x/,2.5x.1/ 2.5x-.1/') << .25
 
 class Arp:
 
-    levels = [V('13//14,6') - V(l) for l in '01']
+    levels = [V('14x13//,6') - V(l) for l in '01']
     chords = D('1 3 5 +').inversions()
 
     def on(self, frame, chip, degree, inv = V('0'), att = V('0')):
