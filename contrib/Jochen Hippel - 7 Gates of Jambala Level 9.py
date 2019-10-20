@@ -1,5 +1,5 @@
-from pym2149.lc import V, D, E, naturalminor
-from pym2149.pitches import C4
+from .lc import V, D, E, naturalminor
+from .pitches import C4
 
 class Kick:
 

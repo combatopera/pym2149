@@ -1,5 +1,5 @@
-from pym2149.lc import V, D, E, naturalminor, unit
-from pym2149.pitches import B3, C2
+from .lc import V, D, E, naturalminor, unit
+from .pitches import B3, C2
 
 class CommonDrum:
 

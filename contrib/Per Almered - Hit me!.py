@@ -1,5 +1,5 @@
-from pym2149.lc import V, D, E, major
-from pym2149.pitches import F4
+from .lc import V, D, E, major
+from .pitches import F4
 
 class Bass:
 
