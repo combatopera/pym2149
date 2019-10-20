@@ -26,9 +26,9 @@ class Snare:
 
     def on(self, frame, chip):
         chip.level = self.level[frame]
-        chip.noiseflag = self.nf[frame]
         chip.toneflag = self.tf[frame]
-        if chip.noiseflag:
+        if self.nf[frame]:
+            chip.noiseflag = True
             chip.noiseperiod = self.np[frame]
         chip.tonepitch = self.pitch[frame]
 
@@ -49,7 +49,6 @@ class Bass:
 
     def on(self, frame, chip, degree, velocity, vibshift):
         chip.level = velocity[frame].pick(self.levels)[frame]
-        chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = topitch((degree + self.timbre)[frame]) + (self.vib << vibshift[frame])[frame]
 
@@ -57,7 +56,6 @@ class Simple:
 
     def on(self, frame, chip, degree):
         chip.level = self.level[frame]
-        chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = topitch(degree[frame]) + self.vib[frame]
 
@@ -79,7 +77,6 @@ class Arp:
 
     def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
         chip.level = velocity[frame].pick(self.levels)[frame]
-        chip.noiseflag = False
         chip.toneflag = True
         chip.tonepitch = topitch((degree + inv[frame].pick(self.chords))[frame])
 
