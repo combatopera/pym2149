@@ -45,7 +45,6 @@ class ContextImpl(Context):
 
         def _put(self, name, value):
             self._data[name] = value
-            self._cache.clear()
 
         def __getattr__(self, name):
             try:
@@ -55,21 +54,28 @@ class ContextImpl(Context):
 
         def _cachedproperty(f):
             name = f.__name__
+            code = f.__code__
+            params = code.co_varnames[1:code.co_argcount]
             def g(self):
+                args = [getattr(self, p) for p in params]
                 try:
-                    value = self._cache[name]
+                    cacheargs, value = self._cache[name]
+                    if all(x is y for x, y in zip(cacheargs, args)):
+                        return value
                 except KeyError:
-                    self._cache[name] = value = f(self)
+                    pass
+                value = f(*[self] + args)
+                self._cache[name] = args, value
                 return value
             return property(g)
 
         @_cachedproperty
-        def sectionframecounts(self):
-            return [self.speed * max(pattern.len for pattern in section) for section in self.sections]
+        def sectionframecounts(self, speed, sections):
+            return [speed * max(pattern.len for pattern in section) for section in sections]
 
         @_cachedproperty
-        def totalframecount(self):
-            return sum(self.sectionframecounts)
+        def totalframecount(self, sectionframecounts):
+            return sum(sectionframecounts)
 
     @types(Config)
     def __init__(self, config):
