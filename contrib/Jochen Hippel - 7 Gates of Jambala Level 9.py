@@ -71,7 +71,7 @@ class Pluck(Simple):
 
 class Arp:
 
-    levels = [V('12//14,5') + V(l) for l in '01']
+    levels = [V('13//14,6') - V(l) for l in '10']
     chords = D('1 3 5 +').inversions()
 
     def on(self, frame, chip, degree, inv = V('0'), velocity = V('1')):
