@@ -39,15 +39,15 @@ class ContextImpl(Context):
         self._cache = {}
 
     def _update(self, text, flip):
-        snapshot = self._globals.copy()
+        before = self._globals.copy()
         exec(text, self._globals) # XXX: Impact of modifying mutable objects?
         addupdate = []
         for name, value in self._globals.items():
-            if not (name in snapshot and value is snapshot[name]):
+            if not (name in before and value is before[name]):
                 self._updates[name] = value
                 addupdate.append(name)
         delete = []
-        for name in snapshot:
+        for name in before:
             if name not in self._globals:
                 self._updates[name] = self.deleted
                 delete.append(name)
