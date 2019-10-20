@@ -173,3 +173,4 @@ class LiveCodingBridge(Prerecorded):
             if oldspeed != self.context.speed:
                 # FIXME: This also needs to happen when speed changed programmatically.
                 frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
+            # TODO: Adjust frameindex when sections changed.
