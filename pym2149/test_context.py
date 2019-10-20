@@ -22,18 +22,24 @@ class TestContext(unittest.TestCase):
 
     tuning = None
 
+    def setUp(self):
+        self.c = ContextImpl(self)
+
     def test_globals(self):
-        c = ContextImpl(self)
-        c._update('''g = 5
+        self.c._update('''g = 5
 def bump():
     global g
-    g += 1
-''', True)
-        self.assertEqual(5, c.g)
-        c.bump()
-        self.assertEqual(6, c.g)
-        c._update('''foo = 'bar'
-''', True)
-        self.assertEqual(6, c.g)
-        c.bump()
-        self.assertEqual(7, c.g)
+    g += 1''', True)
+        self.assertEqual(5, self.c.g)
+        self.c.bump()
+        self.assertEqual(6, self.c.g)
+        self.c._update('''foo = "bar"''', True)
+        self.assertEqual(6, self.c.g)
+        self.c.bump()
+        self.assertEqual(7, self.c.g)
+
+    def test_flip(self):
+        self.c._update('''speed = 100''', False)
+        self.assertEqual(16, self.c.speed)
+        self.c._flip()
+        self.assertEqual(100, self.c.speed)
