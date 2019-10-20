@@ -38,7 +38,7 @@ class ContextImpl(Context):
         self._updates = {}
         self._cache = {}
 
-    def _update(self, text, flip):
+    def _update(self, text):
         before = self._globals.copy()
         exec(text, self._globals) # XXX: Impact of modifying mutable objects?
         addupdate = []
@@ -57,8 +57,6 @@ class ContextImpl(Context):
             log.info("Delete: %s", ', '.join(delete))
         if not (addupdate or delete):
             log.info('No change.')
-        if flip:
-            self._flip()
 
     def _flip(self):
         self._snapshot = self._globals.copy()
