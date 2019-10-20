@@ -85,7 +85,7 @@ def bass(degree):
             velocity = V('1 2x 3x1 0 2x1 2x 2x1 2x 1'),
             vibshift = V('0 6 7x 6 3x 6 2x'))
 
-drums = E(Kick, '3 2x 2 1|3 1 3 1') & E(Snare, '4/3') >> 2
+drums = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '4/3') >> 2
 chords1 = D('1 4 7- 1').of(8)
 chords2 = D('1 7-').of(16)
 bass1 = bass(chords1 + D('1 2x+ 1 + 1 7 1|1 2x+ 1 3x+ 7-|1 2x+ 1 + 1 2 1|1 2x+ 1 3x+ 5-'))
