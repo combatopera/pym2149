@@ -49,3 +49,16 @@ def bump():
         with self.assertRaises(AttributeError) as cm:
             self.c.speed
         self.assertEqual(('speed',), cm.exception.args)
+
+    def test_flip2(self):
+        self.c._update('''x = object()
+y = object()
+z = object()
+sections = [x, y]''', False)
+        self.assertEqual((), self.c.sections)
+        self.c._flip()
+        self.assertEqual([self.c.x, self.c.y], self.c.sections)
+        self.c._update('''sections = [y, z]''', False)
+        self.assertEqual([self.c.x, self.c.y], self.c.sections)
+        self.c._flip()
+        self.assertEqual([self.c.y, self.c.z], self.c.sections)
