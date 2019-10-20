@@ -43,3 +43,9 @@ def bump():
         self.assertEqual(16, self.c.speed)
         self.c._flip()
         self.assertEqual(100, self.c.speed)
+        self.c._update('''del speed''', False)
+        self.assertEqual(100, self.c.speed)
+        self.c._flip()
+        with self.assertRaises(AttributeError) as cm:
+            self.c.speed
+        self.assertEqual(('speed',), cm.exception.args)
