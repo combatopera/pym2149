@@ -17,7 +17,7 @@
 
 from .iface import Context, Config
 from diapyr import types
-import logging
+import logging, threading
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class ContextImpl(Context):
 
     @types(Config)
     def __init__(self, config):
-        self._globals = dict(
+        self._globals = self._slowglobals = dict(
             __name__ = 'pym2149.context',
             tuning = config.tuning,
             mode = 1,
@@ -35,22 +35,31 @@ class ContextImpl(Context):
             sections = (),
         )
         self._snapshot = self._globals.copy()
-        self._updates = {}
+        self._updates = self._slowupdates = {}
         self._cache = {}
+        self._slowlock = threading.Lock()
+        self._fastlock = threading.Lock()
 
     def _update(self, text):
-        before = self._globals.copy()
-        exec(text, self._globals) # XXX: Impact of modifying mutable objects?
         addupdate = []
-        for name, value in self._globals.items():
-            if not (name in before and value is before[name]):
-                self._updates[name] = value
-                addupdate.append(name)
         delete = []
-        for name in before:
-            if name not in self._globals:
-                self._updates[name] = self.deleted
-                delete.append(name)
+        with self._slowlock:
+            with self._fastlock:
+                self._globals = self._slowglobals.copy()
+                self._updates = self._slowupdates.copy()
+            before = self._slowglobals.copy()
+            exec(text, self._slowglobals) # XXX: Impact of modifying mutable objects?
+            for name, value in self._slowglobals.items():
+                if not (name in before and value is before[name]):
+                    self._slowupdates[name] = value
+                    addupdate.append(name)
+            for name in before:
+                if name not in self._slowglobals:
+                    self._slowupdates[name] = self.deleted
+                    delete.append(name)
+            with self._fastlock:
+                self._globals = self._slowglobals
+                self._updates = self._slowupdates
         if addupdate:
             log.info("Add/update: %s", ', '.join(addupdate))
         if delete:
@@ -59,23 +68,29 @@ class ContextImpl(Context):
             log.info('No change.')
 
     def _flip(self):
-        self._snapshot = self._globals.copy()
-        self._updates.clear()
+        if self._slowlock.acquire(False):
+            try:
+                with self._fastlock:
+                    self._snapshot = self._globals.copy()
+                    self._updates.clear()
+            finally:
+                self._slowlock.release()
 
     def __getattr__(self, name):
-        # If the _globals value (or deleted) is due to _update, return _snapshot value (or deleted):
-        try:
-            value = self._globals[name]
-        except KeyError:
-            value = self.deleted
-        if name in self._updates and value is self._updates[name]:
+        with self._fastlock:
+            # If the _globals value (or deleted) is due to _update, return _snapshot value (or deleted):
             try:
-                return self._snapshot[name]
+                value = self._globals[name]
             except KeyError:
+                value = self.deleted
+            if name in self._updates and value is self._updates[name]:
+                try:
+                    return self._snapshot[name]
+                except KeyError:
+                    raise AttributeError(name)
+            if value is self.deleted:
                 raise AttributeError(name)
-        if value is self.deleted:
-            raise AttributeError(name)
-        return value
+            return value
 
     def _cachedproperty(f):
         name = f.__name__
