@@ -35,3 +35,9 @@ harmonicminor = V('0 2 3 5 7 8 11', step = 12, continuous = True)
 major = V('0 2 4 5 7 9 11', step = 12, continuous = True)
 octatonic = V('0 1 3 4 6 7 9 10', step = 12, continuous = True)
 wholetone = V('0 2 4 6 8 10', step = 12, continuous = True)
+
+def topitch(degree):
+    from .util import local
+    c = local.context
+    scale = c.scale >> (1 - c.mode)
+    return c.tonic + float(scale[degree[0] * scale.len + degree[1]] + degree[2])

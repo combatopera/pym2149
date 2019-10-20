@@ -1,4 +1,4 @@
-from .lc import V, D, E, naturalminor
+from .lc import V, D, E, naturalminor, topitch
 from .pitches import C4
 
 class Kick:
@@ -51,7 +51,7 @@ class Bass:
         chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch((degree + self.timbre)[frame]) + (self.vib << vibshift[frame])[frame]
+        chip.tonepitch = topitch((degree + self.timbre)[frame]) + (self.vib << vibshift[frame])[frame]
 
 class Simple:
 
@@ -59,7 +59,7 @@ class Simple:
         chip.level = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch(degree[frame]) + self.vib[frame]
+        chip.tonepitch = topitch(degree[frame]) + self.vib[frame]
 
 class Lead(Simple):
 
@@ -81,7 +81,7 @@ class Arp:
         chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = chip.topitch((degree + inv[frame].pick(self.chords))[frame])
+        chip.tonepitch = topitch((degree + inv[frame].pick(self.chords))[frame])
 
 def bass(degree):
     return E(Bass, '1', degree = degree,

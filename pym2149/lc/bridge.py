@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .util import threadlocals
 from ..iface import Config, Prerecorded, Tuning, Context
 from ..reg import regproperty
 from ..util import ExceptionCatcher
@@ -75,10 +76,6 @@ class ChipProxy(ExceptionCatcher):
 
     def noisepriority(self):
         return not any(chan.noiseflag for chan in self[1:])
-
-    def topitch(self, degree):
-        scale = self._context.scale >> (1 - self._context.mode)
-        return self._context.tonic + float(scale[degree[0] * scale.len + degree[1]] + degree[2])
 
     def toperiod(self, pitch):
         return self._tuning.freq(pitch).toneperiod(self._nomclock)
@@ -160,17 +157,18 @@ class LiveCodingBridge(Prerecorded):
     def frames(self, chip):
         session = self.Session(chip)
         frameindex = self._initialframe() + self.bias
-        while self.loop or frameindex < self.context.totalframecount:
-            frame = session._quiet
-            if self.context.totalframecount: # Otherwise freeze until there is something to play.
-                with session.catch('Failed to prepare a frame:'):
-                    frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
-                    frameindex += 1
-            frame()
-            yield
-            oldspeed = self.context.speed
-            self.context._flip()
-            if oldspeed != self.context.speed:
-                # FIXME: This also needs to happen when speed changed programmatically.
-                frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
-            # TODO: Adjust frameindex when sections changed.
+        with threadlocals(context = self.context):
+            while self.loop or frameindex < self.context.totalframecount:
+                frame = session._quiet
+                if self.context.totalframecount: # Otherwise freeze until there is something to play.
+                    with session.catch('Failed to prepare a frame:'):
+                        frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
+                        frameindex += 1
+                frame()
+                yield
+                oldspeed = self.context.speed
+                self.context._flip()
+                if oldspeed != self.context.speed:
+                    # FIXME: This also needs to happen when speed changed programmatically.
+                    frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
+                # TODO: Adjust frameindex when sections changed.
