@@ -159,6 +159,7 @@ class LiveCodingBridge(Prerecorded):
         frameindex = self._initialframe() + self.bias
         with threadlocals(context = self.context):
             while self.loop or frameindex < self.context.totalframecount:
+                oldspeed = self.context.speed
                 frame = session._quiet
                 if self.context.totalframecount: # Otherwise freeze until there is something to play.
                     with session.catch('Failed to prepare a frame:'):
@@ -166,9 +167,7 @@ class LiveCodingBridge(Prerecorded):
                         frameindex += 1
                 frame()
                 yield
-                oldspeed = self.context.speed
                 self.context._flip()
                 if oldspeed != self.context.speed:
-                    # FIXME: This also needs to happen when speed changed programmatically.
                     frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
                 # TODO: Adjust frameindex when sections changed.

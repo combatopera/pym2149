@@ -19,12 +19,15 @@ from .lc import V, E
 
 class Speed:
 
-    def on(self, chip, speeds, frame):
-        if frame < 1:
-            global speed
-            speed = speeds[frame]
+    def on(self, chip):
         chip.toneflag = True
         chip.level = 10
         chip.tonefreq = 440
 
-sections = [[E(Speed, '/.5', speeds = V('30 20 10'))]]
+    def off(self, speeds, frame):
+        global speed
+        if frame >= speed - 1:
+            speed = speeds[frame]
+
+sections = [[E(Speed, '/.5', speeds = V('20 10 30'))]]
+speed = 30
