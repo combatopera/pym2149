@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from spectrogram import silence
-from pym2149.dac import PWMEffect
-from pym2149.lc import E
+from .dac import PWMEffect
+from .lc import E
 
 class PWM250:
 

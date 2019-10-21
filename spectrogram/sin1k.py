@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from spectrogram import silence
-from pym2149.dac import SinusEffect
-from pym2149.lc import E
+from .dac import SinusEffect
+from .lc import E
 
 # TODO LATER: Find out why the result appears shifted a few samples to the right.
 class Sin1k:
