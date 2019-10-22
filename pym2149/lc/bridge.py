@@ -17,7 +17,7 @@
 
 from .util import threadlocals
 from ..iface import Config, Prerecorded, Tuning, Context
-from ..reg import regproperty
+from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher
 from diapyr import types
 from diapyr.util import innerclass
@@ -45,6 +45,8 @@ class ChipProxy(ExceptionCatcher):
     class ChanProxy:
 
         def __init__(self, chan):
+            self.levelreg = Reg()
+            self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
             self._chan = chan
 
         def _reg(self, reginfo):
@@ -58,9 +60,9 @@ class ChipProxy(ExceptionCatcher):
     envfreq = regproperty(lambda self: self._chip.envfreq)
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
+        self._chip = chip
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
-        self._chip = chip
         self._nomclock = nomclock
         self._tuning = tuning
         self._context = context
@@ -82,7 +84,7 @@ class ChipProxy(ExceptionCatcher):
 
 for name, prop in dict(
     tonefreq = regproperty(lambda self: self._chip.tonefreqs[self._chan]),
-    level = asprop(lambda chip, chan: chip.fixedlevels[chan]),
+    level = regproperty(lambda self: self.levelreg),
     noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
     toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
