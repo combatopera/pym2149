@@ -17,13 +17,15 @@
 
 from spectrogram import silence
 from .dac import SinusEffect
-from .lc import E
+from .lc import E, V
 
 # TODO LATER: Find out why the result appears shifted a few samples to the right.
 class Sin1k:
 
+    level = V('75x15//,0')
+
     def on(self, chip, frame):
-        chip.level = max(0, 15 - frame // 5) # FIXME: Implement clamping already.
+        chip.level = self.level[frame]
         if frame < 1:
             chan = chip[0]._chan
             timer = chip._chip.timers[chan]
