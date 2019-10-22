@@ -74,8 +74,8 @@ class VersionReg(Reg):
         self.version += 1
 
 def regproperty(reg):
-    def get(regs):
-        return reg(regs).value
-    def set(regs, value):
-        reg(regs).value = value
-    return property(get, set)
+    def fget(self):
+        return reg(self).value
+    def fset(self, value):
+        reg(self).value = value
+    return property(fget, fset)
