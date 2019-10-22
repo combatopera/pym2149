@@ -44,8 +44,6 @@ class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
-        tonefreq = regproperty(lambda self: self._chip.tonefreqs[self._chan])
-
         def __init__(self, chan):
             self._chan = chan
 
@@ -56,7 +54,6 @@ class ChipProxy(ExceptionCatcher):
     envshape = asprop(lambda chip: chip.envshapereg)
     envperiod = asprop(lambda chip: chip.envperiodreg)
     envpitch = asprop(lambda chip: chip.envperiodreg, lambda self: self.toenvperiod, None)
-    tonefreq = convenience('tonefreq')
     noisefreq = regproperty(lambda self: self._chip.noisefreq)
     envfreq = regproperty(lambda self: self._chip.envfreq)
 
@@ -84,6 +81,7 @@ class ChipProxy(ExceptionCatcher):
         return self._tuning.freq(pitch).envperiod(self._nomclock, self._chip.envshapereg.value)
 
 for name, prop in dict(
+    tonefreq = regproperty(lambda self: self._chip.tonefreqs[self._chan]),
     level = asprop(lambda chip, chan: chip.fixedlevels[chan]),
     noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
     toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
