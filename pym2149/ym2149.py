@@ -22,7 +22,6 @@ from .mfp import MFPTimer, mfpclock
 from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
-from .pitch import shapescale
 from .reg import Reg, VersionReg
 from diapyr import types
 import logging
@@ -35,6 +34,13 @@ defaultscale = 8
 ym2149nzdegrees = 17, 14
 
 class ClockInfo:
+
+    trishapes = frozenset([0xa, 0xe])
+
+    @classmethod
+    def _shapescale(cls, shape):
+        # Musically, the triangular shapes have twice the scale:
+        return 512 if shape in cls.trishapes else 256
 
     @types(Config, Platform, YMFile)
     def __init__(self, config, platform, ymfile = None):
@@ -70,13 +76,13 @@ class ClockInfo:
         return self._periodimpl(freq, 16) # First notch at freq.
 
     def envperiod(self, freq, shape):
-        return self._periodimpl(freq, shapescale(shape))
+        return self._periodimpl(freq, self._shapescale(shape))
 
     def tonefreq(self, period):
         return self.nomclock / (16 * period)
 
     def envfreq(self, period, shape):
-        return self.nomclock / (shapescale(shape) * period)
+        return self.nomclock / (self._shapescale(shape) * period)
 
 class LogicalRegisters:
 

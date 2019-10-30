@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config, Tuning, Context
-from .util import singleton
 from diapyr import types, DI
 import math, bisect, logging
 
@@ -138,15 +137,6 @@ class Pitch(float):
         else:
             centsstr = "%+3d" % cents
         return notestr + octavestr + centsstr
-
-@singleton
-class shapescale:
-
-    trishapes = frozenset([0xa, 0xe])
-
-    def __call__(self, shape):
-        # Musically, the triangular shapes have twice the scale:
-        return (256, 512)[shape in self.trishapes]
 
 class Freq(float):
 
