@@ -74,8 +74,8 @@ class LogicalRegisters:
         self.fixedlevels = [Reg() for _ in range(confchannels)]
         self.levelmodes = [Reg() for _ in range(confchannels)]
         self.envfreq = Reg()
-        self.envshapereg = VersionReg()
-        self.envperiodreg = Reg(minval = 1).link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreq, self.envshapereg)
+        self.envshape = VersionReg()
+        self.envperiodreg = Reg(minval = 1).link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreq, self.envshape)
         for c in range(confchannels):
             self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
             self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
@@ -84,7 +84,7 @@ class LogicalRegisters:
             self.levelmodes[c].value = False
         self.noiseperiod.value = 0
         self.envperiodreg.value = 0
-        self.envshapereg.value = 0
+        self.envshape.value = 0
         self.timers = tuple(MFPTimer() for _ in range(confchannels))
 
     def flagsoff(self, chan):
@@ -128,7 +128,7 @@ class PhysicalRegisters:
             logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[self.levelbase + c])
             logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[self.levelbase + c])
         logical.envperiodreg.link(self.EP, self.R[0xB], self.R[0xC])
-        logical.envshapereg.link(lambda s: s & 0x0f, self.R[0xD])
+        logical.envshape.link(lambda s: s & 0x0f, self.R[0xD])
         for r in self.R:
             r.value = 0
         self.logical = logical
@@ -145,7 +145,7 @@ class YM2149(Container):
         self.clock = clockinfo.implclock
         # Chip-wide signals:
         noise = NoiseOsc(self.scale, logical.noiseperiod, self.noiseshape)
-        env = EnvOsc(self.scale, logical.envperiodreg, logical.envshapereg)
+        env = EnvOsc(self.scale, logical.envperiodreg, logical.envshape)
         # Digital channels from binary to level in [0, 31]:
         tones = [ToneOsc(self.scale, logical.toneperiods[c]) for c in range(channels)]
         rtones = [RToneOsc(mfpclock, self.clock, logical.timers[c]) for c in range(channels)]
