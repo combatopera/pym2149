@@ -93,9 +93,9 @@ class RollImpl(Roll):
                 vals.append(self.shapes[shape])
                 vals.append(('', '~')[newshape])
                 if self.periods:
-                    vals.append(self.chip.envperiodreg.value)
+                    vals.append(self.chip.envperiod.value)
                 else:
-                    appendpitch(Period(self.chip.envperiodreg.value).envfreq(self.nomclock, shape))
+                    appendpitch(Period(self.chip.envperiod.value).envfreq(self.nomclock, shape))
             elif level:
                 vals.append(level)
                 vals.append('')

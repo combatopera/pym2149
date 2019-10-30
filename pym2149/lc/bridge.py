@@ -55,8 +55,8 @@ class ChipProxy(ExceptionCatcher):
 
     noiseperiod = asprop(lambda chip: chip.noiseperiod)
     envshape = asprop(lambda chip: chip.envshape)
-    envperiod = asprop(lambda chip: chip.envperiodreg)
-    envpitch = asprop(lambda chip: chip.envperiodreg, lambda self: self.toenvperiod, None)
+    envperiod = asprop(lambda chip: chip.envperiod)
+    envpitch = asprop(lambda chip: chip.envperiod, lambda self: self.toenvperiod, None)
     noisefreq = regproperty(lambda self: self.noisefreqreg)
     envfreq = regproperty(lambda self: self._chip.envfreq)
 
