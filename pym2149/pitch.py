@@ -150,18 +150,6 @@ class shapescale:
 
 class Freq(float):
 
-    def periodimpl(self, clock, scale):
-        return Period(round(clock / (scale * self)))
-
-    def toneperiod(self, clock):
-        return self.periodimpl(clock, 16)
-
-    def noiseperiod(self, clock):
-        return self.periodimpl(clock, 16) # First notch at freq.
-
-    def envperiod(self, clock, shape):
-        return self.periodimpl(clock, shapescale(shape))
-
     def __mul__(self, that):
         return type(self)(float.__mul__(self, that))
 

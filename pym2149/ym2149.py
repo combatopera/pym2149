@@ -22,7 +22,7 @@ from .mfp import MFPTimer, mfpclock
 from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
-from .pitch import Freq
+from .pitch import shapescale
 from .reg import Reg, VersionReg
 from diapyr import types
 import logging
@@ -60,14 +60,17 @@ class ClockInfo:
         # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
         return (self.implclock - 1) // (self.scale * outrate)
 
+    def _periodimpl(self, freq, scale):
+        return self.nomclock / (scale * freq)
+
     def toneperiod(self, freq):
-        return Freq(freq).toneperiod(self.nomclock)
+        return self._periodimpl(freq, 16)
 
     def noiseperiod(self, freq):
-        return Freq(freq).noiseperiod(self.nomclock)
+        return self._periodimpl(freq, 16) # First notch at freq.
 
     def envperiod(self, freq, shape):
-        return Freq(freq).envperiod(self.nomclock, shape)
+        return self._periodimpl(freq, shapescale(shape))
 
 class LogicalRegisters:
 
