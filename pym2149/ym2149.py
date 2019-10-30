@@ -49,12 +49,12 @@ class ClockInfo:
         self.scale = defaultscale // config.underclock
         if config.freqclamp:
             # The 0 case just means that 1 is audible:
-            self.mintoneperiod = max(1, self.toneperiodclampor0(platform.outputrate))
+            self.mintoneperiod = max(1, self._toneperiodclampor0(platform.outputrate))
             log.debug("Minimum tone period: %s", self.mintoneperiod)
         else:
             self.mintoneperiod = 1
 
-    def toneperiodclampor0(self, outrate):
+    def _toneperiodclampor0(self, outrate):
         # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
         return (self.implclock - 1) // (self.scale * outrate)
 

@@ -28,9 +28,9 @@ class TestClockInfo(unittest.TestCase):
             nomclock = 2000000
             def toneperiodclampor0(nomclock, outrate):
                 ci = ClockInfo(
-                    Config(nomclock, underclock, True),
-                    Platform(outrate))
-                return ci.toneperiodclampor0(outrate)
+                        Config(nomclock, underclock, True),
+                        Platform(outrate))
+                return ci._toneperiodclampor0(outrate)
             self.assertEqual(5, toneperiodclampor0(nomclock, 44100))
             # We shouldn't make Nyquist itself the clamp:
             self.assertEqual(4, toneperiodclampor0(nomclock, 50000))
