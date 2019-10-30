@@ -17,9 +17,9 @@
 
 from .util import threadlocals
 from ..iface import Config, Prerecorded, Tuning, Context
-from ..pitch import Freq
 from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher
+from ..ym2149 import ClockInfo
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
@@ -46,10 +46,10 @@ class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
-        def __init__(self, chan, nomclock, tuning):
+        def __init__(self, chan, clock, tuning):
             self.tonepitchreg = Reg()
             self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
-            self._chip.toneperiods[chan].link(lambda f: Freq(f).toneperiod(nomclock), self.tonefreqreg)
+            self._chip.toneperiods[chan].link(lambda f: round(clock.toneperiod(f)), self.tonefreqreg)
             self.levelreg = Reg()
             self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
             self._chan = chan
@@ -64,14 +64,14 @@ class ChipProxy(ExceptionCatcher):
     noisefreq = regproperty(lambda self: self.noisefreqreg)
     envfreq = regproperty(lambda self: self.envfreqreg)
 
-    def __init__(self, chip, chan, chancount, nomclock, tuning, context):
+    def __init__(self, chip, chan, chancount, clock, tuning, context):
         self.noisefreqreg = Reg()
-        chip.noiseperiod.link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreqreg)
+        chip.noiseperiod.link(lambda f: round(clock.noiseperiod(f)), self.noisefreqreg)
         self.envpitchreg = Reg()
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
-        chip.envperiod.link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreqreg, chip.envshape)
+        chip.envperiod.link(lambda f, s: round(clock.envperiod(f, s)), self.envfreqreg, chip.envshape)
         self._chip = chip
-        self._chans = [self.ChanProxy((chan + i) % chancount, nomclock, tuning) for i in range(chancount)]
+        self._chans = [self.ChanProxy((chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
 
     def _reg(self, reginfo):
@@ -103,12 +103,12 @@ class LiveCodingBridge(Prerecorded):
 
     bias = .5 # TODO: Make configurable for predictable swing in odd speed case.
 
-    @types(Config, Tuning, Context)
-    def __init__(self, config, tuning, context):
-        self.nomclock = config.nominalclock
+    @types(Config, ClockInfo, Tuning, Context)
+    def __init__(self, config, clock, tuning, context):
         self.loop = not config.ignoreloop
         self.sectionname = config.section
         self.chancount = config.chipchannels
+        self.clock = clock
         self.tuning = tuning
         self.context = context
 
@@ -120,7 +120,7 @@ class LiveCodingBridge(Prerecorded):
     class Session(ExceptionCatcher):
 
         def __init__(self, chip):
-            self.chipproxies = [ChipProxy(chip, chan, self.chancount, self.nomclock, self.tuning, self.context)
+            self.chipproxies = [ChipProxy(chip, chan, self.chancount, self.clock, self.tuning, self.context)
                     for chan in range(self.chancount)]
 
         def _quiet(self):

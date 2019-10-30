@@ -22,6 +22,7 @@ from .mfp import MFPTimer, mfpclock
 from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
+from .pitch import Freq
 from .reg import Reg, VersionReg
 from diapyr import types
 import logging
@@ -37,12 +38,13 @@ class ClockInfo:
 
     @types(Config, Platform, YMFile)
     def __init__(self, config, platform, ymfile = None):
-        if config.nominalclock % config.underclock:
-            raise Exception("Clock %s not divisible by underclock %s." % (config.nominalclock, config.underclock))
-        self.implclock = config.nominalclock // config.underclock
-        if ymfile is not None and config.nominalclock != ymfile.nominalclock:
-            log.info("Context clock %s overridden to: %s", ymfile.nominalclock, config.nominalclock)
-        if self.implclock != config.nominalclock:
+        self.nomclock = config.nominalclock
+        if self.nomclock % config.underclock:
+            raise Exception("Clock %s not divisible by underclock %s." % (self.nomclock, config.underclock))
+        self.implclock = self.nomclock // config.underclock
+        if ymfile is not None and self.nomclock != ymfile.nominalclock:
+            log.info("Context clock %s overridden to: %s", ymfile.nominalclock, self.nomclock)
+        if self.implclock != self.nomclock:
             log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
         if config.underclock < 1 or defaultscale % config.underclock:
             raise Exception("underclock must be a factor of %s." % defaultscale)
@@ -57,6 +59,15 @@ class ClockInfo:
     def _toneperiodclampor0(self, outrate):
         # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
         return (self.implclock - 1) // (self.scale * outrate)
+
+    def toneperiod(self, freq):
+        return Freq(freq).toneperiod(self.nomclock)
+
+    def noiseperiod(self, freq):
+        return Freq(freq).noiseperiod(self.nomclock)
+
+    def envperiod(self, freq, shape):
+        return Freq(freq).envperiod(self.nomclock, shape)
 
 class LogicalRegisters:
 
