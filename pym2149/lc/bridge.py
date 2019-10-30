@@ -89,11 +89,11 @@ class ChipProxy(ExceptionCatcher):
 for name, prop in dict(
     tonefreq = regproperty(lambda self: self.tonefreqreg),
     level = regproperty(lambda self: self.levelreg),
-    noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
-    toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
+    noiseflag = regproperty(lambda self: self._chip.noiseflags[self._chan]),
+    toneflag = regproperty(lambda self: self._chip.toneflags[self._chan]),
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
     tonepitch = regproperty(lambda self: self.tonepitchreg),
-    envflag = asprop(lambda chip, chan: chip.levelmodes[chan]),
+    envflag = regproperty(lambda self: self._chip.levelmodes[self._chan]),
 ).items():
     setattr(ChipProxy.ChanProxy, name, prop)
     setattr(ChipProxy, name, convenience(name))
