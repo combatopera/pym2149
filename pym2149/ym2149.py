@@ -68,8 +68,7 @@ class LogicalRegisters:
         self.tonefreqs = [Reg() for _ in range(confchannels)]
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod).link(lambda f: Freq(f).toneperiod(nomclock), freq)
                 for freq in self.tonefreqs]
-        self.noisefreq = Reg()
-        self.noiseperiod = Reg(minval = 1).link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreq)
+        self.noiseperiod = Reg(minval = 1)
         self.toneflags = [Reg() for _ in range(confchannels)]
         self.noiseflags = [Reg() for _ in range(confchannels)]
         self.fixedlevels = [Reg() for _ in range(confchannels)]

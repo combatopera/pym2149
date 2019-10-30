@@ -17,6 +17,7 @@
 
 from .util import threadlocals
 from ..iface import Config, Prerecorded, Tuning, Context
+from ..pitch import Freq
 from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher
 from diapyr import types
@@ -56,10 +57,12 @@ class ChipProxy(ExceptionCatcher):
     envshape = asprop(lambda chip: chip.envshapereg)
     envperiod = asprop(lambda chip: chip.envperiodreg)
     envpitch = asprop(lambda chip: chip.envperiodreg, lambda self: self.toenvperiod, None)
-    noisefreq = regproperty(lambda self: self._chip.noisefreq)
+    noisefreq = regproperty(lambda self: self.noisefreqreg)
     envfreq = regproperty(lambda self: self._chip.envfreq)
 
     def __init__(self, chip, chan, chancount, nomclock, tuning, context):
+        self.noisefreqreg = Reg()
+        chip.noiseperiod.link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreqreg)
         self._chip = chip
         self._chans = [self.ChanProxy((chan + i) % chancount) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
