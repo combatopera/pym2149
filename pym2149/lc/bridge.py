@@ -27,6 +27,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+# TODO: Use Reg links so that we can read out an unrounded period for example.
 def asprop(reginfo, enc = lambda self: round, dec = lambda self: lambda x: x):
     def fget(self):
         return dec(self)(self._reg(reginfo).value)
@@ -45,8 +46,9 @@ class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
-        def __init__(self, chan, nomclock):
-            self.tonefreqreg = Reg()
+        def __init__(self, chan, nomclock, tuning):
+            self.tonepitchreg = Reg()
+            self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
             self._chip.toneperiods[chan].link(lambda f: Freq(f).toneperiod(nomclock), self.tonefreqreg)
             self.levelreg = Reg()
             self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
@@ -69,7 +71,7 @@ class ChipProxy(ExceptionCatcher):
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         chip.envperiod.link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreqreg, chip.envshape)
         self._chip = chip
-        self._chans = [self.ChanProxy((chan + i) % chancount, nomclock) for i in range(chancount)]
+        self._chans = [self.ChanProxy((chan + i) % chancount, nomclock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
         self._nomclock = nomclock
         self._tuning = tuning
@@ -84,17 +86,13 @@ class ChipProxy(ExceptionCatcher):
     def noisepriority(self):
         return not any(chan.noiseflag for chan in self[1:])
 
-    def toperiod(self, pitch):
-        return self._tuning.freq(pitch).toneperiod(self._nomclock)
-
 for name, prop in dict(
     tonefreq = regproperty(lambda self: self.tonefreqreg),
     level = regproperty(lambda self: self.levelreg),
     noiseflag = asprop(lambda chip, chan: chip.noiseflags[chan]),
     toneflag = asprop(lambda chip, chan: chip.toneflags[chan]),
     toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
-    # TODO: Use Reg links so that we can read out an unrounded period for example.
-    tonepitch = asprop(lambda chip, chan: chip.toneperiods[chan], lambda self: self.toperiod, None),
+    tonepitch = regproperty(lambda self: self.tonepitchreg),
     envflag = asprop(lambda chip, chan: chip.levelmodes[chan]),
 ).items():
     setattr(ChipProxy.ChanProxy, name, prop)
