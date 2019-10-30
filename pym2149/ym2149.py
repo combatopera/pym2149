@@ -62,16 +62,16 @@ class LogicalRegisters:
 
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
-        confchannels = config.chipchannels
-        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
+        channels = range(config.chipchannels)
+        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in channels]
         self.noiseperiod = Reg(minval = 1)
-        self.toneflags = [Reg() for _ in range(confchannels)]
-        self.noiseflags = [Reg() for _ in range(confchannels)]
-        self.fixedlevels = [Reg() for _ in range(confchannels)]
-        self.levelmodes = [Reg() for _ in range(confchannels)]
+        self.toneflags = [Reg() for _ in channels]
+        self.noiseflags = [Reg() for _ in channels]
+        self.fixedlevels = [Reg() for _ in channels]
+        self.levelmodes = [Reg() for _ in channels]
         self.envshape = VersionReg()
         self.envperiod = Reg(minval = 1)
-        for c in range(confchannels):
+        for c in channels:
             self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
             self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
             self.noiseflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
@@ -80,7 +80,7 @@ class LogicalRegisters:
         self.noiseperiod.value = 0
         self.envperiod.value = 0
         self.envshape.value = 0
-        self.timers = tuple(MFPTimer() for _ in range(confchannels))
+        self.timers = tuple(MFPTimer() for _ in channels)
 
     def flagsoff(self, chan):
         self.levelmodes[chan].value = 0 # Effectively the envelope flag.
