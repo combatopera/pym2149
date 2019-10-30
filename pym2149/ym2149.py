@@ -22,7 +22,6 @@ from .mfp import MFPTimer, mfpclock
 from .mix import BinMix
 from .nod import Container
 from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
-from .pitch import Freq
 from .reg import Reg, VersionReg
 from diapyr import types
 import logging
@@ -64,10 +63,7 @@ class LogicalRegisters:
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
         confchannels = config.chipchannels
-        nomclock = config.nominalclock
-        self.tonefreqs = [Reg() for _ in range(confchannels)]
-        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod).link(lambda f: Freq(f).toneperiod(nomclock), freq)
-                for freq in self.tonefreqs]
+        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in range(confchannels)]
         self.noiseperiod = Reg(minval = 1)
         self.toneflags = [Reg() for _ in range(confchannels)]
         self.noiseflags = [Reg() for _ in range(confchannels)]
