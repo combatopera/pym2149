@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config, Tuning, Roll
-from .pitch import Period, Freq
+from .pitch import Period
 from .util import singleton
 from .ym2149 import LogicalRegisters
 from diapyr import types
@@ -87,7 +87,7 @@ class RollImpl(Roll):
                 else:
                     vals.append(level)
                 vals.append('')
-                appendpitch(Freq(self.chip.timers[c].getfreq()))
+                appendpitch(self.chip.timers[c].getfreq())
             elif env:
                 shape = self.chip.envshape.value
                 vals.append(self.shapes[shape])
