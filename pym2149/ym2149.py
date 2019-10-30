@@ -73,9 +73,8 @@ class LogicalRegisters:
         self.noiseflags = [Reg() for _ in range(confchannels)]
         self.fixedlevels = [Reg() for _ in range(confchannels)]
         self.levelmodes = [Reg() for _ in range(confchannels)]
-        self.envfreq = Reg()
         self.envshape = VersionReg()
-        self.envperiod = Reg(minval = 1).link(lambda f, s: Freq(f).envperiod(nomclock, s), self.envfreq, self.envshape)
+        self.envperiod = Reg(minval = 1)
         for c in range(confchannels):
             self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
             self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
