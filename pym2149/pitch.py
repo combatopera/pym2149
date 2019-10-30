@@ -42,7 +42,7 @@ class EqualTemperament:
         self.refmidi = float(config.referencemidinote)
 
     def freq(self, pitch):
-        return Freq(self.reffreq * 2 ** ((pitch - self.refmidi) / 12))
+        return self.reffreq * 2 ** ((pitch - self.refmidi) / 12)
 
     def pitch(self, freq):
         return Pitch(self.refmidi + 12 * math.log(freq / self.reffreq, 2))
@@ -57,7 +57,7 @@ class Unequal:
     def freq(self, pitch):
         pitch -= self.refpitch
         pitchindex = math.floor(pitch) % 12
-        return Freq(self.freqs[pitchindex] * 2 ** (self.factors[pitchindex] * (pitch % 1) + pitch // 12))
+        return self.freqs[pitchindex] * 2 ** (self.factors[pitchindex] * (pitch % 1) + pitch // 12)
 
     def pitch(self, freq):
         octave = math.floor(math.log(freq / self.freqs[0], 2))
@@ -137,8 +137,3 @@ class Pitch(float):
         else:
             centsstr = "%+3d" % cents
         return notestr + octavestr + centsstr
-
-class Freq(float):
-
-    def __mul__(self, that):
-        return type(self)(float.__mul__(self, that))
