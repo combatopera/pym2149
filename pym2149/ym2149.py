@@ -36,6 +36,7 @@ ym2149nzdegrees = 17, 14
 class ClockInfo:
 
     trishapes = frozenset([0xa, 0xe])
+    tonescale = 16
 
     @classmethod
     def _shapescale(cls, shape):
@@ -66,23 +67,23 @@ class ClockInfo:
         # Largest period with frequency strictly greater than Nyquist, or 0 if there isn't one:
         return (self.implclock - 1) // (self.scale * outrate)
 
-    def _periodimpl(self, freq, scale):
-        return self.nomclock / (scale * freq)
+    def _convert(self, freqorperiod, scale):
+        return self.nomclock / (scale * freqorperiod)
 
     def toneperiod(self, freq):
-        return self._periodimpl(freq, 16)
+        return self._convert(freq, self.tonescale)
 
     def noiseperiod(self, freq):
-        return self._periodimpl(freq, 16) # First notch at freq.
+        return self._convert(freq, 16) # First notch at freq.
 
     def envperiod(self, freq, shape):
-        return self._periodimpl(freq, self._shapescale(shape))
+        return self._convert(freq, self._shapescale(shape))
 
     def tonefreq(self, period):
-        return self.nomclock / (16 * period)
+        return self._convert(period, self.tonescale)
 
     def envfreq(self, period, shape):
-        return self.nomclock / (self._shapescale(shape) * period)
+        return self._convert(period, self._shapescale(shape))
 
 class LogicalRegisters:
 
