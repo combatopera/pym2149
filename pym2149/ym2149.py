@@ -72,6 +72,12 @@ class ClockInfo:
     def envperiod(self, freq, shape):
         return self._periodimpl(freq, shapescale(shape))
 
+    def tonefreq(self, period):
+        return self.nomclock / (16 * period)
+
+    def envfreq(self, period, shape):
+        return self.nomclock / (shapescale(shape) * period)
+
 class LogicalRegisters:
 
     @types(Config, ClockInfo)

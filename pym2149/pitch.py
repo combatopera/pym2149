@@ -152,11 +152,3 @@ class Freq(float):
 
     def __mul__(self, that):
         return type(self)(float.__mul__(self, that))
-
-class Period(int):
-
-    def tonefreq(self, clock):
-        return Freq(clock / (16 * self))
-
-    def envfreq(self, clock, shape):
-        return Freq(clock / (shapescale(shape) * self))

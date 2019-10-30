@@ -16,9 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config, Tuning, Roll
-from .pitch import Period
 from .util import singleton
-from .ym2149 import LogicalRegisters
+from .ym2149 import LogicalRegisters, ClockInfo
 from diapyr import types
 
 @singleton
@@ -31,10 +30,9 @@ class RollImpl(Roll):
 
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
 
-    @types(Config, LogicalRegisters, Tuning)
-    def __init__(self, config, chip, tuning):
+    @types(Config, ClockInfo, LogicalRegisters, Tuning)
+    def __init__(self, config, clock, chip, tuning):
         self.height = config.pianorollheight
-        self.nomclock = config.nominalclock
         self.channels = config.chipchannels
         self.periods = config.showperiods # TODO LATER: Command line arg isn't converted to boolean.
         self.stream = config.rollstream
@@ -43,6 +41,7 @@ class RollImpl(Roll):
         self.jump = "\x1b[%sA" % self.height
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
         self.shapeversion = None
+        self.clock = clock
         self.chip = chip
         self.tuning = tuning
 
@@ -66,7 +65,7 @@ class RollImpl(Roll):
                 if self.periods:
                     vals.append(self.chip.toneperiods[c].value)
                 else:
-                    appendpitch(Period(self.chip.toneperiods[c].value).tonefreq(self.nomclock))
+                    appendpitch(self.clock.tonefreq(self.chip.toneperiods[c].value))
             else:
                 vals.append('')
             if tone and noise and rhs:
@@ -95,7 +94,7 @@ class RollImpl(Roll):
                 if self.periods:
                     vals.append(self.chip.envperiod.value)
                 else:
-                    appendpitch(Period(self.chip.envperiod.value).envfreq(self.nomclock, shape))
+                    appendpitch(self.clock.envfreq(self.chip.envperiod.value, shape))
             elif level:
                 vals.append(level)
                 vals.append('')
