@@ -35,7 +35,7 @@ class Reg:
     def __init__(self, **kwargs):
         self.links = []
         self.idle = True
-        self.minval = kwargs.get('minval', None)
+        self.minval = kwargs.get('minval', None) # Typically to avoid 0 period.
         if 'value' in kwargs:
             self.value = kwargs['value']
 
