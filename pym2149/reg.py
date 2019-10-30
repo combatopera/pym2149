@@ -36,7 +36,6 @@ class Reg:
         self.links = []
         self.idle = True
         self.minval = kwargs.get('minval', None)
-        self.maxval = kwargs.get('maxval', None)
         if 'value' in kwargs:
             self.value = kwargs['value']
 
@@ -53,8 +52,6 @@ class Reg:
     def set(self, value):
         if self.minval is not None:
             value = max(self.minval, value)
-        if self.maxval is not None:
-            value = min(self.maxval, value)
         self._value = value
         self.idle = False
         try:
