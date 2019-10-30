@@ -73,9 +73,6 @@ class ChipProxy(ExceptionCatcher):
         self._chip = chip
         self._chans = [self.ChanProxy((chan + i) % chancount, nomclock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
-        self._nomclock = nomclock
-        self._tuning = tuning
-        self._context = context
 
     def _reg(self, reginfo):
         return reginfo(self._chip)
