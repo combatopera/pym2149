@@ -69,7 +69,7 @@ class LogicalRegisters:
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod).link(lambda f: Freq(f).toneperiod(nomclock), freq)
                 for freq in self.tonefreqs]
         self.noisefreq = Reg()
-        self.noiseperiodreg = Reg(minval = 1).link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreq)
+        self.noiseperiod = Reg(minval = 1).link(lambda f: Freq(f).noiseperiod(nomclock), self.noisefreq)
         self.toneflags = [Reg() for _ in range(confchannels)]
         self.noiseflags = [Reg() for _ in range(confchannels)]
         self.fixedlevels = [Reg() for _ in range(confchannels)]
@@ -83,7 +83,7 @@ class LogicalRegisters:
             self.noiseflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
             self.fixedlevels[c].value = 0
             self.levelmodes[c].value = False
-        self.noiseperiodreg.value = 0
+        self.noiseperiod.value = 0
         self.envperiodreg.value = 0
         self.envshapereg.value = 0
         self.timers = tuple(MFPTimer() for _ in range(confchannels))
@@ -122,7 +122,7 @@ class PhysicalRegisters:
         clampedchannels = min(self.supportedchannels, confchannels) # We only have registers for the authentic number of channels.
         for c in range(clampedchannels):
             logical.toneperiods[c].link(self.TP, self.R[c * 2], self.R[c * 2 + 1])
-        logical.noiseperiodreg.link(self.NP, self.R[0x6])
+        logical.noiseperiod.link(self.NP, self.R[0x6])
         for c in range(clampedchannels):
             logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
             logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
@@ -145,7 +145,7 @@ class YM2149(Container):
         self.oscpause = config.oscpause
         self.clock = clockinfo.implclock
         # Chip-wide signals:
-        noise = NoiseOsc(self.scale, logical.noiseperiodreg, self.noiseshape)
+        noise = NoiseOsc(self.scale, logical.noiseperiod, self.noiseshape)
         env = EnvOsc(self.scale, logical.envperiodreg, logical.envshapereg)
         # Digital channels from binary to level in [0, 31]:
         tones = [ToneOsc(self.scale, logical.toneperiods[c]) for c in range(channels)]
