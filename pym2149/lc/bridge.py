@@ -49,7 +49,8 @@ class ChipProxy(ExceptionCatcher):
         def __init__(self, chan, clock, tuning):
             self.tonepitchreg = Reg()
             self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
-            self._chip.toneperiods[chan].link(lambda f: round(clock.toneperiod(f)), self.tonefreqreg)
+            self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
+            self._chip.toneperiods[chan].link(round, self.toneperiodreg)
             self.levelreg = Reg()
             self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
             self._chan = chan
@@ -88,7 +89,7 @@ for name, prop in dict(
     level = regproperty(lambda self: self.levelreg),
     noiseflag = regproperty(lambda self: self._chip.noiseflags[self._chan]),
     toneflag = regproperty(lambda self: self._chip.toneflags[self._chan]),
-    toneperiod = asprop(lambda chip, chan: chip.toneperiods[chan]),
+    toneperiod = regproperty(lambda self: self.toneperiodreg),
     tonepitch = regproperty(lambda self: self.tonepitchreg),
     envflag = regproperty(lambda self: self._chip.levelmodes[self._chan]),
 ).items():
