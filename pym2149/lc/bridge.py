@@ -38,13 +38,14 @@ class ChipProxy(ExceptionCatcher):
 
     class ChanProxy:
 
-        def __init__(self, chan, clock, tuning):
+        def __init__(self, chip, chan, clock, tuning):
             self.tonepitchreg = Reg()
             self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
             self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
-            self._chip.toneperiods[chan].link(round, self.toneperiodreg)
+            chip.toneperiods[chan].link(round, self.toneperiodreg)
             self.levelreg = Reg()
-            self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
+            chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
+            self._chip = chip
             self._chan = chan
 
     noiseperiod = regproperty(lambda self: self.noiseperiodreg)
@@ -62,9 +63,9 @@ class ChipProxy(ExceptionCatcher):
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
-        self._chip = chip
-        self._chans = [self.ChanProxy((chan + i) % chancount, clock, tuning) for i in range(chancount)]
+        self._chans = [self.ChanProxy(chip, (chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
+        self._chip = chip
 
     def __getitem__(self, index):
         return self._chans[index]
@@ -84,7 +85,6 @@ for name, prop in dict(
     setattr(ChipProxy.ChanProxy, name, prop)
     setattr(ChipProxy, name, _convenience(name))
 del name, prop
-ChipProxy.ChanProxy = innerclass(ChipProxy.ChanProxy)
 
 class NoSuchSectionException(Exception): pass
 
