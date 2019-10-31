@@ -27,7 +27,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def convenience(name):
+def _convenience(name):
     def fget(self):
         return getattr(self[0], name)
     def fset(self, value):
@@ -82,7 +82,7 @@ for name, prop in dict(
     envflag = regproperty(lambda self: self._chip.levelmodes[self._chan]),
 ).items():
     setattr(ChipProxy.ChanProxy, name, prop)
-    setattr(ChipProxy, name, convenience(name))
+    setattr(ChipProxy, name, _convenience(name))
 del name, prop
 ChipProxy.ChanProxy = innerclass(ChipProxy.ChanProxy)
 
