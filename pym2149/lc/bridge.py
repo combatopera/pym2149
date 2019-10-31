@@ -46,16 +46,9 @@ class ChanProxy:
         self._chip = chip
         self._chan = chan
 
-class ChipProxy(ExceptionCatcher):
+class ChipRegs:
 
-    noiseperiod = regproperty(lambda self: self.noiseperiodreg)
-    envshape = regproperty(lambda self: self._chip.envshape)
-    envperiod = regproperty(lambda self: self.envperiodreg)
-    envpitch = regproperty(lambda self: self.envpitchreg)
-    noisefreq = regproperty(lambda self: self.noisefreqreg)
-    envfreq = regproperty(lambda self: self.envfreqreg)
-
-    def __init__(self, chip, chan, chanproxies, clock, tuning):
+    def __init__(self, chip, clock, tuning):
         self.noisefreqreg = Reg()
         self.noiseperiodreg = Reg().link(clock.noiseperiod, self.noisefreqreg)
         chip.noiseperiod.link(round, self.noiseperiodreg)
@@ -63,9 +56,21 @@ class ChipProxy(ExceptionCatcher):
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
+
+class ChipProxy(ExceptionCatcher):
+
+    noiseperiod = regproperty(lambda self: self._chipregs.noiseperiodreg)
+    envshape = regproperty(lambda self: self._chip.envshape)
+    envperiod = regproperty(lambda self: self._chipregs.envperiodreg)
+    envpitch = regproperty(lambda self: self._chipregs.envpitchreg)
+    noisefreq = regproperty(lambda self: self._chipregs.noisefreqreg)
+    envfreq = regproperty(lambda self: self._chipregs.envfreqreg)
+
+    def __init__(self, chip, chan, chanproxies, chipregs):
         self._letter = chr(ord('A') + chan)
         self._chip = chip
         self._chans = chanproxies
+        self._chipregs = chipregs
 
     def __getitem__(self, index):
         return self._chans[index]
@@ -109,8 +114,9 @@ class LiveCodingBridge(Prerecorded):
     class Session(ExceptionCatcher):
 
         def __init__(self, chip):
+            chipregs = ChipRegs(chip, self.clock, self.tuning)
             chanproxies = 2 * [ChanProxy(chip, chan, self.clock, self.tuning) for chan in range(self.chancount)]
-            self.chipproxies = [ChipProxy(chip, chan, chanproxies[chan:self.chancount + chan], self.clock, self.tuning)
+            self.chipproxies = [ChipProxy(chip, chan, chanproxies[chan:self.chancount + chan], chipregs)
                     for chan in range(self.chancount)]
 
         def _quiet(self):
