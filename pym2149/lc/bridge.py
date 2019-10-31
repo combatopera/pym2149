@@ -55,7 +55,7 @@ class ChipProxy(ExceptionCatcher):
     noisefreq = regproperty(lambda self: self.noisefreqreg)
     envfreq = regproperty(lambda self: self.envfreqreg)
 
-    def __init__(self, chip, chan, chancount, clock, tuning):
+    def __init__(self, chip, chan, chanproxies, clock, tuning):
         self.noisefreqreg = Reg()
         self.noiseperiodreg = Reg().link(clock.noiseperiod, self.noisefreqreg)
         chip.noiseperiod.link(round, self.noiseperiodreg)
@@ -63,9 +63,9 @@ class ChipProxy(ExceptionCatcher):
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
-        self._chans = [ChanProxy(chip, (chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
         self._chip = chip
+        self._chans = chanproxies
 
     def __getitem__(self, index):
         return self._chans[index]
@@ -109,7 +109,8 @@ class LiveCodingBridge(Prerecorded):
     class Session(ExceptionCatcher):
 
         def __init__(self, chip):
-            self.chipproxies = [ChipProxy(chip, chan, self.chancount, self.clock, self.tuning)
+            chanproxies = 2 * [ChanProxy(chip, chan, self.clock, self.tuning) for chan in range(self.chancount)]
+            self.chipproxies = [ChipProxy(chip, chan, chanproxies[chan:self.chancount + chan], self.clock, self.tuning)
                     for chan in range(self.chancount)]
 
         def _quiet(self):
