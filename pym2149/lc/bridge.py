@@ -60,7 +60,7 @@ class ChipProxy(ExceptionCatcher):
 
     noiseperiod = asprop(lambda chip: chip.noiseperiod)
     envshape = regproperty(lambda self: self._chip.envshape)
-    envperiod = asprop(lambda chip: chip.envperiod)
+    envperiod = regproperty(lambda self: self.envperiodreg)
     envpitch = regproperty(lambda self: self.envpitchreg)
     noisefreq = regproperty(lambda self: self.noisefreqreg)
     envfreq = regproperty(lambda self: self.envfreqreg)
@@ -70,7 +70,8 @@ class ChipProxy(ExceptionCatcher):
         chip.noiseperiod.link(lambda f: round(clock.noiseperiod(f)), self.noisefreqreg)
         self.envpitchreg = Reg()
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
-        chip.envperiod.link(lambda f, s: round(clock.envperiod(f, s)), self.envfreqreg, chip.envshape)
+        self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
+        chip.envperiod.link(round, self.envperiodreg)
         self._chip = chip
         self._chans = [self.ChanProxy((chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
