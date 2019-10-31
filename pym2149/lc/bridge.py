@@ -47,9 +47,6 @@ class ChipProxy(ExceptionCatcher):
             self._chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
             self._chan = chan
 
-        def _reg(self, reginfo):
-            return reginfo(self._chip, self._chan)
-
     noiseperiod = regproperty(lambda self: self.noiseperiodreg)
     envshape = regproperty(lambda self: self._chip.envshape)
     envperiod = regproperty(lambda self: self.envperiodreg)
@@ -68,9 +65,6 @@ class ChipProxy(ExceptionCatcher):
         self._chip = chip
         self._chans = [self.ChanProxy((chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
-
-    def _reg(self, reginfo):
-        return reginfo(self._chip)
 
     def __getitem__(self, index):
         return self._chans[index]
