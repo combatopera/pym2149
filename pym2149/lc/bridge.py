@@ -34,19 +34,19 @@ def _convenience(name):
         setattr(self[0], name, value)
     return property(fget, fset)
 
+class ChanProxy:
+
+    def __init__(self, chip, chan, clock, tuning):
+        self.tonepitchreg = Reg()
+        self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
+        self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
+        chip.toneperiods[chan].link(round, self.toneperiodreg)
+        self.levelreg = Reg()
+        chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
+        self._chip = chip
+        self._chan = chan
+
 class ChipProxy(ExceptionCatcher):
-
-    class ChanProxy:
-
-        def __init__(self, chip, chan, clock, tuning):
-            self.tonepitchreg = Reg()
-            self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
-            self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
-            chip.toneperiods[chan].link(round, self.toneperiodreg)
-            self.levelreg = Reg()
-            chip.fixedlevels[chan].link(lambda l: min(15, max(0, round(l))), self.levelreg)
-            self._chip = chip
-            self._chan = chan
 
     noiseperiod = regproperty(lambda self: self.noiseperiodreg)
     envshape = regproperty(lambda self: self._chip.envshape)
@@ -63,7 +63,7 @@ class ChipProxy(ExceptionCatcher):
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
-        self._chans = [self.ChanProxy(chip, (chan + i) % chancount, clock, tuning) for i in range(chancount)]
+        self._chans = [ChanProxy(chip, (chan + i) % chancount, clock, tuning) for i in range(chancount)]
         self._letter = chr(ord('A') + chan)
         self._chip = chip
 
@@ -82,7 +82,7 @@ for name, prop in dict(
     tonepitch = regproperty(lambda self: self.tonepitchreg),
     envflag = regproperty(lambda self: self._chip.levelmodes[self._chan]),
 ).items():
-    setattr(ChipProxy.ChanProxy, name, prop)
+    setattr(ChanProxy, name, prop)
     setattr(ChipProxy, name, _convenience(name))
 del name, prop
 
