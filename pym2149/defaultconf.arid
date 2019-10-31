@@ -28,13 +28,13 @@ wavrate = 44100
 : The rate for WAV output, ignored when JACK is the target.
 
 freqclamp = true
-: Whether inaudible tones are clamped to the lowest such tone. Setting this to True improves performance when very high frequency tones are used to attenuate the envelope. Quality may be degraded, particularly at lower outputrates.
+: Whether inaudible tones are clamped to the lowest such tone. Setting this to true improves performance when very high frequency tones are used to attenuate the envelope. Quality may be degraded, particularly at lower outputrates.
 
 underclock = 8
 : The number of nominal clock ticks until the chip state can next be updated, must be a factor of 8 i.e. in {1, 2, 4, 8}. Higher numbers improve emulation performance. According to Hatari the real thing updates at 250 kHz, which would make 8 the authentic setting.
 
 oscpause = false
-: Whether an oscillator is paused when turned off in the mixer. Setting to True doesn't significantly help performance and is likely not authentic so this option is a bit useless.
+: Whether an oscillator is paused when turned off in the mixer. Setting to true doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
 nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.ym2149.stclock))
 : You can specify your own clock here, which overrides any other value.
@@ -55,7 +55,7 @@ systemchannelcount = 2
 : The number of system output channels when using JACK.
 
 ignoreloop = $try($enter($(outpath) true) false)
-: If True playback will not loop.
+: If true playback will not loop.
 
 updaterate = $try($enter($(ymfile) $(updaterate)) 50)
 : The rate at which chip params are updated.
@@ -130,7 +130,7 @@ jackringsize = $try($enter($(prerecorded) 2) 10)
 : In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.
 
 jackcoupling = $try($enter($(prerecorded) true) false)
-: If True, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
+: If true, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
 
 zerovelocityisnoteoffchannels = $list()
 : My AZ-1 appears to send Note On with zero velocity instead of Note Off, so its channel goes here.
@@ -142,10 +142,10 @@ monophonicchannels = $list()
 : In each of these MIDI channels the maximum number of 'on' notes is restricted to one. This is useful if you want your MIDI controller to affect just one chip channel, for example.
 
 inputskipenabled = true
-: For real-time performance this should be True to minimise latency. For rendering this should be False to avoid unstable timing.
+: For real-time performance this should be true to minimise latency. For rendering this should be false to avoid unstable timing.
 
 speeddetector = true
-: Set to False to turn off the speed detector and save some CPU.
+: Set to false to turn off the speed detector and save some CPU.
 
 mediation = $global(.mediation.DynamicMediation)
 
