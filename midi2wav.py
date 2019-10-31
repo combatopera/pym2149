@@ -31,7 +31,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName('outpath'))
+    config, di = boot(ConfigName('outpath', name = 'realtime'))
     try:
         di.add(PLL)
         out.configure(di)

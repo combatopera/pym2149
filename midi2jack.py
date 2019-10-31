@@ -31,7 +31,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName())
+    config, di = boot(ConfigName(name = 'realtime'))
     try:
         di.add(PLL)
         jackclient.configure(di)

@@ -126,10 +126,10 @@ plltargetpos = $div($(relplltargetpos) $(updaterate))
 pllalpha = .1
 : The alpha value for the exponential moving average we use for convergence to plltargetpos.
 
-jackringsize = $try($enter($(prerecorded) 2) 10)
+jackringsize = 2
 : In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.
 
-jackcoupling = $try($enter($(prerecorded) true) false)
+jackcoupling = true
 : If true, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
 
 zerovelocityisnoteoffchannels = $list()
