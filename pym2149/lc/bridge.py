@@ -27,14 +27,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# TODO: Use Reg links so that we can read out an unrounded period for example.
-def asprop(reginfo, enc = lambda self: round, dec = lambda self: lambda x: x):
-    def fget(self):
-        return dec(self)(self._reg(reginfo).value)
-    def fset(self, value):
-        self._reg(reginfo).value = enc(self)(value)
-    return property(fget, fset)
-
 def convenience(name):
     def fget(self):
         return getattr(self[0], name)
@@ -58,7 +50,7 @@ class ChipProxy(ExceptionCatcher):
         def _reg(self, reginfo):
             return reginfo(self._chip, self._chan)
 
-    noiseperiod = asprop(lambda chip: chip.noiseperiod)
+    noiseperiod = regproperty(lambda self: self.noiseperiodreg)
     envshape = regproperty(lambda self: self._chip.envshape)
     envperiod = regproperty(lambda self: self.envperiodreg)
     envpitch = regproperty(lambda self: self.envpitchreg)
@@ -67,7 +59,8 @@ class ChipProxy(ExceptionCatcher):
 
     def __init__(self, chip, chan, chancount, clock, tuning, context):
         self.noisefreqreg = Reg()
-        chip.noiseperiod.link(lambda f: round(clock.noiseperiod(f)), self.noisefreqreg)
+        self.noiseperiodreg = Reg().link(clock.noiseperiod, self.noisefreqreg)
+        chip.noiseperiod.link(round, self.noiseperiodreg)
         self.envpitchreg = Reg()
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
