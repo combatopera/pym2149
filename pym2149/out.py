@@ -15,20 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np, logging
 from .buf import MasterBuf
-from .shapes import floatdtype
-from .nod import Node
-from .wav import Wave16
-from .mix import Multiplexer
-from .clock import ClockInfo
-from .ym2149 import YM2149
-from .iface import AmpScale, Multiplexed, Stream, Platform, Config
-from diapyr import types
-from .mix import IdealMixer
-from .minblep import MinBleps
 from .channels import Channels
+from .clock import ClockInfo
+from .iface import AmpScale, Multiplexed, Stream, Platform, Config
+from .minblep import MinBleps
+from .mix import IdealMixer, Multiplexer
+from .nod import Node
+from .shapes import floatdtype
 from .util import singleton
+from .wav import Wave16
+from .ym2149 import YM2149
+from diapyr import types
+import numpy as np, logging
 
 log = logging.getLogger(__name__)
 
