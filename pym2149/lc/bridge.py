@@ -68,12 +68,12 @@ class ChipProxy(ExceptionCatcher):
 
     def __init__(self, chip, chan, chanproxies, chipregs):
         self._letter = chr(ord('A') + chan)
+        self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
         self._chip = chip
-        self._chans = chanproxies
         self._chipregs = chipregs
 
     def __getitem__(self, index):
-        return self._chans[index]
+        return self._chanproxies[index]
 
     def noisepriority(self):
         return not any(chan.noiseflag for chan in self[1:])
@@ -115,9 +115,8 @@ class LiveCodingBridge(Prerecorded):
 
         def __init__(self, chip):
             chipregs = ChipRegs(chip, self.clock, self.tuning)
-            chanproxies = 2 * [ChanProxy(chip, chan, self.clock, self.tuning) for chan in range(self.chancount)]
-            self.chipproxies = [ChipProxy(chip, chan, chanproxies[chan:self.chancount + chan], chipregs)
-                    for chan in range(self.chancount)]
+            chanproxies = [ChanProxy(chip, chan, self.clock, self.tuning) for chan in range(self.chancount)]
+            self.chipproxies = [ChipProxy(chip, chan, chanproxies, chipregs) for chan in range(self.chancount)]
 
         def _quiet(self):
             for proxy in self.chipproxies:
