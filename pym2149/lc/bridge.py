@@ -16,10 +16,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .util import threadlocals
+from ..clock import ClockInfo
 from ..iface import Config, Prerecorded, Tuning, Context
 from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher
-from ..ym2149 import ClockInfo
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial

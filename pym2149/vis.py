@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .clock import ClockInfo
 from .iface import Config, Tuning, Roll
 from .util import singleton
-from .ym2149 import LogicalRegisters, ClockInfo
+from .ym2149 import LogicalRegisters
 from diapyr import types
 
 @singleton

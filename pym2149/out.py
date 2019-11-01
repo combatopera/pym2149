@@ -21,7 +21,8 @@ from .shapes import floatdtype
 from .nod import Node
 from .wav import Wave16
 from .mix import Multiplexer
-from .ym2149 import ClockInfo, YM2149
+from .clock import ClockInfo
+from .ym2149 import YM2149
 from .iface import AmpScale, Multiplexed, Stream, Platform, Config
 from diapyr import types
 from .mix import IdealMixer

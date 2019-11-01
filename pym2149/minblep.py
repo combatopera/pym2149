@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .clock import ClockInfo
+from .iface import Platform
 from mynblep.minblep import MinBleps
 from diapyr import types
-from .iface import Platform
-from .ym2149 import ClockInfo
 
 @types(Platform, ClockInfo, this = MinBleps)
 def loadorcreate(platform, clockinfo):
