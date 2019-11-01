@@ -36,7 +36,7 @@ underclock = 8
 oscpause = false
 : Whether an oscillator is paused when turned off in the mixer. Setting to true doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
-nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.ym2149.stclock))
+nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.clock.stclock))
 : You can specify your own clock here, which overrides any other value.
 
 midipan = false

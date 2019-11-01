@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .clock import stclock
 from .dac import PWMEffect, SinusEffect
 from .iface import YMFile, Config
-from .ym2149 import stclock
 from diapyr import types
 import struct, logging, os, tempfile, shutil, sys
 

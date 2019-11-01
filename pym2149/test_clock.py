@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from .ym2149 import ClockInfo
+from .clock import ClockInfo
 from collections import namedtuple
+import unittest
 
 class TestClockInfo(unittest.TestCase):
 
