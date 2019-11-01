@@ -84,7 +84,7 @@ class ChipProxy(ExceptionCatcher):
         return self._chanproxies[index]
 
     def noisepriority(self):
-        return not any(chan.noiseflag for chan in self[1:])
+        return not any(chan.noiseflag for chan in self._chanproxies[1:])
 
 for name in dir(ChanProxy):
     if '_' != name[0]:
