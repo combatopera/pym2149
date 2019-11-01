@@ -36,6 +36,14 @@ def _convenience(name):
 
 class ChanProxy:
 
+    tonefreq = regproperty(lambda self: self.tonefreqreg)
+    level = regproperty(lambda self: self.levelreg)
+    noiseflag = regproperty(lambda self: self._chip.noiseflags[self._chan])
+    toneflag = regproperty(lambda self: self._chip.toneflags[self._chan])
+    toneperiod = regproperty(lambda self: self.toneperiodreg)
+    tonepitch = regproperty(lambda self: self.tonepitchreg)
+    envflag = regproperty(lambda self: self._chip.levelmodes[self._chan])
+
     def __init__(self, chip, chan, clock, tuning):
         self.tonepitchreg = Reg()
         self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
@@ -78,18 +86,10 @@ class ChipProxy(ExceptionCatcher):
     def noisepriority(self):
         return not any(chan.noiseflag for chan in self[1:])
 
-for name, prop in dict(
-    tonefreq = regproperty(lambda self: self.tonefreqreg),
-    level = regproperty(lambda self: self.levelreg),
-    noiseflag = regproperty(lambda self: self._chip.noiseflags[self._chan]),
-    toneflag = regproperty(lambda self: self._chip.toneflags[self._chan]),
-    toneperiod = regproperty(lambda self: self.toneperiodreg),
-    tonepitch = regproperty(lambda self: self.tonepitchreg),
-    envflag = regproperty(lambda self: self._chip.levelmodes[self._chan]),
-).items():
-    setattr(ChanProxy, name, prop)
-    setattr(ChipProxy, name, _convenience(name))
-del name, prop
+for name in dir(ChanProxy):
+    if '_' != name[0]:
+        setattr(ChipProxy, name, _convenience(name))
+del name
 
 class NoSuchSectionException(Exception): pass
 
