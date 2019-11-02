@@ -35,6 +35,7 @@ class LogicalRegisters:
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
         channels = range(config.chipchannels)
+        # Clamping 0 to 1 authentic for all 3 periods, see qtonpzer, qnoispec, qenvpzer respectively:
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in channels]
         self.noiseperiod = Reg(mask = 0x1f, minval = 1)
         self.toneflags = [Reg() for _ in channels]
@@ -71,7 +72,6 @@ class PhysicalRegisters:
             return not (m & self.mask)
 
     supportedchannels = 3
-    # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
     # TP and EP are suitable for plugging into the formulas in the datasheet:
     TP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0x0f) << 8))
     EP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0xff) << 8))
