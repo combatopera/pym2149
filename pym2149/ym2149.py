@@ -36,12 +36,12 @@ class LogicalRegisters:
     def __init__(self, config, clockinfo):
         channels = range(config.chipchannels)
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in channels]
-        self.noiseperiod = Reg(minval = 1)
+        self.noiseperiod = Reg(mask = 0x1f, minval = 1)
         self.toneflags = [Reg() for _ in channels]
         self.noiseflags = [Reg() for _ in channels]
-        self.fixedlevels = [Reg() for _ in channels]
+        self.fixedlevels = [Reg(mask = 0x0f) for _ in channels]
         self.levelmodes = [Reg() for _ in channels]
-        self.envshape = VersionReg()
+        self.envshape = VersionReg(mask = 0x0f)
         self.envperiod = Reg(minval = 1)
         for c in channels:
             self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
@@ -72,9 +72,8 @@ class PhysicalRegisters:
 
     supportedchannels = 3
     # Clamping 0 to 1 is authentic in all 3 cases, see qtonpzer, qnoispec, qenvpzer respectively.
-    # TP, NP, EP are suitable for plugging into the formulas in the datasheet:
+    # TP and EP are suitable for plugging into the formulas in the datasheet:
     TP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0x0f) << 8))
-    NP = staticmethod(lambda p: p & 0x1f)
     EP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0xff) << 8))
     timers = property(lambda self: self.logical.timers)
     levelbase = 0x8
@@ -83,17 +82,17 @@ class PhysicalRegisters:
     def __init__(self, config, logical):
         # TODO: Add reverse wiring.
         # Like the real thing we have 16 registers, this impl ignores the last 2:
-        self.R = tuple(Reg() for _ in range(16))
+        self.R = [Reg() for _ in range(16)]
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
             logical.toneperiods[c].link(self.TP, self.R[c * 2], self.R[c * 2 + 1])
             logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
             logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
-            logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[self.levelbase + c])
+            self.R[self.levelbase + c] = logical.fixedlevels[c]
             logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[self.levelbase + c])
-        logical.noiseperiod.link(self.NP, self.R[0x6])
+        self.R[0x6] = logical.noiseperiod
         logical.envperiod.link(self.EP, self.R[0xB], self.R[0xC])
-        logical.envshape.link(lambda s: s & 0x0f, self.R[0xD])
+        self.R[0xD] = logical.envshape
         for r in self.R:
             r.value = 0
         self.logical = logical
