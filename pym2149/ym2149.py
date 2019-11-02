@@ -51,7 +51,7 @@ class LogicalRegisters:
             self.fixedlevels[c].value = 0
             self.levelmodes[c].value = False
         self.noiseperiod.value = 0
-        self.envperiod.value = 0
+        self.envperiod.value = PhysicalRegisters.EP(0, 0)
         self.envshape.value = 0
         self.timers = tuple(MFPTimer() for _ in channels)
 
