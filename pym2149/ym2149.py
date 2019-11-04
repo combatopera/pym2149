@@ -29,6 +29,9 @@ import logging
 
 log = logging.getLogger(__name__)
 ym2149nzdegrees = 17, 14
+# TP and EP are suitable for plugging into the formulas in the datasheet:
+TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
+EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
 
 class LogicalRegisters:
 
@@ -45,13 +48,13 @@ class LogicalRegisters:
         self.envshape = VersionReg(mask = 0x0f)
         self.envperiod = Reg(minval = 1)
         for c in channels:
-            self.toneperiods[c].value = PhysicalRegisters.TP(0, 0)
+            self.toneperiods[c].value = TP(0, 0)
             self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
             self.noiseflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
             self.fixedlevels[c].value = 0
             self.levelmodes[c].value = False
         self.noiseperiod.value = 0
-        self.envperiod.value = PhysicalRegisters.EP(0, 0)
+        self.envperiod.value = EP(0, 0)
         self.envshape.value = 0
         self.timers = tuple(MFPTimer() for _ in channels)
 
@@ -72,9 +75,6 @@ class PhysicalRegisters:
             return not (m & self.mask)
 
     supportedchannels = 3
-    # TP and EP are suitable for plugging into the formulas in the datasheet:
-    TP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0x0f) << 8))
-    EP = staticmethod(lambda f, r: (f & 0xff) | ((r & 0xff) << 8))
     timers = property(lambda self: self.logical.timers)
     levelbase = 0x8
 
@@ -85,13 +85,13 @@ class PhysicalRegisters:
         self.R = [Reg() for _ in range(16)]
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
-            logical.toneperiods[c].link(self.TP, self.R[c * 2], self.R[c * 2 + 1])
+            logical.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
             logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
             logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
             self.R[self.levelbase + c] = logical.fixedlevels[c]
             logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[self.levelbase + c])
         self.R[0x6] = logical.noiseperiod
-        logical.envperiod.link(self.EP, self.R[0xB], self.R[0xC])
+        logical.envperiod.link(EP, self.R[0xB], self.R[0xC])
         self.R[0xD] = logical.envshape
         for r in self.R:
             r.value = 0
