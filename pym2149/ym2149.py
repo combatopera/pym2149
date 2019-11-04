@@ -35,7 +35,7 @@ class LogicalRegisters:
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo):
         channels = range(config.chipchannels)
-        # Clamping 0 to 1 authentic for all 3 periods, see qtonpzer, qnoispec, qenvpzer respectively:
+        # Clamping 0 to 1 is authentic for all 3 kinds of period, see qtonpzer, qnoispec, qenvpzer respectively:
         self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in channels]
         self.noiseperiod = Reg(mask = 0x1f, minval = 1)
         self.toneflags = [Reg() for _ in channels]
