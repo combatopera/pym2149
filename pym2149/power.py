@@ -30,5 +30,7 @@ def batterypower():
             words = wordpattern.findall(line)
             if 2 == len(words) and 'state:' == words[0]:
                 yield words[1]
-    state, = states()
-    return statetobatterypower[state]
+    states = list(states())
+    if states:
+        state, = states
+        return statetobatterypower[state]
