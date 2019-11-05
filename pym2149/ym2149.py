@@ -33,6 +33,14 @@ ym2149nzdegrees = 17, 14
 TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
 EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
 
+class MixerFlag:
+
+    def __init__(self, bit):
+        self.mask = 0x01 << bit
+
+    def __call__(self, m):
+        return not (m & self.mask)
+
 class LogicalRegisters:
 
     @types(Config, ClockInfo)
@@ -47,10 +55,11 @@ class LogicalRegisters:
         self.levelmodes = [Reg() for _ in channels]
         self.envshape = VersionReg(mask = 0x0f)
         self.envperiod = Reg(minval = 1)
+        initialmixerflag = MixerFlag(0)(0) # Result is the same whatever the bit.
         for c in channels:
             self.toneperiods[c].value = TP(0, 0)
-            self.toneflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
-            self.noiseflags[c].value = PhysicalRegisters.MixerFlag(0)(0)
+            self.toneflags[c].value = initialmixerflag
+            self.noiseflags[c].value = initialmixerflag
             self.fixedlevels[c].value = 0
             self.levelmodes[c].value = False
         self.noiseperiod.value = 0
@@ -66,14 +75,6 @@ class LogicalRegisters:
 
 class PhysicalRegisters:
 
-    class MixerFlag:
-
-        def __init__(self, bit):
-            self.mask = 0x01 << bit
-
-        def __call__(self, m):
-            return not (m & self.mask)
-
     supportedchannels = 3
     timers = property(lambda self: self.logical.timers)
     levelbase = 0x8
@@ -86,8 +87,8 @@ class PhysicalRegisters:
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
             logical.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
-            logical.toneflags[c].link(self.MixerFlag(c), self.R[0x7])
-            logical.noiseflags[c].link(self.MixerFlag(self.supportedchannels + c), self.R[0x7])
+            logical.toneflags[c].link(MixerFlag(c), self.R[0x7])
+            logical.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
             self.R[self.levelbase + c] = logical.fixedlevels[c]
             logical.levelmodes[c].link(lambda l: bool(l & 0x10), self.R[self.levelbase + c])
         self.R[0x6] = logical.noiseperiod
