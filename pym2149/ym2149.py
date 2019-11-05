@@ -30,8 +30,7 @@ import logging
 log = logging.getLogger(__name__)
 ym2149nzdegrees = 17, 14
 # TP and EP are suitable for plugging into the formulas in the datasheet:
-TP = lambda f, r: (f & 0xff) | ((r & 0x0f) << 8)
-EP = lambda f, r: (f & 0xff) | ((r & 0xff) << 8)
+EP = TP = lambda f, r: (r << 8) | f
 getlevelmode = lambda l: bool(l & 0x10)
 
 class MixerFlag:
@@ -48,14 +47,14 @@ class LogicalRegisters:
     def __init__(self, config, clockinfo):
         channels = range(config.chipchannels)
         # Clamping 0 to 1 is authentic for all 3 kinds of period, see qtonpzer, qnoispec, qenvpzer respectively:
-        self.toneperiods = [Reg(minval = clockinfo.mintoneperiod) for _ in channels]
+        self.toneperiods = [Reg(mask = 0x0fff, minval = clockinfo.mintoneperiod) for _ in channels]
         self.noiseperiod = Reg(mask = 0x1f, minval = 1)
         self.toneflags = [Reg() for _ in channels]
         self.noiseflags = [Reg() for _ in channels]
         self.fixedlevels = [Reg(mask = 0x0f) for _ in channels]
         self.levelmodes = [Reg() for _ in channels]
         self.envshape = VersionReg(mask = 0x0f)
-        self.envperiod = Reg(minval = 1)
+        self.envperiod = Reg(mask = 0xffff, minval = 1)
         initialmixerflag = MixerFlag(0)(0) # Result is the same whatever the bit.
         for c in channels:
             self.toneperiods[c].value = TP(0, 0)
@@ -84,7 +83,7 @@ class PhysicalRegisters:
     def __init__(self, config, logical):
         # XXX: Add reverse wiring?
         # Like the real thing we have 16 registers, this impl ignores the last 2:
-        self.R = [Reg() for _ in range(16)] # Instead of mask, assume all incoming values are 8-bit.
+        self.R = [Reg() for _ in range(16)] # Instead of mask, assume all incoming values are in [0, 255].
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
             logical.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
