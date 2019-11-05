@@ -81,9 +81,9 @@ class PhysicalRegisters:
 
     @types(Config, LogicalRegisters)
     def __init__(self, config, logical):
-        # TODO: Add reverse wiring.
+        # XXX: Add reverse wiring?
         # Like the real thing we have 16 registers, this impl ignores the last 2:
-        self.R = [Reg() for _ in range(16)]
+        self.R = [Reg() for _ in range(16)] # Instead of mask, assume all incoming values are in range.
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
             logical.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
