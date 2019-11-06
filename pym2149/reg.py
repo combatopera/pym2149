@@ -32,11 +32,11 @@ class Link:
 
 class Reg:
 
-    def __init__(self, **kwargs):
+    def __init__(self, maxval = None, minval = None, **kwargs):
         self.links = []
         self.idle = True
-        self.maxval = kwargs.get('maxval', None) # Friendlier than a mask.
-        self.minval = kwargs.get('minval', None) # Typically to avoid 0 period.
+        self.maxval = maxval # Friendlier than a mask.
+        self.minval = minval # Typically to avoid 0 period.
         if 'value' in kwargs:
             self.value = kwargs['value']
 
