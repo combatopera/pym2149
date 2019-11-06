@@ -95,7 +95,7 @@ class PhysicalRegisters:
             logical.levelmodes[c].link(getlevelmode, self.R[self.levelbase + c])
         logical.noiseperiod.link(NP, self.R[0x6])
         logical.envperiod.link(EP, self.R[0xB], self.R[0xC])
-        self.R[0xD] = logical.envshape
+        logical.envshape.link(lambda s: s & 0x0f, self.R[0xD])
         for r in self.R:
             r.value = 0
         self.logical = logical

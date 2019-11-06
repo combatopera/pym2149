@@ -57,3 +57,16 @@ class TestPhysicalRegisters(unittest.TestCase):
         self.assertEqual(0x00, lr.noiseperiod.value)
         pr.R[6].value = 0xff
         self.assertEqual(0x1f, lr.noiseperiod.value)
+
+    def test_envshapemask(self):
+        lr = LogicalRegisters(self, self)
+        pr = PhysicalRegisters(self, lr)
+        self.assertEqual(0x0, lr.envshape.value)
+        pr.R[13].value = 0x0f
+        self.assertEqual(0xf, lr.envshape.value)
+        pr.R[13].value = 0x10
+        self.assertEqual(0x0, lr.envshape.value)
+        pr.R[13].value = 0xf0
+        self.assertEqual(0x0, lr.envshape.value)
+        pr.R[13].value = 0xff
+        self.assertEqual(0xf, lr.envshape.value)
