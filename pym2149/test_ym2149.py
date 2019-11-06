@@ -45,7 +45,7 @@ class TestPhysicalRegisters(unittest.TestCase):
         self.assertEqual(0xf21, lr.toneperiods[0].value)
 
     def test_noiseperiodmask(self):
-        lr = LogicalRegisters(self, self, 0)
+        lr = LogicalRegisters(self, self, minnoiseperiod = None)
         pr = PhysicalRegisters(self, lr)
         self.assertEqual(0x00, lr.noiseperiod.value)
         pr.R[6].value = 0x1f
