@@ -39,6 +39,12 @@ oscpause = false
 nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.clock.stclock))
 : You can specify your own clock here, which overrides any other value.
 
+maxtoneperiod = $py[0x0fff]
+
+maxnoiseperiod = $py[0x1f]
+
+maxenvperiod = $py[0xffff]
+
 midipan = false
 : Pay attention to MIDI panning rather than having an automatic fixed pan per channel.
 

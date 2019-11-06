@@ -47,14 +47,14 @@ class LogicalRegisters:
     def __init__(self, config, clockinfo):
         channels = range(config.chipchannels)
         # Clamping 0 to 1 is authentic for all 3 kinds of period, see qtonpzer, qnoispec, qenvpzer respectively:
-        self.toneperiods = [Reg(maxval = 0x0fff, minval = clockinfo.mintoneperiod) for _ in channels]
-        self.noiseperiod = Reg(maxval = 0x1f, minval = 1)
+        self.toneperiods = [Reg(maxval = config.maxtoneperiod, minval = clockinfo.mintoneperiod) for _ in channels]
+        self.noiseperiod = Reg(maxval = config.maxnoiseperiod, minval = 1)
         self.toneflags = [Reg() for _ in channels]
         self.noiseflags = [Reg() for _ in channels]
         self.fixedlevels = [Reg(maxval = 0x0f, minval = 0) for _ in channels]
         self.levelmodes = [Reg() for _ in channels]
         self.envshape = VersionReg(maxval = 0x0f, minval = 0)
-        self.envperiod = Reg(maxval = 0xffff, minval = 1)
+        self.envperiod = Reg(maxval = config.maxenvperiod, minval = 1)
         initialmixerflag = MixerFlag(0)(0) # Result is the same whatever the bit.
         for c in channels:
             self.toneperiods[c].value = TP(0, 0)
