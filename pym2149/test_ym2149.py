@@ -38,3 +38,5 @@ class TestRegisters(unittest.TestCase):
         self.assertEqual(0xf21, lr.toneperiods[0].value)
         pr.R[1].value = 0x10
         self.assertEqual(0x021, lr.toneperiods[0].value)
+        pr.R[1].value = 0xff
+        self.assertEqual(0xf21, lr.toneperiods[0].value)

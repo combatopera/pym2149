@@ -30,7 +30,8 @@ import logging
 log = logging.getLogger(__name__)
 ym2149nzdegrees = 17, 14
 # TP and EP are suitable for plugging into the formulas in the datasheet:
-EP = TP = lambda f, r: (r << 8) | f
+TP = lambda f, r: ((r & 0x0f) << 8) | f
+EP = lambda f, r: (r << 8) | f
 getlevelmode = lambda l: bool(l & 0x10)
 
 class MixerFlag:
