@@ -18,11 +18,11 @@
 from .ym2149 import LogicalRegisters, PhysicalRegisters
 import unittest
 
-class TestRegisters(unittest.TestCase):
+class TestPhysicalRegisters(unittest.TestCase):
 
     chipchannels = 1
     maxtoneperiod = 0xfff
-    maxnoiseperiod = None
+    maxnoiseperiod = 0x1f
     maxenvperiod = None
     mintoneperiod = None
 
@@ -36,7 +36,24 @@ class TestRegisters(unittest.TestCase):
         self.assertEqual(0x321, lr.toneperiods[0].value)
         pr.R[1].value = 0x0f
         self.assertEqual(0xf21, lr.toneperiods[0].value)
+        # Ignore high nibble:
         pr.R[1].value = 0x10
+        self.assertEqual(0x021, lr.toneperiods[0].value)
+        pr.R[1].value = 0xf0
         self.assertEqual(0x021, lr.toneperiods[0].value)
         pr.R[1].value = 0xff
         self.assertEqual(0xf21, lr.toneperiods[0].value)
+
+    def test_noiseperiodmask(self):
+        lr = LogicalRegisters(self, self, 0)
+        pr = PhysicalRegisters(self, lr)
+        self.assertEqual(0x00, lr.noiseperiod.value)
+        pr.R[6].value = 0x1f
+        self.assertEqual(0x1f, lr.noiseperiod.value)
+        # Ignore 3 most significant bits:
+        pr.R[6].value = 0x20
+        self.assertEqual(0x00, lr.noiseperiod.value)
+        pr.R[6].value = 0xe0
+        self.assertEqual(0x00, lr.noiseperiod.value)
+        pr.R[6].value = 0xff
+        self.assertEqual(0x1f, lr.noiseperiod.value)

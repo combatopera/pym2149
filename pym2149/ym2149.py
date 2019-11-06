@@ -29,8 +29,9 @@ import logging
 
 log = logging.getLogger(__name__)
 ym2149nzdegrees = 17, 14
-# TP and EP are suitable for plugging into the formulas in the datasheet:
+# TP, NP and EP are suitable for plugging into the formulas in the datasheet:
 TP = lambda f, r: ((r & 0x0f) << 8) | f
+NP = lambda p: p & 0x1f
 EP = lambda f, r: (r << 8) | f
 getlevelmode = lambda l: bool(l & 0x10)
 
@@ -45,11 +46,11 @@ class MixerFlag:
 class LogicalRegisters:
 
     @types(Config, ClockInfo)
-    def __init__(self, config, clockinfo):
+    def __init__(self, config, clockinfo, minnoiseperiod = 1):
         channels = range(config.chipchannels)
         # Clamping 0 to 1 is authentic for all 3 kinds of period, see qtonpzer, qnoispec, qenvpzer respectively:
         self.toneperiods = [Reg(maxval = config.maxtoneperiod, minval = clockinfo.mintoneperiod) for _ in channels]
-        self.noiseperiod = Reg(maxval = config.maxnoiseperiod, minval = 1)
+        self.noiseperiod = Reg(maxval = config.maxnoiseperiod, minval = minnoiseperiod)
         self.toneflags = [Reg() for _ in channels]
         self.noiseflags = [Reg() for _ in channels]
         self.fixedlevels = [Reg(maxval = 0x0f, minval = 0) for _ in channels]
@@ -92,7 +93,7 @@ class PhysicalRegisters:
             logical.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
             self.R[self.levelbase + c] = logical.fixedlevels[c]
             logical.levelmodes[c].link(getlevelmode, self.R[self.levelbase + c])
-        self.R[0x6] = logical.noiseperiod
+        logical.noiseperiod.link(NP, self.R[0x6])
         logical.envperiod.link(EP, self.R[0xB], self.R[0xC])
         self.R[0xD] = logical.envshape
         for r in self.R:
