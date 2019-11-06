@@ -35,7 +35,7 @@ class Reg:
     def __init__(self, **kwargs):
         self.links = []
         self.idle = True
-        self.mask = kwargs.get('mask', None)
+        self.maxval = kwargs.get('maxval', None) # Friendlier than a mask.
         self.minval = kwargs.get('minval', None) # Typically to avoid 0 period.
         if 'value' in kwargs:
             self.value = kwargs['value']
@@ -51,8 +51,8 @@ class Reg:
         self.link(lambda *args: (negmask & self.value) | (mask & xform(*args)), *upstream)
 
     def set(self, value):
-        if self.mask is not None:
-            value &= self.mask
+        if self.maxval is not None:
+            value = min(self.maxval, value)
         if self.minval is not None:
             value = max(self.minval, value)
         self._value = value
