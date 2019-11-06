@@ -50,7 +50,7 @@ class ChanProxy:
         self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
         chip.toneperiods[chan].link(round, self.toneperiodreg)
         self.levelreg = Reg()
-        chip.fixedlevels[chan].link(lambda l: max(0, min(15, round(l))), self.levelreg)
+        chip.fixedlevels[chan].link(round, self.levelreg)
         self._chip = chip
         self._chan = chan
 
