@@ -32,13 +32,15 @@ class Link:
 
 class Reg:
 
-    def __init__(self, maxval = None, minval = None, **kwargs):
+    undefined = object()
+
+    def __init__(self, maxval = None, minval = None, value = undefined):
         self.links = []
         self.idle = True
         self.maxval = maxval # Friendlier than a mask.
         self.minval = minval # Typically to avoid 0 period.
-        if 'value' in kwargs:
-            self.value = kwargs['value']
+        if value is not self.undefined:
+            self.value = value
 
     def link(self, xform, *upstream):
         link = Link(self, xform, upstream)
