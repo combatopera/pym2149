@@ -70,3 +70,16 @@ class TestPhysicalRegisters(unittest.TestCase):
         self.assertEqual(0x0, lr.envshape.value)
         pr.R[13].value = 0xff
         self.assertEqual(0xf, lr.envshape.value)
+
+    def test_levelmask(self):
+        lr = LogicalRegisters(self, self)
+        pr = PhysicalRegisters(self, lr)
+        self.assertEqual(0x0, lr.fixedlevels[0].value)
+        pr.R[8].value = 0x0f
+        self.assertEqual(0xf, lr.fixedlevels[0].value)
+        pr.R[8].value = 0x10
+        self.assertEqual(0x0, lr.fixedlevels[0].value)
+        pr.R[8].value = 0xf0
+        self.assertEqual(0x0, lr.fixedlevels[0].value)
+        pr.R[8].value = 0xff
+        self.assertEqual(0xf, lr.fixedlevels[0].value)

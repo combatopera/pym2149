@@ -85,13 +85,13 @@ class PhysicalRegisters:
     def __init__(self, config, logical):
         # XXX: Add reverse wiring?
         # Like the real thing we have 16 registers, this impl ignores the last 2:
-        self.R = [Reg() for _ in range(16)] # Assume all incoming values are in [0, 255].
+        self.R = tuple(Reg() for _ in range(16)) # Assume all incoming values are in [0, 255].
         # We only have registers for the authentic number of channels:
         for c in range(min(self.supportedchannels, config.chipchannels)):
             logical.toneperiods[c].link(TP, self.R[c * 2], self.R[c * 2 + 1])
             logical.toneflags[c].link(MixerFlag(c), self.R[0x7])
             logical.noiseflags[c].link(MixerFlag(self.supportedchannels + c), self.R[0x7])
-            self.R[self.levelbase + c] = logical.fixedlevels[c]
+            logical.fixedlevels[c].link(lambda l: l & 0x0f, self.R[self.levelbase + c])
             logical.levelmodes[c].link(getlevelmode, self.R[self.levelbase + c])
         logical.noiseperiod.link(NP, self.R[0x6])
         logical.envperiod.link(EP, self.R[0xB], self.R[0xC])
