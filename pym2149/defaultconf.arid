@@ -39,7 +39,7 @@ oscpause = false
 nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.clock.stclock))
 : You can specify your own clock here, which overrides any other value.
 
-maxtoneperiod = $py[0x0fff]
+maxtoneperiod = $py[0xfff]
 
 maxnoiseperiod = $py[0x1f]
 
