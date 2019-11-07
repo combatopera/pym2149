@@ -160,7 +160,7 @@ class EParse(Parse):
         def wrap(self, successor):
             pass
 
-class NoteWrapper:
+class Program:
 
     def __init__(self, cls, init):
         def params(name):

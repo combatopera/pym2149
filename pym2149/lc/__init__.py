@@ -24,10 +24,10 @@ def D(*script):
     return concat(Script, VParse(vector, 0, False), script, {})
 
 def E(cls, *script, initargs = (), **kwargs):
-    from .parse import concat, Script, EParse, NoteWrapper
+    from .parse import concat, Script, EParse, Program
     namespace = object()
     kwargs = {(namespace, name): value for name, value in kwargs.items()}
-    return concat(Script, EParse(NoteWrapper(cls, initargs), namespace), script, kwargs)
+    return concat(Script, EParse(Program(cls, initargs), namespace), script, kwargs)
 
 unit = E(lambda: None, '1')
 naturalminor = V('0 2 3 5 7 8 10', step = 12, continuous = True)
