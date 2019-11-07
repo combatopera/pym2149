@@ -148,25 +148,25 @@ class Operators:
 
 class EventSection:
 
-    def __init__(self, relframe, onframes, note, namespace):
+    def __init__(self, relframe, onframes, program, namespace):
         self.relframe = relframe
         self.onframes = onframes
-        self.note = note
+        self.program = program
         self.namespace = namespace
 
     def getvalue(self, frame, xadjust):
-        return Event(xadjust + self.relframe, self.onframes, self.note, self.namespace)
+        return Event(xadjust + self.relframe, self.onframes, self.program, self.namespace)
 
 class Event:
 
-    def __init__(self, absframe, onframes, note, namespace):
+    def __init__(self, absframe, onframes, program, namespace):
         self.absframe = absframe
         self.onframes = onframes
-        self.note = note
+        self.program = program
         self.namespace = namespace
 
     def __call__(self, frame, speed, chipproxy, kwargs):
-        note = self.note.new() # XXX: Allow a note to maintain state?
+        note = self.program.new() # XXX: Allow a note to maintain state?
         def noteargs(params, shift, **extras):
             for name in params:
                 if name in extras:
@@ -178,12 +178,12 @@ class Event:
                     if key in kwargs:
                         yield name, (kwargs[key] >> -self.absframe).of(speed) >> shift
         if self.onframes is None:
-            if self.note.onparams is not None:
-                note.on(**dict(noteargs(self.note.onparams, 0, chip = chipproxy)))
+            if self.program.onparams is not None:
+                note.on(**dict(noteargs(self.program.onparams, 0, chip = chipproxy)))
         else:
-            if self.note.offparams is not None:
+            if self.program.offparams is not None:
                 onframes = self.onframes * speed
-                note.off(**dict(noteargs(self.note.offparams, onframes, chip = chipproxy, onframes = onframes)))
+                note.off(**dict(noteargs(self.program.offparams, onframes, chip = chipproxy, onframes = onframes)))
 
 class Frame(float):
 
