@@ -131,8 +131,8 @@ class EParse(Parse):
 
     pattern = re.compile('(?:([0-9]+)x)?(-?[0-9.]+)?(?:/([0-9.]*))?')
 
-    def __init__(self, note, namespace):
-        self.note = note
+    def __init__(self, program, namespace):
+        self.program = program
         self.namespace = namespace
 
     @innerclass
@@ -153,9 +153,9 @@ class EParse(Parse):
             onwidth = max(0, width - offwidth)
             for _ in range(count):
                 if onwidth:
-                    self.sections.add(onwidth, EventSection(self.sections.len, None, self.note, self.namespace))
+                    self.sections.add(onwidth, EventSection(self.sections.len, None, self.program, self.namespace))
                 if offwidth:
-                    self.sections.add(offwidth, EventSection(self.sections.len, onwidth, self.note, self.namespace))
+                    self.sections.add(offwidth, EventSection(self.sections.len, onwidth, self.program, self.namespace))
 
         def wrap(self, successor):
             pass
