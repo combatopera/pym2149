@@ -16,23 +16,48 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Context, Config
+from .lc import E, V
 from diapyr import types
 import logging, threading
 
 log = logging.getLogger(__name__)
+
+class XTRA:
+
+    toneperiod = V('4 3 2 1,0').of(6) * V('256') + V('100')
+    envflag = V('30x,1')
+    mute = False
+
+    def on(self, chip, frame):
+        if self.mute:
+            return
+        envflag = self.envflag[frame]
+        for chan in range(2):
+            chip[chan].toneflag = True
+            chip[chan].level = 15
+            chip[chan].envflag = envflag
+        if envflag and not self.envflag[frame - 1]:
+            chip.envshape = 0
+        chip.envperiod = 30 << 8
+        toneperiod = self.toneperiod[frame]
+        chip.toneperiod = toneperiod
+        chip[1].toneperiod = toneperiod + 1
+
+    def off(self):
+        type(self).mute = True
 
 class ContextImpl(Context):
 
     deleted = object()
 
     @types(Config)
-    def __init__(self, config):
+    def __init__(self, config, sections = [[E(XTRA, '11/1')]]):
         self._globals = self._slowglobals = dict(
             __name__ = 'pym2149.context',
             tuning = config.tuning,
             mode = 1,
             speed = 16, # XXX: Needed when sections is empty?
-            sections = (),
+            sections = sections,
         )
         self._snapshot = self._globals.copy()
         self._updates = self._slowupdates = {}
