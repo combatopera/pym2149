@@ -10,11 +10,11 @@ class Bass:
         chip.level = 15
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = topitch(degree[frame])
+        chip.tonedegree = degree[frame]
         chip.envflag = True
         if chip.envshape != self.envshape:
             chip.envshape = self.envshape
-        chip.envpitch = topitch((slap[frame].pick(self.envpitches) + degree)[frame])
+        chip.envdegree = (slap[frame].pick(self.envpitches) + degree)[frame]
 
 class Kick:
 
@@ -76,7 +76,7 @@ class Arp2:
     def on(self, frame, chip, degree1, degree2, degree3):
         chip.level = self.level[frame]
         chip.toneflag = True
-        chip.tonepitch = topitch((frame % 3).pick([degree1, degree2, degree3])[frame])
+        chip.tonedegree = (frame % 3).pick([degree1, degree2, degree3])[frame]
 
 class Lead:
 
@@ -98,7 +98,7 @@ class Bright:
     def on(self, frame, chip, degree):
         chip.level = self.level[frame]
         chip.toneflag = True
-        chip.tonepitch = topitch((degree + self.arp)[frame])
+        chip.tonedegree = (degree + self.arp)[frame]
 
 class Luke:
 
@@ -108,7 +108,7 @@ class Luke:
     def on(self, frame, chip, degree, att = V('1')):
         chip.level = att[frame].pick(self.level)[frame]
         chip.toneflag = True
-        chip.tonepitch = topitch((degree + self.arp)[frame])
+        chip.tonedegree = (degree + self.arp)[frame]
 
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'))

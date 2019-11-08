@@ -63,7 +63,8 @@ class ChipRegs:
         self.noisefreqreg = Reg()
         self.noiseperiodreg = Reg().link(clock.noiseperiod, self.noisefreqreg)
         chip.noiseperiod.link(round, self.noiseperiodreg)
-        self.envpitchreg = Reg()
+        self.envdegreereg = Reg()
+        self.envpitchreg = Reg().link(topitch, self.envdegreereg)
         self.envfreqreg = Reg().link(tuning.freq, self.envpitchreg)
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
@@ -74,6 +75,7 @@ class ChipProxy(ExceptionCatcher):
     envshape = regproperty(lambda self: self._chip.envshape)
     envperiod = regproperty(lambda self: self._chipregs.envperiodreg)
     envpitch = regproperty(lambda self: self._chipregs.envpitchreg)
+    envdegree = regproperty(lambda self: self._chipregs.envdegreereg)
     noisefreq = regproperty(lambda self: self._chipregs.noisefreqreg)
     envfreq = regproperty(lambda self: self._chipregs.envfreqreg)
 
