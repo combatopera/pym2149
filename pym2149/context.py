@@ -18,7 +18,7 @@
 from .iface import Context, Config
 from .lc import E, V
 from diapyr import types
-import logging, threading
+import logging, threading, numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -138,5 +138,9 @@ class ContextImpl(Context):
         return [speed * max(pattern.len for pattern in section) for section in sections]
 
     @_cachedproperty
-    def totalframecount(self, sectionframecounts):
-        return sum(sectionframecounts)
+    def cumulativeframecounts(self, sectionframecounts):
+        return np.cumsum(sectionframecounts)
+
+    @property
+    def totalframecount(self):
+        return self.cumulativeframecounts[-1]

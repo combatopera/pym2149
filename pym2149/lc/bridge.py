@@ -24,7 +24,7 @@ from ..util import ExceptionCatcher
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-import logging
+import logging, bisect
 
 log = logging.getLogger(__name__)
 
@@ -148,11 +148,10 @@ class LiveCodingBridge(Prerecorded):
         raise NoSuchSectionException(self.sectionname)
 
     def _sectionandframe(self, frame):
-        while True:
-            for section, k in zip(self.context.sections, self.context.sectionframecounts):
-                if frame < k:
-                    return section, frame
-                frame -= k
+        sectionends = self.context.cumulativeframecounts
+        frame %= sectionends[-1]
+        i = bisect.bisect(sectionends, frame)
+        return self.context.sections[i], frame - (sectionends[i - 1] if i else 0)
 
     def frames(self, chip):
         session = self.Session(chip)
