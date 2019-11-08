@@ -35,7 +35,7 @@ class Boop(CommonDrum):
     def on(self, frame, chip, degree, attenuation = V('0'), np = V('21')):
         if super()._on(frame, chip, np[frame]):
             chip.level -= attenuation[frame]
-            chip.tonepitch = topitch((self.basedegree + degree)[frame])
+            chip.tonedegree = (self.basedegree + degree)[frame]
 
 class Fill(Boop):
 
@@ -56,7 +56,7 @@ class Side:
             chip.toneflag = True
             if chip.noisepriority():
                 chip.noiseperiod = 21
-            chip.tonepitch = topitch(degree[frame])
+            chip.tonedegree = degree[frame]
 
 class Open:
 
@@ -79,7 +79,7 @@ class Bass:
         chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = self.tf[frame]
-        chip.tonepitch = topitch((self.basedegree + degree)[frame])
+        chip.tonedegree = (self.basedegree + degree)[frame]
 
 class Lead:
 
@@ -108,7 +108,7 @@ class Tone:
         chip.level = self.level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = topitch(degree[frame])
+        chip.tonedegree = degree[frame]
 
 class Ping:
 
@@ -118,7 +118,7 @@ class Ping:
         chip.level = velocity[frame].pick(self.levels)[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = topitch(degree[frame])
+        chip.tonedegree = degree[frame]
 
 class Diarp:
 
@@ -126,7 +126,7 @@ class Diarp:
         chip.level = level[frame]
         chip.noiseflag = False
         chip.toneflag = True
-        chip.tonepitch = topitch((degree2 if frame % 8 < 4 else degree1)[frame])
+        chip.tonedegree = (degree2 if frame % 8 < 4 else degree1)[frame]
 
 class Ramp:
 
