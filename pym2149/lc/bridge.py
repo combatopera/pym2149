@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from . import topitch
 from .util import threadlocals
 from ..clock import ClockInfo
 from ..iface import Config, Prerecorded, Tuning, Context
@@ -42,10 +43,12 @@ class ChanProxy:
     toneflag = regproperty(lambda self: self._chip.toneflags[self._chan])
     toneperiod = regproperty(lambda self: self.toneperiodreg)
     tonepitch = regproperty(lambda self: self.tonepitchreg)
+    tonedegree = regproperty(lambda self: self.tonedegreereg)
     envflag = regproperty(lambda self: self._chip.levelmodes[self._chan])
 
     def __init__(self, chip, chan, clock, tuning):
-        self.tonepitchreg = Reg()
+        self.tonedegreereg = Reg()
+        self.tonepitchreg = Reg().link(topitch, self.tonedegreereg)
         self.tonefreqreg = Reg().link(tuning.freq, self.tonepitchreg)
         self.toneperiodreg = Reg().link(clock.toneperiod, self.tonefreqreg)
         chip.toneperiods[chan].link(round, self.toneperiodreg)
