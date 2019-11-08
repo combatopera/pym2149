@@ -33,7 +33,7 @@ class XTRA:
             return
         envflag = self.envflag[frame]
         toneperiod = self.toneperiod[frame]
-        for chan in range(3):
+        for chan in range(min(3, len(chip._chanproxies))):
             chip[chan].toneflag = True
             chip[chan].level = 15
             chip[chan].envflag = envflag
