@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 class XTRA:
 
-    toneperiod = V('4 3 2 1,0').of(6) * V('256') + V('100')
+    toneperiod = V('6 5 4 3,2').of(6) * V('240')
     envflag = V('30x,1')
     mute = False
 
@@ -33,11 +33,11 @@ class XTRA:
             return
         envflag = self.envflag[frame]
         toneperiod = self.toneperiod[frame]
-        for chan in range(2):
+        for chan in range(3):
             chip[chan].toneflag = True
             chip[chan].level = 15
             chip[chan].envflag = envflag
-            chip[chan].toneperiod = toneperiod + chan
+            chip[chan].toneperiod = toneperiod + chan * 2
         if envflag and not self.envflag[frame - 1]:
             chip.envshape = 0
         chip.envperiod = 30 << 8
