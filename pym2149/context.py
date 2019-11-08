@@ -32,16 +32,15 @@ class XTRA:
         if self.mute:
             return
         envflag = self.envflag[frame]
+        toneperiod = self.toneperiod[frame]
         for chan in range(2):
             chip[chan].toneflag = True
             chip[chan].level = 15
             chip[chan].envflag = envflag
+            chip[chan].toneperiod = toneperiod + chan
         if envflag and not self.envflag[frame - 1]:
             chip.envshape = 0
         chip.envperiod = 30 << 8
-        toneperiod = self.toneperiod[frame]
-        chip.toneperiod = toneperiod
-        chip[1].toneperiod = toneperiod + 1
 
     def off(self):
         type(self).mute = True
