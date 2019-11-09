@@ -39,5 +39,8 @@ wholetone = V('0 2 4 6 8 10', step = 12, continuous = True)
 def topitch(degree):
     from .util import local
     c = local.context
-    scale = c.scale >> (1 - c.mode)
-    return c.tonic + float(scale[degree[0] * scale.len + degree[1]] + degree[2])
+    return _topitch(c.scale, c.mode, c.tonic, degree)
+
+def _topitch(scale, mode, tonic, degree):
+    from .parse import rebase
+    return tonic + float((scale << rebase(mode))[degree[0] * scale.len + degree[1]] + degree[2])

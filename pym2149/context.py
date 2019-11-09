@@ -16,7 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Context, Config
-from .lc import E, V
+from .lc import E, V, D, _topitch, major
+from .pitches import E4
 from diapyr import types
 import logging, threading, numpy as np
 
@@ -24,7 +25,7 @@ log = logging.getLogger(__name__)
 
 class XTRA:
 
-    toneperiod = V('6 5 4 3,2').of(6) * V('240')
+    degree = D('-') + D('- 5- 1 5,+').of(6)
     envflag = V('30x,1')
     mute = False
 
@@ -32,12 +33,13 @@ class XTRA:
         if self.mute:
             return
         envflag = self.envflag[frame]
-        toneperiod = self.toneperiod[frame]
+        pitch = _topitch(major, 1, E4, self.degree[frame])
         for chan in range(min(3, len(chip._chanproxies))):
             chip[chan].toneflag = True
             chip[chan].level = 15
             chip[chan].envflag = envflag
-            chip[chan].toneperiod = toneperiod + chan * 2
+            chip[chan].tonepitch = pitch
+            chip[chan].toneperiod += chan * 2
         if envflag and not self.envflag[frame - 1]:
             chip.envshape = 0
         chip.envperiod = 30 << 8
