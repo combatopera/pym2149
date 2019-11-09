@@ -109,8 +109,10 @@ class VParse(Parse):
             lastframe, lastsection = self.sections.at(-1)
             lastsection.wrap((value - lastsection.initial) / (self.sections.len - lastframe))
 
-def vector(d = None):
-    return np.array([0, 0 if d is None else float(d) - 1, 0])
+def vector(dstr = None):
+    def rebase(d):
+        return np.sign(d) * max(0, abs(d) - 1)
+    return np.array([0, 0 if dstr is None else rebase(float(dstr)), 0])
 
 def _flatten(scriptforest):
     for textorseq in scriptforest:
