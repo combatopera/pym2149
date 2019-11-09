@@ -183,15 +183,17 @@ class TestD(unittest.TestCase):
         self.assertEqual([1, 1, 0], list(d[1]))
 
     def test_belowone(self):
-        d = D('2 1 .9 0 -.9 -1 -2 -3')
+        d = D('2 1.125 1 .9 0 -.9 -1 -1.125 -2 -3')
         self.assertEqual([0, 1, 0], list(d[.5]))
-        self.assertEqual([0, 0, 0], list(d[1.5]))
+        self.assertEqual([0, .125, 0], list(d[1.5]))
         self.assertEqual([0, 0, 0], list(d[2.5]))
         self.assertEqual([0, 0, 0], list(d[3.5]))
         self.assertEqual([0, 0, 0], list(d[4.5]))
         self.assertEqual([0, 0, 0], list(d[5.5]))
-        self.assertEqual([0, -1, 0], list(d[6.5]))
-        self.assertEqual([0, -2, 0], list(d[7.5]))
+        self.assertEqual([0, 0, 0], list(d[6.5]))
+        self.assertEqual([0, -.125, 0], list(d[7.5]))
+        self.assertEqual([0, -1, 0], list(d[8.5]))
+        self.assertEqual([0, -2, 0], list(d[9.5]))
 
     def test_inversions(self):
         invs = D('1/1 3/1 1/1 5/1').inversions()
