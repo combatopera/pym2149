@@ -16,36 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Context, Config
-from .lc import E, V, D, _topitch, major
-from .pitches import E4
+from .lc import E
+from .xtra import XTRA
 from diapyr import types
 import logging, threading, numpy as np
 
 log = logging.getLogger(__name__)
-
-class XTRA:
-
-    degree = D('-') + D('- 5- 1 5,+').of(6)
-    envflag = V('30x,1')
-    mute = False
-
-    def on(self, chip, frame):
-        if self.mute:
-            return
-        envflag = self.envflag[frame]
-        pitch = _topitch(major, 1, E4, self.degree[frame])
-        for chan in range(min(3, len(chip._chanproxies))):
-            chip[chan].toneflag = True
-            chip[chan].level = 15
-            chip[chan].envflag = envflag
-            chip[chan].tonepitch = pitch
-            chip[chan].toneperiod += chan * 2
-        if envflag and not self.envflag[frame - 1]:
-            chip.envshape = 0
-        chip.envperiod = 30 << 8
-
-    def off(self):
-        type(self).mute = True
 
 class ContextImpl(Context):
 
