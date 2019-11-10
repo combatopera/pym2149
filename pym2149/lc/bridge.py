@@ -18,13 +18,14 @@
 from . import topitch
 from .util import threadlocals
 from ..clock import ClockInfo
+from ..context import Sections
 from ..iface import Config, Prerecorded, Tuning, Context
 from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher, singleton
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-import logging, bisect, difflib, numpy as np
+import logging, bisect, difflib
 
 log = logging.getLogger(__name__)
 
@@ -164,23 +165,22 @@ class LiveCodingBridge(Prerecorded):
                 if oldspeed != self.context.speed:
                     frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
                 if oldsections != self.context.sections:
-                    frameindex = self.adjustframeindex(oldsections, frameindex)
+                    frameindex = self.adjustframeindex(Sections(self.context.speed, oldsections), frameindex)
 
     def adjustframeindex(self, oldsections, frameindex):
-        oldsectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in oldsections])
-        baseframe = (frameindex // oldsectionends[-1]) * self.context._sections.totalframecount
-        localframe = frameindex % oldsectionends[-1]
-        oldsectionindex = bisect.bisect(oldsectionends, localframe)
-        sectionframe = localframe - (oldsectionends[oldsectionindex - 1] if oldsectionindex else 0)
-        opcodes = difflib.SequenceMatcher(a = oldsections, b = self.context.sections).get_opcodes()
+        baseframe = (frameindex // oldsections.totalframecount) * self.context._sections.totalframecount
+        localframe = frameindex % oldsections.totalframecount
+        oldsectionindex = bisect.bisect(oldsections.sectionends, localframe)
+        sectionframe = localframe - (oldsections.sectionends[oldsectionindex - 1] if oldsectionindex else 0)
+        opcodes = difflib.SequenceMatcher(a = oldsections.sections, b = self.context.sections).get_opcodes()
         @singleton
         def sectionindexandframe():
             for tag, i1, i2, j1, j2 in opcodes:
                 if 'equal' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
                     return j1 + oldsectionindex - i1, sectionframe
             for tag, i1, i2, j1, j2 in opcodes:
-                if 'insert' == tag and oldsections[oldsectionindex] in self.context.sections[j1:j2]:
-                    return j1 + self.context.sections[j1:j2].index(oldsections[oldsectionindex]), sectionframe
+                if 'insert' == tag and oldsections.sections[oldsectionindex] in self.context.sections[j1:j2]:
+                    return j1 + self.context.sections[j1:j2].index(oldsections.sections[oldsectionindex]), sectionframe
             for tag, i1, i2, j1, j2 in opcodes:
                 if 'delete' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
                     return j2, 0
