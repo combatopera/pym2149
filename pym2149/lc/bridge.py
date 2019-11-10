@@ -183,6 +183,6 @@ class LiveCodingBridge(Prerecorded):
                 if 'insert' == tag and oldsection in self.context.sections[j1:j2]:
                     return j1 + self.context.sections[j1:j2].index(oldsection), sectionframe
             for tag, i1, i2, j1, j2 in opcodes:
-                if 'delete' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
-                    return j2, 0
+                if tag in {'delete', 'replace'} and i1 <= oldsectionindex and oldsectionindex < i2:
+                    return j1, 0
         return baseframe + (0 if sectionindexandframe is None else (self.context._sections.startframe(sectionindexandframe[0]) + sectionindexandframe[1]))
