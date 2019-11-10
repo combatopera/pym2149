@@ -19,7 +19,7 @@ from .iface import Context, Config
 from .lc import E
 from .xtra import XTRA
 from diapyr import types
-import logging, threading, numpy as np
+import logging, threading, numpy as np, bisect
 
 log = logging.getLogger(__name__)
 
@@ -120,6 +120,7 @@ class Sections:
     def __init__(self, speed, sections):
         self.sectionframecounts = [speed * max(pattern.len for pattern in section) for section in sections]
         self.cumulativeframecounts = np.cumsum(self.sectionframecounts)
+        self.sections = sections
 
     @property
     def totalframecount(self):
@@ -127,3 +128,8 @@ class Sections:
 
     def startframe(self, sectionindex):
         return self.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
+
+    def sectionandframe(self, frame):
+        frame %= self.cumulativeframecounts[-1]
+        i = bisect.bisect(self.cumulativeframecounts, frame)
+        return self.sections[i], frame - self.startframe(i)

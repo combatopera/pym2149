@@ -146,12 +146,6 @@ class LiveCodingBridge(Prerecorded):
             raise NoSuchSectionException(self.sectionname)
         return self.context._sections.startframe(i)
 
-    def _sectionandframe(self, frame):
-        sectionends = self.context._sections.cumulativeframecounts
-        frame %= sectionends[-1]
-        i = bisect.bisect(sectionends, frame)
-        return self.context.sections[i], frame - self.context._sections.startframe(i)
-
     def frames(self, chip):
         session = self.Session(chip)
         frameindex = self._initialframe() + self.bias
@@ -162,7 +156,7 @@ class LiveCodingBridge(Prerecorded):
                 frame = session._quiet
                 if self.context._sections.totalframecount: # Otherwise freeze until there is something to play.
                     with session.catch('Failed to prepare a frame:'):
-                        frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
+                        frame = partial(session._step, self.context.speed, *self.context._sections.sectionandframe(frameindex))
                         frameindex += 1
                 frame()
                 yield
