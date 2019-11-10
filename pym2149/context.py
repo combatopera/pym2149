@@ -118,18 +118,17 @@ class ContextImpl(Context):
 class Sections:
 
     def __init__(self, speed, sections):
-        self.sectionframecounts = [speed * max(pattern.len for pattern in section) for section in sections]
-        self.cumulativeframecounts = np.cumsum(self.sectionframecounts)
+        self.sectionends = np.cumsum([speed * max(pattern.len for pattern in section) for section in sections])
         self.sections = sections
 
     @property
     def totalframecount(self):
-        return self.cumulativeframecounts[-1]
+        return self.sectionends[-1]
 
     def startframe(self, sectionindex):
-        return self.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
+        return self.sectionends[sectionindex - 1] if sectionindex else 0
 
     def sectionandframe(self, frameindex):
-        localframe = frameindex % self.cumulativeframecounts[-1]
-        i = bisect.bisect(self.cumulativeframecounts, localframe)
+        localframe = frameindex % self.sectionends[-1]
+        i = bisect.bisect(self.sectionends, localframe)
         return self.sections[i], localframe - self.startframe(i)
