@@ -124,3 +124,6 @@ class Sections:
     @property
     def totalframecount(self):
         return self.cumulativeframecounts[-1]
+
+    def startframe(self, sectionindex):
+        return self.cumulativeframecounts[sectionindex - 1] if sectionindex else 0

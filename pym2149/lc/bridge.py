@@ -136,9 +136,6 @@ class LiveCodingBridge(Prerecorded):
                 with proxy.catch("Channel %s update failed:", proxy._letter):
                     pattern.apply(speed, frame, proxy)
 
-    def _startframe(self, sectionindex):
-        return self.context._sections.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
-
     def _initialframe(self):
         if self.sectionname is None:
             return 0
@@ -147,13 +144,13 @@ class LiveCodingBridge(Prerecorded):
             i = self.context.sections.index(section)
         except ValueError:
             raise NoSuchSectionException(self.sectionname)
-        return self._startframe(i)
+        return self.context._sections.startframe(i)
 
     def _sectionandframe(self, frame):
         sectionends = self.context._sections.cumulativeframecounts
         frame %= sectionends[-1]
         i = bisect.bisect(sectionends, frame)
-        return self.context.sections[i], frame - self._startframe(i)
+        return self.context.sections[i], frame - self.context._sections.startframe(i)
 
     def frames(self, chip):
         session = self.Session(chip)
