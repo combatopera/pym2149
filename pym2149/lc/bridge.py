@@ -171,16 +171,17 @@ class LiveCodingBridge(Prerecorded):
         baseframe = (frameindex // oldsections.totalframecount) * self.context._sections.totalframecount
         localframe = frameindex % oldsections.totalframecount
         oldsectionindex = bisect.bisect(oldsections.sectionends, localframe)
-        sectionframe = localframe - (oldsections.sectionends[oldsectionindex - 1] if oldsectionindex else 0)
+        sectionframe = localframe - oldsections.startframe(oldsectionindex)
         opcodes = difflib.SequenceMatcher(a = oldsections.sections, b = self.context.sections).get_opcodes()
         @singleton
         def sectionindexandframe():
             for tag, i1, i2, j1, j2 in opcodes:
                 if 'equal' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
                     return j1 + oldsectionindex - i1, sectionframe
+            oldsection = oldsections.sections[oldsectionindex]
             for tag, i1, i2, j1, j2 in opcodes:
-                if 'insert' == tag and oldsections.sections[oldsectionindex] in self.context.sections[j1:j2]:
-                    return j1 + self.context.sections[j1:j2].index(oldsections.sections[oldsectionindex]), sectionframe
+                if 'insert' == tag and oldsection in self.context.sections[j1:j2]:
+                    return j1 + self.context.sections[j1:j2].index(oldsection), sectionframe
             for tag, i1, i2, j1, j2 in opcodes:
                 if 'delete' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
                     return j2, 0
