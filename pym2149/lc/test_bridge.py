@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .bridge import LiveCodingBridge
+from ..context import Sections
 import unittest
 
 class TestAdjustFrameIndex(unittest.TestCase):
@@ -38,6 +39,10 @@ class TestAdjustFrameIndex(unittest.TestCase):
 
     def adjust(self, *args):
         return self.b.adjustframeindex(self.oldsections, *args)
+
+    @property
+    def _sections(self):
+        return Sections(self.speed, self.sections)
 
     def test_shift(self):
         self.oldsections = self.A, self.C

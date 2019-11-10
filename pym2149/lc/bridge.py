@@ -168,8 +168,7 @@ class LiveCodingBridge(Prerecorded):
 
     def adjustframeindex(self, oldsections, frameindex):
         oldsectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in oldsections])
-        sectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in self.context.sections])
-        baseframe = (frameindex // oldsectionends[-1]) * sectionends[-1]
+        baseframe = (frameindex // oldsectionends[-1]) * self.context._sections.totalframecount
         localframe = frameindex % oldsectionends[-1]
         oldsectionindex = bisect.bisect(oldsectionends, localframe)
         sectionframe = localframe - (oldsectionends[oldsectionindex - 1] if oldsectionindex else 0)
@@ -185,4 +184,4 @@ class LiveCodingBridge(Prerecorded):
             for tag, i1, i2, j1, j2 in opcodes:
                 if 'delete' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
                     return j2, 0
-        return baseframe + (0 if sectionindexandframe is None else ((sectionends[sectionindexandframe[0] - 1] if sectionindexandframe[0] else 0) + sectionindexandframe[1]))
+        return baseframe + (0 if sectionindexandframe is None else (self.context._sections.startframe(sectionindexandframe[0]) + sectionindexandframe[1]))
