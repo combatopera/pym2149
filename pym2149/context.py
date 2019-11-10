@@ -28,7 +28,7 @@ class ContextImpl(Context):
     deleted = object()
 
     @types(Config)
-    def __init__(self, config, sections = [[E(XTRA, '11/1')]]):
+    def __init__(self, config, sections = [(E(XTRA, '11/1'),)]):
         self._globals = self._slowglobals = dict(
             __name__ = 'pym2149.context',
             tuning = config.tuning,

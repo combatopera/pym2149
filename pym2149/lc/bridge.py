@@ -24,7 +24,7 @@ from ..util import ExceptionCatcher
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-import logging, bisect
+import logging, bisect, difflib, numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -161,6 +161,7 @@ class LiveCodingBridge(Prerecorded):
         with threadlocals(context = self.context):
             while self.loop or frameindex < self.context.totalframecount:
                 oldspeed = self.context.speed
+                oldsections = self.context.sections
                 frame = session._quiet
                 if self.context.totalframecount: # Otherwise freeze until there is something to play.
                     with session.catch('Failed to prepare a frame:'):
@@ -171,4 +172,19 @@ class LiveCodingBridge(Prerecorded):
                 self.context._flip()
                 if oldspeed != self.context.speed:
                     frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
-                # TODO: Adjust frameindex when sections changed.
+                if oldsections != self.context.sections:
+                    frameindex = self.adjustframeindex(oldsections, frameindex)
+
+    def adjustframeindex(self, oldsections, frameindex):
+        oldsectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in oldsections])
+        sectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in self.context.sections])
+        iteration = frameindex // oldsectionends[-1]
+        localframe = frameindex % oldsectionends[-1]
+        oldsectionindex = bisect.bisect(oldsectionends, localframe)
+        sectionframe = localframe - (oldsectionends[oldsectionindex - 1] if oldsectionindex else 0)
+        sm = difflib.SequenceMatcher(a = oldsections, b = self.context.sections)
+        for tag, i1, i2, j1, j2 in sm.get_opcodes():
+            if i1 <= oldsectionindex and oldsectionindex < i2 and 'equal' == tag:
+                sectionindex = oldsectionindex - i1 + j1
+                return iteration * sectionends[-1] + (sectionends[sectionindex - 1] if sectionindex else 0) + sectionframe
+        return frameindex
