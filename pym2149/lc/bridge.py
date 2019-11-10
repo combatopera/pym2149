@@ -178,13 +178,17 @@ class LiveCodingBridge(Prerecorded):
     def adjustframeindex(self, oldsections, frameindex):
         oldsectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in oldsections])
         sectionends = np.cumsum([self.context.speed * max(p.len for p in s) for s in self.context.sections])
-        iteration = frameindex // oldsectionends[-1]
+        baseframe = (frameindex // oldsectionends[-1]) * sectionends[-1]
         localframe = frameindex % oldsectionends[-1]
         oldsectionindex = bisect.bisect(oldsectionends, localframe)
         sectionframe = localframe - (oldsectionends[oldsectionindex - 1] if oldsectionindex else 0)
         sm = difflib.SequenceMatcher(a = oldsections, b = self.context.sections)
         for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if i1 <= oldsectionindex and oldsectionindex < i2 and 'equal' == tag:
-                sectionindex = oldsectionindex - i1 + j1
-                return iteration * sectionends[-1] + (sectionends[sectionindex - 1] if sectionindex else 0) + sectionframe
-        return frameindex
+            if 'equal' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
+                sectionindex = j1 + oldsectionindex - i1
+            elif 'insert' == tag and oldsections[oldsectionindex] in self.context.sections[j1:j2]:
+                sectionindex = j1 + self.context.sections[j1:j2].index(oldsections[oldsectionindex])
+            else:
+                continue
+            return baseframe + (sectionends[sectionindex - 1] if sectionindex else 0) + sectionframe
+        return baseframe

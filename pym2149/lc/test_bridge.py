@@ -60,3 +60,10 @@ class TestAdjustFrameIndex(unittest.TestCase):
         self.sections = self.A, self.C
         self.assertEqual(100+60, self.adjust(100+110+60))
         self.assertEqual(100+120+100+60, self.adjust(100+110+120+100+110+60))
+
+    def test_swap(self):
+        self.oldsections = self.A, self.B, self.C
+        self.sections = self.A, self.C, self.B
+        self.assertEqual(50, self.adjust(50))
+        self.assertEqual(100+120+55, self.adjust(100+55))
+        self.assertEqual(100+60, self.adjust(100+110+60))
