@@ -112,12 +112,14 @@ class ContextImpl(Context):
         return property(fget)
 
     @_cachedproperty
-    def sectionframecounts(self, speed, sections):
-        return [speed * max(pattern.len for pattern in section) for section in sections]
+    def _sections(self, speed, sections):
+        return Sections(speed, sections)
 
-    @_cachedproperty
-    def cumulativeframecounts(self, sectionframecounts):
-        return np.cumsum(sectionframecounts)
+class Sections:
+
+    def __init__(self, speed, sections):
+        self.sectionframecounts = [speed * max(pattern.len for pattern in section) for section in sections]
+        self.cumulativeframecounts = np.cumsum(self.sectionframecounts)
 
     @property
     def totalframecount(self):

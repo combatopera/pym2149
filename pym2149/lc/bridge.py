@@ -137,7 +137,7 @@ class LiveCodingBridge(Prerecorded):
                     pattern.apply(speed, frame, proxy)
 
     def _startframe(self, sectionindex):
-        return self.context.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
+        return self.context._sections.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
 
     def _initialframe(self):
         if self.sectionname is None:
@@ -150,7 +150,7 @@ class LiveCodingBridge(Prerecorded):
         return self._startframe(i)
 
     def _sectionandframe(self, frame):
-        sectionends = self.context.cumulativeframecounts
+        sectionends = self.context._sections.cumulativeframecounts
         frame %= sectionends[-1]
         i = bisect.bisect(sectionends, frame)
         return self.context.sections[i], frame - self._startframe(i)
@@ -159,11 +159,11 @@ class LiveCodingBridge(Prerecorded):
         session = self.Session(chip)
         frameindex = self._initialframe() + self.bias
         with threadlocals(context = self.context):
-            while self.loop or frameindex < self.context.totalframecount:
+            while self.loop or frameindex < self.context._sections.totalframecount:
                 oldspeed = self.context.speed
                 oldsections = self.context.sections
                 frame = session._quiet
-                if self.context.totalframecount: # Otherwise freeze until there is something to play.
+                if self.context._sections.totalframecount: # Otherwise freeze until there is something to play.
                     with session.catch('Failed to prepare a frame:'):
                         frame = partial(session._step, self.context.speed, *self._sectionandframe(frameindex))
                         frameindex += 1
