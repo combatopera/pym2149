@@ -26,16 +26,17 @@ class TestAdjustFrameIndex(unittest.TestCase):
         def __init__(self, len):
             self.len = len
 
-    ignoreloop = None
-    section = None
-    chipchannels = None
-    speed = 10
     A = Pattern(10),
     B = Pattern(11),
     C = Pattern(12),
+    speed = 10
 
     def setUp(self):
-        self.b = LiveCodingBridge(self, self, self, self)
+        class Config:
+            ignoreloop = None
+            section = None
+            chipchannels = None
+        self.b = LiveCodingBridge(Config(), None, None, self)
 
     def adjust(self, *args):
         return self.b.adjustframeindex(Sections(self.speed, self.oldsections), *args)
