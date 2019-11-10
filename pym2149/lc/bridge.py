@@ -20,7 +20,7 @@ from .util import threadlocals
 from ..clock import ClockInfo
 from ..iface import Config, Prerecorded, Tuning, Context
 from ..reg import regproperty, Reg
-from ..util import ExceptionCatcher
+from ..util import ExceptionCatcher, singleton
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
@@ -182,13 +182,13 @@ class LiveCodingBridge(Prerecorded):
         localframe = frameindex % oldsectionends[-1]
         oldsectionindex = bisect.bisect(oldsectionends, localframe)
         sectionframe = localframe - (oldsectionends[oldsectionindex - 1] if oldsectionindex else 0)
-        sm = difflib.SequenceMatcher(a = oldsections, b = self.context.sections)
-        for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if 'equal' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
-                sectionindex = j1 + oldsectionindex - i1
-            elif 'insert' == tag and oldsections[oldsectionindex] in self.context.sections[j1:j2]:
-                sectionindex = j1 + self.context.sections[j1:j2].index(oldsections[oldsectionindex])
-            else:
-                continue
-            return baseframe + (sectionends[sectionindex - 1] if sectionindex else 0) + sectionframe
-        return baseframe
+        opcodes = difflib.SequenceMatcher(a = oldsections, b = self.context.sections).get_opcodes()
+        @singleton
+        def sectionindex():
+            for tag, i1, i2, j1, j2 in opcodes:
+                if 'equal' == tag and i1 <= oldsectionindex and oldsectionindex < i2:
+                    return j1 + oldsectionindex - i1
+            for tag, i1, i2, j1, j2 in opcodes:
+                if 'insert' == tag and oldsections[oldsectionindex] in self.context.sections[j1:j2]:
+                    return j1 + self.context.sections[j1:j2].index(oldsections[oldsectionindex])
+        return baseframe + (0 if sectionindex is None else ((sectionends[sectionindex - 1] if sectionindex else 0) + sectionframe))
