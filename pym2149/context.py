@@ -129,7 +129,7 @@ class Sections:
     def startframe(self, sectionindex):
         return self.cumulativeframecounts[sectionindex - 1] if sectionindex else 0
 
-    def sectionandframe(self, frame):
-        frame %= self.cumulativeframecounts[-1]
-        i = bisect.bisect(self.cumulativeframecounts, frame)
-        return self.sections[i], frame - self.startframe(i)
+    def sectionandframe(self, frameindex):
+        localframe = frameindex % self.cumulativeframecounts[-1]
+        i = bisect.bisect(self.cumulativeframecounts, localframe)
+        return self.sections[i], localframe - self.startframe(i)
