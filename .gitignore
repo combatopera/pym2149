@@ -11,3 +11,4 @@ pym2149/native/*.so
 /pym2149.egg-info/
 /setup.cfg
 /setup.py
+/nosetests.xml
