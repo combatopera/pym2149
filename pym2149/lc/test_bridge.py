@@ -37,26 +37,26 @@ class TestAdjustFrameIndex(unittest.TestCase):
         self.b = LiveCodingBridge(self, self, self, self)
 
     def adjust(self, *args):
-        return self.b.adjustframeindex(*args)
+        return self.b.adjustframeindex(self.oldsections, *args)
 
     def test_shift(self):
-        oldsections = self.A, self.C
+        self.oldsections = self.A, self.C
         self.sections = self.A, self.B, self.C
-        self.assertEqual(100+110+60, self.adjust(oldsections, 100+60))
-        self.assertEqual(100+110+120+100+110+60, self.adjust(oldsections, 100+120+100+60))
-        oldsections = self.B, self.C
+        self.assertEqual(100+110+60, self.adjust(100+60))
+        self.assertEqual(100+110+120+100+110+60, self.adjust(100+120+100+60))
+        self.oldsections = self.B, self.C
         self.sections = self.A, self.B, self.C
-        self.assertEqual(100+55, self.adjust(oldsections, 55))
-        self.assertEqual(100+110+60, self.adjust(oldsections, 110+60))
-        self.assertEqual(100+110+120+100+55, self.adjust(oldsections, 110+120+55))
-        self.assertEqual(100+110+120+100+110+60, self.adjust(oldsections, 110+120+110+60))
-        oldsections = self.A, self.B, self.C
+        self.assertEqual(100+55, self.adjust(55))
+        self.assertEqual(100+110+60, self.adjust(110+60))
+        self.assertEqual(100+110+120+100+55, self.adjust(110+120+55))
+        self.assertEqual(100+110+120+100+110+60, self.adjust(110+120+110+60))
+        self.oldsections = self.A, self.B, self.C
         self.sections = self.B, self.C
-        self.assertEqual(55, self.adjust(oldsections, 100+55))
-        self.assertEqual(110+60, self.adjust(oldsections, 100+110+60))
-        self.assertEqual(110+120+55, self.adjust(oldsections, 100+110+120+100+55))
-        self.assertEqual(110+120+110+60, self.adjust(oldsections, 100+110+120+100+110+60))
-        oldsections = self.A, self.B, self.C
+        self.assertEqual(55, self.adjust(100+55))
+        self.assertEqual(110+60, self.adjust(100+110+60))
+        self.assertEqual(110+120+55, self.adjust(100+110+120+100+55))
+        self.assertEqual(110+120+110+60, self.adjust(100+110+120+100+110+60))
+        self.oldsections = self.A, self.B, self.C
         self.sections = self.A, self.C
-        self.assertEqual(100+60, self.adjust(oldsections, 100+110+60))
-        self.assertEqual(100+120+100+60, self.adjust(oldsections, 100+110+120+100+110+60))
+        self.assertEqual(100+60, self.adjust(100+110+60))
+        self.assertEqual(100+120+100+60, self.adjust(100+110+120+100+110+60))
