@@ -44,7 +44,6 @@ def _comparepng(path):
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with tempfile.NamedTemporaryFile() as wavfile:
-        # FIXME: Do not attempt to open any ports!
         subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
