@@ -43,5 +43,5 @@ def topitch(degree):
 
 def _topitch(scale, mode, tonic, degree):
     from .parse import rebase
-    # FIXME: Shouldn't the tonic be adjusted for non-trivial modes?
-    return tonic + float((scale << rebase(mode))[degree[0] * scale.len + degree[1]] + degree[2])
+    mode = rebase(mode)
+    return tonic - scale[mode] + float((scale << mode)[degree[0] * scale.len + degree[1]] + degree[2])

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import V, D, E
+from . import V, D, E, _topitch, major
 from ..util import outerzip
 import unittest
 
@@ -317,3 +317,11 @@ class TestE(unittest.TestCase):
         self.assertEqual(13, s[13.4].absframe)
         self.assertEqual(13.5, s[13.9].absframe)
         self.assertEqual(14, s[14].absframe)
+
+class TestInit(unittest.TestCase):
+
+    def test_modes(self):
+        self.assertEqual([60, 62, 64, 65, 67, 69, 71, 72], [_topitch(major, 1, 60, [0, d, 0]) for d in range(8)])
+        self.assertEqual([60, 62, 63, 65, 67, 69, 70, 72], [_topitch(major, 2, 60, [0, d, 0]) for d in range(8)])
+        self.assertEqual([60, 61, 63, 65, 67, 68, 70, 72], [_topitch(major, 3, 60, [0, d, 0]) for d in range(8)])
+        self.assertEqual([60, 62, 64, 66, 67, 69, 71, 72], [_topitch(major, 4, 60, [0, d, 0]) for d in range(8)])
