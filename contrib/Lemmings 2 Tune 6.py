@@ -1,5 +1,5 @@
-from .lc import V, D, E, naturalminor, unit, topitch
-from .lc.pitches import B3, C2
+from . import V, D, E, naturalminor, unit, topitch
+from .pitches import B3, C2
 
 class CommonDrum:
 

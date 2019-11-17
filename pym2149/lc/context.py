@@ -30,7 +30,7 @@ class ContextImpl(Context):
     @types(Config)
     def __init__(self, config, sections = [(E(XTRA, '11/1'),)]):
         self._globals = self._slowglobals = dict(
-            __name__ = 'pym2149.context',
+            __name__ = 'pym2149.lc.context',
             tuning = config.tuning,
             mode = 1,
             speed = 16, # XXX: Needed when sections is empty?

@@ -1,5 +1,5 @@
-from .lc import V, D, E, naturalminor
-from .lc.pitches import C4
+from . import V, D, E, naturalminor
+from .pitches import C4
 
 class Kick:
 

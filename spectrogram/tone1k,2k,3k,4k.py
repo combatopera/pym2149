@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from . import E, V
 from spectrogram import silence
-from .lc import E, V
 
 class T:
 
