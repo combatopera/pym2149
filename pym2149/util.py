@@ -18,7 +18,6 @@
 from .iface import Config
 from bg import MainBackground
 from diapyr import types
-from contextlib import contextmanager
 import time, logging
 
 log = logging.getLogger(__name__)
@@ -57,15 +56,3 @@ class EMA:
 
 def ceildiv(numerator, denominator):
     return (numerator + denominator - 1) // denominator
-
-@contextmanager
-def catch(obj, *logargs):
-    if not hasattr(obj, '_onfire'):
-        obj._onfire = False
-    try:
-        yield
-        obj._onfire = False
-    except Exception:
-        if not obj._onfire: # TODO: Show error if it has changed.
-            log.exception(*logargs)
-            obj._onfire = True

@@ -16,8 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from contextlib import contextmanager
-import threading
+import threading, logging
 
+log = logging.getLogger(__name__)
 local = threading.local()
 deleted = object()
 
@@ -52,3 +53,15 @@ def outerzip(*iterables):
         if not running:
             break
         yield values
+
+@contextmanager
+def catch(obj, *logargs):
+    if not hasattr(obj, '_onfire'):
+        obj._onfire = False
+    try:
+        yield
+        obj._onfire = False
+    except Exception:
+        if not obj._onfire: # TODO: Show error if it has changed.
+            log.exception(*logargs)
+            obj._onfire = True
