@@ -16,11 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .context import Sections, Context
+from .iface import Config
 from .util import threadlocals
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-from pym2149.iface import Config, Prerecorded
+from pym2149.iface import Prerecorded
 from pym2149.util import ExceptionCatcher, singleton
 import logging, bisect, difflib
 

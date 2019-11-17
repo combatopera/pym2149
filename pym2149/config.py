@@ -22,7 +22,7 @@ from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
 from pathlib import Path
-import sys, logging, numbers, importlib, argparse
+import sys, logging, numbers, importlib, argparse, lurlene
 
 log = logging.getLogger(__name__)
 namespace = 'pym2149'
@@ -146,7 +146,7 @@ class ConfigSubscription(SimpleBackground):
             if config is not None:
                 self.consumer(config)
 
-class ConfigImpl(Config):
+class ConfigImpl(Config, lurlene.iface.Config):
 
     def __init__(self, context):
         self.pRiVaTe = context

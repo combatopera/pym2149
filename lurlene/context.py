@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from . import E
+from .iface import Config
 from .xtra import XTRA
 from diapyr import types
-from pym2149.iface import Config
 import logging, threading, numpy as np, bisect
 
 log = logging.getLogger(__name__)
