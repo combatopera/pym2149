@@ -22,12 +22,12 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.iface import Config
+from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import MainThread
 from pym2149.ymplayer import Player, LogicalBundle
 from diapyr import types
 from diapyr.start import Started
-from lurlene.bridge import LiveCodingBridge
 from lurlene.context import Context
 import lurlene.osc
 
@@ -43,7 +43,7 @@ def main():
     config, di = boot(ConfigName('inpath', '--section'))
     try:
         di.add(loadcontext)
-        di.add(LiveCodingBridge)
+        di.add(LurleneBridge)
         lurlene.osc.configure(di)
         jackclient.configure(di)
         di.add(SyncTimer)

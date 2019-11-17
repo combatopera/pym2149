@@ -21,12 +21,12 @@ from pym2149.initlogging import logging
 from pym2149 import out
 from pym2149.boot import boot
 from pym2149.config import ConfigName
+from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import MainThread
 from pym2149.ymplayer import Player, LogicalBundle
 from lc2jack import loadcontext
 from diapyr.start import Started
-from lurlene.bridge import LiveCodingBridge
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ def main():
     config, di = boot(ConfigName('inpath', '--section', 'outpath'))
     try:
         di.add(loadcontext)
-        di.add(LiveCodingBridge)
+        di.add(LurleneBridge)
         out.configure(di)
         di.add(ChipTimer)
         di.add(LogicalBundle)

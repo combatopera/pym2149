@@ -21,14 +21,13 @@ from .util import threadlocals, catch
 from diapyr import types
 from diapyr.util import innerclass, singleton
 from functools import partial
-from pym2149.iface import Prerecorded
 import logging, bisect, difflib
 
 log = logging.getLogger(__name__)
 
 class NoSuchSectionException(Exception): pass
 
-class LiveCodingBridge(Prerecorded):
+class LiveCodingBridge:
 
     bias = .5 # TODO: Make configurable for predictable swing in odd speed case.
 

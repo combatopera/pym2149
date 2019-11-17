@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .iface import Prerecorded
 from .reg import regproperty, Reg
 from lurlene import topitch
+from lurlene.bridge import LiveCodingBridge
 import logging
 
 log = logging.getLogger(__name__)
@@ -88,3 +90,5 @@ for name in dir(ChanProxy):
     if '_' != name[0]:
         setattr(ChipProxy, name, _convenience(name))
 del name
+
+class LurleneBridge(LiveCodingBridge, Prerecorded): pass
