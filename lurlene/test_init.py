@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from . import V, D, E, _topitch, major
-from pym2149.util import outerzip
+from .util import outerzip
 import unittest
 
 class TestV(unittest.TestCase):
