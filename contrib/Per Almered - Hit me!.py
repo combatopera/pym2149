@@ -1,5 +1,5 @@
 from .lc import V, D, E, major, topitch
-from .pitches import F4
+from .lc.pitches import F4
 
 class Bass:
 

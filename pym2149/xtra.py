@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .lc import V, D, _topitch, major
-from .pitches import E4
+from .lc.pitches import E4
 
 class XTRA:
 
