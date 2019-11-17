@@ -17,8 +17,8 @@
 
 from . import E
 from .xtra import XTRA
-from ..iface import Context, Config
 from diapyr import types
+from pym2149.iface import Context, Config
 import logging, threading, numpy as np, bisect
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class ContextImpl(Context):
     @types(Config)
     def __init__(self, config, sections = [(E(XTRA, '11/1'),)]):
         self._globals = self._slowglobals = dict(
-            __name__ = 'pym2149.lc.context',
+            __name__ = 'lurlene.context',
             tuning = config.tuning,
             mode = 1,
             speed = 16, # XXX: Needed when sections is empty?

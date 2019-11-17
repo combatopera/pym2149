@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..iface import Config, Context
 from bg import SimpleBackground
 from diapyr import types
+from pym2149.iface import Config, Context
 import logging, socket, timelyOSC
 
 log = logging.getLogger(__name__)

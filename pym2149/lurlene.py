@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .lc import topitch
 from .reg import regproperty, Reg
 from .util import ExceptionCatcher
+from lurlene import topitch
 import logging
 
 log = logging.getLogger(__name__)

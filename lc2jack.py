@@ -22,13 +22,13 @@ from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.iface import Config, Context
-from pym2149.lc import osc as lc_osc
-from pym2149.lc.bridge import LiveCodingBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import MainThread
 from pym2149.ymplayer import Player, LogicalBundle
 from diapyr import types
 from diapyr.start import Started
+from lurlene.bridge import LiveCodingBridge
+import lurlene.osc
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ def main():
     try:
         di.add(loadcontext)
         di.add(LiveCodingBridge)
-        lc_osc.configure(di)
+        lurlene.osc.configure(di)
         jackclient.configure(di)
         di.add(SyncTimer)
         di.add(LogicalBundle)

@@ -17,12 +17,12 @@
 
 from . import minblep, pitch
 from .clock import ClockInfo
-from .lc.context import ContextImpl
 from .out import StereoInfo, FloatStream
 from .util import MainThread
 from .vis import RollImpl, NullRoll
 from .ym2149 import YM2149, PhysicalRegisters, LogicalRegisters
 from diapyr import DI
+from lurlene.context import ContextImpl
 import sys
 
 def boot(configname):

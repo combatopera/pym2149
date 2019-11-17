@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..util import singleton
+from pym2149.util import singleton
 
 @singleton
 class __all__(list):

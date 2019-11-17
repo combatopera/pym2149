@@ -17,13 +17,13 @@
 
 from .context import Sections
 from .util import threadlocals
-from ..clock import ClockInfo
-from ..iface import Config, Prerecorded, Tuning, Context
-from ..lurlene import ChipRegs, ChanProxy, ChipProxy
-from ..util import ExceptionCatcher, singleton
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
+from pym2149.clock import ClockInfo
+from pym2149.iface import Config, Prerecorded, Tuning, Context
+from pym2149.lurlene import ChipRegs, ChanProxy, ChipProxy
+from pym2149.util import ExceptionCatcher, singleton
 import logging, bisect, difflib
 
 log = logging.getLogger(__name__)
