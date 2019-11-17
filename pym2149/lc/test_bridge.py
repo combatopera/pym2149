@@ -39,7 +39,7 @@ class TestAdjustFrameIndex(unittest.TestCase):
         self.b = LiveCodingBridge(Config(), None, None, self)
 
     def adjust(self, *args):
-        return self.b.adjustframeindex(Sections(self.speed, self.oldsections), *args)
+        return self.b._adjustframeindex(Sections(self.speed, self.oldsections), *args)
 
     @property
     def _sections(self):

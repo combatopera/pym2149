@@ -165,9 +165,9 @@ class LiveCodingBridge(Prerecorded):
                 if oldspeed != self.context.speed:
                     frameindex = (frameindex - self.bias) / oldspeed * self.context.speed + self.bias
                 if oldsections != self.context.sections:
-                    frameindex = self.adjustframeindex(Sections(self.context.speed, oldsections), frameindex)
+                    frameindex = self._adjustframeindex(Sections(self.context.speed, oldsections), frameindex)
 
-    def adjustframeindex(self, oldsections, frameindex):
+    def _adjustframeindex(self, oldsections, frameindex):
         baseframe = (frameindex // oldsections.totalframecount) * self.context._sections.totalframecount
         localframe = frameindex % oldsections.totalframecount
         oldsectionindex = bisect.bisect(oldsections.sectionends, localframe)
