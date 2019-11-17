@@ -58,16 +58,14 @@ class EMA:
 def ceildiv(numerator, denominator):
     return (numerator + denominator - 1) // denominator
 
-class ExceptionCatcher:
-
-    _onfire = False
-
-    @contextmanager
-    def catch(self, *args):
-        try:
-            yield
-            self._onfire = False
-        except Exception:
-            if not self._onfire: # TODO: Show error if it has changed.
-                log.exception(*args)
-                self._onfire = True
+@contextmanager
+def catch(obj, *logargs):
+    if not hasattr(obj, '_onfire'):
+        obj._onfire = False
+    try:
+        yield
+        obj._onfire = False
+    except Exception:
+        if not obj._onfire: # TODO: Show error if it has changed.
+            log.exception(*logargs)
+            obj._onfire = True

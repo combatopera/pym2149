@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .reg import regproperty, Reg
-from .util import ExceptionCatcher
 from lurlene import topitch
 import logging
 
@@ -63,7 +62,7 @@ class ChipRegs:
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
 
-class ChipProxy(ExceptionCatcher):
+class ChipProxy:
 
     noiseperiod = regproperty(lambda self: self._chipregs.noiseperiodreg)
     envshape = regproperty(lambda self: self._chip.envshape)

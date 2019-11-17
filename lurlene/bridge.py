@@ -22,7 +22,7 @@ from diapyr import types
 from diapyr.util import innerclass, singleton
 from functools import partial
 from pym2149.iface import Prerecorded
-from pym2149.util import ExceptionCatcher
+from pym2149.util import catch
 import logging, bisect, difflib
 
 log = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class LiveCodingBridge(Prerecorded):
         return self.context.speed
 
     @innerclass
-    class Session(ExceptionCatcher):
+    class Session:
 
         def __init__(self, chipproxies):
             self.chipproxies = chipproxies
@@ -59,7 +59,7 @@ class LiveCodingBridge(Prerecorded):
         def _step(self, speed, section, frame):
             self._quiet()
             for proxy, pattern in zip(self.chipproxies, section):
-                with proxy.catch("Channel %s update failed:", proxy._letter):
+                with catch(proxy, "Channel %s update failed:", proxy._letter):
                     pattern.apply(speed, frame, proxy)
 
     def _initialframe(self):
@@ -81,7 +81,7 @@ class LiveCodingBridge(Prerecorded):
                 oldsections = self.context.sections
                 frame = session._quiet
                 if self.context._sections.totalframecount: # Otherwise freeze until there is something to play.
-                    with session.catch('Failed to prepare a frame:'):
+                    with catch(session, 'Failed to prepare a frame:'):
                         frame = partial(session._step, self.context.speed, *self.context._sections.sectionandframe(frameindex))
                         frameindex += 1
                 frame()
