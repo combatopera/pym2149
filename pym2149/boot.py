@@ -22,7 +22,7 @@ from .util import MainThread
 from .vis import RollImpl, NullRoll
 from .ym2149 import YM2149, PhysicalRegisters, LogicalRegisters
 from diapyr import DI
-from lurlene.context import ContextImpl
+from lurlene.context import Context
 import sys
 
 def boot(configname):
@@ -43,7 +43,7 @@ def boot(configname):
     di.add(minblep.loadorcreate)
     di.add(FloatStream)
     pitch.configure(di)
-    di.add(ContextImpl)
+    di.add(Context)
     di.add(RollImpl if config.pianorollenabled else NullRoll)
     di.add(MainThread)
     return config, di

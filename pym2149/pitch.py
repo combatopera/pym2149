@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Config, Tuning, Context
+from .iface import Config, Tuning
 from diapyr import types, DI
+from lurlene.context import Context
 import math, bisect, logging
 
 log = logging.getLogger(__name__)

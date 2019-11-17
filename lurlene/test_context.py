@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .context import ContextImpl
+from .context import Context
 import unittest
 
 class TestContext(unittest.TestCase):
@@ -23,7 +23,7 @@ class TestContext(unittest.TestCase):
     tuning = None
 
     def setUp(self):
-        self.c = ContextImpl(self, ())
+        self.c = Context(self, ())
 
     def test_globals(self):
         self.c._update('''g = 5

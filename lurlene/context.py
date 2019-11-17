@@ -18,12 +18,12 @@
 from . import E
 from .xtra import XTRA
 from diapyr import types
-from pym2149.iface import Context, Config
+from pym2149.iface import Config
 import logging, threading, numpy as np, bisect
 
 log = logging.getLogger(__name__)
 
-class ContextImpl(Context):
+class Context:
 
     deleted = object()
 
