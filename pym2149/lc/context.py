@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Context, Config
-from .lc import E
+from . import E
 from .xtra import XTRA
+from ..iface import Context, Config
 from diapyr import types
 import logging, threading, numpy as np, bisect
 

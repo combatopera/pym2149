@@ -17,7 +17,7 @@
 
 from . import minblep, pitch
 from .clock import ClockInfo
-from .context import ContextImpl
+from .lc.context import ContextImpl
 from .out import StereoInfo, FloatStream
 from .util import MainThread
 from .vis import RollImpl, NullRoll

@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from . import topitch
+from .context import Sections
 from .util import threadlocals
 from ..clock import ClockInfo
-from ..context import Sections
 from ..iface import Config, Prerecorded, Tuning, Context
 from ..reg import regproperty, Reg
 from ..util import ExceptionCatcher, singleton

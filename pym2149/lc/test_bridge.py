@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .bridge import LiveCodingBridge
-from ..context import Sections
+from .context import Sections
 import unittest
 
 class TestAdjustFrameIndex(unittest.TestCase):
