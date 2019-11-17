@@ -19,10 +19,10 @@ from .context import Sections, Context
 from .iface import Config
 from .util import threadlocals
 from diapyr import types
-from diapyr.util import innerclass
+from diapyr.util import innerclass, singleton
 from functools import partial
 from pym2149.iface import Prerecorded
-from pym2149.util import ExceptionCatcher, singleton
+from pym2149.util import ExceptionCatcher
 import logging, bisect, difflib
 
 log = logging.getLogger(__name__)

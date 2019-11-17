@@ -23,10 +23,10 @@ from .minblep import MinBleps
 from .mix import IdealMixer, Multiplexer
 from .nod import Node
 from .shapes import floatdtype
-from .util import singleton
 from .wav import Wave16
 from .ym2149 import YM2149
 from diapyr import types
+from diapyr.util import singleton
 import numpy as np, logging
 
 log = logging.getLogger(__name__)

@@ -17,9 +17,9 @@
 
 from .clock import ClockInfo
 from .iface import Config, Tuning, Roll
-from .util import singleton
 from .ym2149 import LogicalRegisters
 from diapyr import types
+from diapyr.util import singleton
 
 @singleton
 class NullRoll(Roll):

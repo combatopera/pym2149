@@ -23,9 +23,6 @@ import time, logging
 
 log = logging.getLogger(__name__)
 
-def singleton(t):
-    return t()
-
 class MainThread:
 
     @types(Config, MainBackground)

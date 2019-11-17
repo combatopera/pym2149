@@ -19,11 +19,12 @@ from .const import clientname
 from .iface import Config, Stream, Timer
 from .pll import PLL
 from .channels import Channels
-from .util import EMA, singleton
+from .util import EMA
 from .speed import SpeedDetector
 from .native import calsa
 from bg import SimpleBackground, MainBackground
 from diapyr import types
+from diapyr.util import singleton
 import logging, time
 
 log = logging.getLogger(__name__)
