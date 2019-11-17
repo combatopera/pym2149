@@ -27,6 +27,7 @@ projects +=
     splut
     timelyOSC
     pyven
+    Lurlene
 deps +=
     mock
     pyaudio
