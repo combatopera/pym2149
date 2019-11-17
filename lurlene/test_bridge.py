@@ -36,7 +36,7 @@ class TestAdjustFrameIndex(unittest.TestCase):
             ignoreloop = None
             section = None
             chipchannels = None
-        self.b = LiveCodingBridge(Config(), None, None, self)
+        self.b = LiveCodingBridge(Config(), self)
 
     def adjust(self, *args):
         return self.b._adjustframeindex(Sections(self.speed, self.oldsections), *args)

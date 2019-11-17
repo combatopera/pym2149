@@ -20,9 +20,7 @@ from .util import threadlocals
 from diapyr import types
 from diapyr.util import innerclass
 from functools import partial
-from pym2149.clock import ClockInfo
-from pym2149.iface import Config, Prerecorded, Tuning
-from pym2149.lurlene import ChipRegs, ChanProxy, ChipProxy
+from pym2149.iface import Config, Prerecorded
 from pym2149.util import ExceptionCatcher, singleton
 import logging, bisect, difflib
 
@@ -34,13 +32,10 @@ class LiveCodingBridge(Prerecorded):
 
     bias = .5 # TODO: Make configurable for predictable swing in odd speed case.
 
-    @types(Config, ClockInfo, Tuning, Context)
-    def __init__(self, config, clock, tuning, context):
+    @types(Config, Context)
+    def __init__(self, config, context):
         self.loop = not config.ignoreloop
         self.sectionname = config.section
-        self.chancount = config.chipchannels
-        self.clock = clock
-        self.tuning = tuning
         self.context = context
 
     @property
@@ -50,10 +45,8 @@ class LiveCodingBridge(Prerecorded):
     @innerclass
     class Session(ExceptionCatcher):
 
-        def __init__(self, chip):
-            chipregs = ChipRegs(chip, self.clock, self.tuning)
-            chanproxies = [ChanProxy(chip, chan, self.clock, self.tuning) for chan in range(self.chancount)]
-            self.chipproxies = [ChipProxy(chip, chan, chanproxies, chipregs) for chan in range(self.chancount)]
+        def __init__(self, chipproxies):
+            self.chipproxies = chipproxies
 
         def _quiet(self):
             for proxy in self.chipproxies:
@@ -78,8 +71,8 @@ class LiveCodingBridge(Prerecorded):
             raise NoSuchSectionException(self.sectionname)
         return self.context._sections.startframe(i)
 
-    def frames(self, chip):
-        session = self.Session(chip)
+    def frames(self, chipproxies):
+        session = self.Session(chipproxies)
         frameindex = self._initialframe() + self.bias
         with threadlocals(context = self.context):
             while self.loop or frameindex < self.context._sections.totalframecount:
