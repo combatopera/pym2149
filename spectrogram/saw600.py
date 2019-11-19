@@ -22,11 +22,11 @@ class Saw600:
 
     shape = 0x08
 
-    def on(self, chip):
-        chip.envflag = True
-        if chip.envshape != self.shape:
-            chip.envshape = self.shape
-        chip.envfreq = 600
+    def on(self, ym):
+        ym.envflag = True
+        if ym.envshape != self.shape:
+            ym.envshape = self.shape
+        ym.envfreq = 600
 
 sections = [[E(Saw600, '1.5'), silence, silence]]
 speed = 50

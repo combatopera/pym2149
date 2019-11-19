@@ -21,8 +21,8 @@ class Clamping:
 
     level = V('19x-2// 17')
 
-    def on(self, chip, frame):
-        chip.level = self.level[frame]
+    def on(self, ym, frame):
+        ym.level = self.level[frame]
 
 sections = [[E(Clamping, '1')]]
 speed = 20

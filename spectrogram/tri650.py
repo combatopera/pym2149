@@ -22,11 +22,11 @@ class Tri650:
 
     shape = 0x0a
 
-    def on(self, chip):
-        chip.envflag = True
-        if chip.envshape != self.shape:
-            chip.envshape = self.shape
-        chip.envfreq = 650
+    def on(self, ym):
+        ym.envflag = True
+        if ym.envshape != self.shape:
+            ym.envshape = self.shape
+        ym.envfreq = 650
 
 sections = [[E(Tri650, '1.5'), silence, silence]]
 speed = 50

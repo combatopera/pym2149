@@ -20,10 +20,10 @@ from spectrogram import silence
 
 class T:
 
-    def on(self, chip, freq, frame):
-        chip.toneflag = True
-        chip.level = 15
-        chip.tonefreq = freq[frame]
+    def on(self, ym, freq, frame):
+        ym.toneflag = True
+        ym.level = 15
+        ym.tonefreq = freq[frame]
 
 sections = [[E(T, '.25', freq = V('1000 2000 3000 4000').of(.25)), silence, silence]]
 speed = 50

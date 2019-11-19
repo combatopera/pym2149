@@ -22,15 +22,15 @@ class All:
 
     shape = 0x0e
 
-    def on(self, chip):
-        chip.toneflag = True
-        chip.noiseflag = True
-        chip.envflag = True
-        chip.tonefreq = 1000
-        chip.noisefreq = 5000
-        if chip.envshape != self.shape:
-            chip.envshape = self.shape
-        chip.envfreq = 1
+    def on(self, ym):
+        ym.toneflag = True
+        ym.noiseflag = True
+        ym.envflag = True
+        ym.tonefreq = 1000
+        ym.noisefreq = 5000
+        if ym.envshape != self.shape:
+            ym.envshape = self.shape
+        ym.envfreq = 1
 
 sections = [[E(All, '1.5'), silence, silence]]
 speed = 50

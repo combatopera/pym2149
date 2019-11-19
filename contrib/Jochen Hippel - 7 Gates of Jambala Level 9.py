@@ -8,13 +8,13 @@ class Kick:
     tf = V('0,1')
     pitch = V('2x44.01 36 32.01')
 
-    def on(self, frame, chip):
+    def on(self, frame, ym):
         if frame < 4:
-            chip.level = self.level[frame]
-            chip.noiseflag = self.nf[frame]
-            chip.toneflag = self.tf[frame]
-            chip.noiseperiod = 12
-            chip.tonepitch = self.pitch[frame]
+            ym.level = self.level[frame]
+            ym.noiseflag = self.nf[frame]
+            ym.toneflag = self.tf[frame]
+            ym.noiseperiod = 12
+            ym.tonepitch = self.pitch[frame]
 
 class Snare:
 
@@ -24,22 +24,22 @@ class Snare:
     np = V('6x12//,10') << 1
     pitch = V('.02') + V('57 54 52 51') >> 1
 
-    def on(self, frame, chip):
-        chip.level = self.level[frame]
-        chip.toneflag = self.tf[frame]
+    def on(self, frame, ym):
+        ym.level = self.level[frame]
+        ym.toneflag = self.tf[frame]
         if self.nf[frame]:
-            chip.noiseflag = True
-            chip.noiseperiod = self.np[frame]
-        chip.tonepitch = self.pitch[frame]
+            ym.noiseflag = True
+            ym.noiseperiod = self.np[frame]
+        ym.tonepitch = self.pitch[frame]
 
 class Hat:
 
-    def on(self, frame, chip):
+    def on(self, frame, ym):
         if frame < 1:
-            chip.level = 10
-            chip.noiseflag = True
-            chip.toneflag = False
-            chip.noiseperiod = 12
+            ym.level = 10
+            ym.noiseflag = True
+            ym.toneflag = False
+            ym.noiseperiod = 12
 
 class Bass:
 
@@ -47,19 +47,19 @@ class Bass:
     timbre = D('-,--')
     vib = V('5.5x,2x/ 5x1/4 2x-1/') * V('.145') - V('.01')
 
-    def on(self, frame, chip, degree, att, vibshift):
-        chip.level = att[frame].pick(self.levels)[frame]
-        chip.toneflag = True
-        chip.tonedegree = (degree + self.timbre)[frame]
-        chip.tonepitch += (self.vib << vibshift[frame])[frame]
+    def on(self, frame, ym, degree, att, vibshift):
+        ym.level = att[frame].pick(self.levels)[frame]
+        ym.toneflag = True
+        ym.tonedegree = (degree + self.timbre)[frame]
+        ym.tonepitch += (self.vib << vibshift[frame])[frame]
 
 class Simple:
 
-    def on(self, frame, chip, degree):
-        chip.level = self.level[frame]
-        chip.toneflag = True
-        chip.tonedegree = degree[frame]
-        chip.tonepitch += self.vib[frame]
+    def on(self, frame, ym, degree):
+        ym.level = self.level[frame]
+        ym.toneflag = True
+        ym.tonedegree = degree[frame]
+        ym.tonepitch += self.vib[frame]
 
 class Lead(Simple):
 
@@ -76,10 +76,10 @@ class Arp:
     levels = [V('14x13//,6') - V(l) for l in '01']
     chords = D('1 3 5 +').inversions()
 
-    def on(self, frame, chip, degree, inv = V('0'), att = V('0')):
-        chip.level = att[frame].pick(self.levels)[frame]
-        chip.toneflag = True
-        chip.tonedegree = (degree + inv[frame].pick(self.chords))[frame]
+    def on(self, frame, ym, degree, inv = V('0'), att = V('0')):
+        ym.level = att[frame].pick(self.levels)[frame]
+        ym.toneflag = True
+        ym.tonedegree = (degree + inv[frame].pick(self.chords))[frame]
 
 def bass(degree):
     return E(Bass, '1', degree = degree,

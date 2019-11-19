@@ -20,10 +20,10 @@ from spectrogram import silence
 
 class T:
 
-    def on(self, chip, period, frame):
-        chip.toneflag = True
-        chip.level = 15
-        chip.toneperiod = period[frame]
+    def on(self, ym, period, frame):
+        ym.toneflag = True
+        ym.level = 15
+        ym.toneperiod = period[frame]
 
 sections = [[E(T, '.125', period = V('1 2 3 4 5 6 7 8').of(.125)), silence, silence]]
 speed = 50

@@ -21,14 +21,14 @@ from spectrogram import silence
 
 class PWM100:
 
-    def on(self, chip, frame):
-        chip.toneflag = True
-        chip.level = 15
-        chip.tonefreq = 100
+    def on(self, ym, frame):
+        ym.toneflag = True
+        ym.level = 15
+        ym.tonefreq = 100
         if frame < 1:
-            chan = chip[0]._chan
-            timer = chip._chip.timers[chan]
-            timer.effect.value = PWMEffect(chip._chip.fixedlevels[chan])
+            chan = ym[0]._chan
+            timer = ym._chip.timers[chan]
+            timer.effect.value = PWMEffect(ym._chip.fixedlevels[chan])
             timer.freq.value = 101 # Necessarily detune.
 
 sections = [[E(PWM100, '1.5'), silence, silence]]

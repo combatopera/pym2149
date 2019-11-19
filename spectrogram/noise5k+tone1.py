@@ -20,12 +20,12 @@ from spectrogram import silence
 
 class T1N5k:
 
-    def on(self, chip):
-        chip.toneflag = True
-        chip.noiseflag = True
-        chip.level = 15
-        chip.toneperiod = 1
-        chip.noisefreq = 5000
+    def on(self, ym):
+        ym.toneflag = True
+        ym.noiseflag = True
+        ym.level = 15
+        ym.toneperiod = 1
+        ym.noisefreq = 5000
 
 sections = [[E(T1N5k, '1.5'), silence, silence]]
 speed = 50

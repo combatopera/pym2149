@@ -19,10 +19,10 @@ from . import V, E
 
 class Speed:
 
-    def on(self, chip):
-        chip.toneflag = True
-        chip.level = 10
-        chip.tonefreq = 440
+    def on(self, ym):
+        ym.toneflag = True
+        ym.level = 10
+        ym.tonefreq = 440
 
     def off(self, speeds, frame):
         global speed

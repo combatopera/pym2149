@@ -19,7 +19,7 @@ from lurlene import E
 
 class Silence:
 
-    def on(self, chip):
-        chip.level = 13 # Neutral DC.
+    def on(self, ym):
+        ym.level = 13 # Neutral DC.
 
 silence = E(Silence, '1')

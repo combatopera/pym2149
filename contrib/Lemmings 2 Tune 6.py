@@ -5,69 +5,69 @@ class CommonDrum:
 
     level = V('2x15,14')
 
-    def _on(self, frame, chip, np):
+    def _on(self, frame, ym, np):
         if frame < 4:
-            chip.level = self.level[frame]
-            chip.noiseflag = True
-            chip.toneflag = True
-            if chip.noisepriority():
-                chip.noiseperiod = np
+            ym.level = self.level[frame]
+            ym.noiseflag = True
+            ym.toneflag = True
+            if ym.noisepriority():
+                ym.noiseperiod = np
             return True
 
 class Kick(CommonDrum):
 
-    def on(self, frame, chip):
-        if super()._on(frame, chip, 21):
-            chip.tonepitch = C2 - .11
+    def on(self, frame, ym):
+        if super()._on(frame, ym, 21):
+            ym.tonepitch = C2 - .11
 
 class Snare(CommonDrum):
 
     pitch = V('2x60.04 55.06 51.19')
 
-    def on(self, frame, chip):
-        if super()._on(frame, chip, 21):
-            chip.tonepitch = self.pitch[frame]
+    def on(self, frame, ym):
+        if super()._on(frame, ym, 21):
+            ym.tonepitch = self.pitch[frame]
 
 class Boop(CommonDrum):
 
     basedegree = D('++')
 
-    def on(self, frame, chip, degree, attenuation = V('0'), np = V('21')):
-        if super()._on(frame, chip, np[frame]):
-            chip.level -= attenuation[frame]
-            chip.tonedegree = (self.basedegree + degree)[frame]
+    def on(self, frame, ym, degree, attenuation = V('0'), np = V('21')):
+        if super()._on(frame, ym, np[frame]):
+            ym.level -= attenuation[frame]
+            ym.tonedegree = (self.basedegree + degree)[frame]
 
 class Fill(Boop):
 
-    def on(self, frame, chip, degree):
-        chip.level = 0
-        chip.noiseflag = False
-        chip.toneflag = False
-        super().on(frame, chip, degree, np = V('1'))
+    def on(self, frame, ym, degree):
+        ym.level = 0
+        ym.noiseflag = False
+        ym.toneflag = False
+        super().on(frame, ym, degree, np = V('1'))
 
 class Side:
 
     level = V('15//6,12')
 
-    def on(self, frame, chip, degree):
+    def on(self, frame, ym, degree):
         if frame < 8:
-            chip.level = self.level[frame]
-            chip.noiseflag = True
-            chip.toneflag = True
-            if chip.noisepriority():
-                chip.noiseperiod = 21
-            chip.tonedegree = degree[frame]
+            ym.level = self.level[frame]
+            ym.noiseflag = True
+            ym.toneflag = True
+            if ym.noisepriority():
+                ym.noiseperiod = 21
+            ym.tonedegree = degree[frame]
 
 class Open:
 
     level = V('15//6,12')
 
-    def on(self, frame, chip, attenuation = V('0'), np = V('1')):
+    def on(self, frame, ym, attenuation = V('0'), np = V('1')):
         if frame < 8:
-            chip.level = self.level[frame] - attenuation[frame]
-            chip.noiseflag = True
-            chip.toneflag = False
-            chip.noiseperiod = np[frame]
+            ym.level = self.level[frame] - attenuation[frame]
+            ym.noiseflag = True
+            ym.toneflag = False
+            ym.noiseperiod = np[frame]
 
 class Bass:
 
@@ -75,11 +75,11 @@ class Bass:
     tf = V('8x1,0')
     basedegree = D('-')
 
-    def on(self, frame, chip, degree, velocity = V('1')):
-        chip.level = velocity[frame].pick(self.levels)[frame]
-        chip.noiseflag = False
-        chip.toneflag = self.tf[frame]
-        chip.tonedegree = (self.basedegree + degree)[frame]
+    def on(self, frame, ym, degree, velocity = V('1')):
+        ym.level = velocity[frame].pick(self.levels)[frame]
+        ym.noiseflag = False
+        ym.toneflag = self.tf[frame]
+        ym.tonedegree = (self.basedegree + degree)[frame]
 
 class Lead:
 
@@ -87,58 +87,58 @@ class Lead:
     offlevel = V('5x14 13//24,9')
     vibs = V('0'), V('0'), V('8x /3.5,.3/7 -.3/7')
 
-    def _common(self, frame, chip, degree, velocity):
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonepitch = topitch(degree[frame]) + velocity[frame].pick(self.vibs)[frame]
+    def _common(self, frame, ym, degree, velocity):
+        ym.noiseflag = False
+        ym.toneflag = True
+        ym.tonepitch = topitch(degree[frame]) + velocity[frame].pick(self.vibs)[frame]
 
-    def on(self, frame, chip, degree, velocity):
-        self._common(frame, chip, degree, velocity)
-        chip.level = velocity[frame].pick(self.levels)[frame]
+    def on(self, frame, ym, degree, velocity):
+        self._common(frame, ym, degree, velocity)
+        ym.level = velocity[frame].pick(self.levels)[frame]
 
-    def off(self, frame, chip, degree, velocity, onframes):
-        self._common(frame, chip, degree, velocity)
-        chip.level = (self.offlevel >> onframes)[frame]
+    def off(self, frame, ym, degree, velocity, onframes):
+        self._common(frame, ym, degree, velocity)
+        ym.level = (self.offlevel >> onframes)[frame]
 
 class Tone:
 
     level = V('15//15,10')
 
-    def on(self, frame, chip, degree):
-        chip.level = self.level[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonedegree = degree[frame]
+    def on(self, frame, ym, degree):
+        ym.level = self.level[frame]
+        ym.noiseflag = False
+        ym.toneflag = True
+        ym.tonedegree = degree[frame]
 
 class Ping:
 
     levels = V('12//16,8'), V('14//16,10')
 
-    def on(self, frame, chip, degree, velocity):
-        chip.level = velocity[frame].pick(self.levels)[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonedegree = degree[frame]
+    def on(self, frame, ym, degree, velocity):
+        ym.level = velocity[frame].pick(self.levels)[frame]
+        ym.noiseflag = False
+        ym.toneflag = True
+        ym.tonedegree = degree[frame]
 
 class Diarp:
 
-    def on(self, frame, chip, degree1, degree2, level):
-        chip.level = level[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonedegree = (degree2 if frame % 8 < 4 else degree1)[frame]
+    def on(self, frame, ym, degree1, degree2, level):
+        ym.level = level[frame]
+        ym.noiseflag = False
+        ym.toneflag = True
+        ym.tonedegree = (degree2 if frame % 8 < 4 else degree1)[frame]
 
 class Ramp:
 
     level = V('4x15,14')
     tp = (V('-4/4 /4') * V('/128 64')) >> .5
 
-    def on(self, frame, chip, degree):
-        chip.level = self.level[frame]
-        chip.noiseflag = False
-        chip.toneflag = True
-        chip.tonepitch = topitch(degree[frame]) + .06
-        chip.toneperiod += self.tp[frame]
+    def on(self, frame, ym, degree):
+        ym.level = self.level[frame]
+        ym.noiseflag = False
+        ym.toneflag = True
+        ym.tonepitch = topitch(degree[frame]) + .06
+        ym.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
     return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, "3x2 2x|4x 4/%s" % lastoff,
