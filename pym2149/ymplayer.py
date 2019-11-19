@@ -39,7 +39,7 @@ class LogicalBundle(Bundle):
         chipregs = ChipRegs(chip, clock, tuning)
         chanproxies = [ChanProxy(chip, chan, clock, tuning) for chan in chans]
         chipproxies = [ChipProxy(chip, chan, chanproxies, chipregs) for chan in chans]
-        super().__init__(prerecorded, chipproxies)
+        super().__init__(prerecorded, dict(chip = chipproxies))
 
 class PhysicalBundle(Bundle):
 

@@ -75,7 +75,6 @@ class ChipProxy:
     envfreq = regproperty(lambda self: self._chipregs.envfreqreg)
 
     def __init__(self, chip, chan, chanproxies, chipregs):
-        self._letter = chr(ord('A') + chan)
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
         self._chip = chip
         self._chipregs = chipregs
