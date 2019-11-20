@@ -3,6 +3,7 @@
 *.pyc
 pym2149/native/*.pyxbldc
 pym2149/native/*.c
+pym2149/native/*.cpp
 pym2149/native/*.so
 *_turbo/
 *.dsd
