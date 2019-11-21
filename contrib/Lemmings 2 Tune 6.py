@@ -122,11 +122,13 @@ class Ping:
 
 class Diarp:
 
+    whichdegree = V('2 1').of(4)
+
     def on(self, frame, ym, degree1, degree2, level):
         ym.level = level[frame]
         ym.noiseflag = False
         ym.toneflag = True
-        ym.tonedegree = (degree2 if frame % 8 < 4 else degree1)[frame]
+        ym.tonedegree = self.whichdegree[frame].pick([None, degree1, degree2])[frame]
 
 class Ramp:
 
