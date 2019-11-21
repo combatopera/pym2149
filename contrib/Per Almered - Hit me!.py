@@ -18,13 +18,14 @@ class Bass:
 
 class Kick:
 
+    ison = V('8x1,0')
     level = V('13 3x15 13//3 10')
     nf = V('1,0')
     tf = V('0,1')
     pitch = V('2x47 43 40 32 3x24')
 
     def on(self, frame, ym, att = V('0'), np = V('7')):
-        if frame < 8:
+        if self.ison[frame]:
             ym.level = self.level[frame] - att[frame]
             ym.noiseflag = self.nf[frame]
             ym.toneflag = self.tf[frame]
@@ -33,6 +34,7 @@ class Kick:
 
 class Snare:
 
+    ison = V('6x1,0')
     level = V('4x15 13 11'), V('4x14,12'), V('4x13 11 10')
     nf = V('1 3x,1')
     np = V('17,13')
@@ -40,7 +42,7 @@ class Snare:
     pitch = V('64 60 57 55')
 
     def on(self, frame, ym, att = V('0')):
-        if frame < 6:
+        if self.ison[frame]:
             ym.level = att[frame].pick(self.level)[frame]
             ym.noiseflag = self.nf[frame]
             if ym.noisepriority():
