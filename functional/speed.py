@@ -26,7 +26,7 @@ class Speed:
 
     def off(self, speeds, frame):
         global speed
-        if frame >= speed - 1:
+        if V(f"{speed-1}x 1")[frame]:
             speed = speeds[frame]
 
 sections = [[E(Speed, '/.5', speeds = V('20 10 30'))]]
