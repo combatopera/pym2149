@@ -3,13 +3,14 @@ from .pitches import C4
 
 class Kick:
 
+    ison = V('4x1,0')
     level = V('11,13')
     nf = V('1,0')
     tf = V('0,1')
     pitch = V('2x44.01 36 32.01')
 
     def on(self, frame, ym):
-        if frame < 4:
+        if self.ison[frame]:
             ym.level = self.level[frame]
             ym.noiseflag = self.nf[frame]
             ym.toneflag = self.tf[frame]
@@ -34,8 +35,10 @@ class Snare:
 
 class Hat:
 
+    ison = V('1,0')
+
     def on(self, frame, ym):
-        if frame < 1:
+        if self.ison[frame]:
             ym.level = 10
             ym.noiseflag = True
             ym.toneflag = False
