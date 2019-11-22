@@ -74,11 +74,12 @@ class Arp:
 class Arp2:
 
     level = V('2x13 3x12 2x11 6x10,9')
+    whichdegree = V('1 2 3')
 
     def on(self, frame, ym, degree1, degree2, degree3):
         ym.level = self.level[frame]
         ym.toneflag = True
-        ym.tonedegree = (frame % 3).pick([degree1, degree2, degree3])[frame]
+        ym.tonedegree = self.whichdegree[frame].pick({1: degree1, 2: degree2, 3: degree3})[frame]
 
 class Lead:
 
