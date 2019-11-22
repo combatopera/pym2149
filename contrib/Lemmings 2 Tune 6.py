@@ -128,7 +128,7 @@ class Diarp:
         ym.level = level[frame]
         ym.noiseflag = False
         ym.toneflag = True
-        ym.tonedegree = self.whichdegree[frame].pick([None, degree1, degree2])[frame]
+        ym.tonedegree = self.whichdegree[frame].pick({1: degree1, 2: degree2})[frame]
 
 class Ramp:
 
