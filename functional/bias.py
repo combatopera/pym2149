@@ -15,14 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import E
+from . import E, V
 
 class Bias:
+
+    fire = V('5x 1')
 
     def on(self, ym, frame):
         ym.level = 1
         ym.toneflag = True
         ym.toneperiod = frame * 10
+        if self.fire[frame]:
+            global sections
+            sections = [(E(Bias2, '1'),)]
 
-sections = [[E(Bias, '1')]]
-speed = 12
+class Bias2:
+
+    def on(self, ym, frame):
+        ym.level = 2
+        ym.toneflag = True
+        ym.toneperiod = frame * 10
+
+sections = [(E(Bias, '100'),)]
+speed = 6
