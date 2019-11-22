@@ -3,10 +3,11 @@ from .pitches import B3, C2
 
 class CommonDrum:
 
+    ison = V('4x1,0')
     level = V('2x15,14')
 
     def _on(self, frame, ym, np):
-        if frame < 4:
+        if self.ison[frame]:
             ym.level = self.level[frame]
             ym.noiseflag = True
             ym.toneflag = True
@@ -47,10 +48,11 @@ class Fill(Boop):
 
 class Side:
 
+    ison = V('8x1,0')
     level = V('15//6,12')
 
     def on(self, frame, ym, degree):
-        if frame < 8:
+        if self.ison[frame]:
             ym.level = self.level[frame]
             ym.noiseflag = True
             ym.toneflag = True
@@ -60,10 +62,11 @@ class Side:
 
 class Open:
 
+    ison = V('8x1,0')
     level = V('15//6,12')
 
     def on(self, frame, ym, attenuation = V('0'), np = V('1')):
-        if frame < 8:
+        if self.ison[frame]:
             ym.level = self.level[frame] - attenuation[frame]
             ym.noiseflag = True
             ym.toneflag = False
