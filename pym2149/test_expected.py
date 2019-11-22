@@ -34,8 +34,15 @@ def test_expected():
             yield (_comparepng if path.name.endswith(pngsuffix) else _comparetxt), path
 
 def _comparetxt(path):
-    actual = subprocess.check_output([sys.executable, project / 'lc2txt.py', '--ignore-settings',
-            "%s.py" % (project / path.relative_to(expecteddir))], universal_newlines = True)
+    relpath = path.relative_to(expecteddir)
+    configpath = project / relpath.parent / f"{relpath.name}.arid"
+    if configpath.exists():
+        with configpath.open() as f:
+            config = ['--config', f.read()]
+    else:
+        config = []
+    actual = subprocess.check_output([sys.executable, project / 'lc2txt.py', '--ignore-settings'] + config + [
+            project / relpath.parent / f"{relpath.name}.py"], universal_newlines = True)
     with path.open() as f:
         unittest.TestCase().assertEqual(f.read(), actual)
 
@@ -47,7 +54,7 @@ def _comparepng(path):
         subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)]), wavfile.name])
+                project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py", wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
