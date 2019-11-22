@@ -19,7 +19,7 @@ class Bass:
 class Kick:
 
     ison = V('8x1,0')
-    level = V('13 3x15 13//3 10')
+    level = V('13 3x15 3x13// 10')
     nf = V('1,0')
     tf = V('0,1')
     pitch = V('2x47 43 40 32 3x24')
@@ -61,9 +61,9 @@ class Snare2(Snare):
 
 class Arp:
 
-    levels = V('10'), V('14//15 18x9 8 2x7 6//24,0')
+    levels = V('10'), V('15x14// 18x9 8 2x7 24x6//,0')
     chords = D('1 3 5').inversions()
-    vib = V('15.5x,/3 -.4/6 .4/3')
+    vib = V('15.5x,3x/ 6x-.4/ 3x.4/')
 
     def on(self, frame, ym, degree, inv = V('0'), vel = V('1')):
         ym.level = vel[frame].pick(self.levels)[frame]
@@ -86,7 +86,7 @@ class Lead:
     hilevel = V('3x15 14 2x13,12')
     lolevel = V('3x11 3x10,9')
     levels = hilevel, hilevel - V('1'), hilevel - V('2'), V('3x12 11,10'), lolevel, lolevel - V('1'), lolevel - V('2'), lolevel - V('3')
-    vib = V('40.5x,/3 -.4/6 .4/3')
+    vib = V('40.5x,3x/ 6x-.4/ 3x.4/')
 
     def on(self, frame, ym, degree, att = V('0'), vibshift = V('0')):
         ym.level = att[frame].pick(self.levels)[frame]
@@ -95,7 +95,7 @@ class Lead:
 
 class Bright:
 
-    level = V('13 14//4,10')
+    level = V('13 4x14//,10')
     arp = D(['++ + 1'] * 2, '+,1')
 
     def on(self, frame, ym, degree):
@@ -105,7 +105,7 @@ class Bright:
 
 class Luke:
 
-    level = V('12 13 14 12,9'), V('11 12 13 11 9 6 4 2x3 2 1,0'), V('10 11 12 10,8'), V('2x10 11 10,7'), V('2x9 10 9,7'), V('2x8 9 8,6'), V('2x7 8 7,5'), V('6 2x7 6,5'), V('5 2x6 5,4'), V('4 2x5 4,3'), V('3 4x4//4 2,1')
+    level = V('12 13 14 12,9'), V('11 12 13 11 9 6 4 2x3 2 1,0'), V('10 11 12 10,8'), V('2x10 11 10,7'), V('2x9 10 9,7'), V('2x8 9 8,6'), V('2x7 8 7,5'), V('6 2x7 6,5'), V('5 2x6 5,4'), V('4 2x5 4,3'), V('3 4x4// 2,1')
     arp = D('1 +')
 
     def on(self, frame, ym, degree, att = V('1')):
@@ -151,21 +151,21 @@ arp6 = E(Arp2, ['.5/ .5'] * 27, '.5/ .75 3.75/',
         degree2 = D('12x2 4x3|5x3 11x2'),
         degree3 = D('6x5 6x4# 4x5|7x5 4# 3x5 5x4#'))
 lead4 = E(Lead, '2x.75 5/.25 3x.5|2x.75 4.5 2x|1.5 3 .5 4x.25 .5 .25 3x.5 .25 2x.5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 1',
-        degree = D('.75x2 .75x6 .5x+/.5 5x2+ .5x+ 2+/.5 .25x3+ .75x+ 4.5x6 + 6|2x+/.5 3x2+ .25x+ .25x6 .25x5 .25x4 .5x5 .25x4 .5x5 .5x6 .5x4 1.25x2 .25x .5x2 .25x# .5x2# .25x2 .5x3 .25x2# .5x4 .25x3 .5x4# .25x4 .5x5 .25x4# .5x5# .25x5 6'),
+        degree = D('.75x2 .75x6 .5x+/ 5x2+ .5x+ 2+/.5 .25x3+ .75x+ 4.5x6 + 6|2x+/.5 3x2+ .25x+ .25x6 .25x5 .25x4 .5x5 .25x4 .5x5 .5x6 .5x4 1.25x2 .25x .5x2 .25x# .5x2# .25x2 .5x3 .25x2# .5x4 .25x3 .5x4# .25x4 .5x5 .25x4# .5x5# .25x5 6'),
         att = V('16x|10.25x .75x1 .75x2 .75x3 .75x4 .75x5 .75x6 1.25x7'))
 lead5 = E(Bright, '3.75/ .5 .25 .5 .25 3x.5 .25 2x.5|3.75/ .5 .25 .5 .25 .5 .25 .5 .25 .5 3x.25',
         degree = D('4.25x2+ .25x6 .5x+ .25x5 .5x6 .5x4 .5x5 .25x6 .5x5 .5x2|4.5x2+ .5x+ .25x6 .5x5 .25x4 .5x5 .25x6 .5x5 .25x4 .25x2 .25x'))
 lead6 = E(Luke, ['.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 .25 %s 2x.5 .25 .75|.25 2x.5 .25 3x.5 2x.25 .5|.25 2x.5 3x.25 2x.5 .25 .5 .25' % x for x in ['.5', '2x.25']],
         degree = D(['1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 %s 1.25x5 .75x6|1.25x5 .25x2 .5x3 1.25x5 .25x3 .5x2|1.25x5 .25x2 .25x3 .25x5 .5x6# .5x6 .25x5 .5x6 .25x5' % x for x in ['.5x3', '.25x3 .25x2']]))[:-4]
 lead8 = E(Luke, ['62x.25 .5 64x.25'],
-        att = V('30x//30 2x10').of(.25),
+        att = V('30x// 2x10').of(.25),
         degree = D(['2+ 6+ 2++'] * 10, '2+ 6+', ['+ 5+ ++'] * 10, '2x+').of(.25))
 lead9 = E(Lead, ['2x.75 1 3x.5'] * 2, '1.5 6.5|1.5 3 .5 4x.25 2x.75 .5 2x.75 .5 6',
-        degree = D('.35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x6- .35x4b/.35 .4x4 .75x3 6- .35x4b/.35 .15x4 .5x3 .5x4 .75x4/.75 .75x5 6.5x6|1.5x+ .5x+/.5 3x2+ .25x4+ .5x5+ .25x4+ .25x6b+/.25 .5x6+ .75x2++ .5x++ .75x7+ .75x5+ .5x3+ .5x4#+/.5 5.5x6+'),
+        degree = D('.35x4b/ .4x4 .75x3 6- .35x4b/ .15x4 .5x3 .5x6- .35x4b/ .4x4 .75x3 6- .35x4b/ .15x4 .5x3 .5x4 .75x4/ .75x5 6.5x6|1.5x+ .5x+/ 3x2+ .25x4+ .5x5+ .25x4+ .25x6b+/ .5x6+ .75x2++ .5x++ .75x7+ .75x5+ .5x3+ .5x4#+/ 5.5x6+'),
         vibshift = V('9.5x 6.5x34|10x 6x34'))
 luke9 = E(Luke, '12/ 16x.25 12.5/ 14x.25',
         degree = D('48x 4+ 3+ + 6 3+ + 6 4 + 6 4 3 6 4 3 1|50x 3x5+ 6+ 2x5+ 6+ 3x5+ 6+ 2x5+ 6+').of(.25),
-        att = V('48x 15x//15 3|50x 0 6 2x 6 0 6 0 6 2x 8 2x6').of(.25)) # XXX: Express some more elegantly as echo?
+        att = V('48x 15x// 3|50x 0 6 2x 6 0 6 0 6 2x 8 2x6').of(.25)) # XXX: Express some more elegantly as echo?
 A = bass1, kick1, arp1
 B = bass2, kick2 & snare2, arp1
 C = bass3 * 2, kick1 & snare3 & bass3a, arp1
