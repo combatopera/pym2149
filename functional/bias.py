@@ -24,7 +24,7 @@ class Bias:
     def on(self, ym, frame):
         ym.level = 1
         ym.toneflag = True
-        ym.toneperiod = frame * 10
+        ym.toneperiod = 1000 + 10 * frame
         if self.fire[frame]:
             global sections
             sections = [(E(Bias2, '1'),)]
@@ -34,7 +34,7 @@ class Bias2:
     def on(self, ym, frame):
         ym.level = 2
         ym.toneflag = True
-        ym.toneperiod = frame * 10
+        ym.toneperiod = 1000 + 10 * frame
 
 sections = [(E(Bias, '100'),)]
 speed = 6
