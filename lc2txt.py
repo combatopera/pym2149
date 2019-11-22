@@ -31,7 +31,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName('inpath', '--section', '--showperiods', name = 'txt'))
+    config, di = boot(ConfigName('inpath', '--section', name = 'txt'))
     try:
         di.add(loadcontext)
         di.add(LurleneBridge)

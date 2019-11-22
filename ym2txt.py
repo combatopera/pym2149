@@ -30,7 +30,7 @@ from diapyr.start import Started
 log = logging.getLogger(__name__)
 
 def main():
-    config, di = boot(ConfigName('inpath', '--showperiods', name = 'txt'))
+    config, di = boot(ConfigName('inpath', name = 'txt'))
     try:
         di.add(YMOpen)
         txt.configure(di)
