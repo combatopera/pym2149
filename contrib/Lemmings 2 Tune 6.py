@@ -49,7 +49,7 @@ class Fill(Boop):
 class Side:
 
     ison = V('8x1,0')
-    level = V('15//6,12')
+    level = V('6x15//,12')
 
     def on(self, frame, ym, degree):
         if self.ison[frame]:
@@ -63,7 +63,7 @@ class Side:
 class Open:
 
     ison = V('8x1,0')
-    level = V('15//6,12')
+    level = V('6x15//,12')
 
     def on(self, frame, ym, attenuation = V('0'), np = V('1')):
         if self.ison[frame]:
@@ -74,7 +74,7 @@ class Open:
 
 class Bass:
 
-    levels = V('15//6 2x13,0'), V('4x15 4x14,0')
+    levels = V('6x15// 2x13,0'), V('4x15 4x14,0')
     tf = V('8x1,0')
     basedegree = D('-')
 
@@ -87,8 +87,8 @@ class Bass:
 class Lead:
 
     levels = V('4x15 17x14 6x13,12'), V('4x15,14'), V('4x15,14')
-    offlevel = V('5x14 13//24,9')
-    vibs = V('0'), V('0'), V('8x /3.5,.3/7 -.3/7')
+    offlevel = V('5x14 24x13//,9')
+    vibs = V('0'), V('0'), V('8x 3.5x/,7x.3/ 7x-.3/')
 
     def _common(self, frame, ym, degree, velocity):
         ym.noiseflag = False
@@ -105,7 +105,7 @@ class Lead:
 
 class Tone:
 
-    level = V('15//15,10')
+    level = V('15x15//,10')
 
     def on(self, frame, ym, degree):
         ym.level = self.level[frame]
@@ -115,7 +115,7 @@ class Tone:
 
 class Ping:
 
-    levels = V('12//16,8'), V('14//16,10')
+    levels = V('16x12//,8'), V('16x14//,10')
 
     def on(self, frame, ym, degree, velocity):
         ym.level = velocity[frame].pick(self.levels)[frame]
@@ -136,7 +136,7 @@ class Diarp:
 class Ramp:
 
     level = V('4x15,14')
-    tp = (V('-4/4 /4') * V('/128 64')) >> .5
+    tp = (V('4x-4/ 4x/') * V('128x/ 64')) >> .5
 
     def on(self, frame, ym, degree):
         ym.level = self.level[frame]
