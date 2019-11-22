@@ -20,9 +20,9 @@ from . import E
 class Bias:
 
     def on(self, ym, frame):
-        ym.tonepitch = 24 + frame * 2
         ym.level = 1
         ym.toneflag = True
+        ym.toneperiod = frame * 10
 
 sections = [[E(Bias, '1')]]
 speed = 12
