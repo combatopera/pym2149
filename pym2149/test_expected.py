@@ -49,8 +49,10 @@ def _comparetxt(path):
                 '--config', 'local = $global(lurlene.util.local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / f"{relpath.name}.py")])
+    tc = unittest.TestCase()
+    tc.maxDiff = None
     with path.open() as f:
-        unittest.TestCase().assertEqual(f.read(), stream.getvalue())
+        tc.assertEqual(f.read(), stream.getvalue())
 
 def _comparepng(path):
     relpath = path.relative_to(expecteddir)
