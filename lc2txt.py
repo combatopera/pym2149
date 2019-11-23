@@ -27,11 +27,12 @@ from pym2149.util import MainThread
 from pym2149.ymplayer import Player, LogicalBundle
 from lc2jack import loadcontext
 from diapyr.start import Started
+import sys
 
 log = logging.getLogger(__name__)
 
-def main():
-    config, di = boot(ConfigName('inpath', '--section', name = 'txt'))
+def main(args = sys.argv[1:]):
+    config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
     try:
         di.add(loadcontext)
         di.add(LurleneBridge)

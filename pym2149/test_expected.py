@@ -16,10 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .power import batterypower
+from io import StringIO
 from lagoon import sox
+from lurlene.util import threadlocals
 from PIL import Image, ImageChops
 from pathlib import Path
-import subprocess, unittest, sys, tempfile, base64
+import unittest, tempfile, base64, lc2txt, lc2wav
 
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
@@ -41,20 +43,24 @@ def _comparetxt(path):
             config = ['--config', f.read()]
     else:
         config = []
-    actual = subprocess.check_output([sys.executable, project / 'lc2txt.py', '--ignore-settings'] + config + [
-            project / relpath.parent / f"{relpath.name}.py"], universal_newlines = True)
+    stream = StringIO()
+    with threadlocals(stream = stream):
+        lc2txt.main(['--ignore-settings'] + config + [
+                '--config', 'local = $global(lurlene.util.local)',
+                '--config', 'rollstream = $py[config.local.stream]',
+                str(project / relpath.parent / f"{relpath.name}.py")])
     with path.open() as f:
-        unittest.TestCase().assertEqual(f.read(), actual)
+        unittest.TestCase().assertEqual(f.read(), stream.getvalue())
 
 def _comparepng(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with tempfile.NamedTemporaryFile() as wavfile:
-        subprocess.check_call([sys.executable, project / 'lc2wav.py', '--ignore-settings',
+        lc2wav.main(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py", wavfile.name])
+                str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
