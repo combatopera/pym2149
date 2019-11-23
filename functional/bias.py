@@ -39,7 +39,7 @@ class Bias2:
         ym.toneperiod = 1000 + 10 * frame
         if self.fire[frame]:
             global speed
-            speed = 7
+            speed = 7 # The next frame will be 7.5 as we assume 6.5 has happened.
 
 sections = [(E(Bias, '100'),)]
 speed = 6
