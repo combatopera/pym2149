@@ -19,6 +19,7 @@ cdef extern from "resid/sid.h":
 
     cdef cppclass SID:
         SID()
+        void write(unsigned, unsigned)
 
 cdef class NativeSID:
 
