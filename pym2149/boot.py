@@ -17,6 +17,7 @@
 
 from . import minblep, pitch
 from .clock import ClockInfo
+from .lurlene import YM2149Chip
 from .out import StereoInfo, FloatStream
 from .util import MainThread
 from .vis import RollImpl, NullRoll
@@ -46,4 +47,5 @@ def boot(configname):
     di.add(Context)
     di.add(RollImpl if config.pianorollenabled else NullRoll)
     di.add(MainThread)
+    di.add(YM2149Chip)
     return config, di

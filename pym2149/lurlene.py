@@ -15,8 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Prerecorded
+from .clock import ClockInfo
+from .iface import Prerecorded, Chip, Tuning, Config
 from .reg import regproperty, Reg
+from .ym2149 import LogicalRegisters
+from diapyr import types
 from lurlene import topitch
 from lurlene.bridge import LiveCodingBridge
 import logging
@@ -89,5 +92,16 @@ for name in dir(ChanProxy):
     if '_' != name[0]:
         setattr(ChipProxy, name, _convenience(name))
 del name
+
+class YM2149Chip(Chip):
+
+    param = 'ym'
+
+    @types(Config, LogicalRegisters, ClockInfo, Tuning)
+    def __init__(self, config, chip, clock, tuning):
+        chans = range(config.chipchannels)
+        chipregs = ChipRegs(chip, clock, tuning)
+        chanproxies = [ChanProxy(chip, chan, clock, tuning) for chan in chans]
+        self.channels = [ChipProxy(chip, chan, chanproxies, chipregs) for chan in chans]
 
 class LurleneBridge(LiveCodingBridge, Prerecorded): pass

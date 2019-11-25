@@ -34,3 +34,5 @@ class Tuning: pass
 class Roll: pass
 
 class Timer: pass
+
+class Chip: pass
