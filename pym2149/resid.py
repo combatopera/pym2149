@@ -15,6 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .native import resid
+from .iface import Chip
+from .native.resid import NativeSID
+from diapyr import types
 
-SID = resid._SID
+class Channel: pass
+
+class SIDChip(Chip):
+
+    param = 'sid'
+
+    @types()
+    def __init__(self):
+        self.sid = NativeSID()
+        self.channels = [Channel() for _ in range(3)]
+
+def configure(di):
+    di.add(SIDChip)

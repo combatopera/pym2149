@@ -48,4 +48,7 @@ def boot(configname):
     di.add(RollImpl if config.pianorollenabled else NullRoll)
     di.add(MainThread)
     di.add(YM2149Chip)
+    if config['SID', 'enabled'].value:
+        from . import resid
+        resid.configure(di)
     return config, di

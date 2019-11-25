@@ -177,3 +177,6 @@ meantonecomma = .25
 
 showperiods = false
 : If true, show periods in visualisation instead of MIDI notes.
+
+SID enabled = false
+: If true, integrate with reSID shared library.

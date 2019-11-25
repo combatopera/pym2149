@@ -20,6 +20,6 @@ cdef extern from "resid/sid.h":
     cdef cppclass SID:
         SID()
 
-cdef class _SID:
+cdef class NativeSID:
 
     cdef SID sid
