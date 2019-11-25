@@ -21,13 +21,13 @@ from diapyr import types
 
 class Channel: pass
 
-class SIDChip(Chip):
+class SIDChip(NativeSID, Chip):
 
     param = 'sid'
 
     @types()
     def __init__(self):
-        self.sid = NativeSID()
+        super().__init__()
         self.channels = [Channel() for _ in range(3)]
 
 def configure(di):
