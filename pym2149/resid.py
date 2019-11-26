@@ -21,6 +21,9 @@ from .native.resid import NativeSID
 from .reg import regproperty, Reg
 from diapyr import types
 
+PAL = 4.43361875e6 * 4 / 18
+NTSC = 3.579545e6 * 4 / 14
+
 class ChanProxy:
 
     control = regproperty(lambda self: self.controlreg)

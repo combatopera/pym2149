@@ -180,3 +180,6 @@ showperiods = false
 
 SID enabled = false
 : If true, integrate with reSID shared library.
+
+SID clock = $global(.resid.PAL)
+: The clock to use for reSID.
