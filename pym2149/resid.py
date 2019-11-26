@@ -19,7 +19,7 @@ from .iface import Chip
 from .native.resid import NativeSID
 from diapyr import types
 
-class Channel: pass
+class ChipProxy: pass
 
 class SIDChip(NativeSID, Chip):
 
@@ -28,7 +28,7 @@ class SIDChip(NativeSID, Chip):
     @types()
     def __init__(self):
         super().__init__() # XXX: Necessary?
-        self.channels = [Channel() for _ in range(3)]
+        self.channels = [ChipProxy() for _ in range(3)]
 
 def configure(di):
     di.add(SIDChip)
