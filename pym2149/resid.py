@@ -27,7 +27,7 @@ class SIDChip(NativeSID, Chip):
 
     @types()
     def __init__(self):
-        super().__init__()
+        super().__init__() # XXX: Necessary?
         self.channels = [Channel() for _ in range(3)]
 
 def configure(di):
