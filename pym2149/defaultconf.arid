@@ -166,7 +166,7 @@ PortAudio
     ringsize = $(jackringsize)
     coupling = $(jackcoupling)
 
-tuning = $global(pym2149.pitch.EqualTemperament)
+tuning = $global(.pitch.EqualTemperament)
 : The mapping between MIDI note and frequency, other options include Meantone and FiveLimit.
 
 meantoneflats = 2
