@@ -36,13 +36,13 @@ class ChanProxy:
         self.pitchreg = Reg().link(topitch, self.degreereg)
         self.freqreg = Reg().link(tuning.freq, self.pitchreg)
         self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
-        Reg.link(nativeregs[chan * 7], lambda value: value & 0xff, self.fnreg)
-        Reg.link(nativeregs[chan * 7 + 1], lambda value: value >> 8, self.fnreg)
+        Reg.link(nativeregs[chan * 7], lambda fn: fn & 0xff, self.fnreg)
+        Reg.link(nativeregs[chan * 7 + 1], lambda fn: fn >> 8, self.fnreg)
         self.controlreg = Reg()
-        Reg.link(nativeregs[chan * 7 + 4], lambda value: value & 0xff, self.controlreg)
+        Reg.link(nativeregs[chan * 7 + 4], lambda control: control & 0xff, self.controlreg)
         self.adsrreg = Reg()
-        Reg.link(nativeregs[chan * 7 + 5], lambda value: (value >> 8) & 0xff, self.adsrreg)
-        Reg.link(nativeregs[chan * 7 + 6], lambda value: value & 0xff, self.adsrreg)
+        Reg.link(nativeregs[chan * 7 + 5], lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
+        Reg.link(nativeregs[chan * 7 + 6], lambda adsr: adsr & 0xff, self.adsrreg)
 
 @convenient(ChanProxy)
 class ChipProxy:
