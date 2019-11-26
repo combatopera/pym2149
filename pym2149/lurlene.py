@@ -33,6 +33,14 @@ def _convenience(name):
         setattr(self._chanproxies[0], name, value)
     return property(fget, fset)
 
+def convenient(sourcecls):
+    def f(targetcls):
+        for name in dir(sourcecls):
+            if '_' != name[0]:
+                setattr(targetcls, name, _convenience(name))
+        return targetcls
+    return f
+
 class ChanProxy:
 
     tonefreq = regproperty(lambda self: self.tonefreqreg)
@@ -67,6 +75,7 @@ class ChipRegs:
         self.envperiodreg = Reg().link(lambda f, s: clock.envperiod(f, s), self.envfreqreg, chip.envshape)
         chip.envperiod.link(round, self.envperiodreg)
 
+@convenient(ChanProxy)
 class ChipProxy:
 
     noiseperiod = regproperty(lambda self: self._chipregs.noiseperiodreg)
@@ -87,11 +96,6 @@ class ChipProxy:
 
     def noisepriority(self):
         return not any(chan.noiseflag for chan in self._chanproxies[1:])
-
-for name in dir(ChanProxy):
-    if '_' != name[0]:
-        setattr(ChipProxy, name, _convenience(name))
-del name
 
 class YM2149Chip(Chip):
 
