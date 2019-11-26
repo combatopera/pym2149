@@ -24,3 +24,6 @@ cdef extern from "resid/sid.h":
 cdef class NativeSID:
 
     cdef SID sid
+
+    def write(self, regindex, value):
+        self.sid.write(regindex, value)
