@@ -24,10 +24,14 @@ from diapyr import types
 class ChanProxy:
 
     control = regproperty(lambda self: self.controlreg)
+    adsr = regproperty(lambda self: self.adsrreg)
 
     def __init__(self, nativeregs, chan):
         self.controlreg = Reg()
-        Reg.link(nativeregs[chan * 7 + 4], lambda value: max(0, min(0xff, round(value))), self.controlreg)
+        Reg.link(nativeregs[chan * 7 + 4], lambda value: value & 0xff, self.controlreg)
+        self.adsrreg = Reg()
+        Reg.link(nativeregs[chan * 7 + 5], lambda value: (value >> 8) & 0xff, self.adsrreg)
+        Reg.link(nativeregs[chan * 7 + 6], lambda value: value & 0xff, self.adsrreg)
 
 @convenient(ChanProxy)
 class ChipProxy:
