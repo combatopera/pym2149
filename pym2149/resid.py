@@ -15,21 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Chip
+from .iface import Chip, Config, Tuning
 from .lurlene import convenient
 from .native.resid import NativeSID
 from .reg import regproperty, Reg
 from diapyr import types
+from lurlene import topitch
 
 PAL = 4.43361875e6 * 4 / 18
 NTSC = 3.579545e6 * 4 / 14
 
 class ChanProxy:
 
+    degree = regproperty(lambda self: self.degreereg)
     control = regproperty(lambda self: self.controlreg)
     adsr = regproperty(lambda self: self.adsrreg)
 
-    def __init__(self, nativeregs, chan):
+    def __init__(self, nativeregs, chan, fclk, tuning):
+        self.degreereg = Reg()
+        self.pitchreg = Reg().link(topitch, self.degreereg)
+        self.freqreg = Reg().link(tuning.freq, self.pitchreg)
+        self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
+        Reg.link(nativeregs[chan * 7], lambda value: value & 0xff, self.fnreg)
+        Reg.link(nativeregs[chan * 7 + 1], lambda value: value >> 8, self.fnreg)
         self.controlreg = Reg()
         Reg.link(nativeregs[chan * 7 + 4], lambda value: value & 0xff, self.controlreg)
         self.adsrreg = Reg()
@@ -60,12 +68,13 @@ class SIDChip(Chip):
 
     param = 'sid'
 
-    @types()
-    def __init__(self):
+    @types(Config, Tuning)
+    def __init__(self, config, tuning):
+        fclk = config.SID['clock']
         nativesid = NativeSID()
         nativeregs = [self.NativeReg(nativesid, index) for index in range(0x19)]
         chans = range(3)
-        chanproxies = [ChanProxy(nativeregs, chan) for chan in chans]
+        chanproxies = [ChanProxy(nativeregs, chan, fclk, tuning) for chan in chans]
         self.channels = [ChipProxy(chan, chanproxies) for chan in chans]
 
 def configure(di):
