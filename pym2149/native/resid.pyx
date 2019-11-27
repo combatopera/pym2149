@@ -15,15 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+cdef extern from "resid/siddefs.h":
+
+    ctypedef unsigned reg8
+    ctypedef int cycle_count
+
 cdef extern from "resid/sid.h":
 
     cdef cppclass SID:
         SID()
-        void write(unsigned, unsigned)
+        int clock(cycle_count& delta_t, short* buf, int n)
+        void write(reg8 offset, reg8 value)
 
 cdef class NativeSID:
 
     cdef SID sid
 
-    def write(self, regindex, value):
-        self.sid.write(regindex, value)
+    def write(self, offset, value):
+        self.sid.write(offset, value)
