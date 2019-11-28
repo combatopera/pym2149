@@ -69,33 +69,33 @@ class StereoInfo:
 
 class WavWriter(Stream, Node, metaclass = AmpScale):
 
-  log2maxpeaktopeak = 16
+    log2maxpeaktopeak = 16
 
-  @types(Config, Multiplexed, StereoInfo, Platform)
-  def __init__(self, config, wav, stereoinfo, platform):
-    super().__init__()
-    fclass = Wave16
-    self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
-    self.roundmaster = MasterBuf(dtype = floatdtype)
-    self.wavmaster = MasterBuf(dtype = fclass.dtype)
-    self.wav = wav
+    @types(Config, Multiplexed, StereoInfo, Platform)
+    def __init__(self, config, wav, stereoinfo, platform):
+        super().__init__()
+        fclass = Wave16
+        self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
+        self.roundmaster = MasterBuf(dtype = floatdtype)
+        self.wavmaster = MasterBuf(dtype = fclass.dtype)
+        self.wav = wav
 
-  def start(self):
-    self.f = self.open()
+    def start(self):
+        self.f = self.open()
 
-  def callimpl(self):
-    outbuf = self.chain(self.wav)
-    roundbuf = self.roundmaster.ensureandcrop(len(outbuf))
-    wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
-    np.around(outbuf.buf, out = roundbuf.buf)
-    wavbuf.buf[:] = roundbuf.buf
-    self.f.block(wavbuf)
+    def callimpl(self):
+        outbuf = self.chain(self.wav)
+        roundbuf = self.roundmaster.ensureandcrop(len(outbuf))
+        wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
+        np.around(outbuf.buf, out = roundbuf.buf)
+        wavbuf.buf[:] = roundbuf.buf
+        self.f.block(wavbuf)
 
-  def flush(self):
-    self.f.flush()
+    def flush(self):
+        self.f.flush()
 
-  def stop(self):
-    self.f.close()
+    def stop(self):
+        self.f.close()
 
 class StaticOutChannel(Node):
 
