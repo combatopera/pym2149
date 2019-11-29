@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+cimport numpy as np
+
 cdef extern from "resid/siddefs.h":
 
     ctypedef unsigned reg8
@@ -31,5 +33,9 @@ cdef class NativeSID:
 
     cdef SID sid
 
-    def write(self, offset, value):
+    def write(self, reg8 offset, reg8 value):
         self.sid.write(offset, value)
+
+    def clock(self, np.ndarray[short] buf, int n):
+        cdef cycle_count delta_t = 0x7fffffff
+        return self.sid.clock(delta_t, &buf[0], n)
