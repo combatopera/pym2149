@@ -55,6 +55,9 @@ class ChipProxy:
 
 class SID(NativeSID):
 
+    chancount = 3
+    regcount = chancount * 7 + 4
+
     @types()
     def __init__(self):
         super().__init__()
@@ -65,22 +68,21 @@ class SIDChip(Chip):
 
         idle = True # No downstream links so always idle.
 
-        def __init__(self, nativesid, index):
-            self.nativesid = nativesid
+        def __init__(self, sid, index):
+            self.sid = sid
             self.index = index
 
         def set(self, value):
-            self.nativesid.write(self.index, value)
+            self.sid.write(self.index, value)
 
     param = 'sid'
 
     @types(Config, Tuning, SID)
     def __init__(self, config, tuning, sid):
         fclk = config.SID['clock']
-        sidregs = [self.SIDReg(sid, index) for index in range(0x19)]
-        chans = range(3)
-        chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in chans]
-        self.channels = [ChipProxy(chan, chanproxies) for chan in chans]
+        sidregs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+        chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in range(sid.chancount)]
+        self.channels = [ChipProxy(chan, chanproxies) for chan in range(sid.chancount)]
 
 def configure(di):
     di.add(SID)
