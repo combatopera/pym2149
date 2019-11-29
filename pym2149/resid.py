@@ -31,18 +31,18 @@ class ChanProxy:
     control = regproperty(lambda self: self.controlreg)
     adsr = regproperty(lambda self: self.adsrreg)
 
-    def __init__(self, nativeregs, chan, fclk, tuning):
+    def __init__(self, sidregs, chan, fclk, tuning):
         self.degreereg = Reg()
         self.pitchreg = Reg().link(topitch, self.degreereg)
         self.freqreg = Reg().link(tuning.freq, self.pitchreg)
         self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
-        Reg.link(nativeregs[chan * 7], lambda fn: fn & 0xff, self.fnreg)
-        Reg.link(nativeregs[chan * 7 + 1], lambda fn: fn >> 8, self.fnreg)
+        Reg.link(sidregs[chan * 7], lambda fn: fn & 0xff, self.fnreg)
+        Reg.link(sidregs[chan * 7 + 1], lambda fn: fn >> 8, self.fnreg)
         self.controlreg = Reg()
-        Reg.link(nativeregs[chan * 7 + 4], lambda control: control & 0xff, self.controlreg)
+        Reg.link(sidregs[chan * 7 + 4], lambda control: control & 0xff, self.controlreg)
         self.adsrreg = Reg()
-        Reg.link(nativeregs[chan * 7 + 5], lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
-        Reg.link(nativeregs[chan * 7 + 6], lambda adsr: adsr & 0xff, self.adsrreg)
+        Reg.link(sidregs[chan * 7 + 5], lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
+        Reg.link(sidregs[chan * 7 + 6], lambda adsr: adsr & 0xff, self.adsrreg)
 
 @convenient(ChanProxy)
 class ChipProxy:
@@ -53,9 +53,15 @@ class ChipProxy:
     def __getitem__(self, index):
         return self._chanproxies[index]
 
+class SID(NativeSID):
+
+    @types()
+    def __init__(self):
+        super().__init__()
+
 class SIDChip(Chip):
 
-    class NativeReg:
+    class SIDReg:
 
         idle = True # No downstream links so always idle.
 
@@ -68,14 +74,14 @@ class SIDChip(Chip):
 
     param = 'sid'
 
-    @types(Config, Tuning)
-    def __init__(self, config, tuning):
+    @types(Config, Tuning, SID)
+    def __init__(self, config, tuning, sid):
         fclk = config.SID['clock']
-        nativesid = NativeSID()
-        nativeregs = [self.NativeReg(nativesid, index) for index in range(0x19)]
+        sidregs = [self.SIDReg(sid, index) for index in range(0x19)]
         chans = range(3)
-        chanproxies = [ChanProxy(nativeregs, chan, fclk, tuning) for chan in chans]
+        chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in chans]
         self.channels = [ChipProxy(chan, chanproxies) for chan in chans]
 
 def configure(di):
+    di.add(SID)
     di.add(SIDChip)
