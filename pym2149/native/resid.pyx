@@ -36,6 +36,6 @@ cdef class NativeSID:
     def write(self, reg8 offset, reg8 value):
         self.sid.write(offset, value)
 
-    def clock(self, np.ndarray[short] buf, int n):
+    def clock(self, np.ndarray[short] buf):
         cdef cycle_count delta_t = 0x7fffffff
-        return self.sid.clock(delta_t, &buf[0], n)
+        return self.sid.clock(delta_t, &buf[0], len(buf))
