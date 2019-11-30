@@ -15,12 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .buf import MasterBuf
 from .iface import Chip, Config, Tuning
 from .lurlene import convenient
 from .native.resid import NativeSID
+from .nod import BufNode
+from .out import Translator
 from .reg import regproperty, Reg
+from .shapes import floatdtype
 from diapyr import types
 from lurlene import topitch
+import numpy as np
 
 PAL = 4.43361875e6 * 4 / 18
 NTSC = 3.579545e6 * 4 / 14
@@ -57,10 +62,30 @@ class SID(NativeSID):
 
     chancount = 3
     regcount = chancount * 7 + 4
+    log2maxpeaktopeak = 16
 
     @types()
     def __init__(self):
         super().__init__()
+
+class SIDBuf(Node):
+
+    def __init__(self, clockinfo, ampscale, sid, minbleps):
+        super().__init__()
+        self.translator = Translator(clockinfo, minbleps)
+        self.shortmaster = MasterBuf(np.short)
+        self.outmaster = MasterBuf(floatdtype)
+        self.ampscale = 2 ** (ampscale.log2maxpeaktopeak - sid.log2maxpeaktopeak)
+        self.sid = sid
+
+    def callimpl(self):
+        _, outcount = self.translator.step(self.block.framecount)
+        shortbuf = self.shortmaster.ensureandcrop(outcount)
+        self.sid.clock(shortbuf.buf)
+        outbuf = self.outmaster.ensureandcrop(outcount)
+        outbuf.copybuf(shortbuf)
+        outbuf.mul(self.ampscale)
+        return outbuf
 
 class SIDChip(Chip):
 
@@ -86,4 +111,5 @@ class SIDChip(Chip):
 
 def configure(di):
     di.add(SID)
+    di.add(SIDBuf)
     di.add(SIDChip)
