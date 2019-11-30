@@ -53,7 +53,7 @@ class ChanProxy:
         self.pwnreg = Reg().link(lambda pwout: max(0, min(0xfff, round(pwout * 40.95))), self.pulsewidthreg)
         sidregs[chan, 2].link(lambda pwn: pwn & 0xff, self.pwnreg)
         sidregs[chan, 3].link(lambda pwn: pwn >> 8, self.pwnreg)
-        self.controlreg = Reg(value = 0)
+        self.controlreg = Reg(0)
         sidregs[chan, 4].link(lambda control: control & 0xff, self.controlreg)
         self.pulsereg = Reg()
         self.controlreg.mlink(0x40, lambda b: -b, self.pulsereg)
@@ -69,6 +69,7 @@ class ChanProxy:
 class ChipProxy:
 
     modevol = regproperty(lambda self: self._sidregs.modevolreg)
+    volume = regproperty(lambda self: self._sidregs.volumereg)
 
     def __init__(self, chan, chanproxies, sidregs):
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
@@ -132,8 +133,10 @@ class SIDRegs:
 
     def __init__(self, sid):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
-        self.modevolreg = Reg()
+        self.modevolreg = Reg(0)
         self.regs[0x18].link(lambda modevol: modevol & 0xff, self.modevolreg)
+        self.volumereg = Reg()
+        self.modevolreg.mlink(0x0f, lambda vol: vol, self.volumereg)
 
     def __getitem__(self, key):
         chan, offset = key
