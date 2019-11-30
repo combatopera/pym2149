@@ -16,11 +16,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .buf import MasterBuf
-from .iface import Chip, Config, Tuning
+from .clock import ClockInfo
+from .iface import Chip, Config, Tuning, AmpScale
 from .lurlene import convenient
+from .minblep import MinBleps
 from .native.resid import NativeSID
 from .nod import Node
-from .out import Translator
+from .out import Translator, FloatStream
 from .reg import regproperty, Reg
 from .shapes import floatdtype
 from diapyr import types
@@ -87,6 +89,14 @@ class SIDBuf(Node):
         outbuf.mul(self.ampscale)
         return outbuf
 
+class SIDStream(FloatStream):
+
+    streamname = 'sid'
+
+    @types(ClockInfo, AmpScale, SID, MinBleps)
+    def __init__(self, clockinfo, ampscale, sid, minbleps):
+        self.append(SIDBuf(clockinfo, ampscale, sid, minbleps))
+
 class SIDChip(Chip):
 
     class SIDReg:
@@ -111,5 +121,5 @@ class SIDChip(Chip):
 
 def configure(di):
     di.add(SID)
-    di.add(SIDBuf)
+    di.add(SIDStream)
     di.add(SIDChip)
