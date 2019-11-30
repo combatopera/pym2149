@@ -88,7 +88,7 @@ class WavWriter(Stream, Node, metaclass = AmpScale):
         roundbuf = self.roundmaster.ensureandcrop(len(outbuf))
         wavbuf = self.wavmaster.ensureandcrop(len(outbuf))
         np.around(outbuf.buf, out = roundbuf.buf)
-        wavbuf.buf[:] = roundbuf.buf
+        wavbuf.copybuf(roundbuf)
         self.f.block(wavbuf)
 
     def flush(self):
