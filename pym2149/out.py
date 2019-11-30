@@ -133,6 +133,8 @@ class MidiOutChannel(Node):
 
 class FloatStream(list):
 
+    streamname = 'ym'
+
     @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, Channels)
     def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, channels = None):
         naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]

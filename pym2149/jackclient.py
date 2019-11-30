@@ -42,26 +42,30 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
     log2maxpeaktopeak = 1
 
-    @types(Config, StereoInfo, FloatStream, JackClient)
-    def __init__(self, config, stereoinfo, wavs, client):
+    @types(Config, [FloatStream], JackClient)
+    def __init__(self, config, streams, client):
         super().__init__()
         self.systemchannelcount = config.systemchannelcount
-        self.chancount = stereoinfo.getoutchans.size
-        for chanindex in range(self.chancount):
-            client.port_register_output("out_%s" % (1 + chanindex))
-        self.wavs = wavs
+        for stream in streams:
+            for chanindex in range(len(stream)):
+                client.port_register_output("%s_%s" % (stream.streamname, 1 + chanindex))
+        self.streams = streams
         self.client = client
 
     def start(self):
         self.client.activate()
-        # Connect all system channels, cycling over our streams if necessary:
-        for syschanindex in range(self.systemchannelcount):
-            chanindex = syschanindex % self.chancount
-            self.client.connect("%s:out_%s" % (clientname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
-        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
+        def fillers():
+            for stream in self.streams:
+                # Connect all system channels, cycling over our streams if necessary:
+                for syschanindex in range(self.systemchannelcount):
+                    chanindex = syschanindex % len(stream)
+                    self.client.connect("%s:%s_%s" % (clientname, stream.streamname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
+                yield BufferFiller(len(stream), self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
+        self.fillers = tuple(fillers())
 
     def callimpl(self):
-        self.filler([self.chain(wav) for wav in self.wavs])
+        for stream, filler in zip(self.streams, self.fillers):
+            filler([self.chain(wav) for wav in stream])
 
     def flush(self):
         pass # Nothing to be done.
