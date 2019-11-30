@@ -131,7 +131,9 @@ class MidiOutChannel(Node):
     def callimpl(self):
         return [self.pantoamp(pan) for pan in self.channels.getpans()]
 
-class FloatStream(list): pass
+class FloatStream(list):
+
+    chancount = property(len)
 
 class YMStream(FloatStream):
 

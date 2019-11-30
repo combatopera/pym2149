@@ -47,7 +47,7 @@ class JackStream(Stream, Node, metaclass = AmpScale):
         super().__init__()
         self.systemchannelcount = config.systemchannelcount
         for stream in streams:
-            for chanindex in range(len(stream)):
+            for chanindex in range(stream.chancount):
                 client.port_register_output("%s_%s" % (stream.streamname, 1 + chanindex))
         self.streams = streams
         self.client = client
@@ -58,9 +58,9 @@ class JackStream(Stream, Node, metaclass = AmpScale):
             for stream in self.streams:
                 # Connect all system channels, cycling over our streams if necessary:
                 for syschanindex in range(self.systemchannelcount):
-                    chanindex = syschanindex % len(stream)
+                    chanindex = syschanindex % stream.chancount
                     self.client.connect("%s:%s_%s" % (clientname, stream.streamname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
-                yield BufferFiller(len(stream), self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
+                yield BufferFiller(stream.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
         self.fillers = tuple(fillers())
 
     def callimpl(self):
