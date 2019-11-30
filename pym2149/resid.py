@@ -36,6 +36,7 @@ class ChanProxy:
 
     degree = regproperty(lambda self: self.degreereg)
     control = regproperty(lambda self: self.controlreg)
+    triangle = regproperty(lambda self: self.trianglereg)
     gate = regproperty(lambda self: self.gatereg)
     adsr = regproperty(lambda self: self.adsrreg)
 
@@ -46,10 +47,12 @@ class ChanProxy:
         self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
         sidregs[chan, 0].link(lambda fn: fn & 0xff, self.fnreg)
         sidregs[chan, 1].link(lambda fn: fn >> 8, self.fnreg)
-        self.controlreg = Reg()
+        self.controlreg = Reg(value = 0)
         sidregs[chan, 4].link(lambda control: control & 0xff, self.controlreg)
         self.gatereg = Reg()
         self.controlreg.mlink(0x01, lambda gate: gate, self.gatereg)
+        self.trianglereg = Reg()
+        self.controlreg.mlink(0x10, lambda b: b * -1, self.trianglereg)
         self.adsrreg = Reg()
         sidregs[chan, 5].link(lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
         sidregs[chan, 6].link(lambda adsr: adsr & 0xff, self.adsrreg)
