@@ -145,9 +145,9 @@ class SIDRegs:
     def __init__(self, sid):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
         modevolreg = Reg(0)
-        self.regs[0x18].link(lambda modevol: modevol & 0xff, modevolreg)
+        self.regs[0x18].link(lambda x: x, modevolreg)
         self.volumereg = Reg()
-        modevolreg.mlink(0x0f, lambda vol: vol, self.volumereg)
+        modevolreg.mlink(0x0f, lambda volume: max(0, min(0xf, round(volume))), self.volumereg)
 
     def __getitem__(self, key):
         chan, offset = key
