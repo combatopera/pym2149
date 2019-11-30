@@ -54,8 +54,11 @@ class ChanProxy:
 @convenient(ChanProxy)
 class ChipProxy:
 
-    def __init__(self, chan, chanproxies):
+    modevol = regproperty(lambda self: self._sidregs.modevolreg)
+
+    def __init__(self, chan, chanproxies, sidregs):
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
+        self._sidregs = sidregs
 
     def __getitem__(self, index):
         return self._chanproxies[index]
@@ -115,6 +118,8 @@ class SIDRegs:
 
     def __init__(self, sid):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+        self.modevolreg = Reg()
+        self.regs[0x18].link(lambda modevol: modevol & 0xff, self.modevolreg)
 
     def __getitem__(self, key):
         chan, offset = key
@@ -129,7 +134,7 @@ class SIDChip(Chip):
         fclk = config.SID['clock']
         sidregs = SIDRegs(sid)
         chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in range(sid.chancount)]
-        self.channels = [ChipProxy(chan, chanproxies) for chan in range(sid.chancount)]
+        self.channels = [ChipProxy(chan, chanproxies, sidregs) for chan in range(sid.chancount)]
 
 def configure(di):
     di.add(SID)
