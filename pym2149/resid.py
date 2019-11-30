@@ -19,7 +19,7 @@ from .buf import MasterBuf
 from .iface import Chip, Config, Tuning
 from .lurlene import convenient
 from .native.resid import NativeSID
-from .nod import BufNode
+from .nod import Node
 from .out import Translator
 from .reg import regproperty, Reg
 from .shapes import floatdtype
