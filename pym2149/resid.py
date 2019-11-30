@@ -35,6 +35,7 @@ NTSC = 3.579545e6 * 4 / 14
 class ChanProxy:
 
     degree = regproperty(lambda self: self.degreereg)
+    pulsewidth = regproperty(lambda self: self.pulsewidthreg)
     control = regproperty(lambda self: self.controlreg)
     pulse = regproperty(lambda self: self.pulsereg)
     triangle = regproperty(lambda self: self.trianglereg)
@@ -48,6 +49,10 @@ class ChanProxy:
         self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
         sidregs[chan, 0].link(lambda fn: fn & 0xff, self.fnreg)
         sidregs[chan, 1].link(lambda fn: fn >> 8, self.fnreg)
+        self.pulsewidthreg = Reg()
+        self.pwnreg = Reg().link(lambda pwout: max(0, min(0xfff, round(pwout * 40.95))), self.pulsewidthreg)
+        sidregs[chan, 2].link(lambda pwn: pwn & 0xff, self.pwnreg)
+        sidregs[chan, 3].link(lambda pwn: pwn >> 8, self.pwnreg)
         self.controlreg = Reg(value = 0)
         sidregs[chan, 4].link(lambda control: control & 0xff, self.controlreg)
         self.pulsereg = Reg()
