@@ -139,7 +139,7 @@ class FloatStream(list):
         for naive in naives:
             self.append(WavBuf(clockinfo, naive, minbleps))
 
-class Translator:
+class Translator: # TODO: Convert to Node.
 
     naivex = 0
 
