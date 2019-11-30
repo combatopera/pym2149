@@ -74,7 +74,7 @@ class ChanProxy:
         self.releasereg = Reg()
         adreg.mlink(0xf0, lambda attack: attack << 4, self.attackreg)
         adreg.mlink(0x0f, lambda decay: decay, self.decayreg)
-        srreg.mlink(0xf0, lambda sustain: max(0, min(0xf, round(10 ** (sustain / 20)))), self.sustainreg)
+        srreg.mlink(0xf0, lambda sustain: max(0, min(0xf, round(10 ** (sustain / 20) * 0xf))), self.sustainreg)
         srreg.mlink(0x0f, lambda release: release, self.releasereg)
 
 @convenient(ChanProxy)
