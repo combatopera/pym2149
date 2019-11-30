@@ -18,7 +18,7 @@
 from . import minblep, pitch
 from .clock import ClockInfo
 from .lurlene import YM2149Chip
-from .out import StereoInfo, FloatStream
+from .out import StereoInfo, YMStream
 from .util import MainThread
 from .vis import RollImpl, NullRoll
 from .ym2149 import YM2149, PhysicalRegisters, LogicalRegisters
@@ -42,7 +42,7 @@ def boot(configname):
     di.add(PhysicalRegisters)
     di.add(LogicalRegisters)
     di.add(minblep.loadorcreate)
-    di.add(FloatStream)
+    di.add(YMStream)
     pitch.configure(di)
     di.add(Context)
     di.add(RollImpl if config.pianorollenabled else NullRoll)
