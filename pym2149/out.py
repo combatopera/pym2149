@@ -139,6 +139,20 @@ class FloatStream(list):
         for naive in naives:
             self.append(WavBuf(clockinfo, naive, minbleps))
 
+class Translator:
+
+    naivex = 0
+
+    def __init__(self, clockinfo, minbleps):
+        self.naiverate = clockinfo.implclock
+        self.minbleps = minbleps
+
+    def step(self, framecount):
+        naivex = self.naivex
+        outcount = self.minbleps.getoutcount(naivex, framecount)
+        self.naivex = (naivex + framecount) % self.naiverate
+        return naivex, outcount
+
 class WavBuf(Node):
 
     @staticmethod
@@ -157,11 +171,10 @@ class WavBuf(Node):
         # Need space for a whole mixin in case it is rooted at sample outcount:
         self.overflowsize = minbleps.mixinsize
         self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
-        self.naivex = 0
+        self.translator = Translator(clockinfo, minbleps)
         self.dc = floatdtype(0) # Last naive value of previous block.
         self.carrybuf.fill_same(self.dc) # Initial carry can be the initial dc level.
         self.naive = naive
-        self.naiverate = clockinfo.implclock
         self.minbleps = minbleps
 
     def callimpl(self):
@@ -169,16 +182,15 @@ class WavBuf(Node):
         naivebuf = self.chain(self.naive)
         diffbuf = self.diffmaster.ensureandcrop(len(naivebuf))
         diffbuf.differentiate(self.dc, naivebuf)
-        outcount = self.minbleps.getoutcount(self.naivex, self.block.framecount)
+        naivex, outcount = self.translator.step(self.block.framecount)
         # Make space for all samples we can output plus overflow:
         outsize = outcount + self.overflowsize
         outbuf = self.outmaster.ensureandcrop(outsize)
         # Paste in the carry followed by the carried dc level:
         outbuf.copyasprefix(self.overflowsize, self.carrybuf)
         outbuf.fillpart(self.overflowsize, outsize, self.dc)
-        self.minbleps.paste(self.naivex, diffbuf, outbuf)
+        self.minbleps.paste(naivex, diffbuf, outbuf)
         self.carrybuf.copywindow(outbuf, outcount, outsize)
-        self.naivex = (self.naivex + self.block.framecount) % self.naiverate
         self.dc = naivebuf.last()
         return self.outmaster.ensureandcrop(outcount)
 
