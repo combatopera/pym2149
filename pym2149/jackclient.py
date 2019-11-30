@@ -54,18 +54,15 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
     def start(self):
         self.client.activate()
-        def fillers():
-            for stream in self.streams:
-                # Connect all system channels, cycling over our streams if necessary:
-                for syschanindex in range(self.systemchannelcount):
-                    chanindex = syschanindex % stream.chancount
-                    self.client.connect("%s:%s_%s" % (clientname, stream.streamname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
-                yield BufferFiller(stream.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
-        self.fillers = tuple(fillers())
+        for stream in self.streams:
+            # Connect all system channels, cycling over our streams if necessary:
+            for syschanindex in range(self.systemchannelcount):
+                chanindex = syschanindex % stream.chancount
+                self.client.connect("%s:%s_%s" % (clientname, stream.streamname, 1 + chanindex), "system:playback_%s" % (1 + syschanindex))
+        self.filler = BufferFiller(sum(s.chancount for s in self.streams), self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
 
     def callimpl(self):
-        for stream, filler in zip(self.streams, self.fillers):
-            filler([self.chain(wav) for wav in stream])
+        self.filler([self.chain(wav) for stream in self.streams for wav in stream])
 
     def flush(self):
         pass # Nothing to be done.
