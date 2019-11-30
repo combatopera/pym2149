@@ -40,7 +40,10 @@ class ChanProxy:
     pulse = regproperty(lambda self: self.pulsereg)
     triangle = regproperty(lambda self: self.trianglereg)
     gate = regproperty(lambda self: self.gatereg)
-    adsr = regproperty(lambda self: self.adsrreg)
+    attack = regproperty(lambda self: self.attackreg)
+    decay = regproperty(lambda self: self.decayreg)
+    sustain = regproperty(lambda self: self.sustainreg)
+    release = regproperty(lambda self: self.releasereg)
 
     def __init__(self, sidregs, chan, fclk, tuning):
         self.degreereg = Reg()
@@ -61,9 +64,18 @@ class ChanProxy:
         self.controlreg.mlink(0x10, lambda b: -b, self.trianglereg)
         self.gatereg = Reg()
         self.controlreg.mlink(0x01, lambda gate: gate, self.gatereg)
-        self.adsrreg = Reg()
-        sidregs[chan, 5].link(lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
-        sidregs[chan, 6].link(lambda adsr: adsr & 0xff, self.adsrreg)
+        adreg = Reg(0)
+        srreg = Reg(0)
+        sidregs[chan, 5].link(lambda ad: ad, adreg)
+        sidregs[chan, 6].link(lambda sr: sr, srreg)
+        self.attackreg = Reg()
+        self.decayreg = Reg()
+        self.sustainreg = Reg()
+        self.releasereg = Reg()
+        adreg.mlink(0xf0, lambda attack: attack << 4, self.attackreg)
+        adreg.mlink(0x0f, lambda decay: decay, self.decayreg)
+        srreg.mlink(0xf0, lambda sustain: sustain << 4, self.sustainreg)
+        srreg.mlink(0x0f, lambda release: release, self.releasereg)
 
 @convenient(ChanProxy)
 class ChipProxy:
