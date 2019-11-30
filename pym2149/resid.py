@@ -80,7 +80,6 @@ class ChanProxy:
 @convenient(ChanProxy)
 class ChipProxy:
 
-    modevol = regproperty(lambda self: self._sidregs.modevolreg)
     volume = regproperty(lambda self: self._sidregs.volumereg)
 
     def __init__(self, chan, chanproxies, sidregs):
@@ -145,10 +144,10 @@ class SIDRegs:
 
     def __init__(self, sid):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
-        self.modevolreg = Reg(0)
-        self.regs[0x18].link(lambda modevol: modevol & 0xff, self.modevolreg)
+        modevolreg = Reg(0)
+        self.regs[0x18].link(lambda modevol: modevol & 0xff, modevolreg)
         self.volumereg = Reg()
-        self.modevolreg.mlink(0x0f, lambda vol: vol, self.volumereg)
+        modevolreg.mlink(0x0f, lambda vol: vol, self.volumereg)
 
     def __getitem__(self, key):
         chan, offset = key
