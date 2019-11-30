@@ -43,13 +43,13 @@ class ChanProxy:
         self.pitchreg = Reg().link(topitch, self.degreereg)
         self.freqreg = Reg().link(tuning.freq, self.pitchreg)
         self.fnreg = Reg().link(lambda fout: max(0, min(0xffff, round(fout * (1 << 24) / fclk))), self.freqreg)
-        Reg.link(sidregs[chan * 7], lambda fn: fn & 0xff, self.fnreg)
-        Reg.link(sidregs[chan * 7 + 1], lambda fn: fn >> 8, self.fnreg)
+        sidregs[chan, 0].link(lambda fn: fn & 0xff, self.fnreg)
+        sidregs[chan, 1].link(lambda fn: fn >> 8, self.fnreg)
         self.controlreg = Reg()
-        Reg.link(sidregs[chan * 7 + 4], lambda control: control & 0xff, self.controlreg)
+        sidregs[chan, 4].link(lambda control: control & 0xff, self.controlreg)
         self.adsrreg = Reg()
-        Reg.link(sidregs[chan * 7 + 5], lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
-        Reg.link(sidregs[chan * 7 + 6], lambda adsr: adsr & 0xff, self.adsrreg)
+        sidregs[chan, 5].link(lambda adsr: (adsr >> 8) & 0xff, self.adsrreg)
+        sidregs[chan, 6].link(lambda adsr: adsr & 0xff, self.adsrreg)
 
 @convenient(ChanProxy)
 class ChipProxy:
@@ -97,7 +97,7 @@ class SIDStream(FloatStream):
     def __init__(self, clockinfo, ampscale, sid, minbleps):
         self.append(SIDBuf(clockinfo, ampscale, sid, minbleps))
 
-class SIDChip(Chip):
+class SIDRegs:
 
     class SIDReg:
 
@@ -110,12 +110,24 @@ class SIDChip(Chip):
         def set(self, value):
             self.sid.write(self.index, value)
 
+        def link(self, *args):
+            Reg.link(self, *args)
+
+    def __init__(self, sid):
+        self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+
+    def __getitem__(self, key):
+        chan, offset = key
+        return self.regs[chan * 7 + offset]
+
+class SIDChip(Chip):
+
     param = 'sid'
 
     @types(Config, Tuning, SID)
     def __init__(self, config, tuning, sid):
         fclk = config.SID['clock']
-        sidregs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+        sidregs = SIDRegs(sid)
         chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in range(sid.chancount)]
         self.channels = [ChipProxy(chan, chanproxies) for chan in range(sid.chancount)]
 
