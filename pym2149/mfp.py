@@ -23,14 +23,14 @@ mfpclock = 2457600
 class MFPTimer:
 
     def __init__(self):
-        self.wavelength = Reg(value = 2) # TODO LATER: Other shapes will have different numbers of steps.
+        self.wavelength = Reg(2) # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
         # TODO LATER: Verify that TDR 0 indeed behaves like 0x100.
         self.effectivedata = Reg().link(lambda tdr: tdr if tdr else 0x100, self.data)
         self.control.value = 0
         self.data.value = 0
-        self.effect = VersionReg(value = None)
+        self.effect = VersionReg(None)
         self.control_data = Reg()
         self.control.link(lambda cd: cd[0], self.control_data)
         self.data.link(lambda cd: cd[1], self.control_data)
