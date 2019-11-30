@@ -34,7 +34,7 @@ class Reg:
 
     undefined = object()
 
-    def __init__(self, maxval = None, minval = None, value = undefined):
+    def __init__(self, value = undefined, *, maxval = None, minval = None):
         self.links = []
         self.idle = True
         self.maxval = maxval # Friendlier than a mask.
