@@ -84,6 +84,7 @@ class ChipProxy:
 
     volume = regproperty(lambda self: self._sidregs.volumereg)
     lowpass = regproperty(lambda self: self._sidregs.lowpassreg)
+    fcdegree = regproperty(lambda self: self._sidregs.fcdegreereg)
 
     def __init__(self, chan, chanproxies, sidregs):
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
@@ -145,8 +146,14 @@ class SIDRegs:
         def link(self, *args):
             Reg.link(self, *args)
 
-    def __init__(self, sid):
+    def __init__(self, sid, tuning):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+        self.fcdegreereg = Reg()
+        fcpitchreg = Reg().link(topitch, self.fcdegreereg)
+        fcfreqreg = Reg().link(tuning.freq, fcpitchreg)
+        fcreg = Reg().link(lambda freq: max(0, min(0x7ff, round(freq * .16))), fcfreqreg)
+        self.regs[0x15].link(lambda fc: fc, fcreg)
+        self.regs[0x16].link(lambda fc: fc >> 3, fcreg)
         self.resfiltreg = Reg(0)
         self.regs[0x17].link(lambda x: x, self.resfiltreg)
         modevolreg = Reg(0)
@@ -167,7 +174,7 @@ class SIDChip(Chip):
     @types(Config, Tuning, SID)
     def __init__(self, config, tuning, sid):
         fclk = config.SID['clock']
-        sidregs = SIDRegs(sid)
+        sidregs = SIDRegs(sid, tuning)
         chanproxies = [ChanProxy(sidregs, chan, fclk, tuning) for chan in range(sid.chancount)]
         self.channels = [ChipProxy(chan, chanproxies, sidregs) for chan in range(sid.chancount)]
 
