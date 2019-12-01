@@ -44,6 +44,7 @@ class ChanProxy:
     decay = regproperty(lambda self: self.decayreg)
     sustain = regproperty(lambda self: self.sustainreg)
     release = regproperty(lambda self: self.releasereg)
+    filt = regproperty(lambda self: self.filtreg)
 
     def __init__(self, sidregs, chan, fclk, tuning):
         self.degreereg = Reg()
@@ -76,11 +77,14 @@ class ChanProxy:
         adreg.mlink(0x0f, lambda decay: decay, self.decayreg)
         srreg.mlink(0xf0, lambda sustain: max(0, min(0xf, round(10 ** (sustain / 20) * 0xf))) << 4, self.sustainreg)
         srreg.mlink(0x0f, lambda release: release, self.releasereg)
+        self.filtreg = Reg()
+        sidregs.resfiltreg.mlink(0x01 << chan, lambda b: -b, self.filtreg)
 
 @convenient(ChanProxy)
 class ChipProxy:
 
     volume = regproperty(lambda self: self._sidregs.volumereg)
+    lowpass = regproperty(lambda self: self._sidregs.lowpassreg)
 
     def __init__(self, chan, chanproxies, sidregs):
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
@@ -144,10 +148,14 @@ class SIDRegs:
 
     def __init__(self, sid):
         self.regs = [self.SIDReg(sid, index) for index in range(sid.regcount)]
+        self.resfiltreg = Reg(0)
+        self.regs[0x17].link(lambda x: x, self.resfiltreg)
         modevolreg = Reg(0)
         self.regs[0x18].link(lambda x: x, modevolreg)
         self.volumereg = Reg()
         modevolreg.mlink(0x0f, lambda volume: max(0, min(0xf, round(volume))), self.volumereg)
+        self.lowpassreg = Reg()
+        modevolreg.mlink(0x10, lambda b: -b, self.lowpassreg)
 
     def __getitem__(self, key):
         chan, offset = key
