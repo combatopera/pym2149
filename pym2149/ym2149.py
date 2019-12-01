@@ -48,6 +48,7 @@ class LogicalRegisters:
     @types(Config, ClockInfo)
     def __init__(self, config, clockinfo, minnoiseperiod = 1):
         channels = range(config.chipchannels)
+        # TODO: Make effective tone period user-readable without exposing mintoneperiod.
         # Clamping 0 to 1 is authentic for all 3 kinds of period, see qtonpzer, qnoispec, qenvpzer respectively:
         self.toneperiods = [Reg(maxval = config.maxtoneperiod, minval = clockinfo.mintoneperiod) for _ in channels]
         self.noiseperiod = Reg(maxval = config.maxnoiseperiod, minval = minnoiseperiod)
