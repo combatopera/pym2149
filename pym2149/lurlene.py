@@ -20,6 +20,7 @@ from .iface import Prerecorded, Chip, Tuning, Config
 from .reg import regproperty, Reg
 from .ym2149 import LogicalRegisters
 from diapyr import types
+from diapyr.util import innerclass
 from lurlene import topitch
 from lurlene.bridge import LiveCodingBridge
 import logging
@@ -86,10 +87,19 @@ class ChipProxy:
     noisefreq = regproperty(lambda self: self._chipregs.noisefreqreg)
     envfreq = regproperty(lambda self: self._chipregs.envfreqreg)
 
-    def __init__(self, chip, chan, chanproxies, chipregs):
+    @innerclass
+    class Effective:
+
+        @property
+        def envfreq(self):
+            return self._clock.envfreq(self._chip.envperiod.value, self._chip.envshape.value)
+
+    def __init__(self, chip, chan, chanproxies, chipregs, clock):
+        self.effective = self.Effective()
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
         self._chip = chip
         self._chipregs = chipregs
+        self._clock = clock
 
     def __getitem__(self, index):
         return self._chanproxies[index]
@@ -106,6 +116,6 @@ class YM2149Chip(Chip):
         chans = range(config.chipchannels)
         chipregs = ChipRegs(chip, clock, tuning)
         chanproxies = [ChanProxy(chip, chan, clock, tuning) for chan in chans]
-        self.channels = [ChipProxy(chip, chan, chanproxies, chipregs) for chan in chans]
+        self.channels = [ChipProxy(chip, chan, chanproxies, chipregs, clock) for chan in chans]
 
 class LurleneBridge(LiveCodingBridge, Prerecorded): pass
