@@ -94,12 +94,17 @@ class ChipProxy:
         def envfreq(self):
             return self._clock.envfreq(self._chip.envperiod.value, self._chip.envshape.value)
 
+        @property
+        def tonefreq(self):
+            return self._clock.tonefreq(self._chip.toneperiods[self._chan].value)
+
     def __init__(self, chip, chan, chanproxies, chipregs, clock):
         self.effective = self.Effective()
         self._chanproxies = chanproxies[chan:] + chanproxies[:chan]
         self._chip = chip
         self._chipregs = chipregs
         self._clock = clock
+        self._chan = chan
 
     def __getitem__(self, index):
         return self._chanproxies[index]
