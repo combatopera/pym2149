@@ -87,7 +87,7 @@ class ChipProxy:
     noisefreq = regproperty(lambda self: self._chipregs.noisefreqreg)
     envfreq = regproperty(lambda self: self._chipregs.envfreqreg)
 
-    @innerclass
+    @innerclass # FIXME: This exposes things that aren't effective.
     class Effective:
 
         @property
