@@ -7,7 +7,6 @@ class Bass:
     envpitches = D('2x++,+'), D('2x++ 5x+,1'), D('+')
 
     def on(self, frame, ym, degree, slap = V('0')):
-        ym.level = 15
         ym.noiseflag = False
         ym.toneflag = True
         ym.tonedegree = degree[frame]
