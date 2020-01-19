@@ -8,4 +8,7 @@ addons:
 install:
 - curl https://bootstrap.pypa.io/get-pip.py | sudo python3
 - pip3 install --user pyven
+env:
+- HEADS=true
+- HEADS=false
 script: travis_ci.py
