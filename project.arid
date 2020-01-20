@@ -29,7 +29,6 @@ projects +=
     pyven
     Lurlene
 deps +=
-    mock
     pyaudio
     pillow
 years +=
