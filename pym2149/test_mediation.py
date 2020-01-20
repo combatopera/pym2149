@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, mock
 from .mediation import DynamicMediation
-from collections import namedtuple
+from types import SimpleNamespace
+import unittest, mock
 
 class TestDynamicMediation(unittest.TestCase):
 
     def setUp(self):
         self.warn = mock.Mock().warn
-        self.m = DynamicMediation(namedtuple('Config', 'midichannelbase chipchannels')(1, 3))
+        self.m = DynamicMediation(SimpleNamespace(midichannelbase = 1, chipchannels = 3))
         self.m.warn = self.warn
 
     def tearDown(self):
