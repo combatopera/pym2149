@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -37,7 +35,7 @@ def bytecodefactory(config):
         log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
         return Bytecode(f.read(), config.dosoundextraseconds)
 
-def main():
+def main_dsd2wav():
     config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
     try:
         di.add(bytecodefactory)
@@ -49,6 +47,3 @@ def main():
         di(MainThread).sleep()
     finally:
         di.discardall()
-
-if '__main__' == __name__:
-    main()

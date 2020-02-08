@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -39,7 +37,7 @@ def loadcontext(config, context):
         context._update(f.read())
     context._flip()
 
-def main():
+def main_lc2jack():
     config, di = boot(ConfigName('inpath', '--section'))
     try:
         di.add(loadcontext)
@@ -53,6 +51,3 @@ def main():
         di(MainThread).sleep()
     finally:
         di.discardall()
-
-if '__main__' == __name__:
-    main()

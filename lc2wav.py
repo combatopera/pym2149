@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -31,7 +29,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
-def main(args = sys.argv[1:]):
+def main_lc2wav(args = sys.argv[1:]):
     config, di = boot(ConfigName('inpath', '--section', 'outpath', args = args))
     try:
         di.add(loadcontext)
@@ -44,6 +42,3 @@ def main(args = sys.argv[1:]):
         di(MainThread).sleep()
     finally:
         di.discardall()
-
-if '__main__' == __name__:
-    main()
