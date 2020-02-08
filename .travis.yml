@@ -11,4 +11,4 @@ install:
 env:
 - HEADS=true
 - HEADS=false
-script: travis_ci.py
+script: travis_ci
