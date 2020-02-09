@@ -37,7 +37,7 @@ def test_expected():
 
 def _comparetxt(path):
     relpath = path.relative_to(expecteddir)
-    configpath = project / relpath.parent / f"{relpath.name}.arid"
+    configpath = project / relpath.parent / ("%s.arid" % relpath.name)
     if configpath.exists():
         with configpath.open() as f:
             config = ['--config', f.read()]
@@ -48,7 +48,7 @@ def _comparetxt(path):
         lc2txt.main(['--ignore-settings'] + config + [
                 '--config', 'local = $global(lurlene.util.local)',
                 '--config', 'rollstream = $py[config.local.stream]',
-                str(project / relpath.parent / f"{relpath.name}.py")])
+                str(project / relpath.parent / ("%s.py" % relpath.name))])
     tc = unittest.TestCase()
     tc.maxDiff = None
     with path.open() as f:
@@ -62,7 +62,7 @@ def _comparepng(path):
         lc2wav.main(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
+                str(project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)])), wavfile.name])
         sox(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
