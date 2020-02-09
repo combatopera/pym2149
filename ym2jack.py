@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -29,7 +27,7 @@ from diapyr.start import Started
 
 log = logging.getLogger(__name__)
 
-def main():
+def main_ym2jack():
     config, di = boot(ConfigName('inpath'))
     try:
         di.add(YMOpen)
@@ -41,6 +39,3 @@ def main():
         di(MainThread).sleep()
     finally:
         di.discardall()
-
-if '__main__' == __name__:
-    main()

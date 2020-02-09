@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -37,7 +35,7 @@ def bytecodefactory(config):
     with open(config.inpath) as f:
         return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
-def main():
+def main_dosound2jack():
     config, di = boot(ConfigName('inpath', 'srclabel'))
     try:
         di.add(bytecodefactory)
@@ -49,6 +47,3 @@ def main():
         di(MainThread).sleep()
     finally:
         di.discardall()
-
-if '__main__' == __name__:
-    main()

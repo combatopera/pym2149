@@ -15,19 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, mock
 from .mediation import DynamicMediation
-from collections import namedtuple
+from types import SimpleNamespace
+import unittest
 
 class TestDynamicMediation(unittest.TestCase):
 
     def setUp(self):
-        self.warn = mock.Mock().warn
-        self.m = DynamicMediation(namedtuple('Config', 'midichannelbase chipchannels')(1, 3))
+        self.warns = []
+        self.m = DynamicMediation(SimpleNamespace(midichannelbase = 1, chipchannels = 3))
         self.m.warn = self.warn
 
+    def warn(self, *args):
+        self.warns.append(args)
+
     def tearDown(self):
-        self.assertEqual(0, self.warn.call_count)
+        self.assertEqual([], self.warns)
 
     def acquire(self, *args):
         return self.m.acquirechipchan(*args)
@@ -90,10 +93,9 @@ class TestDynamicMediation(unittest.TestCase):
         self.assertEqual(0, self.release(1, 60))
         self.assertEqual(0, self.acquire(1, 61, 3))
         # Chip channel 1 had note-on least recently:
-        self.assertEqual(0, self.warn.call_count)
+        self.assertEqual([], self.warns)
         self.assertEqual(1, self.acquire(4, 60, 4))
-        self.warn.assert_called_once_with(self.m.interruptingformat, 'B')
-        self.warn.reset_mock()
+        self.assertEqual((self.m.interruptingformat, 'B'), self.warns.pop(0))
         # Note-off for interrupted note is now spurious:
         self.assertIs(None, self.m.releasechipchan(2, 60))
 
@@ -109,9 +111,8 @@ class TestDynamicMediation(unittest.TestCase):
         self.assertEqual(1, self.acquire(4, 61, 3))
         self.assertEqual(2, self.acquire(4, 62, 3))
         # Last chip channel for MIDI 2 was 1:
-        self.assertEqual(0, self.warn.call_count)
+        self.assertEqual([], self.warns)
         self.assertEqual(1, self.acquire(2, 61, 4))
-        self.warn.assert_called_once_with(self.m.interruptingformat, 'B')
-        self.warn.reset_mock()
+        self.assertEqual((self.m.interruptingformat, 'B'), self.warns.pop(0))
         # Note-off for interrupted note is now spurious:
         self.assertIs(None, self.m.releasechipchan(4, 61))

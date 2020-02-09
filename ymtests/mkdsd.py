@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -83,7 +81,7 @@ class Globals:
         g.setprev = data.setprev
         g.sleep = data.sleep
 
-def main():
+def main_mkdsd():
     for inpath in sys.argv[1:]:
         outpath = inpath[:inpath.rindex('.')] + '.dsd'
         print(outpath, file=sys.stderr)
@@ -92,6 +90,3 @@ def main():
         with open(outpath, 'wb') as f:
             data.save(f)
             f.flush() # XXX: Why?
-
-if '__main__' == __name__:
-    main()

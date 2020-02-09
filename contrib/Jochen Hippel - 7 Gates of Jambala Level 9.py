@@ -61,18 +61,20 @@ class Simple:
     def on(self, frame, ym, degree):
         ym.level = self.level[frame]
         ym.toneflag = True
-        ym.tonedegree = degree[frame]
+        ym.tonedegree = (self.degree + degree)[frame]
         ym.tonepitch += self.vib[frame]
 
 class Lead(Simple):
 
     level = V('13 7x12 11x11//,0')
     vib = V('6.75x,1.25x/ 2.5x.1/ 1.25x-.1/')
+    degree = D('+')
 
 class Pluck(Simple):
 
     level = V('13x13//,0')
     vib = V('1.25x/,2.5x.1/ 2.5x-.1/') << .25
+    degree = D('1')
 
 class Arp:
 
@@ -101,7 +103,7 @@ arp2 = E(Arp, '1',
         degree = D('+') + progression2,
         att = V('1'))
 lead = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
-        degree = D('+') + progression1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
+        degree = progression1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
 pluck = E(Pluck, '.5',
         degree = progression2 + (D(['+ 1 -'] * 5, '+') + D('3x 2x2 1 3x3 3x2 3x3 4|3x5 3x4 3x3 3x2 3x3 2')).of(.5))
 hat = E(Hat, '.5')

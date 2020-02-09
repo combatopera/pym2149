@@ -45,7 +45,7 @@ def _comparetxt(path):
         config = []
     stream = StringIO()
     with threadlocals(stream = stream):
-        lc2txt.main(['--ignore-settings'] + config + [
+        lc2txt.main_lc2txt(['--ignore-settings'] + config + [
                 '--config', 'local = $global(lurlene.util.local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / ("%s.py" % relpath.name))])
@@ -59,7 +59,7 @@ def _comparepng(path):
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with tempfile.NamedTemporaryFile() as wavfile:
-        lc2wav.main(['--ignore-settings',
+        lc2wav.main_lc2wav(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
                 str(project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)])), wavfile.name])

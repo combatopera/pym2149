@@ -1,10 +1,14 @@
+dist: bionic
+language: minimal
 addons:
   apt:
     packages:
-    - python3-pyparsing
     - portaudio19-dev
     - sox
 install:
-- git clone https://github.com/combatopera/aridity.git ../aridity
-- git clone https://github.com/combatopera/pyven.git ../pyven
-script: ../pyven/travis_ci.py
+- curl https://bootstrap.pypa.io/get-pip.py | sudo python3
+- pip3 install --user pyven
+env:
+- HEADS=true
+- HEADS=false
+script: travis_ci

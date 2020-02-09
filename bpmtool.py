@@ -1,5 +1,3 @@
-#!/usr/bin/env pyven
-
 # Copyright 2014, 2018, 2019 Andrzej Cichocki
 
 # This file is part of pym2149.
@@ -20,7 +18,7 @@
 from pym2149.config import ConfigName
 from pym2149.boot import boot
 
-def main():
+def main_bpmtool():
     config, _ = boot(ConfigName())
     ups = config.updaterate
     lpb = config.linesperbeat
@@ -28,6 +26,3 @@ def main():
         lpm = 60 * ups / upl
         bpm = lpm / lpb
         print("%2s" % upl, "%7.3f" % bpm)
-
-if '__main__' == __name__:
-    main()
