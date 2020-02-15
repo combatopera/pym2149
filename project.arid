@@ -26,7 +26,6 @@ projects +=
     lagoon
     splut
     timelyOSC
-    pyven
     Lurlene
 deps +=
     pyaudio
