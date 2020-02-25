@@ -26,7 +26,7 @@ def batterypower():
     except ImportError:
         return # Run all tests.
     def states():
-        for line in upower('--show-info', '/org/freedesktop/UPower/devices/battery_C173').stdout.decode().splitlines():
+        for line in upower('--show-info', '/org/freedesktop/UPower/devices/battery_C173').splitlines():
             words = wordpattern.findall(line)
             if 2 == len(words) and 'state:' == words[0]:
                 yield words[1]
