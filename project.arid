@@ -17,19 +17,18 @@
 
 author = Andrzej Cichocki
 name = pym2149
-projects +=
-    pyrbo
-    diapyr
+requires +=
     aridity
-    outjack
-    mynblep
+    diapyr
     lagoon
+    Lurlene
+    mynblep
+    outjack
+    pillow
+    pyaudio
+    pyrbo
     splut
     timelyOSC
-    Lurlene
-deps +=
-    pyaudio
-    pillow
 years +=
     2014
     2018
