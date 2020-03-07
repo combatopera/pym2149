@@ -313,7 +313,7 @@ class UnpackedFile:
         try:
             from lagoon import lha
             # Observe we redirect stdout so it doesn't get played:
-            lha('x', os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
+            lha.x(os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
             name, = os.listdir(self.tmpdir)
             self.f = open(os.path.join(self.tmpdir, name), 'rb')
         except:
