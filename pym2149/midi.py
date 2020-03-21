@@ -22,9 +22,9 @@ from .channels import Channels
 from .util import EMA
 from .speed import SpeedDetector
 from .native import calsa
-from bg import SimpleBackground, MainBackground
 from diapyr import types
 from diapyr.util import singleton
+from splut.bg import MainBackground, SimpleBackground
 import logging, time
 
 log = logging.getLogger(__name__)

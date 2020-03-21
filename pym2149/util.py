@@ -16,8 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
-from bg import MainBackground
 from diapyr import types
+from splut.bg import MainBackground
 import time, logging
 
 log = logging.getLogger(__name__)

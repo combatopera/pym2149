@@ -16,12 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
-from bg import SimpleBackground, Sleeper
 from aridity import Context, Repl
 from aridimpl.util import NoSuchPathException
 from aridimpl.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
 from pathlib import Path
+from splut.bg import SimpleBackground, Sleeper
 import sys, logging, numbers, importlib, argparse, lurlene
 
 log = logging.getLogger(__name__)

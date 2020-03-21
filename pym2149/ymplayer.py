@@ -17,8 +17,8 @@
 
 from .iface import Stream, Prerecorded, Config, Roll, Timer, Chip
 from .ym2149 import PhysicalRegisters
-from bg import MainBackground
 from diapyr import types
+from splut.bg import MainBackground
 
 class Bundle:
 

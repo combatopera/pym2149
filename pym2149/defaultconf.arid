@@ -116,7 +116,7 @@ dosoundextraseconds = 3
 chipchannels = 3
 : The number of chip channels to implement. Note that only the first three will have YM2149 registers wired into them.
 
-Profile = $global(bg.Profile)
+Profile = $global(splut.bg.Profile)
 
 profile = $py[None]
 : If not None, must be a config.Profile object.
