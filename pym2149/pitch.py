@@ -30,7 +30,7 @@ class ContextTuning(Tuning):
         self.di = di
 
     def __getattr__(self, name):
-        return getattr(self.di(self.context.tuning), name)
+        return getattr(self.di(self.context.get('tuning')), name)
 
     def dispose(self):
         pass
