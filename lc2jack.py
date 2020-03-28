@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 @types(Config, Context, this = Started)
 def loadcontext(config, context):
     with open(config.inpath) as f:
-        context._update(f.read())
+        context.update(f.read())
     context._flip()
 
 def main_lc2jack():
