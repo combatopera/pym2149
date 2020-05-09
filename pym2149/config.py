@@ -153,7 +153,7 @@ class ConfigImpl(Config, lurlene.iface.Config):
 
     def __getattr__(self, name):
         try:
-            return self[(name,)].unravel()
+            return self[(name,)].unravel() # TODO: Refactor to allow arbitrarily deep dotted notation.
         except NoSuchPathException:
             raise AttributeError(name)
 
