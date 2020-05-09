@@ -29,6 +29,7 @@ requires +=
     pyrbo
     splut
     timelyOSC
+build requires += numpy
 years +=
     2014
     2018
