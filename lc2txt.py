@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 def main_lc2txt(args = sys.argv[1:]):
     config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
-    try:
+    with di:
         di.add(loadcontext)
         di.add(LurleneBridge)
         txt.configure(di)
@@ -40,5 +40,3 @@ def main_lc2txt(args = sys.argv[1:]):
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

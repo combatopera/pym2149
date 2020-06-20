@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 def main_ym2txt():
     config, di = boot(ConfigName('inpath', name = 'txt'))
-    try:
+    with di:
         di.add(YMOpen)
         txt.configure(di)
         di.add(ChipTimer)
@@ -37,5 +37,3 @@ def main_ym2txt():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

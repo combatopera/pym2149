@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 def main_midi2jack():
     config, di = boot(ConfigName(name = 'realtime'))
-    try:
+    with di:
         di.add(PLL)
         jackclient.configure(di)
         di.all(Started) # TODO: Reorder starts to avoid initial underruns.
@@ -43,5 +43,3 @@ def main_midi2jack():
         di.add(MidiListen)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

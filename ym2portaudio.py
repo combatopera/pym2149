@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 def main_ym2portaudio():
     config, di = boot(ConfigName('inpath'))
-    try:
+    with di:
         di.add(YMOpen)
         portaudio.configure(di)
         di.add(SyncTimer)
@@ -37,5 +37,3 @@ def main_ym2portaudio():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

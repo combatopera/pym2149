@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 def main_midi2wav():
     config, di = boot(ConfigName('outpath', name = 'realtime'))
-    try:
+    with di:
         di.add(PLL)
         out.configure(di)
         di.add(config.mediation)
@@ -43,5 +43,3 @@ def main_midi2wav():
         di.add(MidiListen)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

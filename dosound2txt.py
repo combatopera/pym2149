@@ -37,7 +37,7 @@ def bytecodefactory(config):
 
 def main_dosound2txt():
     config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
-    try:
+    with di:
         di.add(bytecodefactory)
         txt.configure(di)
         di.add(SimpleChipTimer)
@@ -45,5 +45,3 @@ def main_dosound2txt():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

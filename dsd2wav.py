@@ -37,7 +37,7 @@ def bytecodefactory(config):
 
 def main_dsd2wav():
     config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
-    try:
+    with di:
         di.add(bytecodefactory)
         out.configure(di)
         di.add(ChipTimer)
@@ -45,5 +45,3 @@ def main_dsd2wav():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

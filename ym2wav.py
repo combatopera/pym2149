@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 def main_ym2wav():
     config, di = boot(ConfigName('inpath', 'outpath'))
-    try:
+    with di:
         di.add(YMOpen)
         out.configure(di)
         di.add(ChipTimer)
@@ -37,5 +37,3 @@ def main_ym2wav():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

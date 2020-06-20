@@ -39,7 +39,7 @@ def loadcontext(config, context):
 
 def main_lc2jack():
     config, di = boot(ConfigName('inpath', '--section'))
-    try:
+    with di:
         di.add(loadcontext)
         di.add(LurleneBridge)
         lurlene.osc.configure(di)
@@ -49,5 +49,3 @@ def main_lc2jack():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()

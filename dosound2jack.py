@@ -37,7 +37,7 @@ def bytecodefactory(config):
 
 def main_dosound2jack():
     config, di = boot(ConfigName('inpath', 'srclabel'))
-    try:
+    with di:
         di.add(bytecodefactory)
         jackclient.configure(di)
         di.add(SyncTimer)
@@ -45,5 +45,3 @@ def main_dosound2jack():
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()
-    finally:
-        di.discardall()
