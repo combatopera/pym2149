@@ -36,3 +36,4 @@ years +=
     2019
 pyversions += 3
 executable = true
+licheck exclude globs += contrib/*
