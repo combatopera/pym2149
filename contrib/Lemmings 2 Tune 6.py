@@ -33,9 +33,9 @@ class Boop(CommonDrum):
 
     basedegree = D('++')
 
-    def on(self, frame, ym, degree, attenuation = V('0'), np = V('21')):
+    def on(self, frame, ym, degree, att = V('0'), np = V('21')):
         if super()._on(frame, ym, np[frame]):
-            ym.level -= attenuation[frame]
+            ym.level -= att[frame]
             ym.tonedegree = (self.basedegree + degree)[frame]
 
 class Fill(Boop):
@@ -65,9 +65,9 @@ class Open:
     ison = V('8x1,0')
     level = V('6x15//,12')
 
-    def on(self, frame, ym, attenuation = V('0'), np = V('1')):
+    def on(self, frame, ym, att = V('0'), np = V('1')):
         if self.ison[frame]:
-            ym.level = self.level[frame] - attenuation[frame]
+            ym.level = self.level[frame] - att[frame]
             ym.noiseflag = True
             ym.toneflag = False
             ym.noiseperiod = np[frame]
@@ -173,10 +173,10 @@ boop2 = E(Boop, '11.5/ 1 2x.5 1 3x.5',
         degree = D('26x3 5 3x3 5 3').of(.5))
 boop3 = E(Boop, '.5',
         degree = D('3 5').of(.5),
-        attenuation = V('3 4').of(.5))
+        att = V('3 4').of(.5))
 boop4 = E(Boop, '.5',
         degree = D('3 5').of(.5),
-        attenuation = V('4 5').of(.5))
+        att = V('4 5').of(.5))
 kick1 = E(Kick, '2')
 side1 = E(Side, '/ 2x.5 6/',
         degree = D('1'))
@@ -190,7 +190,7 @@ open1 = E(Open, '.5/ 2 .5 2x2 1')
 open2 = E(Open, '.5/ 2.5 4 2x.5|.5/ 2.5 5')
 open3 = E(Open, '.5/ 2 .5 1.5 2 3x.5')
 open4 = E(Open, '.5',
-        attenuation = V('1 3 2 1 3 2 1 3 2 1 3 2 1 3 2 4').of(.5),
+        att = V('1 3 2 1 3 2 1 3 2 1 3 2 1 3 2 4').of(.5),
         np = V('2x1 4x21 1 7x21 2x1').of(.5))
 lead2 = E(Tone, ['2/1 1 4x.5 3x'] * 3, '2x2/1 4x',
         degree = D('-') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#- .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
