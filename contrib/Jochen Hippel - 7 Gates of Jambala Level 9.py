@@ -91,26 +91,30 @@ def bass(degree):
             att = V('0 2x1 3x 1 2x 2x1 2x 2x1 0'),
             vibshift = V('0 6 7x 6 3x 6 2x'))
 
-drums = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '4/3') >> 2
-progression1 = D('1 4 7- 1').of(8)
-progression2 = D('1 7-').of(16)
-bass1 = bass(progression1 + D('1 2x+ 1 + 1 7 1|1 2x+ 1 3x+ 7-|1 2x+ 1 + 1 2 1|1 2x+ 1 3x+ 5-'))
-bass2 = bass(progression2 + D('1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1|1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1'))
-arp1 = E(Arp, '1',
-        degree = D('8x 8x- 16x') + progression1,
+drum1 = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '4/3') >> 2
+prog1 = D('1 4 7- 1').of(8)
+prog2 = D('1 7-').of(16)
+bass1 = bass(prog1 + D('1 2x+ 1 + 1 7 1|1 2x+ 1 3x+ 7-|1 2x+ 1 + 1 2 1|1 2x+ 1 3x+ 5-'))
+bass2 = bass(prog2 + D('1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1|1 2x+ 1 + 1 5- 1|1 2x+ 1 3x+ 1'))
+arps1 = E(Arp, '1',
+        degree = D('8x 8x- 16x') + prog1,
         inv = V('8x 8x2 16x'))
-arp2 = E(Arp, '1',
-        degree = D('+') + progression2,
+arps2 = E(Arp, '1',
+        degree = D('+') + prog2,
         att = V('1'))
-lead = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
-        degree = progression1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
-pluck = E(Pluck, '.5',
-        degree = progression2 + (D(['+ 1 -'] * 5, '+') + D('3x 2x2 1 3x3 3x2 3x3 4|3x5 3x4 3x3 3x2 3x3 2')).of(.5))
-hat = E(Hat, '.5')
-A = arp1, bass1 & drums
-B = lead, bass1 & drums, arp1
-C = pluck & hat, bass2 & drums, arp2
-sections = A, B, B, C, C
+vers1 = E(Lead, '2x .5 1 3 3x.5|2x .5 1 3.5 1|2x 3x.5 1 .5 2 2x.5|2x 3x.5 2x 5x.5',
+        degree = prog1 + D('4x 5- 2x7- 6x 5- 7- 5-|2x 2x7- 1 2x7- 9x5-|5x 5- 7- 7x 2 3|5x 5- 7- 2x 2x+ 5 7 4# 4 3').of(.5))
+brdg1 = E(Pluck, '.5',
+        degree = prog2 + (D(['+ 1 -'] * 5, '+') + D('3x 2x2 1 3x3 3x2 3x3 4|3x5 3x4 3x3 3x2 3x3 2')).of(.5))
+hiha1 = E(Hat, '.5')
+Intr1 = arps1, bass1 & drum1
+VERS1 = vers1, bass1 & drum1, arps1
+BRDG1 = brdg1 & hiha1, bass2 & drum1, arps2
+sections = (
+    Intr1,
+    VERS1, VERS1,
+    BRDG1, BRDG1,
+)
 tonic = C4 + .04
 speed = 14
 scale = naturalminor
