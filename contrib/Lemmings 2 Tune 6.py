@@ -1,4 +1,4 @@
-from . import V, D, E, naturalminor, unit, topitch
+from . import V, D, E, naturalminor, unit
 from .pitches import B3, C2
 
 class CommonDrum:
@@ -93,7 +93,8 @@ class Lead:
     def _common(self, frame, ym, degree, velocity):
         ym.noiseflag = False
         ym.toneflag = True
-        ym.tonepitch = topitch(degree[frame]) + velocity[frame].pick(self.vibs)[frame]
+        ym.tonedegree = degree[frame]
+        ym.tonepitch += velocity[frame].pick(self.vibs)[frame]
 
     def on(self, frame, ym, degree, velocity):
         self._common(frame, ym, degree, velocity)
@@ -142,7 +143,8 @@ class Ramp:
         ym.level = self.level[frame]
         ym.noiseflag = False
         ym.toneflag = True
-        ym.tonepitch = topitch(degree[frame]) + .06
+        ym.tonedegree = degree[frame]
+        ym.tonepitch += .06
         ym.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
