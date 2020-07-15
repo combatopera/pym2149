@@ -202,17 +202,22 @@ lead4 = E(Ping, ['2/1 1 4x.5 3x'] * 3, '2/1 6/5',
         velocity = V('26x1 6x'))
 fill = E(Fill, '28/ 8x.5',
         degree = D('3 2').of(.5))
-A = snare1, bass1 * 4, boop1 & side1 & open1 & kick
-B = snare1, ramp, boop1 & side1 & open1 & kick
-C = bass2, diarp, boop2 & side2 & open2 & snare2 & kick
-F = bass2, lead1(0, 2), boop2 & side2 & open2 & snare2 & kick
-G = bass3, lead2 * 2, open3 & snare2 & side3 & kick
-H = lead3 & fill, lead2 * 2, bass3
-I = boop2 & side2 & open2 & snare2 & kick, lead4 * 2, bass4
-J = boop2 & side2 & open2 & snare2 & kick, unit, bass2 * 4
-K = boop1 * 4 & side2[:8] & open2[:8] & snare2 & kick, open4, boop3
-L = boop2 & side2 & open2 & snare2 & kick, side4 * 2 | lead1(.25, 1) | side4 * 2, boop4
-sections = A, B, C, F, G, H, I, J, K, L
+Intr1 = snare1, bass1 * 4, boop1 & side1 & open1 & kick
+Ramp1 = snare1, ramp, boop1 & side1 & open1 & kick
+Ramp2 = bass2, diarp, boop2 & side2 & open2 & snare2 & kick
+VERS1 = bass2, lead1(0, 2), boop2 & side2 & open2 & snare2 & kick
+VERS2 = bass3, lead2 * 2, open3 & snare2 & side3 & kick
+Brdg1 = lead3 & fill, lead2 * 2, bass3
+CHOR1 = boop2 & side2 & open2 & snare2 & kick, lead4 * 2, bass4
+VERS3 = boop2 & side2 & open2 & snare2 & kick, unit, bass2 * 4
+Fill1 = boop1 * 4 & side2[:8] & open2[:8] & snare2 & kick, open4, boop3
+BREK1 = boop2 & side2 & open2 & snare2 & kick, side4 * 2 | lead1(.25, 1) | side4 * 2, boop4
+sections = (
+    Intr1, Ramp1, Ramp2,
+    VERS1, VERS2, Brdg1,
+    CHOR1, VERS3, Fill1,
+    BREK1,
+)
 tonic = B3
 speed = 16
 scale = naturalminor
