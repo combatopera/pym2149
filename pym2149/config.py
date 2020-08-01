@@ -16,13 +16,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config
-from aridity import Context, Repl
-from aridimpl.util import NoSuchPathException
-from aridimpl.model import Function, Number, Text
+from argparse import ArgumentParser
+from aridity import Context, NoSuchPathException, Repl
+from aridity.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
+from importlib import import_module
 from pathlib import Path
 from splut.bg import SimpleBackground, Sleeper
-import sys, logging, numbers, importlib, argparse, lurlene
+import logging, lurlene, numbers, sys
 
 log = logging.getLogger(__name__)
 namespace = 'pym2149'
@@ -30,7 +31,7 @@ namespace = 'pym2149'
 class ConfigName:
 
     def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
-        parser = argparse.ArgumentParser()
+        parser = ArgumentParser()
         parser.add_argument('--repr', action = 'append', default = [])
         parser.add_argument('--config', action = 'append', default = [])
         parser.add_argument('--ignore-settings', action = 'store_true')
@@ -79,7 +80,7 @@ class ConfigLoader:
     def getglobal(context, resolvable):
         spec = resolvable.resolve(context).cat()
         lastdot = spec.rindex('.')
-        return wrap(getattr(importlib.import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
+        return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
 
     @staticmethod
     def enter(context, contextresolvable, resolvable):
