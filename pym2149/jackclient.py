@@ -29,7 +29,7 @@ class JackClient(jc.JackClient, Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
-        portcount = stereoinfo.getoutchans.size + config['SID', 'enabled'].value # FIXME: This is a hack.
+        portcount = stereoinfo.getoutchans.size + config.SID.enabled # FIXME: This is a hack.
         super().__init__(clientname, portcount, config.jackringsize, config.jackcoupling)
 
     def start(self):

@@ -17,12 +17,12 @@
 
 from .iface import Config
 from argparse import ArgumentParser
-from aridity import Context, NoSuchPathException, Repl
-from aridity.model import Function, Number, Text
+from aridity import NoSuchPathException
+from aridity.model import Number, Text
 from diapyr import UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-import logging, lurlene, numbers, sys
+import aridity.config, logging, lurlene, numbers, sys
 
 log = logging.getLogger(__name__)
 namespace = 'pym2149'
@@ -39,26 +39,26 @@ class ConfigName:
         self.additems = parser.parse_args(args)
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
 
-    def applyitems(self, context):
+    def applyitems(self, config):
         if not self.additems.ignore_settings:
-            settings = Path.home() / '.settings.arid'
-            if settings.exists():
-                with Repl(context) as repl:
-                    repl.printf(". %s", settings)
+            try:
+                config.loadsettings()
+            except FileNotFoundError as e:
+                log.warning("Settings not found: %s", e)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
-                with Repl(context) as repl:
+                with config.repl() as repl:
                     for text in value:
                         repl.printf("%s", namespace)
                         for line in text.splitlines():
                             repl("\t%s" % line)
             else:
-                context[namespace, name] = wrap(value)
+                config.put(namespace, name, resolvable = wrap(value))
 
     def newloader(self, di):
         return ConfigLoader(self, di)
 
-def wrap(value):
+def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)
 
 class AsContext:
@@ -105,29 +105,17 @@ class ConfigLoader:
         return path
 
     def load(self):
-        context = Context()
-        context['global',] = Function(self.getglobal)
-        context['enter',] = Function(self.enter)
-        context['py',] = Function(lambda *args: self.py(config, *args))
-        context['resolve',] = Function(self.resolve)
-        with Repl(context) as repl:
+        config = ConfigImpl.blank()
+        config.put('global', function = self.getglobal)
+        config.put('enter', function = self.enter)
+        config.put('py', function = lambda *args: self.py(config, *args))
+        config.put('resolve', function = self.resolve)
+        with config.repl() as repl:
             path = self.mark()
             repl.printf("cwd = %s", path.parent)
             repl.printf("%s . %s", namespace, path.name)
-        self.configname.applyitems(context)
-        config = ConfigImpl(context)
+        self.configname.applyitems(config)
+        config = getattr(config, namespace)
         return config
 
-class ConfigImpl(Config, lurlene.iface.Config):
-
-    def __init__(self, context):
-        self.pRiVaTe = context
-
-    def __getattr__(self, name):
-        try:
-            return self[(name,)].unravel() # TODO: Refactor to allow arbitrarily deep dotted notation.
-        except NoSuchPathException:
-            raise AttributeError(name)
-
-    def __getitem__(self, path):
-        return self.pRiVaTe.resolved(*(namespace,) + path)
+class ConfigImpl(aridity.config.Config, Config, lurlene.iface.Config): pass

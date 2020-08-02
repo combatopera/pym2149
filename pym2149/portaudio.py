@@ -64,10 +64,10 @@ class PortAudioClient(Platform):
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
         config = config.PortAudio
-        self.outputrate = config['outputrate'] # TODO: Find best rate supported by system.
-        self.buffersize = config['buffersize']
+        self.outputrate = config.outputrate # TODO: Find best rate supported by system.
+        self.buffersize = config.buffersize
         self.chancount = stereoinfo.getoutchans.size
-        self.ring = Ring(config['ringsize'], self._newbuf, config['coupling'])
+        self.ring = Ring(config.ringsize, self._newbuf, config.coupling)
         self.port = self._newbuf(np.zeros) # Use zeros so initial underrun doesn't sound terrible.
 
     def _newbuf(self, constructor):

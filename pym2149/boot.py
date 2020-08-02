@@ -31,9 +31,10 @@ def boot(configname):
     di.add(configname)
     di.add(di)
     config = configname.newloader(di).load()
-    if config.repr:
-        for key in config.repr:
-            print(repr(getattr(config, key)))
+    config_repr = list(config.repr)
+    if config_repr:
+        for key in config_repr:
+            print(repr(getattr(config, key).unravel()))
         sys.exit()
     di.add(config)
     di.add(ClockInfo)
@@ -48,7 +49,7 @@ def boot(configname):
     di.add(RollImpl if config.pianorollenabled else NullRoll)
     di.add(MainThread)
     di.add(YM2149Chip)
-    if config['SID', 'enabled'].value:
+    if config.SID.enabled:
         from . import resid
         resid.configure(di)
     return config, di
