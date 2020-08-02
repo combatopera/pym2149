@@ -110,10 +110,9 @@ class ConfigLoader:
         config.put('enter', function = self.enter)
         config.put('py', function = lambda *args: self.py(config, *args))
         config.put('resolve', function = self.resolve)
-        with config.repl() as repl:
-            path = self.mark()
-            repl.printf("cwd = %s", path.parent)
-            repl.printf("%s . %s", namespace, path.name)
+        path = self.mark()
+        config.printf("cwd = %s", path.parent)
+        config.printf("%s . %s", namespace, path.name)
         self.configname.applyitems(config)
         config = getattr(config, namespace)
         return config
