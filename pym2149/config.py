@@ -22,7 +22,6 @@ from aridity.model import Function, Number, Text
 from diapyr import UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-from splut.bg import SimpleBackground, Sleeper
 import logging, lurlene, numbers, sys
 
 log = logging.getLogger(__name__)
@@ -118,34 +117,6 @@ class ConfigLoader:
         self.configname.applyitems(context)
         config = ConfigImpl(context)
         return config
-
-    def reloadornone(self):
-        path = self.configname.path
-        if path.stat().st_mtime != self.mtime:
-            log.info("Reloading: %s", path)
-            return self.load()
-
-class ConfigSubscription(SimpleBackground):
-
-    def __init__(self, profile, configname, di, consumer):
-        super().__init__(profile)
-        self.configname = configname
-        self.di = di
-        self.consumer = consumer
-
-    def start(self):
-        self.loader = self.configname.newloader(self.di)
-        self.consumer(self.loader.load())
-        super().start(self.bg, Sleeper())
-
-    def bg(self, sleeper):
-        while True:
-            sleeper.sleep(1)
-            if self.quit:
-                break
-            config = self.loader.reloadornone()
-            if config is not None:
-                self.consumer(config)
 
 class ConfigImpl(Config, lurlene.iface.Config):
 

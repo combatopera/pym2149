@@ -20,9 +20,8 @@ from .program import FX, NullNote
 from .const import midichannelcount
 from .mediation import Mediation
 from .iface import Config, Tuning
-from .config import ConfigSubscription, ConfigName
 from .ym2149 import LogicalRegisters
-from diapyr import types, DI
+from diapyr import types
 from contextlib import contextmanager
 import logging
 
@@ -105,7 +104,6 @@ class Channels:
     @classmethod
     def configure(cls, di):
         di.add(cls)
-        di.add(ChannelsConfigSubscription)
 
     @types(Config, LogicalRegisters, Mediation, Tuning)
     def __init__(self, config, chip, mediation, tuning):
@@ -142,9 +140,6 @@ class Channels:
 
     def newnote(self, program, midipair, vel, fx, chipchan):
         self.channotes[chipchan] = ChanNote(self.frameindex, program, self.nomclock, self.chip, chipchan, midipair, self.tovoladj(vel), fx, self.normvel(vel), self.tuning)
-
-    def reconfigure(self, config):
-        self.midiprograms = config.midiprograms
 
     def _getfx(self, midichan):
         try:
@@ -205,9 +200,3 @@ class Channels:
 
     def __str__(self):
         return ', '.join("%s -> %s" % (midichan, self.midiprograms[program]) for midichan, program in sorted(self.midichantoprogram.items()))
-
-class ChannelsConfigSubscription(ConfigSubscription):
-
-    @types(Config, ConfigName, DI, Channels)
-    def __init__(self, config, configname, di, channels):
-        super().__init__(config.profile, configname, di, channels.reconfigure)
