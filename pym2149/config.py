@@ -26,6 +26,8 @@ import aridity.config, logging, lurlene, numbers, sys
 
 log = logging.getLogger(__name__)
 
+class ConfigImpl(aridity.config.Config, Config, lurlene.iface.Config): pass
+
 class ConfigName:
 
     namespace = 'pym2149'
@@ -99,5 +101,3 @@ def resolve(di, context, resolvable):
         return AsContext(context, di(getglobal(context, resolvable).value))
     except UnsatisfiableRequestException:
         raise NoSuchPathException
-
-class ConfigImpl(aridity.config.Config, Config, lurlene.iface.Config): pass
