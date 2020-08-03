@@ -59,13 +59,13 @@ class ConfigName:
         config = ConfigImpl.blank()
         config.put('global', function = getglobal)
         config.put('enter', function = enter)
-        config.put('py', function = lambda *args: py(config, *args))
+        config.put('py', function = lambda *args: py(nsconfig, *args))
         config.put('resolve', function = lambda *args: resolve(di, *args))
         config.printf("cwd = %s", self.path.parent)
         config.printf("%s . %s", namespace, self.path.name)
         self._applyitems(config)
-        config = getattr(config, namespace)
-        return config
+        nsconfig = getattr(config, namespace)
+        return nsconfig
 
 def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)
