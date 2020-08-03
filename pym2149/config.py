@@ -55,8 +55,8 @@ class ConfigName:
             else:
                 config.put(namespace, name, resolvable = wrap(value))
 
-    def newloader(self, di):
-        return ConfigLoader(self, di)
+    def loadconfig(self, di):
+        return ConfigLoader(self, di).load()
 
 def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)

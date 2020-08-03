@@ -30,7 +30,7 @@ def boot(configname):
     di = DI()
     di.add(configname)
     di.add(di)
-    config = configname.newloader(di).load()
+    config = configname.loadconfig(di)
     config_repr = list(config.repr)
     if config_repr:
         for key in config_repr:
