@@ -99,20 +99,14 @@ class ConfigLoader:
         self.configname = configname
         self.di = di
 
-    def mark(self):
-        path = self.configname.path
-        self.mtime = path.stat().st_mtime
-        return path
-
     def load(self):
         config = ConfigImpl.blank()
         config.put('global', function = self.getglobal)
         config.put('enter', function = self.enter)
         config.put('py', function = lambda *args: self.py(config, *args))
         config.put('resolve', function = self.resolve)
-        path = self.mark()
-        config.printf("cwd = %s", path.parent)
-        config.printf("%s . %s", namespace, path.name)
+        config.printf("cwd = %s", self.configname.path.parent)
+        config.printf("%s . %s", namespace, self.configname.path.name)
         self.configname.applyitems(config)
         config = getattr(config, namespace)
         return config
