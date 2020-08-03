@@ -39,7 +39,7 @@ class ConfigName:
         self.additems = parser.parse_args(args)
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
 
-    def applyitems(self, config):
+    def _applyitems(self, config):
         if not self.additems.ignore_settings:
             try:
                 config.loadsettings()
@@ -56,7 +56,16 @@ class ConfigName:
                 config.put(namespace, name, resolvable = wrap(value))
 
     def loadconfig(self, di):
-        return ConfigLoader(self, di).load()
+        config = ConfigImpl.blank()
+        config.put('global', function = getglobal)
+        config.put('enter', function = enter)
+        config.put('py', function = lambda *args: py(config, *args))
+        config.put('resolve', function = lambda *args: resolve(di, *args))
+        config.printf("cwd = %s", self.path.parent)
+        config.printf("%s . %s", namespace, self.path.name)
+        self._applyitems(config)
+        config = getattr(config, namespace)
+        return config
 
 def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)
@@ -73,42 +82,21 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
-class ConfigLoader:
+def getglobal(context, resolvable):
+    spec = resolvable.resolve(context).cat()
+    lastdot = spec.rindex('.')
+    return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
 
-    @staticmethod
-    def getglobal(context, resolvable):
-        spec = resolvable.resolve(context).cat()
-        lastdot = spec.rindex('.')
-        return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
+def enter(context, contextresolvable, resolvable):
+    return resolvable.resolve(contextresolvable.resolve(context))
 
-    @staticmethod
-    def enter(context, contextresolvable, resolvable):
-        return resolvable.resolve(contextresolvable.resolve(context))
+def py(config, context, *clauses):
+    return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
 
-    @staticmethod
-    def py(config, context, *clauses):
-        return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
-
-    def resolve(self, context, resolvable):
-        try:
-            return AsContext(context, self.di(self.getglobal(context, resolvable).value))
-        except UnsatisfiableRequestException:
-            raise NoSuchPathException
-
-    def __init__(self, configname, di):
-        self.configname = configname
-        self.di = di
-
-    def load(self):
-        config = ConfigImpl.blank()
-        config.put('global', function = self.getglobal)
-        config.put('enter', function = self.enter)
-        config.put('py', function = lambda *args: self.py(config, *args))
-        config.put('resolve', function = self.resolve)
-        config.printf("cwd = %s", self.configname.path.parent)
-        config.printf("%s . %s", namespace, self.configname.path.name)
-        self.configname.applyitems(config)
-        config = getattr(config, namespace)
-        return config
+def resolve(di, context, resolvable):
+    try:
+        return AsContext(context, di(getglobal(context, resolvable).value))
+    except UnsatisfiableRequestException:
+        raise NoSuchPathException
 
 class ConfigImpl(aridity.config.Config, Config, lurlene.iface.Config): pass
