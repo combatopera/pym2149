@@ -63,7 +63,7 @@ class ConfigName:
         config.put('global', function = getglobal)
         config.put('enter', function = enter)
         config.put('py', function = lambda *args: py(nsconfig, *args))
-        config.put('resolve', function = lambda *args: resolve(di, *args))
+        config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
         config.printf("cwd = %s", self.path.parent)
         config.printf("%s . %s", self.namespace, self.path.name)
         self._applyitems(config)
@@ -74,6 +74,13 @@ def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)
 
 class AsContext:
+
+    @classmethod
+    def resolve(cls, di, context, resolvable):
+        try:
+            return cls(context, di(getglobal(context, resolvable).value))
+        except UnsatisfiableRequestException:
+            raise NoSuchPathException
 
     def __init__(self, parent, obj):
         self.parent = parent
@@ -95,9 +102,3 @@ def enter(context, contextresolvable, resolvable):
 
 def py(config, context, *clauses):
     return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
-
-def resolve(di, context, resolvable):
-    try:
-        return AsContext(context, di(getglobal(context, resolvable).value))
-    except UnsatisfiableRequestException:
-        raise NoSuchPathException
