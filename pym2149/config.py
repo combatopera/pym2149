@@ -25,9 +25,10 @@ from pathlib import Path
 import aridity.config, logging, lurlene, numbers, sys
 
 log = logging.getLogger(__name__)
-namespace = 'pym2149'
 
 class ConfigName:
+
+    namespace = 'pym2149'
 
     def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
         parser = ArgumentParser()
@@ -49,11 +50,11 @@ class ConfigName:
             if 'config' == name:
                 with config.repl() as repl:
                     for text in value:
-                        repl.printf("%s", namespace)
+                        repl.printf("%s", self.namespace)
                         for line in text.splitlines():
                             repl("\t%s" % line)
             else:
-                config.put(namespace, name, resolvable = wrap(value))
+                config.put(self.namespace, name, resolvable = wrap(value))
 
     def loadconfig(self, di):
         config = ConfigImpl.blank()
@@ -62,9 +63,9 @@ class ConfigName:
         config.put('py', function = lambda *args: py(nsconfig, *args))
         config.put('resolve', function = lambda *args: resolve(di, *args))
         config.printf("cwd = %s", self.path.parent)
-        config.printf("%s . %s", namespace, self.path.name)
+        config.printf("%s . %s", self.namespace, self.path.name)
         self._applyitems(config)
-        nsconfig = getattr(config, namespace)
+        nsconfig = getattr(config, self.namespace)
         return nsconfig
 
 def wrap(value): # TODO: Migrate to aridity.
