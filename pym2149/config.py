@@ -42,7 +42,14 @@ class ConfigName:
         self.additems = parser.parse_args(args)
         self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
 
-    def _applyitems(self, config):
+    def loadconfig(self, di):
+        config = ConfigImpl.blank()
+        config.put('global', function = getglobal)
+        config.put('enter', function = enter)
+        config.put('py', function = lambda *args: py(nsconfig, *args))
+        config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
+        config.printf("cwd = %s", self.path.parent)
+        config.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
             try:
                 config.loadsettings()
@@ -57,16 +64,6 @@ class ConfigName:
                             repl("\t%s" % line)
             else:
                 config.put(self.namespace, name, resolvable = wrap(value))
-
-    def loadconfig(self, di):
-        config = ConfigImpl.blank()
-        config.put('global', function = getglobal)
-        config.put('enter', function = enter)
-        config.put('py', function = lambda *args: py(nsconfig, *args))
-        config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
-        config.printf("cwd = %s", self.path.parent)
-        config.printf("%s . %s", self.namespace, self.path.name)
-        self._applyitems(config)
         nsconfig = getattr(config, self.namespace)
         return nsconfig
 
