@@ -99,19 +99,12 @@ class Lead:
     offlevel = V('5x14 24x13//,9')
     vibs = V('0'), V('0'), V('8x 3.5x/,7x.3/ 7x-.3/')
 
-    def _common(self, frame, ym, degree, velocity):
+    def on(self, frame, ym, degree, velocity, onframes):
         ym.noiseflag = False
         ym.toneflag = True
         ym.tonedegree = degree[frame]
         ym.tonepitch += velocity[frame].pick(self.vibs)[frame]
-
-    def on(self, frame, ym, degree, velocity):
-        self._common(frame, ym, degree, velocity)
-        ym.level = velocity[frame].pick(self.levels)[frame]
-
-    def off(self, frame, ym, degree, velocity, onframes):
-        self._common(frame, ym, degree, velocity)
-        ym.level = (self.offlevel >> onframes)[frame]
+        ym.level = (velocity[frame].pick(self.levels) if onframes is None else self.offlevel >> onframes)[frame]
 
 class Tone:
 
