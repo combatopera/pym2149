@@ -38,6 +38,9 @@ class Boop(CommonDrum):
             ym.level -= att[frame]
             ym.tonedegree = (self.basedegree + degree)[frame]
 
+    def off(self):
+        pass
+
 class Fill(Boop):
 
     def on(self, frame, ym, degree):
@@ -60,6 +63,9 @@ class Side:
                 ym.noiseperiod = 21
             ym.tonedegree = degree[frame]
 
+    def off(self):
+        pass
+
 class Open:
 
     ison = V('8x1,0')
@@ -71,6 +77,9 @@ class Open:
             ym.noiseflag = True
             ym.toneflag = False
             ym.noiseperiod = np[frame]
+
+    def off(self):
+        pass
 
 class Bass:
 
@@ -114,6 +123,9 @@ class Tone:
         ym.toneflag = True
         ym.tonedegree = degree[frame]
 
+    def off(self):
+        pass
+
 class Ping:
 
     levels = V('16x12//,8'), V('16x14//,10')
@@ -123,6 +135,9 @@ class Ping:
         ym.noiseflag = False
         ym.toneflag = True
         ym.tonedegree = degree[frame]
+
+    def off(self):
+        pass
 
 class Diarp:
 

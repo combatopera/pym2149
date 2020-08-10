@@ -15,6 +15,9 @@ class Bass:
             ym.envshape = self.envshape
         ym.envdegree = (slap[frame].pick(self.envpitches) + degree)[frame]
 
+    def off(self):
+        pass
+
 class Kick:
 
     ison = V('8x1,0')
@@ -50,6 +53,9 @@ class Snare:
             ym.tonepitch = self.pitch[frame]
             return True
 
+    def off(self):
+        pass
+
 class Snare2(Snare):
 
     np2 = V('17,1'), Snare.np
@@ -70,6 +76,9 @@ class Arp:
         ym.toneflag = True
         ym.tonepitch = topitch((degree + inv[frame].pick(self.chords))[frame]) + self.vib[frame]
 
+    def off(self):
+        pass
+
 class Arp2:
 
     level = V('2x13 3x12 2x11 6x10,9')
@@ -79,6 +88,9 @@ class Arp2:
         ym.level = self.level[frame]
         ym.toneflag = True
         ym.tonedegree = self.whichdegree[frame].pick({1: degree1, 2: degree2, 3: degree3})[frame]
+
+    def off(self):
+        pass
 
 class Lead:
 
@@ -102,6 +114,9 @@ class Bright:
         ym.toneflag = True
         ym.tonedegree = (degree + self.arp)[frame]
 
+    def off(self):
+        pass
+
 class Luke:
 
     level = V('12 13 14 12,9'), V('11 12 13 11 9 6 4 2x3 2 1,0'), V('10 11 12 10,8'), V('2x10 11 10,7'), V('2x9 10 9,7'), V('2x8 9 8,6'), V('2x7 8 7,5'), V('6 2x7 6,5'), V('5 2x6 5,4'), V('4 2x5 4,3'), V('3 4x4// 2,1')
@@ -111,6 +126,9 @@ class Luke:
         ym.level = att[frame].pick(self.level)[frame]
         ym.toneflag = True
         ym.tonedegree = (degree + self.arp)[frame]
+
+    def off(self):
+        pass
 
 bass1 = E(Bass, 2 * ['/.5 /.5 .5 /.5 /.5 .5 /.5 .5 1.5/1|/.5 /.5 .5 /.5 /.5 .5 /.5 4x.5'],
         degree = D('--') + D('2- 2 .5x 2 1.5x2- 2 .5x 1.5x2|2- 2 .5x 2 1.5x2- 2 .5x .5x2 .5x6- .5x'))
@@ -129,7 +147,7 @@ bass7 = E(Bass, '.75/.25 3x/.25 .5',
 kick1 = E(Kick, '2')
 kick1a = E(Kick, '2',
         np = V('1,7'))
-kick2 = E(Kick, '12x .5/ .25 .75 2.5')
+kick2 = E(Kick, '12x .5// .25 .75 2.5')
 kick7 = E(Kick, '.5 .25 .5 .25 2x.5 .25 .5 .75',
         att = V('.5x 1.5x1 .5x .75x1 .75x'))
 snare2 = E(Snare, '13/ 1 .25 .5 .25 .5 2x.25',
@@ -149,7 +167,7 @@ arp6 = E(Arp2, ['.5/ .5'] * 27, '.5/ .75 3.75/',
         degree1 = D('4x 8x6- 4x|5x 7- 2x6- 2x7- 6x6-'),
         degree2 = D('12x2 4x3|5x3 11x2'),
         degree3 = D('6x5 6x4# 4x5|7x5 4# 3x5 5x4#'))
-lead4 = E(Lead, '2x.75 5/.25 3x.5|2x.75 4.5 2x|1.5 3 .5 4x.25 .5 .25 3x.5 .25 2x.5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 1',
+lead4 = E(Lead, '2x.75 5//.25 3x.5|2x.75 4.5 2x|1.5 3 .5 4x.25 .5 .25 3x.5 .25 2x.5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 .5 .25 1',
         degree = D('.75x2 .75x6 .5x+/ 5x2+ .5x+ 2+/.5 .25x3+ .75x+ 4.5x6 + 6|2x+/.5 3x2+ .25x+ .25x6 .25x5 .25x4 .5x5 .25x4 .5x5 .5x6 .5x4 1.25x2 .25x .5x2 .25x# .5x2# .25x2 .5x3 .25x2# .5x4 .25x3 .5x4# .25x4 .5x5 .25x4# .5x5# .25x5 6'),
         att = V('16x|10.25x .75x1 .75x2 .75x3 .75x4 .75x5 .75x6 1.25x7'))
 lead5 = E(Bright, '3.75/ .5 .25 .5 .25 3x.5 .25 2x.5|3.75/ .5 .25 .5 .25 .5 .25 .5 .25 .5 3x.25',
