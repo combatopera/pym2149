@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .power import batterypower
-from io import StringIO
 from lagoon import sox
 from lurlene.util import threadlocals
 from PIL import Image, ImageChops
@@ -37,22 +36,23 @@ def test_expected():
 
 def _comparetxt(path):
     relpath = path.relative_to(expecteddir)
+    actualpath = actualdir / relpath
+    actualpath.parent.mkdir(parents = True, exist_ok = True)
     configpath = project / relpath.parent / ("%s.arid" % relpath.name)
     if configpath.exists():
         with configpath.open() as f:
             config = ['--config', f.read()]
     else:
         config = []
-    stream = StringIO()
-    with threadlocals(stream = stream):
+    with open(actualpath, 'w') as stream, threadlocals(stream = stream):
         lc2txt.main_lc2txt(['--ignore-settings'] + config + [
                 '--config', 'local = $global(lurlene.util.local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / ("%s.py" % relpath.name))])
     tc = unittest.TestCase()
     tc.maxDiff = None
-    with path.open() as f:
-        tc.assertEqual(f.read(), stream.getvalue())
+    with path.open() as f, actualpath.open() as g:
+        tc.assertEqual(f.read(), g.read())
 
 def _comparepng(path):
     relpath = path.relative_to(expecteddir)
