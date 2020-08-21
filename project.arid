@@ -37,3 +37,4 @@ years +=
 pyversions += 3
 executable = true
 licheck exclude globs += contrib/*
+devel packages += alsa-lib-devel
