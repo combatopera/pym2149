@@ -37,4 +37,6 @@ years +=
 pyversions += 3
 executable = true
 licheck exclude globs += contrib/*
-devel packages += alsa-lib-devel
+devel
+    packages += alsa-lib-devel
+    archive http://www.zimmers.net/anonftp/pub/cbm/crossplatform/emulators/resid/resid-0.16.tar.gz = ./configure --enable-shared && make && sudo make install
