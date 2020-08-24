@@ -24,8 +24,8 @@ requires +=
     Lurlene
     mynblep
     outjack
+    outport
     Pillow
-    PyAudio
     pyrbo
     splut
     timelyOSC

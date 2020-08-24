@@ -21,7 +21,7 @@ from .nod import Node
 from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
-from pyaudio import PyAudio, paFloat32, paContinue
+from outport import PyAudio, paFloat32, paContinue
 import numpy as np, logging, threading
 
 log = logging.getLogger(__name__)
