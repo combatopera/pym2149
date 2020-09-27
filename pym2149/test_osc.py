@@ -23,7 +23,7 @@ from .osc2 import EnvOsc, NoiseOsc, RToneOsc, ToneOsc
 from .reg import Reg, VersionReg
 from .shapes import toneshape
 from .ym2149 import YM2149, ym2149nzdegrees
-from collections import namedtuple
+from types import SimpleNamespace
 from unittest import TestCase
 import sys, time
 
@@ -136,7 +136,7 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
     @staticmethod
     def createosc(clock, prescalerornone, effectivedata):
         effect = VersionReg(value = PWMEffect(None))
-        return RToneOsc(mfpclock, clock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
+        return RToneOsc(mfpclock, clock, SimpleNamespace(effect = effect, prescalerornone = prescalerornone, effectivedata = effectivedata))
 
     def test_works(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
@@ -224,11 +224,11 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
         pass # TODO: Implement.
 
     def test_stoptimer(self):
-        effect = VersionReg(value = namedtuple('Effect', 'getshape')(lambda: toneshape))
+        effect = VersionReg(value = SimpleNamespace(getshape = lambda: toneshape))
         prescalerornone = Reg(value=3)
         effectivedata = Reg(value=5)
         chipimplclock = mfpclock*2 # Not dissimilar to the real thing.
-        o = RToneOsc(mfpclock, chipimplclock, namedtuple('Timer', 'effect prescalerornone effectivedata')(effect, prescalerornone, effectivedata))
+        o = RToneOsc(mfpclock, chipimplclock, SimpleNamespace(effect = effect, prescalerornone = prescalerornone, effectivedata = effectivedata))
         self.assertEqual([1]*30 + [0]*11, o.call(Block(41)).tolist())
         self.assertEqual(4, o.maincounter)
         self.assertEqual(chipimplclock//2, o.precounterxmfp)
@@ -246,8 +246,8 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
         # XXX: Finished?
 
     def test_works3(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = 1), Reg(value = 81920))
+        effect = SimpleNamespace(getshape = lambda: toneshape)
+        timer = SimpleNamespace(effect = VersionReg(value = effect), prescalerornone = Reg(value = 1), effectivedata = Reg(value = 81920))
         d = RToneOsc(mfpclock, 100, timer)
         expected = [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0] * 4
         for _ in range(13):
@@ -262,8 +262,8 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
         self.assertEqual(expected, actual)
 
     def test_notrunning(self):
-        effect = namedtuple('Effect', 'getshape')(lambda: toneshape)
-        timer = namedtuple('Timer', 'effect prescalerornone effectivedata')(VersionReg(value = effect), Reg(value = None), Reg(value = 1))
+        effect = SimpleNamespace(getshape = lambda: toneshape)
+        timer = SimpleNamespace(effect = VersionReg(value = effect), prescalerornone = Reg(value = None), effectivedata = Reg(value = 1))
         d = RToneOsc(mfpclock, 1000, timer)
         for _ in range(50):
             self.assertEqual([0] * 100, d.call(Block(100)).tolist()) # Expect no interrupts.

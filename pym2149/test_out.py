@@ -20,7 +20,7 @@ from .minblep import MinBleps
 from .nod import Block, Node
 from .out import floatdtype, WavBuf, WavWriter
 from .power import batterypower
-from collections import namedtuple
+from types import SimpleNamespace
 from unittest import TestCase
 import numpy as np, os, sys, time
 
@@ -45,13 +45,13 @@ class TestWavWriter(TestCase):
         blocksize = clock // (1000, 10)[bigblocks]
         tone = MinPeriodTone()
         outrate = 44100
-        w = WavBuf(namedtuple('ClockInfo', 'implclock')(clock), tone, MinBleps.create(clock, outrate, None))
-        config = namedtuple('Config', 'outpath')(os.devnull)
-        platform = namedtuple('Platform', 'outputrate')(outrate)
+        w = WavBuf(SimpleNamespace(implclock = clock), tone, MinBleps.create(clock, outrate, None))
+        config = SimpleNamespace(outpath = os.devnull)
+        platform = SimpleNamespace(outputrate = outrate)
         w = WavWriter(
             config,
             w,
-            namedtuple('StereoInfo', 'getoutchans')(namedtuple('getoutchansimpl', 'size')(1)),
+            SimpleNamespace(getoutchans = SimpleNamespace(size = 1)),
             platform)
         w.start()
         tone.cursor = 0
