@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .iface import Config, Tuning
-from diapyr import types, DI
+from diapyr import DI, types
 from lurlene.context import Context
-import math, bisect, logging
+import bisect, logging, math
 
 log = logging.getLogger(__name__)
 

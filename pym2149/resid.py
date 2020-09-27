@@ -17,13 +17,13 @@
 
 from .buf import MasterBuf
 from .clock import ClockInfo
-from .iface import Chip, Config, Tuning, AmpScale
+from .iface import AmpScale, Chip, Config, Tuning
 from .lurlene import convenient
 from .minblep import MinBleps
 from .native.resid import NativeSID
 from .nod import Node
-from .out import Translator, FloatStream
-from .reg import regproperty, Reg
+from .out import FloatStream, Translator
+from .reg import Reg, regproperty
 from .shapes import floatdtype
 from diapyr import types
 from lurlene import topitch

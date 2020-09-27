@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from .lfsr import Lfsr
 from .ym2149 import ym2149nzdegrees
+from unittest import TestCase
 
-class TestLfsr(unittest.TestCase):
+class TestLfsr(TestCase):
 
     def test_correctsequence(self):
         # Subsequence of the real LFSR from Hatari mailing list:

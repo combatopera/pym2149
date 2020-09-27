@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from .nod import Node, Block
+from .nod import Block, Node
+from unittest import TestCase
 
 class MyNode(Node):
 
@@ -29,7 +29,7 @@ class MyNode(Node):
         self.x += 1
         return x
 
-class TestNode(unittest.TestCase):
+class TestNode(TestCase):
 
     def test_works(self):
         n = MyNode()

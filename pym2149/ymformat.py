@@ -17,9 +17,9 @@
 
 from .clock import stclock
 from .dac import PWMEffect, SinusEffect
-from .iface import YMFile, Config
+from .iface import Config, YMFile
 from diapyr import types
-import struct, logging, os, tempfile, shutil, sys
+import logging, os, shutil, struct, sys, tempfile
 
 log = logging.getLogger(__name__)
 

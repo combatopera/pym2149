@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import YMFile, Config, Platform
+from .iface import Config, Platform, YMFile
 from diapyr import types
 import logging
 

@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .pitch import Pitch, Meantone, FiveLimit
+from .pitch import FiveLimit, Meantone, Pitch
 from types import SimpleNamespace
-import unittest, math
+from unittest import TestCase
+import math
 
-class TestMeantone(unittest.TestCase):
+class TestMeantone(TestCase):
 
     def test_pythagoreanmodified(self):
         m = Meantone(SimpleNamespace(referencefrequency = 15552, referencemidinote = 60.25, meantoneflats = 5, meantonecomma = 0))
@@ -77,7 +78,7 @@ class TestMeantone(unittest.TestCase):
         m = Meantone(SimpleNamespace(referencefrequency = 440, referencemidinote = 69, meantoneflats = 2, meantonecomma = 1 / 3))
         self.assertEqual(9, sum(1 for p in range(60, 72) if math.isclose(6 / 5, m.freq(p + 3) / m.freq(p))))
 
-class TestFiveLimit(unittest.TestCase):
+class TestFiveLimit(TestCase):
 
     def test_asymmetric(self):
         t = FiveLimit(SimpleNamespace(referencefrequency = 440, referencemidinote = 69))
@@ -94,7 +95,7 @@ class TestFiveLimit(unittest.TestCase):
         self.assertAlmostEqual(440 * 9 / 5, t.freq(79))
         self.assertAlmostEqual(440 * 15 / 8, t.freq(80))
 
-class TestPitch(unittest.TestCase):
+class TestPitch(TestCase):
 
     def test_str(self):
         self.assertEqual('C..4   ', str(Pitch(60)))

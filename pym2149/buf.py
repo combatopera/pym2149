@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-from pyrbo import turbo, T, generic, LOCAL
 from .const import u4
 from .shapes import signaldtype
+from pyrbo import generic, LOCAL, turbo, T
+import numpy as np
 
 class Buf(metaclass = generic):
 

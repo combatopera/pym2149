@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from .dac import Dac
-from .nod import BufNode, Block
+from .nod import Block, BufNode
 from .shapes import signaldtype
+from unittest import TestCase
 
 class Ramps(BufNode):
 
@@ -31,7 +31,7 @@ class Ramps(BufNode):
         for i in range(self.block.framecount):
             self.blockbuf.fillpart(i, i + 1, self.dtype(i))
 
-class TestDac(unittest.TestCase):
+class TestDac(TestCase):
 
     def test_works(self):
         d = Dac(Ramps(), 16, 1)

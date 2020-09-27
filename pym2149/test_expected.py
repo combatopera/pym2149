@@ -18,9 +18,11 @@
 from .power import batterypower
 from lagoon import sox
 from lurlene.util import threadlocals
-from PIL import Image, ImageChops
 from pathlib import Path
-import unittest, tempfile, base64, lc2txt, lc2wav
+from PIL import Image, ImageChops
+from tempfile import NamedTemporaryFile
+from unittest import TestCase
+import base64, lc2txt, lc2wav
 
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
@@ -49,7 +51,7 @@ def _comparetxt(path):
                 '--config', 'local = $global(lurlene.util.local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / ("%s.py" % relpath.name))])
-    tc = unittest.TestCase()
+    tc = TestCase()
     tc.maxDiff = None
     with path.open() as f, actualpath.open() as g:
         tc.assertEqual(f.read(), g.read())
@@ -58,7 +60,7 @@ def _comparepng(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
-    with tempfile.NamedTemporaryFile() as wavfile:
+    with NamedTemporaryFile() as wavfile:
         lc2wav.main_lc2wav(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
@@ -69,4 +71,4 @@ def _comparepng(path):
         return sum(h[:limit]) / sum(h)
     if frac(92) < 1 or frac(14) < .99 or frac(10) < .98:
         with actualpath.open('rb') as f:
-            unittest.TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
+            TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))

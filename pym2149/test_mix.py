@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, numpy as np
 from .mix import IdealMixer, Multiplexer
-from .nod import BufNode, Block, Container
+from .nod import Block, BufNode, Container
 from .out import TrivialOutChannel
+from unittest import TestCase
+import numpy as np
 
 class Counter(BufNode):
 
@@ -33,7 +34,7 @@ class Counter(BufNode):
             self.blockbuf.fillpart(frameindex, frameindex + 1, self.x)
             self.x += 1
 
-class TestIdealMixer(unittest.TestCase):
+class TestIdealMixer(TestCase):
 
     def expect(self, m, values, actual):
         self.assertEqual(len(values), len(actual))
@@ -47,7 +48,7 @@ class TestIdealMixer(unittest.TestCase):
         # Check the buffer is actually cleared first:
         self.expect(m, [20, 22, 24, 26, 28], m.call(Block(5)))
 
-class TestMultiplexer(unittest.TestCase):
+class TestMultiplexer(TestCase):
 
     def test_works(self):
         a = Counter()

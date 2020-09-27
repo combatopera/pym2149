@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from mynblep.shapes import floatdtype
 from .const import u4
+from mynblep.shapes import floatdtype
 import math, numpy as np
 
 signaldtype = np.uint8 # Slightly faster than plain old int.

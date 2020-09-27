@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from .timer import SimpleTimer, MinBlockRateTimer
+from unittest import TestCase
 
-class TestSimpleTimer(unittest.TestCase):
+class TestSimpleTimer(TestCase):
 
     def periodframecount(self, rate):
         block, = self.t.blocksforperiod(rate)
@@ -59,7 +59,7 @@ class TestSimpleTimer(unittest.TestCase):
         self.assertEqual(-1.5, t.carryticks)
         t.carryticks = 0
 
-class TestMinBlockRateTimer(unittest.TestCase):
+class TestMinBlockRateTimer(TestCase):
 
     def test_minblockrate(self):
         t = MinBlockRateTimer(1000, 2)

@@ -15,16 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest, time, sys
-from .osc2 import ToneOsc, NoiseOsc, EnvOsc, RToneOsc
+from .dac import PWMEffect
+from .lfsr import Lfsr
 from .mfp import mfpclock
 from .nod import Block
+from .osc2 import EnvOsc, NoiseOsc, RToneOsc, ToneOsc
 from .reg import Reg, VersionReg
-from .lfsr import Lfsr
-from .ym2149 import ym2149nzdegrees, YM2149
 from .shapes import toneshape
-from .dac import PWMEffect
+from .ym2149 import YM2149, ym2149nzdegrees
 from collections import namedtuple
+from unittest import TestCase
+import sys, time
 
 class AbstractTestOsc:
 
@@ -43,7 +44,7 @@ class AbstractTestOsc:
         sys.stderr.write("%s ... " % expression)
         self.assertTrue(eval(expression))
 
-class TestToneOsc(AbstractTestOsc, unittest.TestCase):
+class TestToneOsc(AbstractTestOsc, TestCase):
 
     performanceperiods = 0x001, 0xfff
     performancelimit = .05
@@ -121,7 +122,7 @@ class TestToneOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
         self.assertEqual([1], o.call(Block(1)).tolist())
 
-class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do not behave like YM2149 tones.
+class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave like YM2149 tones.
 
     performanceperiods = 0x001, 0xfff
     performancelimit = .1
@@ -279,7 +280,7 @@ class TestRToneOsc(AbstractTestOsc, unittest.TestCase): # FIXME: MFP timers do n
         self.assertEqual(None, d.precounterxmfp)
         self.assertEqual(1, d.maincounter)
 
-class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
+class TestNoiseOsc(AbstractTestOsc, TestCase):
 
     performanceperiods = 0x01, 0x1f
     performancelimit = .05
@@ -337,7 +338,7 @@ class TestNoiseOsc(AbstractTestOsc, unittest.TestCase):
         self.assertEqual([1] * 7, o.call(Block(7)).tolist())
         self.assertEqual([1] * 3 + [0] * 16 + [1] * 1, o.call(Block(20)).tolist())
 
-class TestEnvOsc(unittest.TestCase):
+class TestEnvOsc(TestCase):
 
     def test_shapes(self):
         s = EnvOsc.shapes[0x0c]

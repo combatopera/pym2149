@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Platform, AmpScale, Stream
+from .iface import AmpScale, Platform, Stream
 from diapyr import types
 
 class TxtPlatform(Platform, metaclass = AmpScale):

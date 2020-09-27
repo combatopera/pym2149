@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
-from .iface import Config, Tuning, Roll
+from .iface import Config, Roll, Tuning
 from .ym2149 import LogicalRegisters
 from diapyr import types
 from diapyr.util import singleton

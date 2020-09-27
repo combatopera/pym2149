@@ -17,7 +17,7 @@
 
 from .buf import MasterBuf
 from .clock import ClockInfo
-from .iface import AmpScale, Multiplexed, Stream, Platform, Config
+from .iface import AmpScale, Config, Multiplexed, Platform, Stream
 from .minblep import MinBleps
 from .mix import IdealMixer, Multiplexer
 from .nod import Node
@@ -26,7 +26,7 @@ from .wav import Wave16
 from .ym2149 import YM2149
 from diapyr import types
 from diapyr.util import singleton
-import numpy as np, logging
+import logging, numpy as np
 
 log = logging.getLogger(__name__)
 

@@ -16,9 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .ym2149 import LogicalRegisters, PhysicalRegisters
-import unittest
+from unittest import TestCase
 
-class TestPhysicalRegisters(unittest.TestCase):
+class TestPhysicalRegisters(TestCase):
 
     chipchannels = 1
     maxtoneperiod = 0xfff

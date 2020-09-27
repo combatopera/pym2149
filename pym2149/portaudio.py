@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import AmpScale, Platform, Stream, Config
+from .iface import AmpScale, Config, Platform, Stream
 from .jackclient import BufferFiller
 from .nod import Node
 from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
-from outport import PyAudio, paFloat32, paContinue
-import numpy as np, logging, threading
+from outport import paContinue, paFloat32, PyAudio
+import logging, numpy as np, threading
 
 log = logging.getLogger(__name__)
 

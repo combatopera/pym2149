@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .dosound import issleepcommand
-import re, itertools
+import itertools, re
 
 class Line:
 

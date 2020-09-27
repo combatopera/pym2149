@@ -17,11 +17,12 @@
 
 from .buf import Buf
 from .minblep import MinBleps
-from .nod import Node, Block
-from .out import WavWriter, WavBuf, floatdtype
+from .nod import Block, Node
+from .out import floatdtype, WavBuf, WavWriter
 from .power import batterypower
 from collections import namedtuple
-import unittest, numpy as np, time, sys, os
+from unittest import TestCase
+import numpy as np, os, sys, time
 
 class MinPeriodTone(Node):
 
@@ -37,7 +38,7 @@ class MinPeriodTone(Node):
     def callimpl(self):
         return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
 
-class TestWavWriter(unittest.TestCase):
+class TestWavWriter(TestCase):
 
     def minperiodperformance(self, bigblocks, strictlimitornone):
         clock = 250000

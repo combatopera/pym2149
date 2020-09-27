@@ -16,13 +16,13 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
-from .dac import Level, Dac
+from .dac import Dac, Level
 from .iface import AmpScale, Config
 from .lfsr import Lfsr
-from .mfp import MFPTimer, mfpclock
+from .mfp import mfpclock, MFPTimer
 from .mix import BinMix
 from .nod import Container
-from .osc2 import ToneOsc, NoiseOsc, Shape, EnvOsc, RToneOsc
+from .osc2 import EnvOsc, NoiseOsc, RToneOsc, Shape, ToneOsc
 from .reg import Reg, VersionReg
 from diapyr import types
 import logging

@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .nod import BufNode
-from .shapes import toneshape, leveltosinusshape, level5toamp, level4to5, signaldtype, floatdtype
+from .shapes import floatdtype, level4to5, level5toamp, leveltosinusshape, signaldtype, toneshape
 import numpy as np
 
 class Level(BufNode):

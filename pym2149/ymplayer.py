@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .iface import Stream, Prerecorded, Config, Roll, Timer, Chip
+from .iface import Chip, Config, Prerecorded, Roll, Stream, Timer
 from .ym2149 import PhysicalRegisters
 from diapyr import types
 from splut.bg import MainBackground
