@@ -15,19 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
 from pym2149 import portaudio
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import SyncTimer
-from pym2149.util import MainThread
+from pym2149.util import initlogging, MainThread
 from pym2149.ymformat import YMOpen
 from pym2149.ymplayer import Player, PhysicalBundle
 from diapyr.start import Started
+import logging
 
 log = logging.getLogger(__name__)
 
 def main_ym2portaudio():
+    initlogging()
     config, di = boot(ConfigName('inpath'))
     with di:
         di.add(YMOpen)

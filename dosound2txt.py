@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
 from pym2149 import txt
 from pym2149.boot import boot
 from pym2149.budgie import readbytecode
@@ -23,10 +22,11 @@ from pym2149.config import ConfigName
 from pym2149.dosound import Bytecode
 from pym2149.iface import Config
 from pym2149.timerimpl import SimpleChipTimer
-from pym2149.util import MainThread
+from pym2149.util import initlogging, MainThread
 from pym2149.ymplayer import Player, PhysicalBundle
 from diapyr import types
 from diapyr.start import Started
+import logging
 
 log = logging.getLogger(__name__)
 
@@ -36,6 +36,7 @@ def bytecodefactory(config):
         return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
 def main_dosound2txt():
+    initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
     with di:
         di.add(bytecodefactory)

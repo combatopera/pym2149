@@ -15,19 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from pym2149.initlogging import logging
 from pym2149 import jackclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.iface import Config
 from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import SyncTimer
-from pym2149.util import MainThread
+from pym2149.util import initlogging, MainThread
 from pym2149.ymplayer import Player, LogicalBundle
 from diapyr import types
 from diapyr.start import Started
 from lurlene.context import Context
-import lurlene.osc
+import logging, lurlene.osc
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +37,7 @@ def loadcontext(config, context):
     context.flip()
 
 def main_lc2jack():
+    initlogging()
     config, di = boot(ConfigName('inpath', '--section'))
     with di:
         di.add(loadcontext)
