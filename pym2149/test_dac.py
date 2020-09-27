@@ -22,10 +22,8 @@ from unittest import TestCase
 
 class Ramps(BufNode):
 
-    dtype = signaldtype
-
     def __init__(self):
-        super().__init__(self.dtype)
+        super().__init__(signaldtype)
 
     def callimpl(self):
         for i in range(self.block.framecount):
