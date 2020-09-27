@@ -85,11 +85,12 @@ class SinusEffect(TimerEffect):
 class Dac(BufNode):
 
     def __init__(self, level, log2maxpeaktopeak, ampshare):
-        super().__init__(BufType.float)
+        buftype = BufType.float
+        super().__init__(buftype)
         # We take off .5 so that the peak amplitude is about -3 dB:
         maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
         # Lookup of ideal amplitudes:
-        self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in range(32)), self.dtype)
+        self.leveltopeaktopeak = np.fromiter((level5toamp(v) * maxpeaktopeak for v in range(32)), buftype.dtype)
         self.level = level
 
     def callimpl(self):

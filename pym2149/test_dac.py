@@ -22,12 +22,14 @@ from unittest import TestCase
 
 class Ramps(BufNode):
 
+    buftype = BufType.signal
+
     def __init__(self):
-        super().__init__(BufType.signal)
+        super().__init__(self.buftype)
 
     def callimpl(self):
         for i in range(self.block.framecount):
-            self.blockbuf.fillpart(i, i + 1, self.dtype(i))
+            self.blockbuf.fillpart(i, i + 1, self.buftype.dtype(i))
 
 class TestDac(TestCase):
 

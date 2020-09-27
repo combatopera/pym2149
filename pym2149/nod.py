@@ -65,7 +65,6 @@ class BufNode(Node):
     def __init__(self, buftype, channels = 1):
         super().__init__()
         self.masterbuf = buftype()
-        self.dtype = buftype.dtype # XXX: What really uses this?
         self.channels = channels
         self.realcallimpl = self.callimpl
         self.callimpl = self.makeresult
