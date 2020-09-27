@@ -21,7 +21,26 @@ from diapyr.util import enum
 from pyrbo import generic, LOCAL, turbo, T
 import numpy as np
 
+@enum(
+    ['float', floatdtype],
+    ['int16', np.int16],
+    ['short', np.short],
+    ['signal', signaldtype],
+)
+class BufType:
+
+    def __init__(self, _, dtype):
+        self.dtype = dtype
+
+    def __call__(self):
+        return MasterBuf(self.dtype)
+
+groupsets = {T: [{t.dtype for t in BufType.enum}]}
+
 class Buf(metaclass = generic):
+
+    def _turbo(**types):
+        return turbo(types = dict(self = dict(buf = [T]), **types), groupsets = groupsets)
 
     def __init__(self, buf):
         self.buf = buf
@@ -32,47 +51,47 @@ class Buf(metaclass = generic):
     def last(self):
         return self.buf[-1]
 
-    @turbo(self = dict(buf = [T]), endframe = u4, that = dict(buf = [T]), i = u4)
+    @_turbo(endframe = u4, that = dict(buf = [T]), i = u4)
     def copyasprefix(self, endframe, that):
         self_buf = that_buf = LOCAL
         for i in range(endframe):
             self_buf[i] = that_buf[i]
 
-    @turbo(self = dict(buf = [T]), that = dict(buf = [T]), startframe = u4, endframe = u4, i = u4)
+    @_turbo(that = dict(buf = [T]), startframe = u4, endframe = u4, i = u4)
     def copywindow(self, that, startframe, endframe):
         self_buf = that_buf = LOCAL
         for i in range(endframe - startframe):
             self_buf[i] = that_buf[startframe]
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, value = T)
+    @_turbo(startframe = u4, endframe = u4, value = T)
     def fillpart(self, startframe, endframe, value):
         self_buf = LOCAL
         while startframe < endframe:
             self_buf[startframe] = value
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), startframe = u4, endframe = u4, thatnp = [T], j = u4)
+    @_turbo(startframe = u4, endframe = u4, thatnp = [T], j = u4)
     def partcopyintonp(self, startframe, endframe, thatnp):
         self_buf = LOCAL
         for j in range(endframe - startframe):
             thatnp[j] = self_buf[startframe]
             startframe += 1
 
-    @turbo(self = dict(buf = [T]), value = np.int8, i = u4, v = T)
+    @_turbo(value = np.int8, i = u4, v = T)
     def fill_i1(self, value):
         self_buf = py_self_buf = LOCAL
         v = value # Cast once.
         for i in range(py_self_buf.size):
             self_buf[i] = v
 
-    @turbo(self = dict(buf = [T]), value = T, i = u4)
+    @_turbo(value = T, i = u4)
     def fill_same(self, value):
         self_buf = py_self_buf = LOCAL
         for i in range(py_self_buf.size):
             self_buf[i] = value
 
-    @turbo(self = dict(buf = [T]), start = u4, end = u4, step = u4, data = [T], j = u4)
+    @_turbo(start = u4, end = u4, step = u4, data = [T], j = u4)
     def putstrided(self, start, end, step, data):
         self_buf = LOCAL
         j = 0
@@ -90,7 +109,7 @@ class Buf(metaclass = generic):
     def mulbuf(self, that):
         self.buf *= that.buf
 
-    @turbo(self = dict(buf = [T]), that = dict(buf = [signaldtype]), lookup = [T], i = u4)
+    @_turbo(that = dict(buf = [signaldtype]), lookup = [T], i = u4)
     def mapbuf(self, that, lookup):
         self_buf = that_buf = py_that_buf = LOCAL
         for i in range(py_that_buf.size):
@@ -122,20 +141,6 @@ class Buf(metaclass = generic):
 
     def tolist(self): # For tests.
         return list(self.buf)
-
-@enum(
-    ['float', floatdtype],
-    ['int16', np.int16],
-    ['short', np.short],
-    ['signal', signaldtype],
-)
-class BufType:
-
-    def __init__(self, _, dtype):
-        self.dtype = dtype
-
-    def __call__(self):
-        return MasterBuf(self.dtype)
 
 class MasterBuf:
 
