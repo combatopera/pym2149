@@ -16,7 +16,6 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .buf import MasterBuf
-from .channels import Channels
 from .clock import ClockInfo
 from .iface import AmpScale, Multiplexed, Stream, Platform, Config
 from .minblep import MinBleps
@@ -38,11 +37,8 @@ class StereoInfo:
         self.n = config.chipchannels
         if config.stereo:
             self.panlaw = config.panlaw
-            if config.midipan:
-                self.getoutchans = self.getmidioutchans
-            else:
-                self.maxpan = float(config.maxpan)
-                self.getoutchans = self.getstaticoutchans
+            self.maxpan = float(config.maxpan)
+            self.getoutchans = self.getstaticoutchans
         else:
             self.getoutchans = self.gettrivialoutchans
 
@@ -52,20 +48,13 @@ class StereoInfo:
     def staticamp(self, outchan, chipchan):
         return self.pantoamp(outchan, (chipchan * 2 - (self.n - 1)) / (self.n - 1) * self.maxpan)
 
-    def gettrivialoutchans(self, *args):
+    def gettrivialoutchans(self):
         return [TrivialOutChannel]
     gettrivialoutchans.size = 1
 
-    def getstaticoutchans(self, *args):
+    def getstaticoutchans(self):
         return [StaticOutChannel([self.staticamp(oc, cc) for cc in range(self.n)]) for oc in range(2)]
     getstaticoutchans.size = 2
-
-    def getmidioutchans(self, channels):
-        class PanToAmp:
-            def __init__(this, outchan): this.outchan = outchan
-            def __call__(this, pan): return self.pantoamp(this.outchan, pan)
-        return [MidiOutChannel(channels, PanToAmp(outchan)) for outchan in range(2)]
-    getmidioutchans.size = 2
 
 class WavWriter(Stream, Node, metaclass = AmpScale):
 
@@ -116,21 +105,6 @@ class TrivialOutChannel:
 
     nontrivial = False
 
-class MidiOutChannel(Node):
-
-    nontrivial = True
-
-    def __init__(self, channels, pantoamp):
-        super().__init__()
-        self.channels = channels
-        self.pantoamp = pantoamp
-
-    def size(self):
-        return len(list(self.channels.getpans())) # Only called once.
-
-    def callimpl(self):
-        return [self.pantoamp(pan) for pan in self.channels.getpans()]
-
 class FloatStream(list):
 
     chancount = property(len)
@@ -139,9 +113,9 @@ class YMStream(FloatStream):
 
     streamname = 'ym'
 
-    @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps, Channels)
-    def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps, channels = None):
-        naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans(channels)]
+    @types(Config, ClockInfo, YM2149, AmpScale, StereoInfo, MinBleps)
+    def __init__(self, config, clockinfo, chip, ampscale, stereoinfo, minbleps):
+        naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans()]
         for naive in naives:
             self.append(WavBuf(clockinfo, naive, minbleps))
 

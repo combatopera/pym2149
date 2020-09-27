@@ -45,10 +45,7 @@ maxnoiseperiod = $py[0x1f]
 
 maxenvperiod = $py[0xffff]
 
-midipan = false
-: Pay attention to MIDI panning rather than having an automatic fixed pan per channel.
-
-stereo = $(midipan)
+stereo = false
 : Stereo output.
 
 panlaw = 3
@@ -79,37 +76,6 @@ rollstream = $global(sys.stderr)
 
 rollmincents = 10
 
-midichannelbase = 1
-: In case you wanted 0-based channel numbering.
-
-midiprogrambase = 0
-: Some synths use 1 for the first program.
-
-neutralvelocity = $py[0x60]
-: The velocity that does not adjust program level.
-
-velocityperlevel = $py[0x10]
-: Change of velocity required to adjust program level by 1.
-
-DefaultNote = $global(.program.DefaultNote)
-
-midiprograms = $py[{config.midiprogrambase + i: config.DefaultNote for i in range(0x80)}]
-: Program number to Note subclass.
-
-midichannelcount = $global(.const.midichannelcount)
-
-midichanneltoprogram = $py[{config.midichannelbase + i: config.midiprogrambase + i for i in range(config.midichannelcount)}]
-: Initial assignment of programs to channels.
-
-pitchbendpersemitone = $py[0x200]
-: The default of 0x200 is 4 coarse steps per semitone, or 25 cents per coarse step, or a radius of 16 semitones.
-
-slidechannels = $list()
-: In these channels the coarse value of each controller is its target (with fine part 0), and the targetwards adjustment per chip update is the unsigned fine value multipled by slidespeed (for a change of slidespeed*fine*updaterate per second). Additionally, the pitch bend of the channel is zeroed just before every note-on (without affecting the target or the adjustment rate).
-
-slidespeed = 1
-: In the slidechannels the adjustments are multiplied by this.
-
 dosoundextraseconds = 3
 : When playing a Dosound script, the amount of time to continue rendering after end of script.
 
@@ -124,36 +90,11 @@ profile = $py[None]
 trace = $py[None]
 : If not None, the number of seconds worth of trace data to collect.
 
-relplltargetpos = .5
-
-plltargetpos = $div($(relplltargetpos) $(updaterate))
-: The target median shift in seconds between the start of a MIDI event processing window (of size 1/updaterate) and the events in that window. Higher values (i.e. MIDI events closer to end of window and thus our processing of them) improve latency at increased risk of unstable timing (we don't want any events to stray into the next window).
-
-pllalpha = .1
-: The alpha value for the exponential moving average we use for convergence to plltargetpos.
-
 jackringsize = 2
 : In the YMFile case, two buffers allows us to prepare another while waiting for JACK to process the one.
 
 jackcoupling = true
 : If true, JACK overrun (i.e. waiting for it to release a buffer) is considered a normal condition. This is for when we'd like to use blocking on JACK as our timing mechanism.
-
-zerovelocityisnoteoffchannels = $list()
-: My AZ-1 appears to send Note On with zero velocity instead of Note Off, so its channel goes here.
-
-performancechannels = $list()
-: Events from these MIDI channels are treated as unscheduled, so contribute to neither the PLL nor speed detector.
-
-monophonicchannels = $list()
-: In each of these MIDI channels the maximum number of 'on' notes is restricted to one. This is useful if you want your MIDI controller to affect just one chip channel, for example.
-
-inputskipenabled = true
-: For real-time performance this should be true to minimise latency. For rendering this should be false to avoid unstable timing.
-
-speeddetector = true
-: Set to false to turn off the speed detector and save some CPU.
-
-mediation = $global(.mediation.DynamicMediation)
 
 OSC
     host = 127.0.0.1
