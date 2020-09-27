@@ -19,5 +19,9 @@ from pyrbo import nocompile
 
 def warmup():
     with nocompile:
-        from . import buf, osc2
-        del buf, osc2
+        from . import osc2
+        from .buf import Buf, groupsets
+        del osc2
+        for param, groupset in groupsets.items():
+            for group in groupset:
+                Buf[param, next(iter(group))]
