@@ -22,11 +22,12 @@ from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import SyncTimer
-from pym2149.util import MainThread
+from pym2149.util import initlogging, MainThread
 from pym2149.ymplayer import LogicalBundle, Player
 import lurlene.osc
 
 def main_lc2portaudio():
+    initlogging()
     config, di = boot(ConfigName('inpath', '--section'))
     with di:
         di.add(loadcontext)
