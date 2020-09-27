@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import errno, numpy as np, struct, sys
+from .buf import BufType
+import errno, struct, sys
 
 class Wave16:
 
     bytespersample = 2
     hugefilesize = 0x80000000
-    dtype = np.int16
+    buftype = BufType.int16
     formats = {2: '<H', 4: '<I'}
 
     def __init__(self, path, rate, channels):

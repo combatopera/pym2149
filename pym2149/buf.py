@@ -125,6 +125,7 @@ class Buf(metaclass = generic):
 
 @enum(
     ['float', floatdtype],
+    ['int16', np.int16],
     ['short', np.short],
 )
 class BufType:

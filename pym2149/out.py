@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .buf import BufType, MasterBuf
+from .buf import BufType
 from .clock import ClockInfo
 from .iface import AmpScale, Config, Multiplexed, Platform, Stream
 from .minblep import MinBleps
@@ -66,7 +66,7 @@ class WavWriter(Stream, Node, metaclass = AmpScale):
         fclass = Wave16
         self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
         self.roundmaster = BufType.float()
-        self.wavmaster = MasterBuf(dtype = fclass.dtype)
+        self.wavmaster = fclass.buftype()
         self.wav = wav
 
     def start(self):
