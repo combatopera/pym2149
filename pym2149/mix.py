@@ -50,9 +50,9 @@ class BinMix(BufNode):
 
 class Multiplexer(Node):
 
-    def __init__(self, dtype, streams):
+    def __init__(self, buftype, streams):
         super().__init__()
-        self.multi = MasterBuf(dtype)
+        self.multi = buftype()
         self.channels = len(streams)
         self.streams = streams
 

@@ -16,7 +16,8 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .const import u4
-from .shapes import signaldtype
+from .shapes import floatdtype, signaldtype
+from diapyr.util import enum
 from pyrbo import generic, LOCAL, turbo, T
 import numpy as np
 
@@ -121,6 +122,17 @@ class Buf(metaclass = generic):
 
     def tolist(self): # For tests.
         return list(self.buf)
+
+@enum(
+    ['float', floatdtype],
+)
+class BufType:
+
+    def __init__(self, _, dtype):
+        self.dtype = dtype
+
+    def __call__(self):
+        return MasterBuf(self.dtype)
 
 class MasterBuf:
 

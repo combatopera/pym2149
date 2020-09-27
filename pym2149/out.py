@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .buf import MasterBuf
+from .buf import BufType, MasterBuf
 from .clock import ClockInfo
 from .iface import AmpScale, Config, Multiplexed, Platform, Stream
 from .minblep import MinBleps
@@ -141,7 +141,7 @@ class WavBuf(Node):
         if 1 == len(wavs):
             wav, = wavs
         else:
-            wav = Multiplexer(floatdtype, wavs)
+            wav = Multiplexer(BufType.float, wavs)
         return wav
 
     def __init__(self, clockinfo, naive, minbleps):

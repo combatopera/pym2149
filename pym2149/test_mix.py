@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .buf import BufType
 from .mix import IdealMixer, Multiplexer
 from .nod import Block, BufNode, Container
 from .out import TrivialOutChannel
@@ -23,11 +24,11 @@ import numpy as np
 
 class Counter(BufNode):
 
-    dtype = np.int64 # Closest thing to int.
+    buftype = BufType(None, np.int64) # Closest thing to int.
 
     def __init__(self, x = 0):
-        super().__init__(self.dtype)
-        self.x = self.dtype(x)
+        super().__init__(self.buftype.dtype)
+        self.x = self.buftype.dtype(x)
 
     def callimpl(self):
         for frameindex in range(self.block.framecount):
@@ -54,5 +55,5 @@ class TestMultiplexer(TestCase):
         a = Counter()
         b = Counter(10)
         c = Counter(30)
-        m = Multiplexer(Counter.dtype, [a, b, c])
+        m = Multiplexer(Counter.buftype, [a, b, c])
         self.assertEqual([0, 10, 30, 1, 11, 31, 2, 12, 32, 3, 13, 33, 4, 14, 34], m.call(Block(5)).tolist())
