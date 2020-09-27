@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-cimport ctime
 from libc.string cimport memset
+cimport ctime
 
 cdef extern from "alsa/global.h":
     pass

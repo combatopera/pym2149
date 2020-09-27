@@ -23,7 +23,7 @@ from pym2149.config import ConfigName
 from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import MainThread
-from pym2149.ymplayer import Player, LogicalBundle
+from pym2149.ymplayer import LogicalBundle, Player
 import lurlene.osc
 
 def main_lc2portaudio():

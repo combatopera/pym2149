@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from diapyr.start import Started
+from lc2jack import loadcontext
 from pym2149 import txt
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.lurlene import LurleneBridge
 from pym2149.timerimpl import SimpleChipTimer
 from pym2149.util import initlogging, MainThread
-from pym2149.ymplayer import Player, LogicalBundle
-from lc2jack import loadcontext
-from diapyr.start import Started
+from pym2149.ymplayer import LogicalBundle, Player
 import logging, sys
 
 log = logging.getLogger(__name__)

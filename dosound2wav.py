@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from diapyr.start import Started
+from dosound2jack import bytecodefactory
 from pym2149 import out
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import ChipTimer
 from pym2149.util import initlogging, MainThread
 from pym2149.ymplayer import Player, PhysicalBundle
-from dosound2jack import bytecodefactory
-from diapyr.start import Started
 import logging
 
 log = logging.getLogger(__name__)
