@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .buf import MasterBuf
 import logging
 
 log = logging.getLogger(__name__)
@@ -63,10 +62,10 @@ class Container(Node):
 
 class BufNode(Node):
 
-    def __init__(self, dtype, channels = 1):
+    def __init__(self, buftype, channels = 1):
         super().__init__()
-        self.masterbuf = MasterBuf(dtype)
-        self.dtype = dtype
+        self.masterbuf = buftype()
+        self.dtype = buftype.dtype # XXX: What really uses this?
         self.channels = channels
         self.realcallimpl = self.callimpl
         self.callimpl = self.makeresult

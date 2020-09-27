@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .buf import BufType
 from .const import i4, i8, u1, u4, u8
 from .nod import BufNode
 from .shapes import Shape, signaldtype, toneshape
@@ -33,7 +34,7 @@ class ShapeOsc(BufNode):
     progressdtype = u4
 
     def __init__(self, scale, periodreg):
-        super().__init__(signaldtype)
+        super().__init__(BufType.signal)
         self.stepsize = 0 # XXX: Move to reset?
         self.scale = scale
         self.periodreg = periodreg
@@ -105,7 +106,7 @@ class IncompatibleShapeException(Exception): pass
 class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
-        super().__init__(signaldtype)
+        super().__init__(BufType.signal)
         self.effectversion = None
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock

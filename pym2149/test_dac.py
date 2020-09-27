@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .buf import BufType
 from .dac import Dac
 from .nod import Block, BufNode
-from .shapes import signaldtype
 from unittest import TestCase
 
 class Ramps(BufNode):
 
     def __init__(self):
-        super().__init__(signaldtype)
+        super().__init__(BufType.signal)
 
     def callimpl(self):
         for i in range(self.block.framecount):

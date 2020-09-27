@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .buf import BufType
 from .nod import BufNode
-from .shapes import floatdtype, level4to5, level5toamp, leveltosinusshape, signaldtype, toneshape
+from .shapes import level4to5, level5toamp, leveltosinusshape, signaldtype, toneshape
 import numpy as np
 
 class Level(BufNode):
@@ -26,7 +27,7 @@ class Level(BufNode):
     lookup = np.fromiter([pwmzero5bit] + list(range(32)), signaldtype)
 
     def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
-        super().__init__(signaldtype) # Must be suitable for use as index downstream.
+        super().__init__(BufType.signal) # Must be suitable for use as index downstream.
         self.levelmodereg = levelmodereg
         self.fixedreg = fixedreg
         self.env = env
@@ -84,7 +85,7 @@ class SinusEffect(TimerEffect):
 class Dac(BufNode):
 
     def __init__(self, level, log2maxpeaktopeak, ampshare):
-        super().__init__(floatdtype)
+        super().__init__(BufType.float)
         # We take off .5 so that the peak amplitude is about -3 dB:
         maxpeaktopeak = (2 ** (log2maxpeaktopeak - .5)) / ampshare
         # Lookup of ideal amplitudes:

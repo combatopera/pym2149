@@ -17,7 +17,6 @@
 
 from .buf import BufType
 from .nod import BufNode, Node
-from .shapes import signaldtype
 import logging
 
 log = logging.getLogger(__name__)
@@ -25,7 +24,7 @@ log = logging.getLogger(__name__)
 class BinMix(BufNode):
 
     def __init__(self, tone, noise, toneflagreg, noiseflagreg):
-        super().__init__(signaldtype)
+        super().__init__(BufType.signal)
         self.tone = tone
         self.noise = noise
         self.toneflagreg = toneflagreg
@@ -78,7 +77,7 @@ class IdealMixer(BufNode):
             self.callimpl = self.nontrivialcallimpl
         else:
             self.callimpl = self.trivialcallimpl
-        super().__init__(buftype.dtype)
+        super().__init__(buftype)
         self.datum = buftype.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
         self.container = container
         self.chipamps = chipamps

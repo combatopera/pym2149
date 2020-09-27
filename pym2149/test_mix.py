@@ -27,7 +27,7 @@ class Counter(BufNode):
     buftype = BufType(None, np.int64) # Closest thing to int.
 
     def __init__(self, x = 0):
-        super().__init__(self.buftype.dtype)
+        super().__init__(self.buftype)
         self.x = self.buftype.dtype(x)
 
     def callimpl(self):

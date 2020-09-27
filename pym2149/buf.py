@@ -127,6 +127,7 @@ class Buf(metaclass = generic):
     ['float', floatdtype],
     ['int16', np.int16],
     ['short', np.short],
+    ['signal', signaldtype],
 )
 class BufType:
 
