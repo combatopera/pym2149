@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .buf import MasterBuf
+from .buf import BufType
 from .clock import ClockInfo
 from .iface import AmpScale, Chip, Config, Tuning
 from .lurlene import convenient
@@ -24,10 +24,8 @@ from .native.resid import NativeSID
 from .nod import Node
 from .out import FloatStream, Translator
 from .reg import Reg, regproperty
-from .shapes import floatdtype
 from diapyr import types
 from lurlene import topitch
-import numpy as np
 
 PAL = 4.43361875e6 * 4 / 18
 NTSC = 3.579545e6 * 4 / 14
@@ -108,8 +106,8 @@ class SIDBuf(Node):
     def __init__(self, clockinfo, ampscale, sid, minbleps):
         super().__init__()
         self.translator = Translator(clockinfo, minbleps)
-        self.shortmaster = MasterBuf(np.short)
-        self.outmaster = MasterBuf(floatdtype)
+        self.shortmaster = BufType.short()
+        self.outmaster = BufType.float()
         self.ampscale = 2 ** (ampscale.log2maxpeaktopeak - sid.log2maxpeaktopeak)
         self.sid = sid
 

@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .buf import MasterBuf
+from .buf import BufType
 from .nod import BufNode, Node
-from .shapes import floatdtype, signaldtype
+from .shapes import signaldtype
 import logging
 
 log = logging.getLogger(__name__)
@@ -70,16 +70,16 @@ class IdealMixer(BufNode):
 
     def __init__(self, container, log2maxpeaktopeak, chipamps):
         log.debug("Mix is trivial: %s", not chipamps.nontrivial)
-        dtype = floatdtype
+        buftype = BufType.float
         if chipamps.nontrivial:
             if len(container) != chipamps.size():
                 raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
-            self.contrib = MasterBuf(dtype)
+            self.contrib = buftype()
             self.callimpl = self.nontrivialcallimpl
         else:
             self.callimpl = self.trivialcallimpl
-        super().__init__(dtype)
-        self.datum = dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
+        super().__init__(buftype.dtype)
+        self.datum = buftype.dtype(2 ** (log2maxpeaktopeak - 1.5)) # Half power point, very close to -3 dB.
         self.container = container
         self.chipamps = chipamps
 

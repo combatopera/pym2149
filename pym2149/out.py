@@ -65,7 +65,7 @@ class WavWriter(Stream, Node, metaclass = AmpScale):
         super().__init__()
         fclass = Wave16
         self.open = lambda: fclass(config.outpath, platform.outputrate, stereoinfo.getoutchans.size)
-        self.roundmaster = MasterBuf(dtype = floatdtype)
+        self.roundmaster = BufType.float()
         self.wavmaster = MasterBuf(dtype = fclass.dtype)
         self.wav = wav
 
@@ -146,11 +146,11 @@ class WavBuf(Node):
 
     def __init__(self, clockinfo, naive, minbleps):
         super().__init__()
-        self.diffmaster = MasterBuf(dtype = floatdtype)
-        self.outmaster = MasterBuf(dtype = floatdtype)
+        self.diffmaster = BufType.float()
+        self.outmaster = BufType.float()
         # Need space for a whole mixin in case it is rooted at sample outcount:
         self.overflowsize = minbleps.mixinsize
-        self.carrybuf = MasterBuf(dtype = floatdtype).ensureandcrop(self.overflowsize)
+        self.carrybuf = BufType.float().ensureandcrop(self.overflowsize)
         self.translator = Translator(clockinfo, minbleps)
         self.dc = floatdtype(0) # Last naive value of previous block.
         self.carrybuf.fill_same(self.dc) # Initial carry can be the initial dc level.
