@@ -29,9 +29,7 @@ requires +=
     pyrbo>=5
     splut>=4
     timelyOSC>=4
-build requires +=
-    Cython
-    numpy
+build requires += numpy
 years +=
     2014
     2018
