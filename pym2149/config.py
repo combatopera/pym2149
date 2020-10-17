@@ -22,11 +22,11 @@ from aridity.model import Number, Text
 from diapyr import UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-import aridity.config, logging, lurlene, numbers, sys
+import aridity.config, logging, numbers, sys
 
 log = logging.getLogger(__name__)
 
-class ConfigImpl(aridity.config.Config, Config, lurlene.iface.Config): pass
+class ConfigImpl(aridity.config.Config, Config): pass
 
 class ConfigName:
 
