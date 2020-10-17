@@ -19,7 +19,7 @@ from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
 from aridity.model import Number, Text
-from diapyr import DI, UnsatisfiableRequestException
+from diapyr import DI, types, UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
 import aridity.config, logging, numbers, sys
