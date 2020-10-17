@@ -29,7 +29,7 @@ import sys
 
 def boot(configname):
     di = DI()
-    di.add(configname)
+    di.add(configname.loadconfig)
     di.add(di)
     config = di(Config)
     config_repr = list(config.repr)
