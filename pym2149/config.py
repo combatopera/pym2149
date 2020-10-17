@@ -45,7 +45,7 @@ class ConfigName:
         config = aridity.config.Config.blank()
         config.put('global', function = getglobal)
         config.put('enter', function = enter)
-        config.put('py', function = lambda *args: py(getattr(config, self.namespace), *args))
+        config.put('py', function = lambda *args: py(getattr(config.node, self.namespace), *args))
         config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
         config.printf("cwd = %s", self.path.parent)
         config.printf("%s . %s", self.namespace, self.path.name)
@@ -63,7 +63,7 @@ class ConfigName:
                             repl("\t%s" % line)
             else:
                 config.put(self.namespace, name, resolvable = wrap(value))
-        return getattr(config, self.namespace)
+        return getattr(config.node, self.namespace)
 
 def wrap(value): # TODO: Migrate to aridity.
     return (Number if isinstance(value, numbers.Number) else Text)(value)

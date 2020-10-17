@@ -35,7 +35,7 @@ def boot(configname):
     config_repr = list(config.repr)
     if config_repr:
         for key in config_repr:
-            print(repr(getattr(config, key).unravel()))
+            print(repr((~getattr(config, key)).unravel()))
         sys.exit()
     di.add(ClockInfo)
     di.add(StereoInfo)
