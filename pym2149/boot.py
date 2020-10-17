@@ -17,6 +17,7 @@
 
 from . import minblep, pitch
 from .clock import ClockInfo
+from .iface import Config
 from .lurlene import YM2149Chip
 from .out import StereoInfo, YMStream
 from .util import MainThread
@@ -30,13 +31,12 @@ def boot(configname):
     di = DI()
     di.add(configname)
     di.add(di)
-    config = configname.loadconfig(di)
+    config = di(Config)
     config_repr = list(config.repr)
     if config_repr:
         for key in config_repr:
             print(repr(getattr(config, key).unravel()))
         sys.exit()
-    di.add(config)
     di.add(ClockInfo)
     di.add(StereoInfo)
     di.add(YM2149)
