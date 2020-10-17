@@ -18,11 +18,12 @@
 from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
+from aridity.config import ConfigCtrl
 from aridity.model import Number, Text
 from diapyr import DI, types, UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-import aridity.config, logging, numbers, sys
+import logging, numbers, sys
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class ConfigName:
 
     @types(DI, this = Config)
     def loadconfig(self, di):
-        config = aridity.config.Config.blank()
+        config = ConfigCtrl()
         config.put('global', function = getglobal)
         config.put('enter', function = enter)
         config.put('py', function = lambda *args: py(getattr(config.node, self.namespace), *args))
