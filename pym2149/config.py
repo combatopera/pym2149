@@ -19,11 +19,11 @@ from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
-from aridity.model import Number, Text, wrap
+from aridity.model import wrap
 from diapyr import DI, types, UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-import logging, numbers, sys
+import logging, sys
 
 log = logging.getLogger(__name__)
 
