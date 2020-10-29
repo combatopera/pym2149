@@ -19,11 +19,11 @@ from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
-from aridity.model import Number, Text
+from aridity.model import wrap
 from diapyr import DI, types, UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
-import logging, numbers, sys
+import logging, sys
 
 log = logging.getLogger(__name__)
 
@@ -65,9 +65,6 @@ class ConfigName:
             else:
                 config.put(self.namespace, name, resolvable = wrap(value)) # TODO: Retire use of resolvable keyword.
         return getattr(config.node, self.namespace)
-
-def wrap(value): # TODO: Migrate to aridity.
-    return (Number if isinstance(value, numbers.Number) else Text)(value)
 
 class AsContext:
 
