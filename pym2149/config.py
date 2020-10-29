@@ -63,7 +63,7 @@ class ConfigName:
                         for line in text.splitlines():
                             repl("\t%s" % line)
             else:
-                config.put(self.namespace, name, resolvable = wrap(value)) # TODO: Retire use of resolvable keyword.
+                setattr(getattr(config.node, self.namespace), name, value)
         return getattr(config.node, self.namespace)
 
 class AsContext:
