@@ -72,7 +72,7 @@ pianorollheight = $enter($(prerecorded) $(pianorollheight))
 pianorollenabled = true
 : Set to false to disable the piano roll.
 
-rollstream = $global(sys.stderr)
+rollstream = $pyref(sys stderr)
 
 rollmincents = 10
 
@@ -82,7 +82,7 @@ dosoundextraseconds = 3
 chipchannels = 3
 : The number of chip channels to implement. Note that only the first three will have YM2149 registers wired into them.
 
-Profile = $global(splut.bg.Profile)
+Profile = $pyref(splut.bg Profile)
 
 profile = $py[None]
 : If not None, must be a config.Profile object.

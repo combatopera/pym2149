@@ -21,6 +21,6 @@ ignoreloop = true
 
 pianorollheight = $py[None]
 
-rollstream = $global(sys.stdout)
+rollstream = $pyref(sys stdout)
 
 rollmincents = 1
