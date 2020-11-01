@@ -18,7 +18,7 @@
 author = Andrzej Cichocki
 name = pym2149
 requires +=
-    aridity>=40
+    aridity>=41
     diapyr>=18
     lagoon>=17
     Lurlene>=7
