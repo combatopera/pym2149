@@ -71,7 +71,7 @@ class AsContext:
     @classmethod
     def resolve(cls, di, context, resolvable):
         try:
-            return cls(context, di(getglobal(context, resolvable).value))
+            return cls(context, di(getglobal(context, resolvable).scalar))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
