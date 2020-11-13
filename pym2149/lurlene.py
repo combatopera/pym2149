@@ -64,6 +64,13 @@ class ChanProxy:
         self._chip = chip
         self._chan = chan
 
+    def blank(self):
+        self.level = 0
+        self.noiseflag = False
+        self.toneflag = False
+        self.envflag = False
+        # FIXME: Also disable timer effect (without resetting it).
+
 class ChipRegs:
 
     def __init__(self, chip, clock, tuning):
