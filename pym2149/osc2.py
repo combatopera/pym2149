@@ -152,6 +152,7 @@ class RToneOsc(BufNode):
         i = u4,
         j = u4,
         val = signaldtype,
+        numerator = i8,
     )
     def rtoneimpl(self, prescaler, etdr):
         self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_maincounter = self_precounterxmfp = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
@@ -160,13 +161,15 @@ class RToneOsc(BufNode):
         nextstepxmfp = chunksizexmfp * self_maincounter + self_precounterxmfp - chunksizexmfp
         i = 0
         while True:
-            j = min((nextstepxmfp + self_mfpclock - 1) // self_mfpclock, self_block_framecount)
-            val = self_shape_buf[self_index]
-            while i < j:
-                self_blockbuf_buf[i] = val
-                i += 1
-            if j == self_block_framecount:
-                break
+            numerator = nextstepxmfp + self_mfpclock - 1
+            if numerator >= 0:
+                j = min(numerator // self_mfpclock, self_block_framecount)
+                val = self_shape_buf[self_index]
+                while i < j:
+                    self_blockbuf_buf[i] = val
+                    i += 1
+                if j == self_block_framecount:
+                    break
             nextstepxmfp += stepsizexmfp
             self_index += 1
             if self_index == self_shape_size:
