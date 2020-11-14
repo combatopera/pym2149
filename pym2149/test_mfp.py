@@ -32,3 +32,12 @@ class TestMFPTimer(TestCase):
         t.control_data.value = 3, 0
         self.assertEqual(300, t.getfreq())
         self.assertEqual((3, 0), t._findtcrtdr(300))
+
+    def test_stop(self):
+        t = MFPTimer()
+        t.freq.value = 1000
+        self.assertEqual(10, t.prescalerornone.value)
+        self.assertEqual(123, t.effectivedata.value)
+        t.freq.value = 0
+        self.assertEqual(None, t.prescalerornone.value)
+        self.assertEqual(123, t.effectivedata.value)
