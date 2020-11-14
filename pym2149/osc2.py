@@ -20,6 +20,7 @@ from .const import i4, i8, u1, u4, u8
 from .nod import BufNode
 from .shapes import Shape, signaldtype, toneshape
 from pyrbo import LOCAL, turbo
+from types import SimpleNamespace
 import itertools, numpy as np
 
 oscnodepyrbotype = dict(
@@ -101,14 +102,11 @@ class ShapeOsc(BufNode):
                     i += 1
         return self_index, self_progress, self_stepsize
 
-class IncompatibleShapeException(Exception): pass
-
 class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer):
         super().__init__(BufType.signal)
-        self.effectversion = None
-        self.index = -1
+        self.shape = SimpleNamespace(size = None)
         self.maincounter = 0
         self.precounterxmfp = None
         self.mfpclock = mfpclock
@@ -117,11 +115,8 @@ class RToneOsc(BufNode):
 
     def callimpl(self):
         shape = self.timer.effect.value.getshape()
-        if self.effectversion != self.timer.effect.version:
-            self.effectversion = self.timer.effect.version
-        else:
-            if shape.size != self.shape.size or shape.introlen != self.shape.introlen:
-                raise IncompatibleShapeException
+        if shape.size != self.shape.size or shape.introlen != self.shape.introlen:
+            self.index = -1
         self.shape = shape
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
