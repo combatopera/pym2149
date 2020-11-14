@@ -108,25 +108,21 @@ class RToneOsc(BufNode):
     def __init__(self, mfpclock, chipimplclock, timer):
         super().__init__(BufType.signal)
         self.effectversion = None
+        self.index = -1
+        self.maincounter = 0
+        self.precounterxmfp = None
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
 
-    def reset(self, shape):
-        self.index = -1
-        self.maincounter = 0
-        self.precounterxmfp = None
-        self.shape = shape
-
     def callimpl(self):
+        shape = self.timer.effect.value.getshape()
         if self.effectversion != self.timer.effect.version:
-            self.reset(self.timer.effect.value.getshape())
             self.effectversion = self.timer.effect.version
         else:
-            shape = self.timer.effect.value.getshape()
             if shape.size != self.shape.size or shape.introlen != self.shape.introlen:
                 raise IncompatibleShapeException
-            self.shape = shape
+        self.shape = shape
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
             self.blockbuf.fill_same(self.shape.buf[self.index])
