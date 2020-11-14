@@ -46,7 +46,7 @@ class MFPTimer:
 
     def _findtcrtdr(self, freq):
         diff = None
-        for tcr, prescaler in prescalers.items(): # XXX: Do we care about non-determinism?
+        for tcr, prescaler in prescalers.items():
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
             if 1 <= etdr and etdr <= 0x100:
