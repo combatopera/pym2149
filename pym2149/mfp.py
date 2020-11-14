@@ -45,13 +45,13 @@ class MFPTimer:
             self.effect.value = effect
 
     def _findtcrtdr(self, freq):
-        diff = None
+        diff = float('inf')
         for tcr, prescaler in prescalers.items():
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
             if 1 <= etdr and etdr <= 0x100:
                 d = abs(mfpclock / (etdr * prescaler) - freq)
-                if diff is None or d < diff:
+                if d < diff:
                     tcrtdr = tcr, etdr & 0xff
                     diff = d
         return tcrtdr
