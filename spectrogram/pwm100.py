@@ -25,7 +25,7 @@ class PWM100:
         ym.toneflag = True
         ym.level = 15
         ym.tonefreq = 100
-        ym.timereffect = PWMEffect(ym._chip.fixedlevels[ym._chan])
+        ym.timereffect = PWMEffect
         ym.timerfreq = 101 # Necessarily detune.
 
 sections = [[E(PWM100, '1.5'), silence, silence]]

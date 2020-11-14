@@ -104,7 +104,7 @@ class ShapeOsc(BufNode):
 
 class RToneOsc(BufNode):
 
-    def __init__(self, mfpclock, chipimplclock, timer):
+    def __init__(self, mfpclock, chipimplclock, timer, fixedreg):
         super().__init__(BufType.signal)
         self.shape = SimpleNamespace(size = None)
         self.maincounter = 0
@@ -112,9 +112,10 @@ class RToneOsc(BufNode):
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
+        self.fixedreg = fixedreg
 
     def callimpl(self):
-        shape = self.timer.effect.value.getshape()
+        shape = self.timer.effect.value.getshape(self.fixedreg)
         if shape.size != self.shape.size or shape.introlen != self.shape.introlen:
             self.index = -1
         self.shape = shape

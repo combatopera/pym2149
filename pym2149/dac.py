@@ -18,6 +18,7 @@
 from .buf import BufType
 from .nod import BufNode
 from .shapes import level4to5, level5toamp, leveltosinusshape, signaldtype, toneshape
+from diapyr.util import singleton
 import numpy as np
 
 class Level(BufNode):
@@ -46,14 +47,10 @@ class Level(BufNode):
             self.blockbuf.copybuf(self.chain(self.signal))
             self.blockbuf.mul(level4to5(self.fixedreg.value))
 
-class TimerEffect:
+@singleton
+class PWMEffect:
 
-    def __init__(self, fixedreg):
-        self.fixedreg = fixedreg
-
-class PWMEffect(TimerEffect):
-
-    def getshape(self):
+    def getshape(self, fixedreg):
         return toneshape
 
     def __call__(self, node):
@@ -71,10 +68,11 @@ class PWMEffect(TimerEffect):
             node.blockbuf.mul(level4to5(node.fixedreg.value) - node.pwmzero5bit)
             node.blockbuf.add(node.pwmzero5bit)
 
-class SinusEffect(TimerEffect):
+@singleton
+class SinusEffect:
 
-    def getshape(self):
-        return leveltosinusshape[self.fixedreg.value]
+    def getshape(self, fixedreg):
+        return leveltosinusshape[fixedreg.value]
 
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.rtone))

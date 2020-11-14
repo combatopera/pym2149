@@ -110,7 +110,7 @@ class YM2149(Container):
         env = EnvOsc(self.scale, logical.envperiod, logical.envshape)
         # Digital channels from binary to level in [0, 31]:
         tones = [ToneOsc(self.scale, logical.toneperiods[c]) for c in range(channels)]
-        rtones = [RToneOsc(mfpclock, self.clock, logical.timers[c]) for c in range(channels)]
+        rtones = [RToneOsc(mfpclock, self.clock, logical.timers[c], logical.fixedlevels[c]) for c in range(channels)]
         # XXX: Add rtones to maskables?
         self.maskables = tones + [noise, env] # Maskable by mixer and level mode.
         binchans = [BinMix(tones[c], noise, logical.toneflags[c], logical.noiseflags[c]) for c in range(channels)]

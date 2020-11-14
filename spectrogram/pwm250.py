@@ -25,7 +25,7 @@ class PWM250:
         ym.toneflag = True
         ym.level = 15
         ym.tonefreq = 250
-        ym.timereffect = PWMEffect(ym._chip.fixedlevels[ym._chan])
+        ym.timereffect = PWMEffect
         ym.timerfreq = 250
 
 sections = [[E(PWM250, '1.5'), silence, silence]]
