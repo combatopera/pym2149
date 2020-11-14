@@ -70,12 +70,6 @@ class LogicalRegisters:
         self.envshape.value = 0
         self.timers = tuple(MFPTimer() for _ in channels)
 
-    def flagsoff(self, chan):
-        self.levelmodes[chan].value = 0 # Effectively the envelope flag.
-        self.toneflags[chan].value = False
-        self.noiseflags[chan].value = False
-        self.timers[chan].effect.value = None
-
 class PhysicalRegisters:
 
     supportedchannels = 3
