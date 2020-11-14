@@ -71,7 +71,7 @@ class ChanProxy:
         self.noiseflag = False
         self.toneflag = False
         self.envflag = False
-        # FIXME: Also disable timer effect (without resetting it).
+        self.timereffect = None
 
 class ChipRegs:
 
