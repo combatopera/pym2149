@@ -45,6 +45,8 @@ class MFPTimer:
             self.effect.value = effect
 
     def _findtcrtdr(self, freq):
+        if not freq:
+            return 0, self.data.value # Stop timer.
         diff = float('inf')
         for tcr, prescaler in prescalers.items():
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
