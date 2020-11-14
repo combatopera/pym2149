@@ -31,4 +31,4 @@ class TestMFPTimer(TestCase):
         t = MFPTimer()
         t.control_data.value = 3, 0
         self.assertEqual(300, t.getfreq())
-        self.assertEqual((3, 0), t.findtcrtdr(300))
+        self.assertEqual((3, 0), t._findtcrtdr(300))

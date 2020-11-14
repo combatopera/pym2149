@@ -36,7 +36,7 @@ class MFPTimer:
         self.data.link(lambda cd: cd[1], self.control_data)
         self.freq = Reg()
         # XXX: Should change of wavelength trigger this link?
-        self.control_data.link(self.findtcrtdr, self.freq)
+        self.control_data.link(self._findtcrtdr, self.freq)
         self.prescalerornone = Reg().link(lambda tcr: prescalers.get(tcr), self.control)
 
     def update(self, tcr, tdr, effect):
@@ -44,7 +44,7 @@ class MFPTimer:
         if type(effect) != type(self.effect.value):
             self.effect.value = effect
 
-    def findtcrtdr(self, freq):
+    def _findtcrtdr(self, freq):
         diff = None
         for tcr, prescaler in prescalers.items(): # XXX: Do we care about non-determinism?
             prescaler *= self.wavelength.value # Avoid having to multiply twice.
