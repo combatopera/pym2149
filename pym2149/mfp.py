@@ -56,8 +56,8 @@ class MFPTimer:
                     diff = d
         return tcrtdr
 
-    def getnormperiod(self):
+    def _getnormperiod(self):
         return prescalers[self.control.value] * self.effectivedata.value * self.wavelength.value
 
     def getfreq(self): # Currently only called when effect is not None.
-        return mfpclock / self.getnormperiod()
+        return mfpclock / self._getnormperiod()

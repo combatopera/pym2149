@@ -23,9 +23,9 @@ class TestMFPTimer(TestCase):
     def test_setfreq(self):
         timer = MFPTimer()
         timer.freq.value = 1000
-        self.assertEqual(2460, timer.getnormperiod()) # Close.
+        self.assertEqual(2460, timer._getnormperiod()) # Close.
         timer.freq.value = 100
-        self.assertEqual(24576, timer.getnormperiod()) # Exact.
+        self.assertEqual(24576, timer._getnormperiod()) # Exact.
 
     def test_zerotdr(self):
         t = MFPTimer()
