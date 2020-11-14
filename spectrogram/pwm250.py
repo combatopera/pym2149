@@ -26,10 +26,8 @@ class PWM250:
         ym.level = 15
         ym.tonefreq = 250
         if frame < 1:
-            chan = ym[0]._chan
-            timer = ym._chip.timers[chan]
-            timer.effect.value = PWMEffect(ym._chip.fixedlevels[chan])
-            timer.freq.value = 250
+            ym.timereffect = PWMEffect(ym._chip.fixedlevels[ym._chan])
+            ym.timerfreq = 250
 
 sections = [[E(PWM250, '1.5'), silence, silence]]
 speed = 50

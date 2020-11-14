@@ -52,6 +52,8 @@ class ChanProxy:
     tonepitch = regproperty(lambda self: self.tonepitchreg)
     tonedegree = regproperty(lambda self: self.tonedegreereg)
     envflag = regproperty(lambda self: self._chip.levelmodes[self._chan])
+    timerfreq = regproperty(lambda self: self._chip.timers[self._chan].freq)
+    timereffect = regproperty(lambda self: self._chip.timers[self._chan].effect)
 
     def __init__(self, chip, chan, clock, tuning):
         self.tonedegreereg = Reg()

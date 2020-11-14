@@ -27,10 +27,8 @@ class Sin1k:
     def on(self, ym, frame):
         ym.level = self.level[frame]
         if frame < 1:
-            chan = ym[0]._chan
-            timer = ym._chip.timers[chan]
-            timer.effect.value = SinusEffect(ym._chip.fixedlevels[chan])
-            timer.freq.value = 1000 * 4 # FIXME: It should know wavelength from effect.
+            ym.timereffect = SinusEffect(ym._chip.fixedlevels[ym._chan])
+            ym.timerfreq = 1000 * 4 # FIXME: It should know wavelength from effect.
 
 sections = [[E(Sin1k, '2'), silence, silence]]
 speed = 50

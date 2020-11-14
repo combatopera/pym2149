@@ -26,10 +26,8 @@ class PWM100:
         ym.level = 15
         ym.tonefreq = 100
         if frame < 1:
-            chan = ym[0]._chan
-            timer = ym._chip.timers[chan]
-            timer.effect.value = PWMEffect(ym._chip.fixedlevels[chan])
-            timer.freq.value = 101 # Necessarily detune.
+            ym.timereffect = PWMEffect(ym._chip.fixedlevels[ym._chan])
+            ym.timerfreq = 101 # Necessarily detune.
 
 sections = [[E(PWM100, '1.5'), silence, silence]]
 speed = 50
