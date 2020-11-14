@@ -36,11 +36,10 @@ class Level(BufNode):
         self.timereffectreg = timereffectreg
 
     def callimpl(self):
-        levelmode = self.levelmodereg.value
         timereffect = self.timereffectreg.value
         if timereffect is not None:
-            timereffect(levelmode, self.env, self.signal, self.rtone, self.blockbuf, self.chain)
-        elif levelmode:
+            timereffect(self)
+        elif self.levelmodereg.value:
             self.blockbuf.copybuf(self.chain(self.signal))
             self.blockbuf.mulbuf(self.chain(self.env))
         else:
@@ -57,30 +56,30 @@ class PWMEffect(TimerEffect):
     def getshape(self):
         return toneshape
 
-    def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
-        if levelmode:
+    def __call__(self, node):
+        if node.levelmodereg.value:
             # TODO: Test this branch, or override levelmode starting with first interrupt.
-            blockbuf.copybuf(chain(envnode)) # Values in [0, 31].
-            blockbuf.add(1) # Shift env values to [1, 32].
-            blockbuf.mulbuf(chain(signalnode)) # Introduce 0.
-            blockbuf.mulbuf(chain(rtonenode)) # Introduce more 0.
-            blockbuf.mapbuf(blockbuf, Level.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+            node.blockbuf.copybuf(node.chain(node.env)) # Values in [0, 31].
+            node.blockbuf.add(1) # Shift env values to [1, 32].
+            node.blockbuf.mulbuf(node.chain(node.signal)) # Introduce 0.
+            node.blockbuf.mulbuf(node.chain(node.rtone)) # Introduce more 0.
+            node.blockbuf.mapbuf(node.blockbuf, node.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
         else:
-            blockbuf.copybuf(chain(signalnode))
-            blockbuf.mulbuf(chain(rtonenode))
+            node.blockbuf.copybuf(node.chain(node.signal))
+            node.blockbuf.mulbuf(node.chain(node.rtone))
             # Map 0 to pwmzero and 1 to fixed level:
-            blockbuf.mul(level4to5(self.fixedreg.value) - Level.pwmzero5bit)
-            blockbuf.add(Level.pwmzero5bit)
+            node.blockbuf.mul(level4to5(node.fixedreg.value) - node.pwmzero5bit)
+            node.blockbuf.add(node.pwmzero5bit)
 
 class SinusEffect(TimerEffect):
 
     def getshape(self):
         return leveltosinusshape[self.fixedreg.value]
 
-    def __call__(self, levelmode, envnode, signalnode, rtonenode, blockbuf, chain):
-        blockbuf.copybuf(chain(rtonenode))
-        blockbuf.mul(2)
-        blockbuf.add(1)
+    def __call__(self, node):
+        node.blockbuf.copybuf(node.chain(node.rtone))
+        node.blockbuf.mul(2)
+        node.blockbuf.add(1)
 
 class Dac(BufNode):
 
