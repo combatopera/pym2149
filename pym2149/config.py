@@ -44,7 +44,6 @@ class ConfigName:
     @types(DI, this = Config)
     def loadconfig(self, di):
         config = ConfigCtrl()
-        config.put('global', function = getglobal)
         config.put('enter', function = enter)
         config.put('py', function = lambda *args: py(getattr(config.node, self.namespace), *args))
         config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
@@ -71,7 +70,7 @@ class AsContext:
     @classmethod
     def resolve(cls, di, context, resolvable):
         try:
-            return cls(context, di(getglobal(context, resolvable).scalar))
+            return cls(context, di(_getglobal(context, resolvable).scalar))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
@@ -85,7 +84,7 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
-def getglobal(context, resolvable):
+def _getglobal(context, resolvable):
     spec = resolvable.resolve(context).cat()
     lastdot = spec.rindex('.')
     return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))

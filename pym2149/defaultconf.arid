@@ -36,7 +36,7 @@ underclock = 8
 oscpause = false
 : Whether an oscillator is paused when turned off in the mixer. Setting to true doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
-nominalclock = $try($enter($(ymfile) $(nominalclock)) $global(.clock.stclock))
+nominalclock = $try($enter($(ymfile) $(nominalclock)) $pyref(pym2149.clock stclock))
 : You can specify your own clock here, which overrides any other value.
 
 maxtoneperiod = $py[0xfff]
@@ -107,7 +107,7 @@ PortAudio
     ringsize = $(jackringsize)
     coupling = $(jackcoupling)
 
-tuning = $global(.pitch.EqualTemperament)
+tuning = $pyref(pym2149.pitch EqualTemperament)
 : The mapping between MIDI note and frequency, other options include Meantone and FiveLimit.
 
 meantoneflats = 2
@@ -122,7 +122,7 @@ showperiods = false
 SID enabled = false
 : If true, integrate with reSID shared library.
 
-SID clock = $global(.resid.PAL)
+SID clock = $pyref(pym2149.resid PAL)
 : The clock to use for reSID.
 
 Lurlene lazy = false
