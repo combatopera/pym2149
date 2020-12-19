@@ -156,8 +156,8 @@ class Ramp:
         ym.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
-    return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, "3x2 2x|4x 4/%s" % lastoff,
-            degree = D("2x3 2x2 3x 2|3 5/%s 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x" % firstslide),
+    return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, f"3x2 2x|4x 4/{lastoff}",
+            degree = D(f"2x3 2x2 3x 2|3 5/{firstslide} 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x"),
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
 snar1 = E(Snare, '.5 1 .5 1 .5 1 2x.25 6x.5')

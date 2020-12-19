@@ -62,8 +62,8 @@ class TestWavWriter(TestCase):
             tone.cursor += block.framecount
         w.stop()
         if strictlimitornone is not None:
-            expression = "%.3f < %s" % (time.time() - start, strictlimitornone)
-            sys.stderr.write("%s ... " % expression)
+            expression = f"{time.time() - start:.3f} < {strictlimitornone}"
+            sys.stderr.write(f"{expression} ... ")
             self.assertTrue(eval(expression))
 
     def test_minperiodperformancesmallblocks(self):

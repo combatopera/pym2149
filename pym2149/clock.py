@@ -39,14 +39,14 @@ class ClockInfo:
     def __init__(self, config, platform, ymfile = None):
         self.nomclock = config.nominalclock
         if self.nomclock % config.underclock:
-            raise Exception("Clock %s not divisible by underclock %s." % (self.nomclock, config.underclock))
+            raise Exception(f"Clock {self.nomclock} not divisible by underclock {config.underclock}.")
         self.implclock = self.nomclock // config.underclock
         if ymfile is not None and self.nomclock != ymfile.nominalclock:
             log.info("Context clock %s overridden to: %s", ymfile.nominalclock, self.nomclock)
         if self.implclock != self.nomclock:
             log.debug("Clock adjusted to %s to take advantage of non-trivial underclock.", self.implclock)
         if config.underclock < 1 or defaultscale % config.underclock:
-            raise Exception("underclock must be a factor of %s." % defaultscale)
+            raise Exception(f"underclock must be a factor of {defaultscale}.")
         self.scale = defaultscale // config.underclock
         if config.freqclamp:
             # The 0 case just means that 1 is audible:

@@ -39,7 +39,7 @@ class RollImpl(Roll):
         self.stream = config.rollstream
         self.mincents = config.rollmincents
         self.line = 0
-        self.jump = "\x1b[%sA" % self.height
+        self.jump = f"\x1b[{self.height}A"
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
         self.shapeversion = None
         self.clock = clock

@@ -136,5 +136,5 @@ class Pitch(float):
         if abs(cents) < mincents:
             centsstr = ' ' * 3
         else:
-            centsstr = "%+3d" % cents
+            centsstr = f"{cents:+3d}"
         return notestr + octavestr + centsstr

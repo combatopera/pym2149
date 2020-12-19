@@ -39,7 +39,7 @@ class ConfigName:
         for param in params:
             parser.add_argument(param)
         self.additems = parser.parse_args(args)
-        self.path = Path(__file__).resolve().parent / ("%s.arid" % name)
+        self.path = Path(__file__).resolve().parent / f"{name}.arid"
 
     @types(DI, this = Config)
     def loadconfig(self, di):
@@ -61,7 +61,7 @@ class ConfigName:
                     for text in value:
                         repl.printf("%s", self.namespace)
                         for line in text.splitlines():
-                            repl("\t%s" % line)
+                            repl(f"\t{line}")
             else:
                 setattr(getattr(config.node, self.namespace), name, value)
         return getattr(config.node, self.namespace)

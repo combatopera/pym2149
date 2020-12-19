@@ -40,7 +40,7 @@ def _comparetxt(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
-    configpath = project / relpath.parent / ("%s.arid" % relpath.name)
+    configpath = project / relpath.parent / f"{relpath.name}.arid"
     if configpath.exists():
         with configpath.open() as f:
             config = ['--config', f.read()]
@@ -50,7 +50,7 @@ def _comparetxt(path):
         lc2txt.main_lc2txt(['--ignore-settings'] + config + [
                 '--config', 'local = $pyref(lurlene.util local)',
                 '--config', 'rollstream = $py[config.local.stream]',
-                str(project / relpath.parent / ("%s.py" % relpath.name))])
+                str(project / relpath.parent / f"{relpath.name}.py")])
     tc = TestCase()
     tc.maxDiff = None
     with path.open() as f, actualpath.open() as g:
@@ -64,7 +64,7 @@ def _comparepng(path):
         lc2wav.main_lc2wav(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                str(project / relpath.parent / ("%s.py" % relpath.name[:-len(pngsuffix)])), wavfile.name])
+                str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
         sox.print(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):

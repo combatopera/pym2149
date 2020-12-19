@@ -40,8 +40,8 @@ class AbstractTestOsc:
             self.cmptime(time.time() - start, self.performancelimit)
 
     def cmptime(self, taken, strictlimit):
-        expression = "%.3f < %s" % (taken, strictlimit)
-        sys.stderr.write("%s ... " % expression)
+        expression = f"{taken:.3f} < {strictlimit}"
+        sys.stderr.write(f"{expression} ... ")
         self.assertTrue(eval(expression))
 
 class TestToneOsc(AbstractTestOsc, TestCase):

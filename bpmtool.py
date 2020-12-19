@@ -25,4 +25,4 @@ def main_bpmtool():
     for upl in range(1, 21):
         lpm = 60 * ups / upl
         bpm = lpm / lpb
-        print("%2s" % upl, "%7.3f" % bpm)
+        print(f"{upl:2} {bpm:7.3f}")

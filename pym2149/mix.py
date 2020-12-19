@@ -72,7 +72,7 @@ class IdealMixer(BufNode):
         buftype = BufType.float
         if chipamps.nontrivial:
             if len(container) != chipamps.size():
-                raise Exception("Expected %s chipamps but got: %s" % (len(container), chipamps.size()))
+                raise Exception(f"Expected {len(container)} chipamps but got: {chipamps.size()}")
             self.contrib = buftype()
             self.callimpl = self.nontrivialcallimpl
         else:

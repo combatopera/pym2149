@@ -26,7 +26,7 @@ class Block:
         self.framecount = int(framecount)
 
     def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.framecount)
+        return f"{type(self).__name__}({self.framecount!r})"
 
 class Node:
 
