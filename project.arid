@@ -45,3 +45,4 @@ warmups += pym2149.warmup:warmup
 flakes exclude globs +=
     ymtests/dosound*.py
     ymtests/q*.py
+upstream devel packages += sox
