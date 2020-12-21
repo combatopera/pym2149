@@ -20,9 +20,11 @@ from .iface import Chip, Config, Prerecorded, Tuning
 from .reg import Reg, regproperty
 from .ym2149 import LogicalRegisters
 from diapyr import types
+from diapyr.start import Started
 from diapyr.util import innerclass
 from lurlene import topitch
 from lurlene.bridge import LiveCodingBridge
+from lurlene.context import Context
 import logging
 
 log = logging.getLogger(__name__)
@@ -133,3 +135,9 @@ class YM2149Chip(Chip):
         self.channels = [ChipProxy(chip, chan, chanproxies, chipregs, clock) for chan in chans]
 
 class LurleneBridge(LiveCodingBridge, Prerecorded): pass
+
+@types(Config, Context, this = Started)
+def loadcontext(config, context):
+    with open(config.inpath) as f:
+        context.update(f.read())
+    context.flip()

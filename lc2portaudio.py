@@ -16,11 +16,10 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from diapyr.start import Started
-from lc2jack import loadcontext
 from pym2149 import portaudio
 from pym2149.boot import boot
 from pym2149.config import ConfigName
-from pym2149.lurlene import LurleneBridge
+from pym2149.lurlene import loadcontext, LurleneBridge
 from pym2149.timerimpl import SyncTimer
 from pym2149.util import initlogging, MainThread
 from pym2149.ymplayer import LogicalBundle, Player
