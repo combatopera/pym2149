@@ -20,9 +20,10 @@ from .minblep import MinBleps
 from .nod import Block, Node
 from .out import floatdtype, WavBuf, WavWriter
 from .power import batterypower
+from .test_osc import CmpTime
 from types import SimpleNamespace
 from unittest import TestCase
-import numpy as np, os, sys, time
+import numpy as np, os, time
 
 class MinPeriodTone(Node):
 
@@ -38,7 +39,7 @@ class MinPeriodTone(Node):
     def callimpl(self):
         return Buf(self.buf[self.cursor:self.cursor + self.block.framecount])
 
-class TestWavWriter(TestCase):
+class TestWavWriter(TestCase, CmpTime):
 
     def minperiodperformance(self, bigblocks, strictlimitornone):
         clock = 250000
@@ -62,9 +63,7 @@ class TestWavWriter(TestCase):
             tone.cursor += block.framecount
         w.stop()
         if strictlimitornone is not None:
-            expression = f"{time.time() - start:.3f} < {strictlimitornone}"
-            sys.stderr.write(f"{expression} ... ")
-            self.assertTrue(eval(expression))
+            self.cmptime(time.time() - start, strictlimitornone)
 
     def test_minperiodperformancesmallblocks(self):
         if batterypower():

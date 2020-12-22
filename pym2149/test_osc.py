@@ -27,7 +27,14 @@ from types import SimpleNamespace
 from unittest import TestCase
 import sys, time
 
-class AbstractTestOsc:
+class CmpTime:
+
+    def cmptime(self, taken, strictlimit):
+        expression = f"{taken:.3f} < {strictlimit}"
+        sys.stderr.write(f"{expression} ... ")
+        self.assertTrue(eval(expression))
+
+class AbstractTestOsc(CmpTime):
 
     def test_performance(self):
         blockrate = 50
@@ -38,11 +45,6 @@ class AbstractTestOsc:
             for _ in range(blockrate):
                 o.call(Block(blocksize))
             self.cmptime(time.time() - start, self.performancelimit)
-
-    def cmptime(self, taken, strictlimit):
-        expression = f"{taken:.3f} < {strictlimit}"
-        sys.stderr.write(f"{expression} ... ")
-        self.assertTrue(eval(expression))
 
 class TestToneOsc(AbstractTestOsc, TestCase):
 
