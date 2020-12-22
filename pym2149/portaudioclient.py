@@ -19,9 +19,8 @@ from .iface import AmpScale, Config, Platform, Stream
 from .jackclient import BufferFiller
 from .nod import Node
 from .out import FloatStream, StereoInfo
-from .shapes import floatdtype
 from diapyr import types
-import logging, numpy as np, outjack.portaudioclient as pac
+import logging, outjack.portaudioclient as pac
 
 log = logging.getLogger(__name__)
 
