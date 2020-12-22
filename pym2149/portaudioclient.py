@@ -30,13 +30,7 @@ class PortAudioClient(pac.PortAudioClient, Platform):
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
         config = config.PortAudio
-        self.outputrate = config.outputrate # TODO: Find best rate supported by system.
-        self.buffersize = config.buffersize
-        self.chancount = stereoinfo.getoutchans.size
-        self.port = self._newbuf(np.zeros) # Use zeros so initial underrun doesn't sound terrible.
-
-    def _newbuf(self, constructor):
-        return constructor(self.chancount * self.buffersize, dtype = floatdtype)
+        super().__init__(stereoinfo.getoutchans.size, config.outputrate, config.buffersize)
 
 class PortAudioStream(Node, Stream, metaclass = AmpScale):
 
