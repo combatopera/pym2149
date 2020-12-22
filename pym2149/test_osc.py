@@ -29,7 +29,8 @@ import sys, time
 
 class CmpTime:
 
-    def cmptime(self, taken, strictlimit):
+    def cmptime(self, start, strictlimit):
+        taken = time.time() - start
         expression = f"{taken:.3f} < {strictlimit}"
         sys.stderr.write(f"{expression} ... ")
         self.assertTrue(eval(expression))
@@ -44,7 +45,7 @@ class AbstractTestOsc(CmpTime):
             start = time.time()
             for _ in range(blockrate):
                 o.call(Block(blocksize))
-            self.cmptime(time.time() - start, self.performancelimit)
+            self.cmptime(start, self.performancelimit)
 
 class TestToneOsc(AbstractTestOsc, TestCase):
 

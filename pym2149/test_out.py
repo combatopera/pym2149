@@ -62,8 +62,7 @@ class TestWavWriter(TestCase, CmpTime):
             w.call(block)
             tone.cursor += block.framecount
         w.stop()
-        if strictlimitornone is not None:
-            self.cmptime(time.time() - start, strictlimitornone)
+        strictlimitornone is None or self.cmptime(start, strictlimitornone)
 
     def test_minperiodperformancesmallblocks(self):
         if batterypower():
