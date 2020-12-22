@@ -22,42 +22,9 @@ from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
 from outport import paContinue, paFloat32, PyAudio
-import logging, numpy as np, threading
+import logging, numpy as np
 
 log = logging.getLogger(__name__)
-
-class Ring: # There is a very similar ring impl in outjack, not sure if possible to unduplicate.
-
-    def __init__(self, ringsize, newbuf, coupling):
-        self.outbufs = [newbuf(np.empty) for _ in range(ringsize)]
-        self.unconsumed = [False] * ringsize
-        self.lock = threading.Lock()
-        self.cv = threading.Condition(self.lock)
-        self.readcursor = self.writecursor = 0
-        self.size = ringsize
-        self.coupling = coupling
-
-    def flip(self):
-        with self.lock:
-            self.unconsumed[self.writecursor] = True
-            self.writecursor = (self.writecursor + 1) % self.size
-            logoverrun = not self.coupling
-            while self.unconsumed[self.writecursor]: # Use while in case of spurious wakeup.
-                if logoverrun:
-                    log.error('Overrun!')
-                    logoverrun = False
-                self.cv.wait()
-            return self.outbufs[self.writecursor]
-
-    def consume(self, port):
-        with self.lock:
-            if self.unconsumed[self.readcursor]:
-                np.copyto(port, self.outbufs[self.readcursor])
-                self.unconsumed[self.readcursor] = False
-                self.readcursor = (self.readcursor + 1) % self.size
-                self.cv.notify()
-            else:
-                log.warning('Underrun!')
 
 class PortAudioClient(Platform):
 
@@ -67,7 +34,6 @@ class PortAudioClient(Platform):
         self.outputrate = config.outputrate # TODO: Find best rate supported by system.
         self.buffersize = config.buffersize
         self.chancount = stereoinfo.getoutchans.size
-        self.ring = Ring(config.ringsize, self._newbuf, config.coupling)
         self.port = self._newbuf(np.zeros) # Use zeros so initial underrun doesn't sound terrible.
 
     def _newbuf(self, constructor):
@@ -83,12 +49,6 @@ class PortAudioClient(Platform):
                 frames_per_buffer = self.buffersize,
                 start = False,
                 stream_callback = self._callback)
-
-    def initial(self):
-        return self.ring.outbufs[0]
-
-    def flip(self):
-        return self.ring.flip()
 
     def _callback(self, in_data, frame_count, time_info, status_flags):
         # Upstream immediately copies what we return, so assuming single thread a single port is fine:
