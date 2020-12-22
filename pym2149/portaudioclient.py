@@ -30,7 +30,7 @@ class PortAudioClient(pac.PortAudioClient, Platform):
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
         config = config.PortAudio
-        super().__init__(stereoinfo.getoutchans.size, config.outputrate, config.buffersize)
+        super().__init__(stereoinfo.getoutchans.size, config.outputrate, config.buffersize, config.ringsize, config.coupling)
 
 class PortAudioStream(Node, Stream, metaclass = AmpScale):
 
