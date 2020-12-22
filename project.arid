@@ -24,7 +24,6 @@ requires +=
     Lurlene>=7
     mynblep>=10
     outjack>=10
-    outport>=2
     Pillow>=7.2.0
     pyrbo>=5
     splut>=4
