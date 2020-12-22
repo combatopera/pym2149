@@ -71,7 +71,7 @@ class PortAudioStream(Node, Stream, metaclass = AmpScale):
         self.client = client
 
     def start(self):
-        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.initial, self.client.flip, True)
+        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer, True)
         self.client.activate()
 
     def callimpl(self):
