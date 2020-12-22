@@ -30,10 +30,9 @@ import sys, time
 class CmpTime:
 
     def cmptime(self, start, strictlimit):
-        taken = time.time() - start
-        expression = f"{taken:.3f} < {strictlimit}"
+        expression = f"{time.time() - start:.3f} < {strictlimit}"
         sys.stderr.write(f"{expression} ... ")
-        self.assertTrue(eval(expression))
+        self.assertTrue(eval(expression)) # XXX: Really use rounded time taken?
 
 class AbstractTestOsc(CmpTime):
 
