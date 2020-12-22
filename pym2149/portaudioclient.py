@@ -21,7 +21,6 @@ from .nod import Node
 from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
-from outport import paContinue, paFloat32, PyAudio
 import logging, numpy as np
 
 log = logging.getLogger(__name__)
@@ -38,26 +37,6 @@ class PortAudioClient(Platform):
 
     def _newbuf(self, constructor):
         return constructor(self.chancount * self.buffersize, dtype = floatdtype)
-
-    def start(self):
-        self.p = PyAudio()
-        self.stream = self.p.open(
-                rate = self.outputrate,
-                channels = self.chancount,
-                format = paFloat32,
-                output = True,
-                frames_per_buffer = self.buffersize,
-                start = False,
-                stream_callback = self._callback)
-
-    def _callback(self, in_data, frame_count, time_info, status_flags):
-        # Upstream immediately copies what we return, so assuming single thread a single port is fine:
-        self.ring.consume(self.port)
-        return self.port, paContinue
-
-    def stop(self):
-        self.stream.close()
-        self.p.terminate()
 
 class PortAudioStream(Node, Stream, metaclass = AmpScale):
 
