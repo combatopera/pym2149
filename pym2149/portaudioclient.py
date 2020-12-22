@@ -21,11 +21,11 @@ from .nod import Node
 from .out import FloatStream, StereoInfo
 from .shapes import floatdtype
 from diapyr import types
-import logging, numpy as np
+import logging, numpy as np, outjack.portaudioclient as pac
 
 log = logging.getLogger(__name__)
 
-class PortAudioClient(Platform):
+class PortAudioClient(pac.PortAudioClient, Platform):
 
     @types(Config, StereoInfo)
     def __init__(self, config, stereoinfo):
@@ -50,8 +50,8 @@ class PortAudioStream(Node, Stream, metaclass = AmpScale):
         self.client = client
 
     def start(self):
-        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer, True)
         self.client.activate()
+        self.filler = BufferFiller(self.chancount, self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer, True)
 
     def callimpl(self):
         self.filler([self.chain(wav) for wav in self.wavs])
