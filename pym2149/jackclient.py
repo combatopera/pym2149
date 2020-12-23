@@ -59,7 +59,7 @@ class JackStream(Stream, Node, metaclass = AmpScale):
             for syschanindex in range(self.systemchannelcount):
                 chanindex = syschanindex % stream.chancount
                 self.client.connect(f"{clientname}:{stream.streamname}_{1 + chanindex}", f"system:playback_{1 + syschanindex}")
-        self.filler = BufferFiller(sum(s.chancount for s in self.streams), self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer, False)
+        self.filler = BufferFiller(sum(s.chancount for s in self.streams), self.client.buffersize, self.client.current_output_buffer, self.client.send_and_get_output_buffer)
 
     def callimpl(self):
         self.filler([self.chain(wav) for stream in self.streams for wav in stream])
@@ -72,10 +72,9 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
 class BufferFiller:
 
-    def __init__(self, portcount, buffersize, init, flip, interleaved):
+    def __init__(self, portcount, buffersize, init, flip):
         self.portcount = portcount
         self.buffersize = buffersize
-        self.interleaved = interleaved
         self._newbuf(init)
         self.flip = flip
 
@@ -93,12 +92,8 @@ class BufferFiller:
 
     def _newbuf(self, factory):
         outbuf = factory().view()
-        if self.interleaved:
-            outbuf.shape = self.buffersize, self.portcount
-            self.outbuf = outbuf.T
-        else:
-            outbuf.shape = self.portcount, self.buffersize
-            self.outbuf = outbuf
+        outbuf.shape = self.portcount, self.buffersize
+        self.outbuf = outbuf
         self.cursor = 0
 
 def configure(di):
