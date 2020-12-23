@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from diapyr.start import Started
-from pym2149 import portaudio
+from pym2149 import portaudioclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.lurlene import loadcontext, LurleneBridge
@@ -34,7 +34,7 @@ def main_lc2portaudio():
         lurlene.osc.configure(di)
         di.add(SyncTimer)
         di.add(LogicalBundle)
-        portaudio.configure(di)
+        portaudioclient.configure(di)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()

@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from diapyr.start import Started
-from pym2149 import portaudio
+from pym2149 import portaudioclient
 from pym2149.boot import boot
 from pym2149.config import ConfigName
 from pym2149.timerimpl import SyncTimer
@@ -32,7 +32,7 @@ def main_ym2portaudio():
     config, di = boot(ConfigName('inpath'))
     with di:
         di.add(YMOpen)
-        portaudio.configure(di)
+        portaudioclient.configure(di)
         di.add(SyncTimer)
         di.add(PhysicalBundle)
         di.add(Player)
