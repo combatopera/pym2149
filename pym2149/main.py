@@ -27,7 +27,7 @@ import logging
 log = logging.getLogger(__name__)
 
 def main_ym2jack():
-    from pym2149 import jackclient
+    from . import jackclient
     initlogging()
     config, di = boot(ConfigName('inpath'))
     with di:
@@ -40,7 +40,7 @@ def main_ym2jack():
         di(MainThread).sleep()
 
 def main_ym2portaudio():
-    from pym2149 import portaudioclient
+    from . import portaudioclient
     initlogging()
     config, di = boot(ConfigName('inpath'))
     with di:
@@ -53,7 +53,7 @@ def main_ym2portaudio():
         di(MainThread).sleep()
 
 def main_ym2txt():
-    from pym2149 import txt
+    from . import txt
     initlogging()
     config, di = boot(ConfigName('inpath', name = 'txt'))
     with di:
@@ -66,7 +66,7 @@ def main_ym2txt():
         di(MainThread).sleep()
 
 def main_ym2wav():
-    from pym2149 import out
+    from . import out
     initlogging()
     config, di = boot(ConfigName('inpath', 'outpath'))
     with di:
