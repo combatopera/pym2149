@@ -48,7 +48,7 @@ def _comparetxt(path):
     else:
         config = []
     with open(actualpath, 'w') as stream, threadlocals(stream = stream):
-        main_lc2txt(['--ignore-settings'] + config + [
+        main_lc2txt(['--ignore-settings', *config,
                 '--config', 'local = $pyref(lurlene.util local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / f"{relpath.name}.py")])
