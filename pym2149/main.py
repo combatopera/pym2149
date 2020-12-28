@@ -17,14 +17,73 @@
 
 from .boot import boot
 from .config import ConfigName
-from .timerimpl import ChipTimer, SyncTimer
+from .lurlene import loadcontext, LurleneBridge
+from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
-from .ymplayer import Player, PhysicalBundle
+from .ymplayer import Player, LogicalBundle, PhysicalBundle
 from diapyr.start import Started
-import logging
+import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
+
+def main_lc2jack():
+    from . import jackclient
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section'))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        lurlene.osc.configure(di)
+        di.add(SyncTimer)
+        di.add(LogicalBundle)
+        jackclient.configure(di)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+def main_lc2portaudio():
+    from . import portaudioclient
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section'))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        lurlene.osc.configure(di)
+        di.add(SyncTimer)
+        di.add(LogicalBundle)
+        portaudioclient.configure(di)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+def main_lc2txt(args = sys.argv[1:]):
+    from . import txt
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        txt.configure(di)
+        di.add(SimpleChipTimer)
+        di.add(LogicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+def main_lc2wav(args = sys.argv[1:]):
+    from . import out
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section', 'outpath', args = args))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        out.configure(di)
+        di.add(ChipTimer)
+        di.add(LogicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 def main_ym2jack():
     from . import jackclient

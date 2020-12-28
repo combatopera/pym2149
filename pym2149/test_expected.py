@@ -15,14 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .main import main_lc2txt, main_lc2wav
 from .power import batterypower
+from base64 import a85encode
 from lagoon import sox
 from lurlene.util import threadlocals
 from pathlib import Path
 from PIL import Image, ImageChops
 from tempfile import NamedTemporaryFile
 from unittest import TestCase
-import base64, lc2txt, lc2wav
 
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
@@ -47,7 +48,7 @@ def _comparetxt(path):
     else:
         config = []
     with open(actualpath, 'w') as stream, threadlocals(stream = stream):
-        lc2txt.main_lc2txt(['--ignore-settings'] + config + [
+        main_lc2txt(['--ignore-settings'] + config + [
                 '--config', 'local = $pyref(lurlene.util local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / f"{relpath.name}.py")])
@@ -61,7 +62,7 @@ def _comparepng(path):
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with NamedTemporaryFile() as wavfile:
-        lc2wav.main_lc2wav(['--ignore-settings',
+        main_lc2wav(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
                 str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
@@ -71,4 +72,4 @@ def _comparepng(path):
         return sum(h[:limit]) / sum(h)
     if frac(92) < 1 or frac(14) < .99 or frac(10) < .98:
         with actualpath.open('rb') as f:
-            TestCase().fail(base64.a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
+            TestCase().fail(a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
