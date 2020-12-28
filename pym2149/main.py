@@ -16,16 +16,64 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .boot import boot
+from .budgie import readbytecode
 from .config import ConfigName
+from .dosound import Bytecode
+from .iface import Config
 from .lurlene import loadcontext, LurleneBridge
 from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
 from .ymplayer import Player, LogicalBundle, PhysicalBundle
+from diapyr import types
 from diapyr.start import Started
 import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
+
+@types(Config, this = Bytecode)
+def bytecodefactory(config):
+    with open(config.inpath) as f:
+        return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
+
+def main_dosound2jack():
+    from . import jackclient
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel'))
+    with di:
+        di.add(bytecodefactory)
+        jackclient.configure(di)
+        di.add(SyncTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+def main_dosound2txt(): # TODO: Additional seconds not needed.
+    from . import txt
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
+    with di:
+        di.add(bytecodefactory)
+        txt.configure(di)
+        di.add(SimpleChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+def main_dosound2wav():
+    from . import out
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
+    with di:
+        di.add(bytecodefactory)
+        out.configure(di)
+        di.add(ChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 def main_lc2jack():
     from . import jackclient
