@@ -31,6 +31,15 @@ import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
 
+def main_bpmtool():
+    config, _ = boot(ConfigName())
+    ups = config.updaterate
+    lpb = config.linesperbeat
+    for upl in range(1, 21):
+        lpm = 60 * ups / upl
+        bpm = lpm / lpb
+        print(f"{upl:2} {bpm:7.3f}")
+
 @types(Config, this = Bytecode)
 def bytecodefactory(config):
     with open(config.inpath) as f:
