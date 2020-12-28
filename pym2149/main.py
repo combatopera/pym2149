@@ -41,7 +41,7 @@ def main_bpmtool():
         print(f"{upl:2} {bpm:7.3f}")
 
 @types(Config, this = Bytecode)
-def bytecodefactory(config):
+def srcbytecodefactory(config):
     with open(config.inpath) as f:
         return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
@@ -50,7 +50,7 @@ def main_dosound2jack():
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel'))
     with di:
-        di.add(bytecodefactory)
+        di.add(srcbytecodefactory)
         jackclient.configure(di)
         di.add(SyncTimer)
         di.add(PhysicalBundle)
@@ -63,7 +63,7 @@ def main_dosound2txt(): # TODO: Additional seconds not needed.
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
     with di:
-        di.add(bytecodefactory)
+        di.add(srcbytecodefactory)
         txt.configure(di)
         di.add(SimpleChipTimer)
         di.add(PhysicalBundle)
@@ -76,7 +76,26 @@ def main_dosound2wav():
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
     with di:
-        di.add(bytecodefactory)
+        di.add(srcbytecodefactory)
+        out.configure(di)
+        di.add(ChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
+
+@types(Config, this = Bytecode)
+def dsdbytecodefactory(config):
+    with open(config.inpath, 'rb') as f:
+        log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
+        return Bytecode(f.read(), config.dosoundextraseconds)
+
+def main_dsd2wav():
+    from . import out
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
+    with di:
+        di.add(dsdbytecodefactory)
         out.configure(di)
         di.add(ChipTimer)
         di.add(PhysicalBundle)
