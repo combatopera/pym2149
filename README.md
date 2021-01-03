@@ -1,13 +1,41 @@
 # pym2149
-YM2149 emulator supporting YM files, OSC, MIDI to JACK, PortAudio, WAV.
+YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
 
-[![Build Status](https://travis-ci.org/combatopera/pym2149.svg?branch=master)](https://travis-ci.org/combatopera/pym2149)
+## Install
+These are generic installation instructions.
 
-## Install latest release
+### To use, permanently
+The quickest way to get started is to install the current release from PyPI:
 ```
 # Tested on Linux and Mac:
 pip3 install --user pym2149
 ```
+
+### To use, temporarily
+If you prefer to keep .local clean, install to a virtualenv:
+```
+python3 -m venv venvname
+venvname/bin/pip install pym2149
+. venvname/bin/activate
+```
+
+### To develop
+First clone the repo using HTTP or SSH:
+```
+git clone https://github.com/combatopera/pym2149.git
+git clone git@github.com:combatopera/pym2149.git
+```
+Now use pyven's pipify to create a setup.py, which pip can then use to install the project editably:
+```
+python3 -m venv pyvenvenv
+pyvenvenv/bin/pip install pyven
+pyvenvenv/bin/pipify pym2149
+
+python3 -m venv venvname
+venvname/bin/pip install -e pym2149
+. venvname/bin/activate
+```
+
 ## Usage
 ```
 # GitHub trick to download some files to play:
