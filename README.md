@@ -42,8 +42,9 @@ venvname/bin/pip install -e pym2149
 svn export https://github.com/combatopera/pym2149/trunk/contrib
 
 # Play a tune written in the (currently nameless) live coding language:
-lc2jack.py 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
+lc2jack 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
+lc2portaudio 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
 
 # Play a Dosound sound effect:
-dosound2jack.py contrib/sounds.s snd19
+dosound2jack contrib/sounds.s snd19
 ```
