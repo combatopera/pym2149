@@ -82,6 +82,7 @@ class Globals:
         g.sleep = data.sleep
 
 def main_mkdsd():
+    'Compile Dosound DSL scripts to bytecode for playback on a real Atari.'
     for inpath in sys.argv[1:]:
         outpath = inpath[:inpath.rindex('.')] + '.dsd'
         print(outpath, file=sys.stderr)
