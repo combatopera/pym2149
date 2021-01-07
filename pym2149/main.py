@@ -79,6 +79,7 @@ def srcbytecodefactory(config):
         return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
 def main_dosound2jack():
+    'Play a Dosound script via JACK.'
     from . import jackclient
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel'))
@@ -92,6 +93,7 @@ def main_dosound2jack():
         di(MainThread).sleep()
 
 def main_dosound2txt(): # TODO: Additional seconds not needed.
+    'Render a Dosound script to logging.'
     from . import txt
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
@@ -105,6 +107,7 @@ def main_dosound2txt(): # TODO: Additional seconds not needed.
         di(MainThread).sleep()
 
 def main_dosound2wav():
+    'Render a Dosound script to WAV.'
     from . import out
     initlogging()
     config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
@@ -124,6 +127,7 @@ def dsdbytecodefactory(config):
         return Bytecode(f.read(), config.dosoundextraseconds)
 
 def main_dsd2wav():
+    'Render Dosound bytecode to WAV.'
     from . import out
     initlogging()
     config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
@@ -137,6 +141,7 @@ def main_dsd2wav():
         di(MainThread).sleep()
 
 def main_lc2jack():
+    'Play a Lurlene song via JACK.'
     from . import jackclient
     initlogging()
     config, di = boot(ConfigName('inpath', '--section'))
@@ -152,6 +157,7 @@ def main_lc2jack():
         di(MainThread).sleep()
 
 def main_lc2portaudio():
+    'Play a Lurlene song via PortAudio.'
     from . import portaudioclient
     initlogging()
     config, di = boot(ConfigName('inpath', '--section'))
@@ -167,6 +173,7 @@ def main_lc2portaudio():
         di(MainThread).sleep()
 
 def main_lc2txt(args = sys.argv[1:]):
+    'Render a Lurlene song to logging.'
     from . import txt
     initlogging()
     config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
@@ -181,6 +188,7 @@ def main_lc2txt(args = sys.argv[1:]):
         di(MainThread).sleep()
 
 def main_lc2wav(args = sys.argv[1:]):
+    'Render a Lurlene song to WAV.'
     from . import out
     initlogging()
     config, di = boot(ConfigName('inpath', '--section', 'outpath', args = args))
@@ -195,6 +203,7 @@ def main_lc2wav(args = sys.argv[1:]):
         di(MainThread).sleep()
 
 def main_ym2jack():
+    'Play a YM file via JACK.'
     from . import jackclient
     initlogging()
     config, di = boot(ConfigName('inpath'))
@@ -208,6 +217,7 @@ def main_ym2jack():
         di(MainThread).sleep()
 
 def main_ym2portaudio():
+    'Play a YM file via PortAudio.'
     from . import portaudioclient
     initlogging()
     config, di = boot(ConfigName('inpath'))
@@ -221,6 +231,7 @@ def main_ym2portaudio():
         di(MainThread).sleep()
 
 def main_ym2txt():
+    'Render a YM file to logging.'
     from . import txt
     initlogging()
     config, di = boot(ConfigName('inpath', name = 'txt'))
@@ -234,6 +245,7 @@ def main_ym2txt():
         di(MainThread).sleep()
 
 def main_ym2wav():
+    'Render a YM file to WAV.'
     from . import out
     initlogging()
     config, di = boot(ConfigName('inpath', 'outpath'))
