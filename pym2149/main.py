@@ -64,6 +64,7 @@ def boot(configname):
     return config, di
 
 def main_bpmtool():
+    'Show a table of speed (updates per tracker line) to BPM.'
     config, _ = boot(ConfigName())
     ups = config.updaterate
     lpb = config.linesperbeat
