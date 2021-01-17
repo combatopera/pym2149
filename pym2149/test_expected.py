@@ -66,7 +66,7 @@ def _comparepng(path):
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
                 str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
-        sox.print(wavfile.name, '-n', 'spectrogram', '-o', actualpath)
+        sox[print](wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
         return sum(h[:limit]) / sum(h)
