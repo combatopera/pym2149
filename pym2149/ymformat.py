@@ -267,6 +267,7 @@ class YM6(YM56):
 class YMOpen(YMFile):
 
     impls = {i.formatid.encode(): i for i in [YM2, YM3, YM3b, YM5, YM6]}
+    magic = b'YM'
 
     @types(Config)
     def __init__(self, config):
@@ -283,8 +284,8 @@ class YMOpen(YMFile):
     def startimpl(self):
         self.f = open(self.path, 'rb')
         try:
-            if 'YM' == self.f.read(2):
-                self.ym = self.impls['YM' + self.f.read(2)](self.f, self.once)
+            if self.magic == self.f.read(2):
+                self.ym = self.impls[self.magic + self.f.read(2)](self.f, self.once)
                 return
         except:
             self.f.close()
