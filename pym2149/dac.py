@@ -47,10 +47,8 @@ class FixedLevelEffect:
 
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
-        if node.levelmodereg.value: # XXX: Support clearing this via interrupt?
-            node.blockbuf.mulbuf(node.chain(node.env))
-        else:
-            node.blockbuf.mulbuf(node.chain(node.rtone))
+        # XXX: Support clearing levelmode via interrupt?
+        node.blockbuf.mulbuf(node.chain(node.env if node.levelmodereg.value else node.rtone))
 
 @singleton
 class PWMEffect(FixedLevelEffect):
