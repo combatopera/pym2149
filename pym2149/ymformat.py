@@ -18,6 +18,7 @@
 from .clock import stclock
 from .dac import PWMEffect, SinusEffect
 from .iface import Config, YMFile
+from .ym2149 import PhysicalRegisters
 from diapyr import types
 import logging, os, shutil, struct, sys, tempfile
 
@@ -197,6 +198,18 @@ class YM56(YM):
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
         else:
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
+        self.timerttls = [0] * PhysicalRegisters.supportedchannels
+
+    def withtimers(self, chip, update):
+        for chan, ttl in enumerate(self.timerttls):
+            if ttl:
+                self.timerttls[chan] -= 1
+        for chan, tcr, tdr, effect, ttl in update():
+            chip.timers[chan].update(tcr, tdr, effect)
+            self.timerttls[chan] = ttl
+        for chan, timer in enumerate(chip.timers):
+            if not self.timerttls[chan] and timer.effect.value is not None:
+                timer.effect.value = None
 
 class Frame56(PlainFrame):
 
@@ -205,24 +218,25 @@ class Frame56(PlainFrame):
         self.index = ym.frameindex
         self.flags = ym
 
-class Frame5(Frame56):
-
     def __call__(self, chip):
         super().__call__(chip)
+        self.flags.withtimers(chip, lambda: self.updatetimers(chip))
+
+class Frame5(Frame56):
+
+    def updatetimers(self, chip):
         if self.data[0x1] & 0x30:
             chan = ((self.data[0x1] & 0x30) >> 4) - 1
             tcr = (self.data[0x6] & 0xe0) >> 5
             tdr = self.data[0xE]
-            chip.timers[chan].update(tcr, tdr, PWMEffect)
+            yield chan, tcr, tdr, PWMEffect, 1
         if self.flags.logdigidrum and (self.data[0x3] & 0x30):
             log.warning("Digi-drum at frame %s.", self.index)
             self.flags.logdigidrum = False
 
 class Frame6(Frame56):
 
-    def __call__(self, chip):
-        super().__call__(chip)
-        timerchans = set()
+    def updatetimers(self, chip):
         for r, rr, rrr in [0x1, 0x6, 0xE], [0x3, 0x8, 0xF]:
             if self.data[r] & 0x30:
                 chan = ((self.data[r] & 0x30) >> 4) - 1
@@ -230,22 +244,17 @@ class Frame6(Frame56):
                 if 0x00 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
-                    chip.timers[chan].update(tcr, tdr, PWMEffect)
-                    timerchans.add(chan)
+                    yield chan, tcr, tdr, PWMEffect, 1
                 if self.flags.logdigidrum and 0x40 == fx:
                     log.warning("Digi-drum at frame %s.", self.index)
                     self.flags.logdigidrum = False
                 if 0x80 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
-                    chip.timers[chan].update(tcr, tdr, SinusEffect)
-                    timerchans.add(chan)
+                    yield chan, tcr, tdr, SinusEffect, 1
                 if self.flags.logsyncbuzzer and 0xc0 == fx:
                     log.warning("Sync-buzzer at frame %s.", self.index)
                     self.flags.logsyncbuzzer = False
-        for chan, timer in enumerate(chip.timers):
-            if chan not in timerchans:
-                timer.effect.value = None
 
 class YM5(YM56):
 
