@@ -58,4 +58,4 @@ def _makesinus5shape(steps, maxlevel4, skew):
     # For each step, the level that's closest to its ideal mean amp:
     return Shape([level4to5(max(0, int(round(amptolevel4(amp))))) for amp in amps])
 
-level4tosinus5shape = {level4: _makesinus5shape(8, level4, 0) for level4 in range(16)}
+level4tosinus5shape = tuple(_makesinus5shape(8, level4, 0) for level4 in range(16))
