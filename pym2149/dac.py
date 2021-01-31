@@ -76,7 +76,10 @@ class SinusEffect:
 
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
-        node.blockbuf.mulbuf(node.chain(node.rtone))
+        if node.levelmodereg.value: # Assume intentional, as clearing it on first interrupt of frame would sound bad.
+            node.blockbuf.mulbuf(node.chain(node.env))
+        else:
+            node.blockbuf.mulbuf(node.chain(node.rtone))
 
 class Dac(BufNode):
 
