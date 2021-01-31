@@ -77,8 +77,6 @@ class SinusEffect:
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
         node.blockbuf.mulbuf(node.chain(node.rtone))
-        node.blockbuf.mul(2)
-        node.blockbuf.add(1)
 
 class Dac(BufNode):
 

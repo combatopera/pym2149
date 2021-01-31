@@ -52,11 +52,11 @@ def meansin(x1, x2):
 def sinsliceamp(i, n, skew):
     return (meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
-def makesinusshape(steps, maxlevel4, skew):
+def _makesinusshape(steps, maxlevel4, skew):
     maxamp = level5toamp(level4to5(maxlevel4))
     amps = [maxamp * sinsliceamp(step, steps, skew) for step in range(steps)]
     # For each step, the level that's closest to its ideal mean amp:
-    unit = [max(0, int(round(amptolevel4(amp)))) for amp in amps]
+    unit = [level4to5(max(0, int(round(amptolevel4(amp))))) for amp in amps]
     return Shape(unit)
 
-leveltosinusshape = {level4: makesinusshape(8, level4, 0) for level4 in range(16)}
+leveltosinusshape = {level4: _makesinusshape(8, level4, 0) for level4 in range(16)}
