@@ -17,14 +17,11 @@
 
 from .buf import BufType
 from .nod import BufNode
-from .shapes import level4to5, level5toamp, level4tosinus5shape, signaldtype, toneshape
+from .shapes import level4to5, level5toamp, level4tosinus5shape, level4totone5shape, signaldtype
 from diapyr.util import singleton
 import numpy as np
 
 class Level(BufNode):
-
-    pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
-    pwmzero5bit = level4to5(pwmzero4bit)
 
     def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
         super().__init__(BufType.signal) # Must be suitable for use as index downstream.
@@ -50,7 +47,7 @@ class Level(BufNode):
 class PWMEffect:
 
     def getshape(self, fixedreg):
-        return toneshape
+        return level4totone5shape[fixedreg.value]
 
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
@@ -58,9 +55,6 @@ class PWMEffect:
             node.blockbuf.mulbuf(node.chain(node.env))
         else:
             node.blockbuf.mulbuf(node.chain(node.rtone))
-            # Map 0 to pwmzero and 1 to fixed level:
-            node.blockbuf.mul(level4to5(node.fixedreg.value) - node.pwmzero5bit)
-            node.blockbuf.add(node.pwmzero5bit)
 
 @singleton
 class SinusEffect:

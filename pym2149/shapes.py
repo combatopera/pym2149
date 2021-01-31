@@ -44,7 +44,8 @@ class Shape:
         self.size = self.buf.size
         self.introlen = introlen
 
-toneshape = Shape([1, 0])
+rawtoneshape = 1, 0
+toneshape = Shape(rawtoneshape)
 
 def _meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
@@ -59,3 +60,4 @@ def _makesinus5shape(steps, maxlevel4, skew):
     return Shape([level4to5(max(0, int(round(amptolevel4(amp))))) for amp in amps])
 
 level4tosinus5shape = tuple(_makesinus5shape(8, level4, 0) for level4 in range(16))
+level4totone5shape = tuple(Shape([level4to5(level4 * x) for x in rawtoneshape]) for level4 in range(16))
