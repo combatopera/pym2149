@@ -171,6 +171,7 @@ class YM3b(YM23):
 class YM56(YM):
 
     framesize = 16
+    logdigidrum = True
 
     def __init__(self, f, once):
         super().__init__(f, True)
@@ -196,7 +197,6 @@ class YM56(YM):
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
         else:
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
-        self.logdigidrum = True
 
 class Frame56(PlainFrame):
 
@@ -256,10 +256,7 @@ class YM6(YM56):
 
     formatid = 'YM6!'
     frameobj = Frame6
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.logsyncbuzzer = True
+    logsyncbuzzer = True
 
 class YMOpen(YMFile):
 
