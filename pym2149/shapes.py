@@ -46,15 +46,15 @@ class Shape:
 
 toneshape = Shape([1, 0])
 
-def meansin(x1, x2):
+def _meansin(x1, x2):
     return (-math.cos(x2) - -math.cos(x1)) / (x2 - x1)
 
-def sinsliceamp(i, n, skew):
-    return (meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
+def _sinsliceamp(i, n, skew):
+    return (_meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
 def _makesinus5shape(steps, maxlevel4, skew):
     maxamp = level5toamp(level4to5(maxlevel4))
-    amps = [maxamp * sinsliceamp(step, steps, skew) for step in range(steps)]
+    amps = [maxamp * _sinsliceamp(step, steps, skew) for step in range(steps)]
     # For each step, the level that's closest to its ideal mean amp:
     return Shape([level4to5(max(0, int(round(amptolevel4(amp))))) for amp in amps])
 
