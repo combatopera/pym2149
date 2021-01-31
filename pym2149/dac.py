@@ -43,31 +43,26 @@ class Level(BufNode):
             self.blockbuf.copybuf(self.chain(self.signal))
             self.blockbuf.mul(level4to5(self.fixedreg.value))
 
+class FixedLevelEffect:
+
+    def __call__(self, node):
+        node.blockbuf.copybuf(node.chain(node.signal))
+        if node.levelmodereg.value: # XXX: Support clearing this via interrupt?
+            node.blockbuf.mulbuf(node.chain(node.env))
+        else:
+            node.blockbuf.mulbuf(node.chain(node.rtone))
+
 @singleton
-class PWMEffect:
+class PWMEffect(FixedLevelEffect):
 
     def getshape(self, fixedreg):
         return level4totone5shape[fixedreg.value]
 
-    def __call__(self, node):
-        node.blockbuf.copybuf(node.chain(node.signal))
-        if node.levelmodereg.value: # We do not support toggling this via interrupt.
-            node.blockbuf.mulbuf(node.chain(node.env))
-        else:
-            node.blockbuf.mulbuf(node.chain(node.rtone))
-
 @singleton
-class SinusEffect:
+class SinusEffect(FixedLevelEffect):
 
     def getshape(self, fixedreg):
         return level4tosinus5shape[fixedreg.value]
-
-    def __call__(self, node):
-        node.blockbuf.copybuf(node.chain(node.signal))
-        if node.levelmodereg.value: # Assume intentional, as clearing it on first interrupt of frame would sound bad.
-            node.blockbuf.mulbuf(node.chain(node.env))
-        else:
-            node.blockbuf.mulbuf(node.chain(node.rtone))
 
 class Dac(BufNode):
 
