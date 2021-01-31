@@ -25,7 +25,6 @@ class Level(BufNode):
 
     pwmzero4bit = 0 # TODO: Currently consistent with ST-Sound, but make it a register.
     pwmzero5bit = level4to5(pwmzero4bit)
-    lookup = np.fromiter([pwmzero5bit] + list(range(32)), signaldtype)
 
     def __init__(self, levelmodereg, fixedreg, env, signal, rtone, timereffectreg):
         super().__init__(BufType.signal) # Must be suitable for use as index downstream.
@@ -54,15 +53,10 @@ class PWMEffect:
         return toneshape
 
     def __call__(self, node):
-        if node.levelmodereg.value:
-            # TODO: Test this branch, or override levelmode starting with first interrupt.
-            node.blockbuf.copybuf(node.chain(node.env)) # Values in [0, 31].
-            node.blockbuf.add(1) # Shift env values to [1, 32].
-            node.blockbuf.mulbuf(node.chain(node.signal)) # Introduce 0.
-            node.blockbuf.mulbuf(node.chain(node.rtone)) # Introduce more 0.
-            node.blockbuf.mapbuf(node.blockbuf, node.lookup) # Map 0 to 5-bit pwmzero and sub 1 from rest.
+        node.blockbuf.copybuf(node.chain(node.signal))
+        if node.levelmodereg.value: # We do not support toggling this via interrupt.
+            node.blockbuf.mulbuf(node.chain(node.env))
         else:
-            node.blockbuf.copybuf(node.chain(node.signal))
             node.blockbuf.mulbuf(node.chain(node.rtone))
             # Map 0 to pwmzero and 1 to fixed level:
             node.blockbuf.mul(level4to5(node.fixedreg.value) - node.pwmzero5bit)
