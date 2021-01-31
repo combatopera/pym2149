@@ -138,39 +138,39 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
     @staticmethod
     def createosc(clock, prescalerornone, effectivedata):
         effect = Reg(value = PWMEffect)
-        return RToneOsc(mfpclock, clock, SimpleNamespace(effect = effect, prescalerornone = prescalerornone, effectivedata = effectivedata), None)
+        return RToneOsc(mfpclock, clock, SimpleNamespace(effect = effect, prescalerornone = prescalerornone, effectivedata = effectivedata), Reg(value = 15))
 
     def test_works(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(96)).tolist()
-        self.assertEqual([1] * 24, v[:24])
-        self.assertEqual([0] * 24, v[24:48])
-        self.assertEqual([1] * 24, v[48:72])
-        self.assertEqual([0] * 24, v[72:])
+        self.assertEqual([31] * 24, v[:24])
+        self.assertEqual([1] * 24, v[24:48])
+        self.assertEqual([31] * 24, v[48:72])
+        self.assertEqual([1] * 24, v[72:])
         v = o.call(Block(48)).tolist()
-        self.assertEqual([1] * 24, v[:24])
-        self.assertEqual([0] * 24, v[24:])
+        self.assertEqual([31] * 24, v[:24])
+        self.assertEqual([1] * 24, v[24:])
 
     def test_works2(self):
         o = self.createosc(2000000, Reg(value = 1), Reg(value = 29))
         v = o.call(Block(95)).tolist()
-        self.assertEqual([1] * 24, v[:24])
-        self.assertEqual([0] * 24, v[24:48])
-        self.assertEqual([1] * 23, v[48:71])
-        self.assertEqual([0] * 24, v[71:])
+        self.assertEqual([31] * 24, v[:24])
+        self.assertEqual([1] * 24, v[24:48])
+        self.assertEqual([31] * 23, v[48:71])
+        self.assertEqual([1] * 24, v[71:])
         v = o.call(Block(48)).tolist()
-        self.assertEqual([1] * 24, v[:24])
-        self.assertEqual([0] * 23, v[24:47])
-        self.assertEqual([1], v[47:])
+        self.assertEqual([31] * 24, v[:24])
+        self.assertEqual([1] * 23, v[24:47])
+        self.assertEqual([31], v[47:])
 
     def test_resume(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
         v = o.call(Block(25)).tolist()
-        self.assertEqual([1] * 24, v[:24])
-        self.assertEqual([0], v[24:])
+        self.assertEqual([31] * 24, v[:24])
+        self.assertEqual([1], v[24:])
         v = o.call(Block(24)).tolist()
-        self.assertEqual([0] * 23, v[:23])
-        self.assertEqual([1], v[23:])
+        self.assertEqual([1] * 23, v[:23])
+        self.assertEqual([31], v[23:])
 
     def test_carry(self):
         r = Reg(value = 8*0x01*mfpclock//200)
@@ -185,39 +185,39 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
     def test_endexistingstepatendofblock(self):
         r = Reg(value = 8*0x01*mfpclock//200)
         o = self.createosc(200, Reg(value = 1), r)
+        self.assertEqual([31] * 4, o.call(Block(4)).tolist())
+        self.assertEqual([31] * 4, o.call(Block(4)).tolist())
         self.assertEqual([1] * 4, o.call(Block(4)).tolist())
-        self.assertEqual([1] * 4, o.call(Block(4)).tolist())
-        self.assertEqual([0] * 4, o.call(Block(4)).tolist())
 
     def test_increaseperiodonboundary(self):
         r = Reg(value = 8*0x01*mfpclock//200)
         o = self.createosc(200, Reg(value = 1), r)
-        self.assertEqual([1] * 8 + [0] * 8, o.call(Block(16)).tolist())
+        self.assertEqual([31] * 8 + [1] * 8, o.call(Block(16)).tolist())
         r.value = 8*0x02*mfpclock//200
-        self.assertEqual([1] * 16 + [0] * 15, o.call(Block(31)).tolist())
+        self.assertEqual([31] * 16 + [1] * 15, o.call(Block(31)).tolist())
         r.value = 8*0x03*mfpclock//200
         # Unlike tone, the existing countdown is not affected:
-        self.assertEqual([0] + [1] * 24 + [0] * 24 + [1], o.call(Block(50)).tolist())
+        self.assertEqual([1] + [31] * 24 + [1] * 24 + [31], o.call(Block(50)).tolist())
 
     def test_decreaseperiodonboundary(self):
         r = Reg(value = 8*0x03*mfpclock//200)
         o = self.createosc(200, Reg(value = 1), r)
-        self.assertEqual([1] * 24 + [0] * 24, o.call(Block(48)).tolist())
+        self.assertEqual([31] * 24 + [1] * 24, o.call(Block(48)).tolist())
         r.value = 8*0x02*mfpclock//200
-        self.assertEqual([1] * 16 + [0] * 16 + [1] * 6, o.call(Block(38)).tolist())
+        self.assertEqual([31] * 16 + [1] * 16 + [31] * 6, o.call(Block(38)).tolist())
         r.value = 8*0x01*mfpclock//200
         # Unlike tone, the existing countdown is not affected:
-        self.assertEqual([1] * 10 + [0] * 8 + [1] * 8 + [0], o.call(Block(27)).tolist())
+        self.assertEqual([31] * 10 + [1] * 8 + [31] * 8 + [1], o.call(Block(27)).tolist())
 
     def test_smallerblocksthanperiod(self):
         r = Reg(value = 1*0x05*mfpclock//200)
         o = self.createosc(200, Reg(value = 1), r)
-        self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
-        self.assertEqual([1,0,0,0], o.call(Block(4)).tolist())
-        self.assertEqual([0,0,1], o.call(Block(3)).tolist())
-        self.assertEqual([1,1,1,1], o.call(Block(4)).tolist())
-        self.assertEqual([0,0,0,0,0], o.call(Block(5)).tolist())
-        self.assertEqual([1], o.call(Block(1)).tolist())
+        self.assertEqual([31,31,31,31], o.call(Block(4)).tolist())
+        self.assertEqual([31,1,1,1], o.call(Block(4)).tolist())
+        self.assertEqual([1,1,31], o.call(Block(3)).tolist())
+        self.assertEqual([31,31,31,31], o.call(Block(4)).tolist())
+        self.assertEqual([1,1,1,1,1], o.call(Block(5)).tolist())
+        self.assertEqual([31], o.call(Block(1)).tolist())
 
     def test_writetdrwhilestopped(self):
         pass # TODO: Implement.
