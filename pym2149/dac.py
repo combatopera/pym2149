@@ -17,7 +17,7 @@
 
 from .buf import BufType
 from .nod import BufNode
-from .shapes import level4to5, level5toamp, leveltosinusshape, signaldtype, toneshape
+from .shapes import level4to5, level5toamp, level4tosinus5shape, signaldtype, toneshape
 from diapyr.util import singleton
 import numpy as np
 
@@ -72,7 +72,7 @@ class PWMEffect:
 class SinusEffect:
 
     def getshape(self, fixedreg):
-        return leveltosinusshape[fixedreg.value]
+        return level4tosinus5shape[fixedreg.value]
 
     def __call__(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
