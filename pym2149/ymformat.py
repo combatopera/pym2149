@@ -19,6 +19,7 @@ from .clock import stclock
 from .dac import NullEffect, PWMEffect, SinusEffect
 from .iface import Config, YMFile
 from .ym2149 import PhysicalRegisters
+from contextlib import contextmanager
 from diapyr import types
 import logging, os, shutil, struct, sys, tempfile
 
@@ -200,13 +201,12 @@ class YM56(YM):
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
         self.timerttls = [0] * PhysicalRegisters.supportedchannels
 
-    def withtimers(self, chip, update):
+    @contextmanager
+    def processtimerttls(self, chip):
         for chan, ttl in enumerate(self.timerttls):
             if ttl:
                 self.timerttls[chan] -= 1
-        for chan, tcr, tdr, effect, ttl in update():
-            chip.timers[chan].update(tcr, tdr, effect)
-            self.timerttls[chan] = ttl
+        yield self.timerttls
         for chan, timer in enumerate(chip.timers):
             if not self.timerttls[chan] and timer.effect.value is not NullEffect:
                 timer.effect.value = NullEffect
@@ -219,8 +219,11 @@ class Frame56(PlainFrame):
         self.flags = ym
 
     def applydata(self, chip):
+        with self.flags.processtimerttls(chip) as timerttls:
+            for chan, tcr, tdr, effect, ttl in self.updatetimers(chip):
+                chip.timers[chan].update(tcr, tdr, effect)
+                timerttls[chan] = ttl
         super().applydata(chip)
-        self.flags.withtimers(chip, lambda: self.updatetimers(chip))
 
 class Frame5(Frame56):
 
