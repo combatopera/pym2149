@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import stclock
-from .dac import PWMEffect, SinusEffect
+from .dac import NullEffect, PWMEffect, SinusEffect
 from .iface import Config, YMFile
 from .ym2149 import PhysicalRegisters
 from diapyr import types
@@ -208,8 +208,8 @@ class YM56(YM):
             chip.timers[chan].update(tcr, tdr, effect)
             self.timerttls[chan] = ttl
         for chan, timer in enumerate(chip.timers):
-            if not self.timerttls[chan] and timer.effect.value is not None:
-                timer.effect.value = None
+            if not self.timerttls[chan] and timer.effect.value is not NullEffect:
+                timer.effect.value = NullEffect
 
 class Frame56(PlainFrame):
 

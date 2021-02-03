@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
+from .dac import NullEffect
 from .iface import Chip, Config, Prerecorded, Tuning
 from .reg import Reg, regproperty
 from .ym2149 import LogicalRegisters
@@ -73,7 +74,7 @@ class ChanProxy:
         self.noiseflag = False
         self.toneflag = False
         self.envflag = False
-        self.timereffect = None
+        self.timereffect = NullEffect
 
 class ChipRegs:
 

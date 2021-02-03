@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+from .dac import NullEffect
 from .reg import Reg
 
 prescalers = {1 + i: v for i, v in enumerate([4, 10, 16, 50, 64, 100, 200])}
@@ -30,7 +31,7 @@ class MFPTimer:
         self.effectivedata = Reg().link(lambda tdr: tdr if tdr else 0x100, self.data)
         self.control.value = 0
         self.data.value = 0
-        self.effect = Reg(None)
+        self.effect = Reg(NullEffect)
         self.control_data = Reg()
         self.control.link(lambda cd: cd[0], self.control_data)
         self.data.link(lambda cd: cd[1], self.control_data)

@@ -33,15 +33,18 @@ class Level(BufNode):
         self.timereffectreg = timereffectreg
 
     def callimpl(self):
-        timereffect = self.timereffectreg.value
-        if timereffect is not None:
-            timereffect(self)
-        elif self.levelmodereg.value:
-            self.blockbuf.copybuf(self.chain(self.signal))
-            self.blockbuf.mulbuf(self.chain(self.env))
+        self.timereffectreg.value(self)
+
+@singleton
+class NullEffect:
+    'The timer does not interfere.'
+
+    def __call__(self, node):
+        node.blockbuf.copybuf(node.chain(node.signal))
+        if node.levelmodereg.value:
+            node.blockbuf.mulbuf(node.chain(node.env))
         else:
-            self.blockbuf.copybuf(self.chain(self.signal))
-            self.blockbuf.mul(level4to5(self.fixedreg.value))
+            node.blockbuf.mul(level4to5(node.fixedreg.value))
 
 class FixedLevelEffect:
 

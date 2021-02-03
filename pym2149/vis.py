@@ -16,6 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
+from .dac import NullEffect
 from .iface import Config, Roll, Tuning
 from .ym2149 import LogicalRegisters
 from diapyr import types
@@ -60,7 +61,7 @@ class RollImpl(Roll):
             level = self.chip.fixedlevels[c].value
             newshape = (self.shapeversion != self.chip.envshape.version)
             self.shapeversion = self.chip.envshape.version
-            timereffect = self.chip.timers[c].effect.value is not None
+            timereffect = self.chip.timers[c].effect.value is not NullEffect
             rhs = env or level
             if tone and rhs:
                 if self.periods:
