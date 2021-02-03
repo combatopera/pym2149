@@ -122,7 +122,7 @@ class PlainFrame:
     def __init__(self, ym):
         self.data = ym.readframe()
 
-    def __call__(self, chip):
+    def applydata(self, chip):
         for i, x in enumerate(self.data):
             if 0xD != i or 255 != x:
                 chip.R[i].value = x
@@ -218,8 +218,8 @@ class Frame56(PlainFrame):
         self.index = ym.frameindex
         self.flags = ym
 
-    def __call__(self, chip):
-        super().__call__(chip)
+    def applydata(self, chip):
+        super().applydata(chip)
         self.flags.withtimers(chip, lambda: self.updatetimers(chip))
 
 class Frame5(Frame56):
@@ -304,7 +304,7 @@ class YMOpen(YMFile):
 
     def frames(self, chip):
         for frame in self.ym:
-            frame(chip)
+            frame.applydata(chip)
             yield
 
     def stop(self):
