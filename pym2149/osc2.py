@@ -128,6 +128,15 @@ class RToneOsc(BufNode):
                 self.precounterxmfp = prescalerornone * self.chipimplclock
             self.index, self.maincounter, self.precounterxmfp = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
 
+    def nextinterruptornone(self): # XXX: Possible to performantly unduplicate?
+        prescaler = self.timer.prescalerornone.value
+        if prescaler is not None:
+            chunksizexmfp = self.chipimplclock * prescaler
+            precounterxmfp = self.precounterxmfp
+            if precounterxmfp is None:
+                precounterxmfp = chunksizexmfp
+            return ((self.maincounter - 1) * chunksizexmfp + precounterxmfp + self.mfpclock - 1) // self.mfpclock
+
     @turbo(
         self = dict(
             oscnodepyrbotype,

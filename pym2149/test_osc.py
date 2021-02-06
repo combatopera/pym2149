@@ -142,22 +142,26 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
 
     def test_works(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
+        self.assertEqual(0, o.nextinterruptornone())
         v = o.call(Block(96)).tolist()
         self.assertEqual([31] * 24, v[:24])
         self.assertEqual([1] * 24, v[24:48])
         self.assertEqual([31] * 24, v[48:72])
         self.assertEqual([1] * 24, v[72:])
+        self.assertEqual(0, o.nextinterruptornone())
         v = o.call(Block(48)).tolist()
         self.assertEqual([31] * 24, v[:24])
         self.assertEqual([1] * 24, v[24:])
 
     def test_works2(self):
         o = self.createosc(2000000, Reg(value = 1), Reg(value = 29))
+        self.assertEqual(0, o.nextinterruptornone())
         v = o.call(Block(95)).tolist()
         self.assertEqual([31] * 24, v[:24])
         self.assertEqual([1] * 24, v[24:48])
         self.assertEqual([31] * 23, v[48:71])
         self.assertEqual([1] * 24, v[71:])
+        self.assertEqual(0, o.nextinterruptornone())
         v = o.call(Block(48)).tolist()
         self.assertEqual([31] * 24, v[:24])
         self.assertEqual([1] * 23, v[24:47])
@@ -165,9 +169,11 @@ class TestRToneOsc(AbstractTestOsc, TestCase): # FIXME: MFP timers do not behave
 
     def test_resume(self):
         o = self.createosc(200, Reg(value = 1), Reg(value = 8*3*mfpclock//200))
+        self.assertEqual(0, o.nextinterruptornone())
         v = o.call(Block(25)).tolist()
         self.assertEqual([31] * 24, v[:24])
         self.assertEqual([1], v[24:])
+        self.assertEqual(23, o.nextinterruptornone())
         v = o.call(Block(24)).tolist()
         self.assertEqual([1] * 23, v[:23])
         self.assertEqual([31], v[23:])
