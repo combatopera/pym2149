@@ -39,6 +39,10 @@ class Shape:
 
     pyrbotype = dict(buf = [signaldtype], size = u4, introlen = u4)
 
+    @classmethod
+    def level4to5(cls, data4):
+        return cls(map(level4to5, data4))
+
     def __init__(self, g, introlen = 0):
         self.buf = np.fromiter(g, signaldtype)
         self.size = self.buf.size
@@ -53,11 +57,12 @@ def _meansin(x1, x2):
 def _sinsliceamp(i, n, skew):
     return (_meansin(*(2 * math.pi * (i + off + skew) / n for off in [-.5, .5])) + 1) / 2
 
-def _makesinus5shape(steps, maxlevel4, skew):
+def _sinuslevel4(steps, maxlevel4, skew):
     maxamp = level5toamp(level4to5(maxlevel4))
-    amps = [maxamp * _sinsliceamp(step, steps, skew) for step in range(steps)]
-    # For each step, the level that's closest to its ideal mean amp:
-    return Shape([level4to5(max(0, int(round(amptolevel4(amp))))) for amp in amps])
+    for step in range(steps):
+        amp = maxamp * _sinsliceamp(step, steps, skew)
+        # For each step, the level that's closest to its ideal mean amp:
+        yield max(0, int(round(amptolevel4(amp))))
 
-level4tosinus5shape = tuple(_makesinus5shape(8, level4, 0) for level4 in range(16))
-level4totone5shape = tuple(Shape([level4to5(level4 * x) for x in rawtoneshape]) for level4 in range(16))
+level4tosinus5shape = tuple(Shape.level4to5(_sinuslevel4(8, level4, 0)) for level4 in range(16))
+level4totone5shape = tuple(Shape.level4to5(level4 * x for x in rawtoneshape) for level4 in range(16))
