@@ -20,7 +20,6 @@ from .const import i4, i8, u1, u4, u8
 from .nod import BufNode
 from .shapes import Shape, signaldtype, toneshape
 from pyrbo import LOCAL, turbo
-from types import SimpleNamespace
 import itertools, numpy as np
 
 oscnodepyrbotype = dict(
@@ -108,9 +107,6 @@ class RToneOsc(BufNode):
 
     def __init__(self, mfpclock, chipimplclock, timer, fixedreg):
         super().__init__(BufType.signal)
-        self.maincounter = 0
-        self.precounterxmfp = None
-        self.shape = SimpleNamespace(size = None)
         self.mfpclock = mfpclock
         self.chipimplclock = chipimplclock
         self.timer = timer
@@ -119,7 +115,10 @@ class RToneOsc(BufNode):
     def callimpl(self):
         effect = self.timer.effect.value
         if effect is not self.effect:
-            self.index = -1
+            # Simulate running interrupt routine synchronously now (start of frame) and subsequently by interrupt:
+            self.maincounter = 0
+            self.precounterxmfp = None
+            self.index = -1 # Reset index in shape.
             self.effect = effect
         self.shape = effect.getshape(self.fixedreg)
         prescalerornone = self.timer.prescalerornone.value
