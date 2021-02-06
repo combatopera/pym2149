@@ -118,7 +118,7 @@ class RToneOsc(BufNode):
             # Simulate running interrupt routine synchronously now (start of frame) and subsequently by interrupt:
             self.maincounter = 0
             self.precounterxmfp = None
-            self.index = -1 # Reset index in shape.
+            self.repeat, self.index = 0, -1 # Reset index in shape.
             self.effect = effect
         self.shape = effect.getshape(self.fixedreg)
         prescalerornone = self.timer.prescalerornone.value
@@ -128,7 +128,8 @@ class RToneOsc(BufNode):
         else:
             if self.precounterxmfp is None:
                 self.precounterxmfp = prescalerornone * self.chipimplclock
-            self.index, self.maincounter, self.precounterxmfp = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
+            self.repeat, self.index, self.maincounter, self.precounterxmfp = self.rtoneimpl(prescalerornone, self.timer.effectivedata.value)
+        self.timer.repeat.value = self.repeat
 
     @turbo(
         self = dict(
@@ -137,6 +138,7 @@ class RToneOsc(BufNode):
             chipimplclock = u8,
             maincounter = i4,
             precounterxmfp = u4,
+            repeat = u4,
         ),
         prescaler = u4,
         etdr = u4,
@@ -149,7 +151,7 @@ class RToneOsc(BufNode):
         numerator = i8,
     )
     def rtoneimpl(self, prescaler, etdr):
-        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_index = self_maincounter = self_precounterxmfp = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
+        self_blockbuf_buf = self_block_framecount = self_mfpclock = self_chipimplclock = self_repeat = self_index = self_maincounter = self_precounterxmfp = self_shape_buf = self_shape_size = self_shape_introlen = LOCAL
         chunksizexmfp = self_chipimplclock * prescaler
         stepsizexmfp = chunksizexmfp * etdr
         nextstepxmfp = chunksizexmfp * self_maincounter + self_precounterxmfp - chunksizexmfp
@@ -167,6 +169,7 @@ class RToneOsc(BufNode):
             nextstepxmfp += stepsizexmfp
             self_index += 1
             if self_index == self_shape_size:
+                self_repeat += 1
                 self_index = self_shape_introlen
         nextstepxmfp -= self_mfpclock * self_block_framecount
         self_maincounter = 1
@@ -174,7 +177,7 @@ class RToneOsc(BufNode):
             nextstepxmfp += chunksizexmfp
             self_maincounter -= 1
         self_maincounter += nextstepxmfp // chunksizexmfp
-        return self_index, self_maincounter, nextstepxmfp % chunksizexmfp
+        return self_repeat, self_index, self_maincounter, nextstepxmfp % chunksizexmfp
 
 class ToneOsc(ShapeOsc):
 

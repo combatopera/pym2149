@@ -39,6 +39,7 @@ class MFPTimer:
         # XXX: Should change of wavelength trigger this link?
         self.control_data.link(self._findtcrtdr, self.freq)
         self.prescalerornone = Reg().link(lambda tcr: prescalers.get(tcr), self.control)
+        self.repeat = Reg()
 
     def update(self, tcr, tdr, effect):
         self.control_data.value = tcr, tdr
