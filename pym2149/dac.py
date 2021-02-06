@@ -33,13 +33,13 @@ class Level(BufNode):
         self.timereffectreg = timereffectreg
 
     def callimpl(self):
-        self.timereffectreg.value(self)
+        self.timereffectreg.value.putlevel5(self)
 
 @singleton
 class NullEffect:
     'The timer does not interfere.'
 
-    def __call__(self, node):
+    def putlevel5(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
         if node.levelmodereg.value:
             node.blockbuf.mulbuf(node.chain(node.env))
@@ -48,7 +48,7 @@ class NullEffect:
 
 class FixedLevelEffect:
 
-    def __call__(self, node):
+    def putlevel5(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
         # XXX: Support clearing levelmode via interrupt?
         node.blockbuf.mulbuf(node.chain(node.env if node.levelmodereg.value else node.rtone))
