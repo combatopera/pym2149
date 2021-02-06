@@ -44,6 +44,7 @@ class NullEffect:
         if node.levelmodereg.value:
             node.blockbuf.mulbuf(node.chain(node.env))
         else:
+            # According to block diagram, the level is already 5-bit when combining with binary signal:
             node.blockbuf.mul(level4to5(node.fixedreg.value))
 
 class FixedLevelEffect:
