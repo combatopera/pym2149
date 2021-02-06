@@ -37,7 +37,7 @@ class Level(BufNode):
 
 @singleton
 class NullEffect:
-    'The timer does not interfere.'
+    'All registers write directly to chip, the timer does not interfere.'
 
     def putlevel5(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
@@ -48,6 +48,7 @@ class NullEffect:
             node.blockbuf.mul(level4to5(node.fixedreg.value))
 
 class FixedLevelEffect:
+    'Registers levelmodereg/fixedreg are virtual, and interrupt setup/routine is in control of forwarding their data to chip.'
 
     def putlevel5(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
@@ -56,12 +57,14 @@ class FixedLevelEffect:
 
 @singleton
 class PWMEffect(FixedLevelEffect):
+    'Ignore levelmodereg, alternate fixed level between fixedreg value and zero.'
 
     def getshape(self, fixedreg):
         return level4totone5shape[fixedreg.value]
 
 @singleton
 class SinusEffect(FixedLevelEffect):
+    'Ignore levelmodereg, set fixed level to sample value as scaled by fixedreg.'
 
     def getshape(self, fixedreg):
         return level4tosinus5shape[fixedreg.value]
