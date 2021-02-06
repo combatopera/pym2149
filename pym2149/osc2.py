@@ -104,6 +104,8 @@ class ShapeOsc(BufNode):
 
 class RToneOsc(BufNode):
 
+    effect = None
+
     def __init__(self, mfpclock, chipimplclock, timer, fixedreg):
         super().__init__(BufType.signal)
         self.maincounter = 0
@@ -115,10 +117,11 @@ class RToneOsc(BufNode):
         self.fixedreg = fixedreg
 
     def callimpl(self):
-        shape = self.timer.effect.value.getshape(self.fixedreg)
-        if shape.size != self.shape.size or shape.introlen != self.shape.introlen: # XXX: Or whenever effect obj changes?
+        effect = self.timer.effect.value
+        if effect is not self.effect:
             self.index = -1
-        self.shape = shape
+            self.effect = effect
+        self.shape = effect.getshape(self.fixedreg)
         prescalerornone = self.timer.prescalerornone.value
         if prescalerornone is None:
             self.blockbuf.fill_same(self.shape.buf[self.index])
