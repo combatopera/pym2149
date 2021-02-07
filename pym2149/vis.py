@@ -64,18 +64,9 @@ class RollImpl(Roll):
                 yield self._pitchstr(self.clock.tonefreq(self.chip.toneperiods[c].value))
         else:
             yield ''
-        if tone and noise and rhs:
-            yield '&'
-        else:
-            yield ''
-        if noise and rhs:
-            yield self.chip.noiseperiod.value
-        else:
-            yield ''
-        if (tone or noise) and rhs:
-            yield '*'
-        else:
-            yield ''
+        yield '&' if tone and noise and rhs else ''
+        yield self.chip.noiseperiod.value if noise and rhs else ''
+        yield '*' if (tone or noise) and rhs else ''
         yield from self.effecttovals[effect](self, c)
 
     def _dacvals(self, c):
