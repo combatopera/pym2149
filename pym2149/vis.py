@@ -83,7 +83,11 @@ class RollImpl(Roll):
                 yield level
             yield ''
             yield self._pitchstr(self.chip.timers[c].getfreq())
-        elif env:
+        else:
+            yield from self._dacvals(c)
+
+    def _dacvals(self, c):
+        if self.chip.levelmodes[c].value:
             shape = self.chip.envshape.value
             yield self.shapes[shape]
             yield '~' if self.shapeversion != self.chip.envshape.version else ''
@@ -91,12 +95,9 @@ class RollImpl(Roll):
                 yield self.chip.envperiod.value
             else:
                 yield self._pitchstr(self.clock.envfreq(self.chip.envperiod.value, shape))
-        elif level:
-            yield level
-            yield ''
-            yield ''
         else:
-            yield ''
+            level = self.chip.fixedlevels[c].value
+            yield level if level else ''
             yield ''
             yield ''
 
