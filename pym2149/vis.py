@@ -104,7 +104,6 @@ class RollImpl(Roll):
         if self.line == self.height:
             self.stream.write(self.jump)
             self.line = 0
-        vals = tuple(v for c in range(self.channels) for v in self._getvals(c))
+        print(self.format % tuple(v for c in range(self.channels) for v in self._getvals(c)), file = self.stream)
         self.shapeversion = self.chip.envshape.version
-        print(self.format % vals, file = self.stream)
         self.line += 1
