@@ -79,12 +79,7 @@ class RollImpl(Roll):
         if effect is NullEffect:
             yield from self._dacvals(c)
         else:
-            if level:
-                yield level
-                yield ''
-                yield self._pitchstr(self.chip.timers[c].getfreq())
-            else:
-                yield from self._dacvals(c)
+            yield from self._pwmvals(c)
 
     def _dacvals(self, c):
         if self.chip.levelmodes[c].value:
@@ -98,6 +93,17 @@ class RollImpl(Roll):
         else:
             level = self.chip.fixedlevels[c].value
             yield level if level else ''
+            yield ''
+            yield ''
+
+    def _pwmvals(self, c):
+        level = self.chip.fixedlevels[c].value
+        if level:
+            yield level
+            yield ''
+            yield self._pitchstr(self.chip.timers[c].getfreq())
+        else:
+            yield ''
             yield ''
             yield ''
 
