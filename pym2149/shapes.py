@@ -26,24 +26,22 @@ log2 = math.log(2)
 def level5toamp(level):
     return 2 ** ((level - 31) / 4)
 
-def amptolevel5(amp):
-    return 31 + 4 * math.log(amp) / log2
-
-def amptolevel4(amp):
-    return 15 + 2 * math.log(amp) / log2
+def _amptolevel4(amp):
+    return max(0, int(round(15 + 2 * math.log(amp) / log2)))
 
 def level4to5(level4):
     return level4 * 2 + 1 # Observe 4-bit 0 is 5-bit 1.
 
 class Shape:
 
+    defaultintrolen = 0
     pyrbotype = dict(buf = [signaldtype], size = u4, introlen = u4)
 
     @classmethod
-    def level4to5(cls, data4):
-        return cls(map(level4to5, data4))
+    def level4to5(cls, data4, introlen = defaultintrolen):
+        return cls(map(level4to5, data4), introlen)
 
-    def __init__(self, g, introlen = 0):
+    def __init__(self, g, introlen = defaultintrolen):
         self.buf = np.fromiter(g, signaldtype)
         self.size = self.buf.size
         self.introlen = introlen
@@ -60,9 +58,8 @@ def _sinsliceamp(i, n, skew):
 def _sinuslevel4(steps, maxlevel4, skew):
     maxamp = level5toamp(level4to5(maxlevel4))
     for step in range(steps):
-        amp = maxamp * _sinsliceamp(step, steps, skew)
         # For each step, the level that's closest to its ideal mean amp:
-        yield max(0, int(round(amptolevel4(amp))))
+        yield _amptolevel4(maxamp * _sinsliceamp(step, steps, skew))
 
 level4tosinus5shape = tuple(Shape.level4to5(_sinuslevel4(8, level4, 0)) for level4 in range(16))
 level4totone5shape = tuple(Shape.level4to5(level4 * x for x in rawtoneshape) for level4 in range(16))

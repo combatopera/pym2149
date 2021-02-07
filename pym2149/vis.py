@@ -33,7 +33,7 @@ class RollImpl(Roll):
     line = 0
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
     shapeversion = None
-    wavestart = '~'
+    wavestartstr = '~'
 
     @types(Config, ClockInfo, LogicalRegisters, Tuning)
     def __init__(self, config, clock, chip, tuning):
@@ -76,7 +76,7 @@ class RollImpl(Roll):
             shape = self.chip.envshape.value
             envperiod = self.chip.envperiod.value
             yield self.shapes[shape]
-            yield self.wavestart if self.shapeversion != self.chip.envshape.version else ''
+            yield self.wavestartstr if self.shapeversion != self.chip.envshape.version else ''
             yield envperiod if self.periods else self._pitchstr(self.clock.envfreq(envperiod, shape))
         else:
             yield self.chip.fixedlevels[c].value or ''
@@ -88,7 +88,7 @@ class RollImpl(Roll):
         level = self.chip.fixedlevels[c].value
         if level:
             yield level
-            yield self.wavestart if self.effects[c] is not self.chip.timers[c].effect.value else ''
+            yield self.wavestartstr if self.effects[c] is not self.chip.timers[c].effect.value else ''
             yield self._pitchstr(self.chip.timers[c].getfreq())
         else:
             yield ''
