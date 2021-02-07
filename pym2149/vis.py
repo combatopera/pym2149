@@ -79,11 +79,8 @@ class RollImpl(Roll):
         if effect is NullEffect:
             yield from self._dacvals(c)
         else:
-            if env or level:
-                if env:
-                    yield self.shapes[self.chip.envshape.value]
-                else:
-                    yield level
+            if level:
+                yield level
                 yield ''
                 yield self._pitchstr(self.chip.timers[c].getfreq())
             else:
