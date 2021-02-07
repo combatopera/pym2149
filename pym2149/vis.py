@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
-from .dac import NullEffect
+from .dac import NullEffect, PWMEffect, SinusEffect
 from .iface import Config, Roll, Tuning
 from .ym2149 import LogicalRegisters
 from diapyr import types
@@ -76,10 +76,7 @@ class RollImpl(Roll):
             yield '*'
         else:
             yield ''
-        if effect is NullEffect:
-            yield from self._dacvals(c)
-        else:
-            yield from self._pwmvals(c)
+        yield from self.effecttovals[effect](self, c)
 
     def _dacvals(self, c):
         if self.chip.levelmodes[c].value:
@@ -96,7 +93,7 @@ class RollImpl(Roll):
             yield ''
             yield ''
 
-    def _pwmvals(self, c):
+    def _synthvals(self, c):
         level = self.chip.fixedlevels[c].value
         if level:
             yield level
@@ -106,6 +103,12 @@ class RollImpl(Roll):
             yield ''
             yield ''
             yield ''
+
+    effecttovals = {
+        NullEffect: _dacvals,
+        PWMEffect: _synthvals,
+        SinusEffect: _synthvals,
+    }
 
     def update(self):
         if self.line == self.height:
