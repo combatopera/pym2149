@@ -30,7 +30,9 @@ class NullRoll(Roll):
 
 class RollImpl(Roll):
 
+    line = 0
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
+    shapeversion = None
 
     @types(Config, ClockInfo, LogicalRegisters, Tuning)
     def __init__(self, config, clock, chip, tuning):
@@ -39,10 +41,8 @@ class RollImpl(Roll):
         self.periods = config.showperiods # TODO LATER: Command line arg isn't converted to boolean.
         self.stream = config.rollstream
         self.mincents = config.rollmincents
-        self.line = 0
         self.jump = f"\x1b[{self.height}A"
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
-        self.shapeversion = None
         self.clock = clock
         self.chip = chip
         self.tuning = tuning
@@ -59,8 +59,6 @@ class RollImpl(Roll):
             noise = self.chip.noiseflags[c].value
             env = self.chip.levelmodes[c].value
             level = self.chip.fixedlevels[c].value
-            newshape = (self.shapeversion != self.chip.envshape.version)
-            self.shapeversion = self.chip.envshape.version
             timereffect = self.chip.timers[c].effect.value is not NullEffect
             rhs = env or level
             if tone and rhs:
@@ -92,7 +90,7 @@ class RollImpl(Roll):
             elif env:
                 shape = self.chip.envshape.value
                 vals.append(self.shapes[shape])
-                vals.append(('', '~')[newshape])
+                vals.append('~' if self.shapeversion != self.chip.envshape.version else '')
                 if self.periods:
                     vals.append(self.chip.envperiod.value)
                 else:
@@ -106,4 +104,5 @@ class RollImpl(Roll):
                 vals.append('')
                 vals.append('')
         print(self.format % tuple(vals), file = self.stream)
+        self.shapeversion = self.chip.envshape.version
         self.line += 1
