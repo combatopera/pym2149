@@ -55,7 +55,7 @@ class RollImpl(Roll):
         noise = self.chip.noiseflags[c].value
         env = self.chip.levelmodes[c].value
         level = self.chip.fixedlevels[c].value
-        timereffect = self.chip.timers[c].effect.value is not NullEffect
+        effect = self.chip.timers[c].effect.value
         rhs = env or level
         if tone and rhs:
             if self.periods:
@@ -76,13 +76,16 @@ class RollImpl(Roll):
             yield '*'
         else:
             yield ''
-        if timereffect and (env or level):
-            if env:
-                yield self.shapes[self.chip.envshape.value]
+        if effect is not NullEffect:
+            if env or level:
+                if env:
+                    yield self.shapes[self.chip.envshape.value]
+                else:
+                    yield level
+                yield ''
+                yield self._pitchstr(self.chip.timers[c].getfreq())
             else:
-                yield level
-            yield ''
-            yield self._pitchstr(self.chip.timers[c].getfreq())
+                yield from self._dacvals(c)
         else:
             yield from self._dacvals(c)
 
