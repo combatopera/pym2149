@@ -63,3 +63,13 @@ def _sinuslevel4(steps, maxlevel4, skew):
 
 level4tosinus5shape = tuple(Shape.level4to5(_sinuslevel4(8, level4, 0)) for level4 in range(16))
 level4totone5shape = tuple(Shape.level4to5(level4 * x for x in rawtoneshape) for level4 in range(16))
+
+def makesample5shape(data, signed, is4bit):
+    if is4bit:
+        data4 = data
+    else:
+        if signed:
+            data = [(d + 0x80) & 0xff for d in data]
+        d0 = min(data)
+        data4 = (_amptolevel4(((d - d0) + .5) / 0x100) for d in data)
+    return Shape.level4to5(data4, len(data) - 1)

@@ -68,6 +68,18 @@ class SinusEffect(FixedLevelEffect):
     def getshape(self, fixedreg):
         return level4tosinus5shape[fixedreg.value]
 
+class DigiDrumEffect:
+    'Like SinusEffect but in addition toneflagreg and noiseflagreg are virtual and we ignore them.'
+
+    def __init__(self, sample5shape):
+        self.sample5shape = sample5shape
+
+    def getshape(self, fixedreg):
+        return self.sample5shape
+
+    def putlevel5(self, node):
+        node.blockbuf.copybuf(node.chain(node.rtone))
+
 class Dac(BufNode):
 
     def __init__(self, level, log2maxpeaktopeak, ampshare):

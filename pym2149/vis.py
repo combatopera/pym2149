@@ -16,7 +16,7 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import ClockInfo
-from .dac import NullEffect, PWMEffect, SinusEffect
+from .dac import DigiDrumEffect, NullEffect, PWMEffect, SinusEffect
 from .iface import Config, Roll, Tuning
 from .ym2149 import LogicalRegisters
 from diapyr import types
@@ -98,7 +98,17 @@ class RollImpl(Roll):
             yield '' # XXX: Indicate new effect even if we can't hear it?
             yield ''
 
+    def _ddvals(self, c):
+        yield ''
+        yield ''
+        yield ''
+        yield ''
+        yield '%%'
+        yield self._effectstartstr(c)
+        yield ''
+
     effecttypetovals = {
+        DigiDrumEffect: _ddvals,
         type(NullEffect): _regularvals,
         type(PWMEffect): _synthvals,
         type(SinusEffect): _synthvals,

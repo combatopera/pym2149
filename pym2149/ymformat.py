@@ -16,8 +16,9 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .clock import stclock
-from .dac import NullEffect, PWMEffect, SinusEffect
+from .dac import DigiDrumEffect, NullEffect, PWMEffect, SinusEffect
 from .iface import Config, YMFile
+from .shapes import makesample5shape
 from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
@@ -191,6 +192,18 @@ class FramesTTL:
     def exhausted(self):
         return not self.frames
 
+class SampleTTL:
+
+    def __init__(self, repeatreg):
+        self.repeatreg = repeatreg
+
+    def decr(self):
+        pass
+
+    def exhausted(self):
+        # XXX: Somehow ensure last sample value gets a full timer period?
+        return bool(self.repeatreg.value)
+
 class YM56(YM):
 
     framesize = 16
@@ -199,17 +212,14 @@ class YM56(YM):
     def __init__(self, f, once):
         super().__init__(f, True)
         self.framecount = self.lword()
-        # We can ignore the other attributes as they are specific to sample data:
-        interleaved = self.lword() & 0x01
+        interleaved, ddsigned, dd4bit = (songattr & (1 << b) for songattr in [self.lword()] for b in range(3))
         samplecount = self.word()
         self.clock = self.lword()
         self.framefreq = self.word()
         loopframe = self.readloopframe()
         self.skip(self.word()) # Future expansion.
-        if samplecount:
-            log.warning("Ignoring %s samples.", samplecount)
-            for _ in range(samplecount):
-                self.skip(self.lword())
+        log.debug("Read %s samples.", samplecount)
+        self.samples = [makesample5shape(self.f.read(self.lword()), ddsigned, dd4bit) for _ in range(samplecount)]
         self.info = tuple(self.ntstring() for _ in range(3))
         dataoffset = self.f.tell()
         self.readframe = self.interleavedframe if interleaved else self.simpleframe
@@ -254,9 +264,12 @@ class Frame5(Frame56):
             tcr = (self.data[0x6] & 0xe0) >> 5
             tdr = self.data[0xE]
             yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
-        if self.flags.logdigidrum and (self.data[0x3] & 0x30):
-            log.warning("Digi-drum at frame %s.", self.index)
-            self.flags.logdigidrum = False
+        if self.data[0x3] & 0x30:
+            chan = ((self.data[0x3] & 0x30) >> 4) - 1
+            sample = self.flags.samples[self.data[0x8 + chan] & 0x1f]
+            tcr = (self.data[0x8] & 0xe0) >> 5
+            tdr = self.data[0xF]
+            yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
 
 class Frame6(Frame56):
 
@@ -269,9 +282,11 @@ class Frame6(Frame56):
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
                     yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
-                if self.flags.logdigidrum and 0x40 == fx:
-                    log.warning("Digi-drum at frame %s.", self.index)
-                    self.flags.logdigidrum = False
+                if 0x40 == fx:
+                    sample = self.flags.samples[self.data[0x8 + chan] & 0x1f]
+                    tcr = (self.data[rr] & 0xe0) >> 5
+                    tdr = self.data[rrr]
+                    yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
                 if 0x80 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
