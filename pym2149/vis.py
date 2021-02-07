@@ -51,23 +51,23 @@ class RollImpl(Roll):
         return self.tuning.pitch(freq).str(self.mincents)
 
     def _getvals(self, c):
-        tone = self.chip.toneflags[c].value
-        noise = self.chip.noiseflags[c].value
-        env = self.chip.levelmodes[c].value
-        level = self.chip.fixedlevels[c].value
-        effect = self.chip.timers[c].effect.value
-        rhs = env or level
-        if tone and rhs:
-            if self.periods:
-                yield self.chip.toneperiods[c].value
+        if self.chip.levelmodes[c].value or self.chip.fixedlevels[c].value:
+            tone = self.chip.toneflags[c].value
+            noise = self.chip.noiseflags[c].value
+            if tone:
+                toneperiod = self.chip.toneperiods[c].value
+                yield toneperiod if self.periods else self._pitchstr(self.clock.tonefreq(toneperiod))
             else:
-                yield self._pitchstr(self.clock.tonefreq(self.chip.toneperiods[c].value))
+                yield ''
+            yield '&' if tone and noise else ''
+            yield self.chip.noiseperiod.value if noise else ''
+            yield '*' if tone or noise else ''
         else:
             yield ''
-        yield '&' if tone and noise and rhs else ''
-        yield self.chip.noiseperiod.value if noise and rhs else ''
-        yield '*' if (tone or noise) and rhs else ''
-        yield from self.effecttovals[effect](self, c)
+            yield ''
+            yield ''
+            yield ''
+        yield from self.effecttovals[self.chip.timers[c].effect.value](self, c)
 
     def _dacvals(self, c):
         if self.chip.levelmodes[c].value:
