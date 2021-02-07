@@ -50,7 +50,7 @@ class RollImpl(Roll):
     def _pitchstr(self, freq):
         return self.tuning.pitch(freq).str(self.mincents)
 
-    def _getvals(self, c):
+    def _lhsvals(self, c):
         if self.chip.levelmodes[c].value or self.chip.fixedlevels[c].value:
             tone = self.chip.toneflags[c].value
             noise = self.chip.noiseflags[c].value
@@ -67,9 +67,9 @@ class RollImpl(Roll):
             yield ''
             yield ''
             yield ''
-        yield from self.effecttovals[self.chip.timers[c].effect.value](self, c)
 
-    def _dacvals(self, c):
+    def _regularvals(self, c):
+        yield from self._lhsvals(c)
         if self.chip.levelmodes[c].value:
             shape = self.chip.envshape.value
             yield self.shapes[shape]
@@ -85,6 +85,7 @@ class RollImpl(Roll):
             yield ''
 
     def _synthvals(self, c):
+        yield from self._lhsvals(c)
         level = self.chip.fixedlevels[c].value
         if level:
             yield level
@@ -96,10 +97,13 @@ class RollImpl(Roll):
             yield ''
 
     effecttovals = {
-        NullEffect: _dacvals,
+        NullEffect: _regularvals,
         PWMEffect: _synthvals,
         SinusEffect: _synthvals,
     }
+
+    def _getvals(self, c):
+        return self.effecttovals[self.chip.timers[c].effect.value](self, c)
 
     def update(self):
         if self.line == self.height:
