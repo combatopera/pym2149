@@ -33,6 +33,7 @@ class RollImpl(Roll):
     line = 0
     shapes = ('\\_',) * 4 + ('/_',) * 4 + ('\\\\', '\\_', '\\/', '\\\u203e', '//', '/\u203e', '/\\', '/_')
     shapeversion = None
+    wavestart = '~'
 
     @types(Config, ClockInfo, LogicalRegisters, Tuning)
     def __init__(self, config, clock, chip, tuning):
@@ -43,6 +44,7 @@ class RollImpl(Roll):
         self.mincents = config.rollmincents
         self.jump = f"\x1b[{self.height}A"
         self.format = ' | '.join(self.channels * ["%7s %1s %2s %1s %2s%1s%7s"])
+        self.effects = [None] * self.channels
         self.clock = clock
         self.chip = chip
         self.tuning = tuning
@@ -73,7 +75,7 @@ class RollImpl(Roll):
         if self.chip.levelmodes[c].value:
             shape = self.chip.envshape.value
             yield self.shapes[shape]
-            yield '~' if self.shapeversion != self.chip.envshape.version else ''
+            yield self.wavestart if self.shapeversion != self.chip.envshape.version else ''
             if self.periods:
                 yield self.chip.envperiod.value
             else:
@@ -88,7 +90,7 @@ class RollImpl(Roll):
         level = self.chip.fixedlevels[c].value
         if level:
             yield level
-            yield ''
+            yield self.wavestart if self.effects[c] is not self.chip.timers[c].effect.value else ''
             yield self._pitchstr(self.chip.timers[c].getfreq())
         else:
             yield ''
@@ -110,4 +112,6 @@ class RollImpl(Roll):
             self.line = 0
         print(self.format % tuple(v for c in range(self.channels) for v in self._getvals(c)), file = self.stream)
         self.shapeversion = self.chip.envshape.version
+        for c in range(self.channels):
+            self.effects[c] = self.chip.timers[c].effect.value
         self.line += 1
