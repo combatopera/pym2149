@@ -21,6 +21,7 @@ from .iface import Config, YMFile
 from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
+from diapyr.util import singleton
 import logging, os, shutil, struct, sys, tempfile
 
 log = logging.getLogger(__name__)
@@ -170,6 +171,26 @@ class YM3b(YM23):
             self.skip(-(self.framecount * self.framesize + 4))
             self.loopinfo = LoopInfo(loopframe, self.f.tell() + loopframe)
 
+@singleton
+class EternalTTL:
+
+    def decr(self):
+        pass
+
+    def exhausted(self):
+        pass
+
+class FramesTTL:
+
+    def __init__(self, frames):
+        self.frames = frames
+
+    def decr(self):
+        self.frames -= 1
+
+    def exhausted(self):
+        return not self.frames
+
 class YM56(YM):
 
     framesize = 16
@@ -199,17 +220,17 @@ class YM56(YM):
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe)
         else:
             self.loopinfo = LoopInfo(loopframe, dataoffset + loopframe * self.framesize)
-        self.timerttls = [0] * PhysicalRegisters.supportedchannels
+        self.timerttls = [EternalTTL] * PhysicalRegisters.supportedchannels
 
     @contextmanager
     def processtimerttls(self, chip):
-        for chan, ttl in enumerate(self.timerttls):
-            if ttl:
-                self.timerttls[chan] -= 1
+        for ttl in self.timerttls:
+            ttl.decr()
         yield self.timerttls
         for chan, timer in enumerate(chip.timers):
-            if not self.timerttls[chan] and timer.effect.value is not NullEffect:
+            if self.timerttls[chan].exhausted():
                 timer.effect.value = NullEffect
+                self.timerttls[chan] = EternalTTL
 
 class Frame56(PlainFrame):
 
@@ -232,7 +253,7 @@ class Frame5(Frame56):
             chan = ((self.data[0x1] & 0x30) >> 4) - 1
             tcr = (self.data[0x6] & 0xe0) >> 5
             tdr = self.data[0xE]
-            yield chan, tcr, tdr, PWMEffect, 1
+            yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
         if self.flags.logdigidrum and (self.data[0x3] & 0x30):
             log.warning("Digi-drum at frame %s.", self.index)
             self.flags.logdigidrum = False
@@ -247,14 +268,14 @@ class Frame6(Frame56):
                 if 0x00 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
-                    yield chan, tcr, tdr, PWMEffect, 1
+                    yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
                 if self.flags.logdigidrum and 0x40 == fx:
                     log.warning("Digi-drum at frame %s.", self.index)
                     self.flags.logdigidrum = False
                 if 0x80 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
-                    yield chan, tcr, tdr, SinusEffect, 1
+                    yield chan, tcr, tdr, SinusEffect, FramesTTL(1)
                 if self.flags.logsyncbuzzer and 0xc0 == fx:
                     log.warning("Sync-buzzer at frame %s.", self.index)
                     self.flags.logsyncbuzzer = False
