@@ -52,6 +52,9 @@ class RollImpl(Roll):
     def _pitchstr(self, freq):
         return self.tuning.pitch(freq).str(self.mincents)
 
+    def _effectstartstr(self, c):
+        return self.wavestartstr if self.effects[c] is not self.chip.timers[c].effect.value else ''
+
     def _lhsvals(self, c):
         if self.chip.levelmodes[c].value or self.chip.fixedlevels[c].value:
             tone = self.chip.toneflags[c].value
@@ -88,21 +91,21 @@ class RollImpl(Roll):
         level = self.chip.fixedlevels[c].value
         if level:
             yield level
-            yield self.wavestartstr if self.effects[c] is not self.chip.timers[c].effect.value else ''
+            yield self._effectstartstr(c)
             yield self._pitchstr(self.chip.timers[c].getfreq())
         else:
             yield ''
-            yield ''
+            yield '' # XXX: Indicate new effect even if we can't hear it?
             yield ''
 
-    effecttovals = {
-        NullEffect: _regularvals,
-        PWMEffect: _synthvals,
-        SinusEffect: _synthvals,
+    effecttypetovals = {
+        type(NullEffect): _regularvals,
+        type(PWMEffect): _synthvals,
+        type(SinusEffect): _synthvals,
     }
 
     def _getvals(self, c):
-        return self.effecttovals[self.chip.timers[c].effect.value](self, c)
+        return self.effecttypetovals[type(self.chip.timers[c].effect.value)](self, c)
 
     def update(self):
         if self.line == self.height:
