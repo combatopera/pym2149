@@ -47,62 +47,64 @@ class RollImpl(Roll):
         self.chip = chip
         self.tuning = tuning
 
+    def _pitchstr(self, freq):
+        return self.tuning.pitch(freq).str(self.mincents)
+
+    def _getvals(self, c):
+        tone = self.chip.toneflags[c].value
+        noise = self.chip.noiseflags[c].value
+        env = self.chip.levelmodes[c].value
+        level = self.chip.fixedlevels[c].value
+        timereffect = self.chip.timers[c].effect.value is not NullEffect
+        rhs = env or level
+        if tone and rhs:
+            if self.periods:
+                yield self.chip.toneperiods[c].value
+            else:
+                yield self._pitchstr(self.clock.tonefreq(self.chip.toneperiods[c].value))
+        else:
+            yield ''
+        if tone and noise and rhs:
+            yield '&'
+        else:
+            yield ''
+        if noise and rhs:
+            yield self.chip.noiseperiod.value
+        else:
+            yield ''
+        if (tone or noise) and rhs:
+            yield '*'
+        else:
+            yield ''
+        if timereffect and (env or level):
+            if env:
+                yield self.shapes[self.chip.envshape.value]
+            else:
+                yield level
+            yield ''
+            yield self._pitchstr(self.chip.timers[c].getfreq())
+        elif env:
+            shape = self.chip.envshape.value
+            yield self.shapes[shape]
+            yield '~' if self.shapeversion != self.chip.envshape.version else ''
+            if self.periods:
+                yield self.chip.envperiod.value
+            else:
+                yield self._pitchstr(self.clock.envfreq(self.chip.envperiod.value, shape))
+        elif level:
+            yield level
+            yield ''
+            yield ''
+        else:
+            yield ''
+            yield ''
+            yield ''
+
     def update(self):
         if self.line == self.height:
             self.stream.write(self.jump)
             self.line = 0
-        vals = []
-        def appendpitch(freq):
-            vals.append(self.tuning.pitch(freq).str(self.mincents))
-        for c in range(self.channels):
-            tone = self.chip.toneflags[c].value
-            noise = self.chip.noiseflags[c].value
-            env = self.chip.levelmodes[c].value
-            level = self.chip.fixedlevels[c].value
-            timereffect = self.chip.timers[c].effect.value is not NullEffect
-            rhs = env or level
-            if tone and rhs:
-                if self.periods:
-                    vals.append(self.chip.toneperiods[c].value)
-                else:
-                    appendpitch(self.clock.tonefreq(self.chip.toneperiods[c].value))
-            else:
-                vals.append('')
-            if tone and noise and rhs:
-                vals.append('&')
-            else:
-                vals.append('')
-            if noise and rhs:
-                vals.append(self.chip.noiseperiod.value)
-            else:
-                vals.append('')
-            if (tone or noise) and rhs:
-                vals.append('*')
-            else:
-                vals.append('')
-            if timereffect and (env or level):
-                if env:
-                    vals.append(self.shapes[self.chip.envshape.value])
-                else:
-                    vals.append(level)
-                vals.append('')
-                appendpitch(self.chip.timers[c].getfreq())
-            elif env:
-                shape = self.chip.envshape.value
-                vals.append(self.shapes[shape])
-                vals.append('~' if self.shapeversion != self.chip.envshape.version else '')
-                if self.periods:
-                    vals.append(self.chip.envperiod.value)
-                else:
-                    appendpitch(self.clock.envfreq(self.chip.envperiod.value, shape))
-            elif level:
-                vals.append(level)
-                vals.append('')
-                vals.append('')
-            else:
-                vals.append('')
-                vals.append('')
-                vals.append('')
-        print(self.format % tuple(vals), file = self.stream)
+        vals = tuple(v for c in range(self.channels) for v in self._getvals(c))
         self.shapeversion = self.chip.envshape.version
+        print(self.format % vals, file = self.stream)
         self.line += 1
