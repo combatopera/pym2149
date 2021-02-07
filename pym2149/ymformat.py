@@ -202,7 +202,7 @@ class SampleTTL:
 
     def exhausted(self):
         # XXX: Somehow ensure last sample value gets a full timer period?
-        return bool(self.repeatreg.value)
+        return self.repeatreg.value
 
 class YM56(YM):
 
