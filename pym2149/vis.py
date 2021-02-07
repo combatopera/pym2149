@@ -74,12 +74,10 @@ class RollImpl(Roll):
         yield from self._lhsvals(c)
         if self.chip.levelmodes[c].value:
             shape = self.chip.envshape.value
+            envperiod = self.chip.envperiod.value
             yield self.shapes[shape]
             yield self.wavestart if self.shapeversion != self.chip.envshape.version else ''
-            if self.periods:
-                yield self.chip.envperiod.value
-            else:
-                yield self._pitchstr(self.clock.envfreq(self.chip.envperiod.value, shape))
+            yield envperiod if self.periods else self._pitchstr(self.clock.envfreq(envperiod, shape))
         else:
             yield self.chip.fixedlevels[c].value or ''
             yield ''
