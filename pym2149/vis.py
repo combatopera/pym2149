@@ -79,8 +79,7 @@ class RollImpl(Roll):
             else:
                 yield self._pitchstr(self.clock.envfreq(self.chip.envperiod.value, shape))
         else:
-            level = self.chip.fixedlevels[c].value
-            yield level if level else ''
+            yield self.chip.fixedlevels[c].value or ''
             yield ''
             yield ''
 
