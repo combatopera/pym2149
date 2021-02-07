@@ -207,7 +207,6 @@ class SampleTTL:
 class YM56(YM):
 
     framesize = 16
-    logdigidrum = True
 
     def __init__(self, f, once):
         super().__init__(f, True)
