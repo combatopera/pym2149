@@ -51,7 +51,7 @@ class FixedLevelEffect:
     'Registers levelmodereg and fixedreg are virtual, of which levelmodereg is ignored.'
 
     def __init__(self):
-        self.wavelength, = set(shape.size for shape in self.level4toshape)
+        self.wavelength, = set(shape.wavelength() for shape in self.level4toshape)
 
     def getshape(self, fixedreg):
         return self.level4toshape[fixedreg.value]

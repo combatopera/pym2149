@@ -46,6 +46,9 @@ class Shape:
         self.size = self.buf.size
         self.introlen = introlen
 
+    def wavelength(self):
+        return self.size - self.introlen
+
 rawtoneshape = 1, 0
 toneshape = Shape(rawtoneshape)
 
