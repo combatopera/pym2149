@@ -24,7 +24,6 @@ mfpclock = 2457600
 class MFPTimer:
 
     def __init__(self):
-        self.wavelength = Reg(2) # TODO LATER: Other shapes will have different numbers of steps.
         self.control = Reg()
         self.data = Reg()
         # TODO LATER: Verify that TDR 0 indeed behaves like 0x100.
@@ -50,7 +49,7 @@ class MFPTimer:
             return 0, self.data.value # Stop timer.
         diff = float('inf')
         for tcr, prescaler in prescalers.items():
-            prescaler *= self.wavelength.value # Avoid having to multiply twice.
+            prescaler *= self.effect.value.wavelength # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
             if 1 <= etdr and etdr <= 0x100:
                 d = abs(mfpclock / (etdr * prescaler) - freq)
@@ -60,7 +59,7 @@ class MFPTimer:
         return tcrtdr
 
     def _getnormperiod(self):
-        return prescalers[self.control.value] * self.effectivedata.value * self.wavelength.value
+        return prescalers[self.control.value] * self.effectivedata.value * self.effect.value.wavelength
 
     def getfreq(self): # Currently only called when effect is not None.
         return mfpclock / self._getnormperiod()

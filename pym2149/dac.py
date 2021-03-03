@@ -50,6 +50,12 @@ class NullEffect:
 class FixedLevelEffect:
     'Registers levelmodereg and fixedreg are virtual, of which levelmodereg is ignored.'
 
+    def __init__(self):
+        self.wavelength, = set(shape.size for shape in self.level4toshape)
+
+    def getshape(self, fixedreg):
+        return self.level4toshape[fixedreg.value]
+
     def putlevel5(self, node):
         node.blockbuf.copybuf(node.chain(node.signal))
         node.blockbuf.mulbuf(node.chain(node.rtone))
@@ -58,15 +64,13 @@ class FixedLevelEffect:
 class PWMEffect(FixedLevelEffect):
     'Interrupt setup/routine alternates fixed level between fixedreg and zero.'
 
-    def getshape(self, fixedreg):
-        return level4totone5shape[fixedreg.value]
+    level4toshape = level4totone5shape
 
 @singleton
 class SinusEffect(FixedLevelEffect):
     'Interrupt setup/routine sets fixed level to sample value as scaled by fixedreg.'
 
-    def getshape(self, fixedreg):
-        return level4tosinus5shape[fixedreg.value]
+    level4toshape = level4tosinus5shape
 
 class DigiDrumEffect:
     'Like SinusEffect but in addition toneflagreg and noiseflagreg are virtual and we ignore them.'
