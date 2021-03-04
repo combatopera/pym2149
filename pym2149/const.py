@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from mynblep.const import u4
+from minBlepy.const import u4
 import numpy as np
 
 clientname = 'pym2149'

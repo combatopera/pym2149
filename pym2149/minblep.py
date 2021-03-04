@@ -18,7 +18,7 @@
 from .clock import ClockInfo
 from .iface import Platform
 from diapyr import types
-from mynblep.minblep import MinBleps
+from minBlepy.minblep import MinBleps
 
 @types(Platform, ClockInfo, this = MinBleps)
 def loadorcreate(platform, clockinfo):
