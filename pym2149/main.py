@@ -44,7 +44,7 @@ def boot(configname):
     config_repr = list(config.repr)
     if config_repr:
         for key in config_repr:
-            print(repr((-getattr(config, key)).context().unravel()))
+            print(repr((-getattr(config, key)).scope().unravel()))
         sys.exit()
     di.add(ClockInfo)
     di.add(StereoInfo)

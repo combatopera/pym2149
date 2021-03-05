@@ -46,7 +46,7 @@ class ConfigName:
         config = ConfigCtrl()
         config.put('enter', function = enter)
         config.put('py', function = lambda *args: py(getattr(config.node, self.namespace), *args))
-        config.put('resolve', function = lambda *args: AsContext.resolve(di, *args))
+        config.put('resolve', function = lambda *args: AsScope.resolve(di, *args))
         config.printf("cwd = %s", self.path.parent)
         config.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
@@ -65,12 +65,12 @@ class ConfigName:
                 setattr(getattr(config.node, self.namespace), name, value)
         return getattr(config.node, self.namespace)
 
-class AsContext:
+class AsScope:
 
     @classmethod
-    def resolve(cls, di, context, resolvable):
+    def resolve(cls, di, scope, resolvable):
         try:
-            return cls(context, di(_getglobal(context, resolvable).scalar))
+            return cls(scope, di(_getglobal(scope, resolvable).scalar))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
@@ -84,13 +84,13 @@ class AsContext:
         except AttributeError:
             return self.parent.resolved(name)
 
-def _getglobal(context, resolvable):
-    spec = resolvable.resolve(context).cat()
+def _getglobal(scope, resolvable):
+    spec = resolvable.resolve(scope).cat()
     lastdot = spec.rindex('.')
     return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
 
-def enter(context, contextresolvable, resolvable):
-    return resolvable.resolve(contextresolvable.resolve(context))
+def enter(scope, scoperesolvable, resolvable):
+    return resolvable.resolve(scoperesolvable.resolve(scope))
 
-def py(config, context, *clauses):
+def py(config, scope, *clauses):
     return wrap(eval(' '.join(c.cat() for c in clauses), dict(config = config)))
