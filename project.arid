@@ -45,3 +45,4 @@ flakes exclude globs +=
     ymtests/dosound*.py
     ymtests/q*.py
 upstream devel packages += sox
+buildbot enabled = true
