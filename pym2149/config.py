@@ -31,7 +31,7 @@ class ConfigName:
 
     namespace = 'pym2149'
 
-    def __init__(self, *params, args = sys.argv[1:], name = 'defaultconf'):
+    def __init__(self, *params, args = sys.argv[1:], name = 'root'):
         parser = ArgumentParser()
         parser.add_argument('--repr', action = 'append', default = [])
         parser.add_argument('--config', action = 'append', default = [])
