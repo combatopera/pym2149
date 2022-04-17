@@ -33,7 +33,6 @@ class ConfigName:
 
     def __init__(self, *params, args = sys.argv[1:], name = 'root'):
         parser = ArgumentParser()
-        parser.add_argument('--repr', action = 'append', default = [])
         parser.add_argument('--config', action = 'append', default = [])
         parser.add_argument('--ignore-settings', action = 'store_true')
         for param in params:

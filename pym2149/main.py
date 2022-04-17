@@ -40,12 +40,6 @@ def boot(configname):
     di = DI()
     di.add(configname.loadconfig)
     di.add(di)
-    config = di(Config)
-    config_repr = list(config.repr)
-    if config_repr:
-        for key in config_repr:
-            print(repr((-getattr(config, key)).scope().unravel()))
-        sys.exit()
     di.add(ClockInfo)
     di.add(StereoInfo)
     di.add(YM2149)
@@ -55,6 +49,7 @@ def boot(configname):
     di.add(YMStream)
     pitch.configure(di)
     di.add(Context)
+    config = di(Config)
     di.add(RollImpl if config.pianorollenabled else NullRoll)
     di.add(MainThread)
     di.add(YM2149Chip)
