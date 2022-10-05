@@ -90,3 +90,6 @@ def main_mkdsd():
         exec(compile(open(inpath).read(), inpath, 'exec'), Globals(data).__dict__)
         with open(outpath, 'wb') as f:
             data.save(f)
+
+if '__main__' == __name__:
+    main_mkdsd()
