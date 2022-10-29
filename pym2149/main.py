@@ -30,20 +30,6 @@ import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
 
-def main_dosound2txt(): # TODO: Additional seconds not needed.
-    'Render a Dosound script to logging.'
-    from . import txt
-    initlogging()
-    config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
-    with di:
-        di.add(srcbytecodefactory)
-        txt.configure(di)
-        di.add(SimpleChipTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
 def main_dosound2wav():
     'Render a Dosound script to WAV.'
     from . import out

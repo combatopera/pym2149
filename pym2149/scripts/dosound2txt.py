@@ -15,7 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_dosound2txt
+'Render a Dosound script to logging.'
+from . import boot, srcbytecodefactory
+from .. import txt
+from ..config import ConfigName
+from ..timerimpl import SimpleChipTimer
+from ..util import initlogging, MainThread
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main(): # TODO: Additional seconds not needed.
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel', name = 'txt'))
+    with di:
+        di.add(srcbytecodefactory)
+        txt.configure(di)
+        di.add(SimpleChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_dosound2txt()
+    main()
