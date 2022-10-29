@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .main import main_lc2txt, main_lc2wav
 from .power import batterypower
+from .scripts import lc2txt, lc2wav
 from base64 import a85encode
 from lagoon import sox
 from lurlene.util import threadlocals
@@ -48,7 +48,7 @@ def _comparetxt(path):
     else:
         config = []
     with open(actualpath, 'w') as stream, threadlocals(stream = stream):
-        main_lc2txt(['--ignore-settings', *config,
+        lc2txt.main(['--ignore-settings', *config,
                 '--config', 'local = $pyref(lurlene.util local)',
                 '--config', 'rollstream = $py[config.local.stream]',
                 str(project / relpath.parent / f"{relpath.name}.py")])
@@ -62,7 +62,7 @@ def _comparepng(path):
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
     with NamedTemporaryFile() as wavfile:
-        main_lc2wav(['--ignore-settings',
+        lc2wav.main(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
                 str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])

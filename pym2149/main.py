@@ -16,44 +16,12 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigName
-from .lurlene import loadcontext, LurleneBridge
 from .scripts import boot
-from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
+from .timerimpl import ChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
-from .ymplayer import Player, LogicalBundle, PhysicalBundle
+from .ymplayer import PhysicalBundle, Player
 from diapyr.start import Started
-import sys
-
-def main_lc2txt(args = sys.argv[1:]):
-    'Render a Lurlene song to logging.'
-    from . import txt
-    initlogging()
-    config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
-    with di:
-        di.add(loadcontext)
-        di.add(LurleneBridge)
-        txt.configure(di)
-        di.add(SimpleChipTimer)
-        di.add(LogicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
-def main_lc2wav(args = sys.argv[1:]):
-    'Render a Lurlene song to WAV.'
-    from . import out
-    initlogging()
-    config, di = boot(ConfigName('inpath', '--section', 'outpath', args = args))
-    with di:
-        di.add(loadcontext)
-        di.add(LurleneBridge)
-        out.configure(di)
-        di.add(ChipTimer)
-        di.add(LogicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
 
 def main_ym2jack():
     'Play a YM file via JACK.'

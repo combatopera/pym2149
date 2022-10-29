@@ -15,7 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_lc2txt
+'Render a Lurlene song to logging.'
+from . import boot
+from .. import txt
+from ..config import ConfigName
+from ..lurlene import loadcontext, LurleneBridge
+from ..timerimpl import SimpleChipTimer
+from ..util import initlogging, MainThread
+from ..ymplayer import LogicalBundle, Player
+from diapyr.start import Started
+import sys
+
+def main(args = sys.argv[1:]):
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section', name = 'txt', args = args))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        txt.configure(di)
+        di.add(SimpleChipTimer)
+        di.add(LogicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_lc2txt()
+    main()
