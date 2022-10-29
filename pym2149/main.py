@@ -23,20 +23,6 @@ from .ymformat import YMOpen
 from .ymplayer import PhysicalBundle, Player
 from diapyr.start import Started
 
-def main_ym2jack():
-    'Play a YM file via JACK.'
-    from . import jackclient
-    initlogging()
-    config, di = boot(ConfigName('inpath'))
-    with di:
-        di.add(YMOpen)
-        jackclient.configure(di)
-        di.add(SyncTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
 def main_ym2portaudio():
     'Play a YM file via PortAudio.'
     from . import portaudioclient
