@@ -15,7 +15,30 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_lc2jack
+'Play a Lurlene song via JACK.'
+from . import boot
+from .. import jackclient
+from ..config import ConfigName
+from ..lurlene import loadcontext, LurleneBridge
+from ..timerimpl import SyncTimer
+from ..util import initlogging, MainThread
+from ..ymplayer import LogicalBundle, Player
+from diapyr.start import Started
+import lurlene.osc
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath', '--section'))
+    with di:
+        di.add(loadcontext)
+        di.add(LurleneBridge)
+        lurlene.osc.configure(di)
+        di.add(SyncTimer)
+        di.add(LogicalBundle)
+        jackclient.configure(di)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_lc2jack()
+    main()

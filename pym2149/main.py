@@ -25,22 +25,6 @@ from .ymplayer import Player, LogicalBundle, PhysicalBundle
 from diapyr.start import Started
 import lurlene.osc, sys
 
-def main_lc2jack():
-    'Play a Lurlene song via JACK.'
-    from . import jackclient
-    initlogging()
-    config, di = boot(ConfigName('inpath', '--section'))
-    with di:
-        di.add(loadcontext)
-        di.add(LurleneBridge)
-        lurlene.osc.configure(di)
-        di.add(SyncTimer)
-        di.add(LogicalBundle)
-        jackclient.configure(di)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
 def main_lc2portaudio():
     'Play a Lurlene song via PortAudio.'
     from . import portaudioclient
