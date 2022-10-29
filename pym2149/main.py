@@ -15,48 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import minblep, pitch
 from .budgie import readbytecode
-from .clock import ClockInfo
 from .config import ConfigName
 from .dosound import Bytecode
 from .iface import Config
-from .lurlene import loadcontext, LurleneBridge, YM2149Chip
-from .out import StereoInfo, YMStream
+from .lurlene import loadcontext, LurleneBridge
+from .scripts import boot
 from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
-from .vis import NullRoll, RollImpl
-from .ym2149 import LogicalRegisters, PhysicalRegisters, YM2149
 from .ymformat import YMOpen
 from .ymplayer import Player, LogicalBundle, PhysicalBundle
-from diapyr import DI, types
+from diapyr import types
 from diapyr.start import Started
-from lurlene.context import Context
 import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
-
-def boot(configname):
-    di = DI()
-    di.add(configname.loadconfig)
-    di.add(di)
-    di.add(ClockInfo)
-    di.add(StereoInfo)
-    di.add(YM2149)
-    di.add(PhysicalRegisters)
-    di.add(LogicalRegisters)
-    di.add(minblep.loadorcreate)
-    di.add(YMStream)
-    pitch.configure(di)
-    di.add(Context)
-    config = di(Config)
-    di.add(RollImpl if config.pianorollenabled else NullRoll)
-    di.add(MainThread)
-    di.add(YM2149Chip)
-    if config.SID.enabled:
-        from . import resid
-        resid.configure(di)
-    return config, di
 
 def main_bpmtool():
     'Show a table of speed (updates per tracker line) to BPM.'
