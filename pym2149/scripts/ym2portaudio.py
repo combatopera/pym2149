@@ -15,7 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_ym2portaudio
+'Play a YM file via PortAudio.'
+from . import boot
+from .. import portaudioclient
+from ..config import ConfigName
+from ..timerimpl import SyncTimer
+from ..util import initlogging, MainThread
+from ..ymformat import YMOpen
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath'))
+    with di:
+        di.add(YMOpen)
+        portaudioclient.configure(di)
+        di.add(SyncTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_ym2portaudio()
+    main()

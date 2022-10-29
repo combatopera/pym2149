@@ -17,25 +17,11 @@
 
 from .config import ConfigName
 from .scripts import boot
-from .timerimpl import ChipTimer, SyncTimer
+from .timerimpl import ChipTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
 from .ymplayer import PhysicalBundle, Player
 from diapyr.start import Started
-
-def main_ym2portaudio():
-    'Play a YM file via PortAudio.'
-    from . import portaudioclient
-    initlogging()
-    config, di = boot(ConfigName('inpath'))
-    with di:
-        di.add(YMOpen)
-        portaudioclient.configure(di)
-        di.add(SyncTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
 
 def main_ym2txt():
     'Render a YM file to logging.'
