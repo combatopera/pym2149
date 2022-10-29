@@ -15,7 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_dosound2wav
+'Render a Dosound script to WAV.'
+from . import boot, srcbytecodefactory
+from .. import out
+from ..config import ConfigName
+from ..timerimpl import ChipTimer
+from ..util import initlogging, MainThread
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
+    with di:
+        di.add(srcbytecodefactory)
+        out.configure(di)
+        di.add(ChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_dosound2wav()
+    main()

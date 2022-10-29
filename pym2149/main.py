@@ -19,7 +19,7 @@ from .config import ConfigName
 from .dosound import Bytecode
 from .iface import Config
 from .lurlene import loadcontext, LurleneBridge
-from .scripts import boot, srcbytecodefactory
+from .scripts import boot
 from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
@@ -29,20 +29,6 @@ from diapyr.start import Started
 import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
-
-def main_dosound2wav():
-    'Render a Dosound script to WAV.'
-    from . import out
-    initlogging()
-    config, di = boot(ConfigName('inpath', 'srclabel', 'outpath'))
-    with di:
-        di.add(srcbytecodefactory)
-        out.configure(di)
-        di.add(ChipTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
 
 @types(Config, this = Bytecode)
 def dsdbytecodefactory(config):
