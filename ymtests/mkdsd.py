@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+'Compile Dosound DSL scripts to bytecode for playback on a real Atari.'
 from functools import reduce
 import operator, sys
 
@@ -81,8 +82,7 @@ class Globals:
         g.setprev = data.setprev
         g.sleep = data.sleep
 
-def main_mkdsd():
-    'Compile Dosound DSL scripts to bytecode for playback on a real Atari.'
+def main():
     for inpath in sys.argv[1:]:
         outpath = inpath[:inpath.rindex('.')] + '.dsd'
         print(outpath, file=sys.stderr)
@@ -92,4 +92,4 @@ def main_mkdsd():
             data.save(f)
 
 if '__main__' == __name__:
-    main_mkdsd()
+    main()
