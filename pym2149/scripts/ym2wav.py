@@ -15,7 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_ym2wav
+'Render a YM file to WAV.'
+from . import boot
+from .. import out
+from ..config import ConfigName
+from ..timerimpl import ChipTimer
+from ..util import initlogging, MainThread
+from ..ymformat import YMOpen
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'outpath'))
+    with di:
+        di.add(YMOpen)
+        out.configure(di)
+        di.add(ChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_ym2wav()
+    main()
