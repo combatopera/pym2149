@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .budgie import readbytecode
 from .config import ConfigName
 from .dosound import Bytecode
 from .iface import Config
 from .lurlene import loadcontext, LurleneBridge
-from .scripts import boot
+from .scripts import boot, srcbytecodefactory
 from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
@@ -30,11 +29,6 @@ from diapyr.start import Started
 import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
-
-@types(Config, this = Bytecode)
-def srcbytecodefactory(config):
-    with open(config.inpath) as f:
-        return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
 def main_dosound2jack():
     'Play a Dosound script via JACK.'

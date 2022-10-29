@@ -16,15 +16,22 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .. import minblep, pitch
+from ..budgie import readbytecode
 from ..clock import ClockInfo
+from ..dosound import Bytecode
 from ..iface import Config
 from ..lurlene import YM2149Chip
 from ..out import StereoInfo, YMStream
 from ..util import MainThread
 from ..vis import NullRoll, RollImpl
 from ..ym2149 import LogicalRegisters, PhysicalRegisters, YM2149
-from diapyr import DI
+from diapyr import DI, types
 from lurlene.context import Context
+
+@types(Config, this = Bytecode)
+def srcbytecodefactory(config):
+    with open(config.inpath) as f:
+        return Bytecode(readbytecode(f, config.srclabel), config.dosoundextraseconds)
 
 def boot(configname):
     di = DI()
