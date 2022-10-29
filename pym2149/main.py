@@ -23,20 +23,6 @@ from .ymformat import YMOpen
 from .ymplayer import PhysicalBundle, Player
 from diapyr.start import Started
 
-def main_ym2txt():
-    'Render a YM file to logging.'
-    from . import txt
-    initlogging()
-    config, di = boot(ConfigName('inpath', name = 'txt'))
-    with di:
-        di.add(YMOpen)
-        txt.configure(di)
-        di.add(ChipTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
 def main_ym2wav():
     'Render a YM file to WAV.'
     from . import out

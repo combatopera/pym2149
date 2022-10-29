@@ -15,7 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_ym2txt
+'Render a YM file to logging.'
+from . import boot
+from .. import txt
+from ..config import ConfigName
+from ..timerimpl import ChipTimer
+from ..util import initlogging, MainThread
+from ..ymformat import YMOpen
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath', name = 'txt'))
+    with di:
+        di.add(YMOpen)
+        txt.configure(di)
+        di.add(ChipTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_ym2txt()
+    main()
