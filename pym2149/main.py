@@ -16,39 +16,14 @@
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 from .config import ConfigName
-from .dosound import Bytecode
-from .iface import Config
 from .lurlene import loadcontext, LurleneBridge
 from .scripts import boot
 from .timerimpl import ChipTimer, SimpleChipTimer, SyncTimer
 from .util import initlogging, MainThread
 from .ymformat import YMOpen
 from .ymplayer import Player, LogicalBundle, PhysicalBundle
-from diapyr import types
 from diapyr.start import Started
-import logging, lurlene.osc, sys
-
-log = logging.getLogger(__name__)
-
-@types(Config, this = Bytecode)
-def dsdbytecodefactory(config):
-    with open(config.inpath, 'rb') as f:
-        log.debug("Total ticks: %s", (ord(f.read(1)) << 8) | ord(f.read(1)))
-        return Bytecode(f.read(), config.dosoundextraseconds)
-
-def main_dsd2wav():
-    'Render Dosound bytecode to WAV.'
-    from . import out
-    initlogging()
-    config, di = boot(ConfigName('inpath', 'outpath', name = 'dsd'))
-    with di:
-        di.add(dsdbytecodefactory)
-        out.configure(di)
-        di.add(ChipTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
+import lurlene.osc, sys
 
 def main_lc2jack():
     'Play a Lurlene song via JACK.'
