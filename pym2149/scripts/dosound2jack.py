@@ -15,7 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..main import main_dosound2jack
+'Play a Dosound script via JACK.'
+from . import boot, srcbytecodefactory
+from .. import jackclient
+from ..config import ConfigName
+from ..timerimpl import SyncTimer
+from ..util import initlogging, MainThread
+from ..ymplayer import PhysicalBundle, Player
+from diapyr.start import Started
+
+def main():
+    initlogging()
+    config, di = boot(ConfigName('inpath', 'srclabel'))
+    with di:
+        di.add(srcbytecodefactory)
+        jackclient.configure(di)
+        di.add(SyncTimer)
+        di.add(PhysicalBundle)
+        di.add(Player)
+        di.all(Started)
+        di(MainThread).sleep()
 
 if '__main__' == __name__:
-    main_dosound2jack()
+    main()

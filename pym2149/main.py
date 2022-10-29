@@ -30,20 +30,6 @@ import logging, lurlene.osc, sys
 
 log = logging.getLogger(__name__)
 
-def main_dosound2jack():
-    'Play a Dosound script via JACK.'
-    from . import jackclient
-    initlogging()
-    config, di = boot(ConfigName('inpath', 'srclabel'))
-    with di:
-        di.add(srcbytecodefactory)
-        jackclient.configure(di)
-        di.add(SyncTimer)
-        di.add(PhysicalBundle)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
-
 def main_dosound2txt(): # TODO: Additional seconds not needed.
     'Render a Dosound script to logging.'
     from . import txt
