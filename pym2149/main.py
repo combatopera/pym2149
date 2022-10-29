@@ -23,23 +23,7 @@ from .util import initlogging, MainThread
 from .ymformat import YMOpen
 from .ymplayer import Player, LogicalBundle, PhysicalBundle
 from diapyr.start import Started
-import lurlene.osc, sys
-
-def main_lc2portaudio():
-    'Play a Lurlene song via PortAudio.'
-    from . import portaudioclient
-    initlogging()
-    config, di = boot(ConfigName('inpath', '--section'))
-    with di:
-        di.add(loadcontext)
-        di.add(LurleneBridge)
-        lurlene.osc.configure(di)
-        di.add(SyncTimer)
-        di.add(LogicalBundle)
-        portaudioclient.configure(di)
-        di.add(Player)
-        di.all(Started)
-        di(MainThread).sleep()
+import sys
 
 def main_lc2txt(args = sys.argv[1:]):
     'Render a Lurlene song to logging.'
