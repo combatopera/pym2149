@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-import lurlene.iface
+import lurlene.util
 
 class AmpScale(type): pass
 
@@ -29,7 +29,7 @@ class YMFile(Prerecorded): pass
 
 class Platform: pass
 
-class Config(lurlene.iface.Config): pass
+class Config(lurlene.util.Config): pass
 
 class Tuning: pass
 
