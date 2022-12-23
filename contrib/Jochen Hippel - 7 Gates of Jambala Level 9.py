@@ -1,5 +1,5 @@
 from lurlene import V, D, E, naturalminor
-from lurlene.pitches import C4
+from lurlene.pitch import C4
 
 class Kick:
 
