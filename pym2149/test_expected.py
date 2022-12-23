@@ -18,6 +18,7 @@
 from .power import batterypower
 from .scripts import lc2txt, lc2wav
 from base64 import a85encode
+from contextlib import contextmanager
 from lagoon import sox
 from lurlene.util import threadlocals
 from pathlib import Path
@@ -28,30 +29,37 @@ from unittest import TestCase
 project = Path(__file__).parent.parent
 expecteddir = project / 'expected'
 actualdir = project / 'actual'
-pngsuffix = '.png'
 
 def test_expected():
     if batterypower():
         return
     for path in expecteddir.glob('**/*'):
         if not path.is_dir():
-            yield (_comparepng if path.name.endswith(pngsuffix) else _comparetxt), path
+            yield (_comparepng if path.name.endswith('.png') else _comparetxt), path
+
+@contextmanager
+def _scriptpath(relpath):
+    with NamedTemporaryFile('w') as f:
+        f.write(f"__name__ = {'.'.join(relpath.parts)!r}\n")
+        f.write((project / relpath.with_suffix('.py')).read_text())
+        f.flush()
+        yield f.name
 
 def _comparetxt(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
-    configpath = project / relpath.parent / f"{relpath.name}.arid"
+    configpath = project / relpath.with_suffix('.arid')
     if configpath.exists():
         with configpath.open() as f:
             config = ['--config', f.read()]
     else:
         config = []
-    with open(actualpath, 'w') as stream, threadlocals(stream = stream):
+    with _scriptpath(relpath) as scriptpath, open(actualpath, 'w') as stream, threadlocals(stream = stream):
         lc2txt.main(['--ignore-settings', *config,
                 '--config', 'local = $pyref(lurlene.util local)',
                 '--config', 'rollstream = $py[config.local.stream]',
-                str(project / relpath.parent / f"{relpath.name}.py")])
+                scriptpath])
     tc = TestCase()
     tc.maxDiff = None
     with path.open() as f, actualpath.open() as g:
@@ -61,11 +69,11 @@ def _comparepng(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
     actualpath.parent.mkdir(parents = True, exist_ok = True)
-    with NamedTemporaryFile() as wavfile:
+    with _scriptpath(relpath.with_suffix('')) as scriptpath, NamedTemporaryFile() as wavfile:
         lc2wav.main(['--ignore-settings',
                 '--config', 'freqclamp = false', # I want to see the very low periods.
                 '--config', 'pianorollenabled = false',
-                str(project / relpath.parent / f"{relpath.name[:-len(pngsuffix)]}.py"), wavfile.name])
+                scriptpath, wavfile.name])
         sox[print](wavfile.name, '-n', 'spectrogram', '-o', actualpath)
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
