@@ -1,5 +1,5 @@
-from . import V, D, E, naturalminor, unit
-from .pitches import B3, C2
+from lurlene import V, D, E, naturalminor, unit
+from lurlene.pitches import B3, C2
 
 class CommonDrum:
 

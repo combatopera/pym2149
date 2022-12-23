@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import E, V
+from . import silence
+from lurlene import E, V
 from pym2149.dac import SinusEffect
-from spectrogram import silence
 
 # TODO LATER: Find out why the result appears shifted a few samples to the right.
 class Sin1k:

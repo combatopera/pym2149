@@ -1,5 +1,5 @@
-from . import V, D, E, major, topitch
-from .pitches import F4
+from lurlene import V, D, E, major, topitch
+from lurlene.pitches import F4
 
 class Bass:
 
