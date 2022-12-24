@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E
 
 class All:
@@ -32,5 +32,5 @@ class All:
             ym.envshape = self.shape
         ym.envfreq = 1
 
-sections = [[E(All, '1.5'), silence, silence]]
+sections = [[E(All, '1.5'), neutral, neutral]]
 speed = 50

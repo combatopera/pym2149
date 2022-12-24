@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E
 from pym2149.dac import PWMEffect
 
@@ -28,5 +28,5 @@ class PWM250:
         ym.timereffect = PWMEffect
         ym.timerfreq = 250
 
-sections = [[E(PWM250, '1.5'), silence, silence]]
+sections = [[E(PWM250, '1.5'), neutral, neutral]]
 speed = 50

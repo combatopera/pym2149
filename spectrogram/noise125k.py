@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E
 
 class N125k:
@@ -25,5 +25,5 @@ class N125k:
         ym.level = 15
         ym.noisefreq = 125000
 
-sections = [[E(N125k, '1.5'), silence, silence]]
+sections = [[E(N125k, '1.5'), neutral, neutral]]
 speed = 50

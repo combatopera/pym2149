@@ -17,9 +17,9 @@
 
 from lurlene import E
 
-class Silence:
+class NeutralDC:
 
     def on(self, ym):
-        ym.level = 13 # Neutral DC.
+        ym.level = 13
 
-silence = E(Silence, '1')
+neutral = E(NeutralDC, '1')

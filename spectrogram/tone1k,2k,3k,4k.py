@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E, V
 
 class T:
@@ -25,5 +25,5 @@ class T:
         ym.level = 15
         ym.tonefreq = freq[frame]
 
-sections = [[E(T, '.25', freq = V('1000 2000 3000 4000').of(.25)), silence, silence]]
+sections = [[E(T, '.25', freq = V('1000 2000 3000 4000').of(.25)), neutral, neutral]]
 speed = 50

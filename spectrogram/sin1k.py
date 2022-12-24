@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E, V
 from pym2149.dac import SinusEffect
 
@@ -29,5 +29,5 @@ class Sin1k:
         ym.timereffect = SinusEffect
         ym.timerfreq = 1000
 
-sections = [[E(Sin1k, '2'), silence, silence]]
+sections = [[E(Sin1k, '2'), neutral, neutral]]
 speed = 50

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import silence
+from . import neutral
 from lurlene import E
 
 class T1k:
@@ -25,5 +25,5 @@ class T1k:
         ym.level = 15
         ym.tonefreq = 1000
 
-sections = [[E(T1k, '1.5'), silence, silence]]
+sections = [[E(T1k, '1.5'), neutral, neutral]]
 speed = 50
