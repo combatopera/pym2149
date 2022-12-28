@@ -91,7 +91,7 @@ def bass(degree):
             att = V('0 2x1 3x 1 2x 2x1 2x 2x1 0'),
             vibshift = V('0 6 7x 6 3x 6 2x'))
 
-drum1 = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '4//3') >> 2
+drum1 = E(Kick, '3 2x 2 1', ['3 1'] * 2) & E(Snare, '1 3z') >> 2
 prog1 = D('1 4 7- 1').of(8)
 prog2 = D('1 7-').of(16)
 bass1 = bass(prog1 + D('1 2x+ 1 + 1 7 1|1 2x+ 1 3x+ 7-|1 2x+ 1 + 1 2 1|1 2x+ 1 3x+ 5-'))
