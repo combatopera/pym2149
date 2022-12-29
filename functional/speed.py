@@ -29,5 +29,5 @@ class Speed:
         if V(f"{speed - 1}x 1")[frame]:
             speed = speeds[frame]
 
-sections = [[E(Speed, '/.5', speeds = V('20 10 30'))]]
+sections = [[E(Speed, 'r.5', speeds = V('20 10 30'))]]
 speed = 30

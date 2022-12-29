@@ -156,7 +156,7 @@ class Ramp:
         ym.toneperiod += self.tp[frame]
 
 def lead1(firstslide, lastoff):
-    return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, f"3x2 2x|4x 4/{lastoff}",
+    return E(Lead, '3x2 2x|4x 2 2x', ['2 1.5 .5 4x'] * 2, f"3x2 2x|4x 4r{lastoff}",
             degree = D(f"2x3 2x2 3x 2|3 5/{firstslide} 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x"),
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
@@ -177,9 +177,9 @@ ramp2 = E(Diarp, '8x4',
         degree1 = D('+'),
         degree2 = D('4x3+ 4x2+'),
         level = V('16x15 12x14// 4x11'))
-boop1 = E(Boop, '3.5/ 2x2 .5',
+boop1 = E(Boop, '3.5r 2x2 .5',
         degree = D('3'))
-boop2 = E(Boop, '11.5/ 1 2x.5 1 3x.5',
+boop2 = E(Boop, '11.5r 1 2x.5 1 3x.5',
         degree = D('26x3 5 3x3 5 3').of(.5))
 boop3 = E(Boop, '.5',
         degree = D('3 5').of(.5),
@@ -188,29 +188,29 @@ boop4 = E(Boop, '.5',
         degree = D('3 5').of(.5),
         att = V('4 5').of(.5))
 kick1 = E(Kick, '2')
-side1 = E(Side, '/ 2x.5 6/',
+side1 = E(Side, 'r 2x.5 6r',
         degree = D('1'))
-side2 = E(Side, '/ 2x.5 3/ 2x.5 2/|/ 2x.5 6/',
+side2 = E(Side, 'r 2x.5 3r 2x.5 2r|r 2x.5 6r',
         degree = D('7- 4x 3x7-'))
-side3 = E(Side, '/ 2x.5 2/',
+side3 = E(Side, 'r 2x.5 2r',
         degree = D('1'))
 side4 = E(Side, '2x .5 1 .5 2x .5 1 .5 2x .5 1 .5 8x.5',
         degree = D('++') + D('4x 7- 2x 7- 4x 7- 2x 7- 4x 7- 2x 7- 3 2 1 7- 3 2 1 7-').of(.5))
-open1 = E(Open, '.5/ 2 .5 2x2 1')
-open2 = E(Open, '.5/ 2.5 4 2x.5|.5/ 2.5 5')
-open3 = E(Open, '.5/ 2 .5 1.5 2 3x.5')
+open1 = E(Open, '.5r 2 .5 2x2 1')
+open2 = E(Open, '.5r 2.5 4 2x.5|.5r 2.5 5')
+open3 = E(Open, '.5r 2 .5 1.5 2 3x.5')
 open4 = E(Open, '.5',
         att = V('1 3 2 1 3 2 1 3 2 1 3 2 1 3 2 4').of(.5),
         np = V('2x1 4x21 1 7x21 2x1').of(.5))
-lead2 = E(Tone, ['2/1 1 4x.5 3x'] * 3, '2x2/1 4x',
+lead2 = E(Tone, ['2r1 1 4x.5 3x'] * 3, '2x2r1 4x',
         degree = D('-') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x .5x7- .5x .5x7- 1 6- 5-|2x4- 1.5x6#- .5x6- .5x6#- .5x6- 6#- 4- 6#-|2x7- 2x 2 7- 1 2'))
-lead3 = E(Lead, '6', ['1 3'] * 4, '2|4 4/',
+lead3 = E(Lead, '6', ['1 3'] * 4, '2|4 4r',
         degree = D('+') + D('6x/.5 3 3x2 3 3x/.5 3 3x2 3 3x4 2x|8x2'),
         velocity = V('2'))
-lead4 = E(Ping, ['2/1 1 4x.5 3x'] * 3, '2/1 6/5',
+lead4 = E(Ping, ['2r1 1 4x.5 3x'] * 3, '2r1 6r5',
         degree = D('++') + D('2x 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x6- 1.5x3 .5x2 .5x3 .5x2 3 1 7-|2x 1.5x3 .5x2 .5x3 .5x2 2x3 1|8x2'),
         velocity = V('26x1 6x'))
-fill = E(Fill, '28/ 8x.5',
+fill = E(Fill, '28r 8x.5',
         degree = D('3 2').of(.5))
 Intr1 = snar1, bass1 * 4, boop1 & side1 & open1 & kick1
 Ramp1 = snar1, ramp1, boop1 & side1 & open1 & kick1
