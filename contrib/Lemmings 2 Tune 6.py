@@ -160,7 +160,7 @@ def lead1(firstslide, lastoff):
             degree = D(f"2x3 2x2 3x 2|3 5/{firstslide} 2 3 2x 3 4|3.5x5 .5x6 5 4/.5 2 3|3.5x4 .5x5 4 3/.5 1 2|2x3 2x2 3x 2|3 5/.25 2 3 4x"),
             velocity = V('18x 1.5x1 6.5x 1.5x1 4.5x|12x 4x1'))
 
-snar1 = E(Snare, '.5 1 .5 1 .5 1 2x.25 6x.5')
+snar1 = E(Snare, '.5 1 .5 1 .5 1 2x/4 6x.5')
 snar2 = E(Snare, '8') >> 3.5
 bass1 = E(Bass, '4x1.5 2x',
         degree = D('7x- 7--'),
