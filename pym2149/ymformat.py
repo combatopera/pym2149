@@ -99,7 +99,7 @@ class YM:
         return frame
 
     def simpleframe(self):
-        return [ord(c) for c in self.f.read(self.framesize)]
+        return [c for c in self.f.read(self.framesize)]
 
     def step(self):
         frame = self.frameobj(self)
