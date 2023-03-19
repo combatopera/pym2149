@@ -24,11 +24,11 @@ requires +=
     Lurlene>=13
     minBlepy>=13
     outjack>=15
-    Pillow>=7.2.0
     pyrbo>=5
     splut>=4
     timelyOSC>=4
 build requires += numpy
+test requires += Pillow>=7.2.0
 years +=
     2014
     2018
