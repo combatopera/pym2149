@@ -23,6 +23,7 @@ from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
 from diapyr.util import singleton
+from lagoon.util import onerror
 import logging, os, shutil, struct, sys, tempfile
 
 log = logging.getLogger(__name__)
@@ -324,21 +325,14 @@ class YMOpen(YMFile):
 
     def startimpl(self):
         self.f = open(self.path, 'rb')
-        try:
+        with onerror(self.f.close):
             if self.magic == self.f.read(2):
                 self.ym = self.impls[self.magic + self.f.read(2)](self.f, self.once)
                 return
-        except:
-            self.f.close()
-            raise
         self.f.close()
         self.f = UnpackedFile(self.path)
-        try:
+        with onerror(self.f.close):
             self.ym = self.impls[self.f.read(4)](self.f, self.once)
-            # return
-        except:
-            self.f.close()
-            raise
 
     def frames(self, chip):
         for frame in self.ym:
@@ -352,15 +346,12 @@ class UnpackedFile:
 
     def __init__(self, path):
         self.tmpdir = tempfile.mkdtemp()
-        try:
+        with onerror(self.clean):
             from lagoon import lha
             # Observe we redirect stdout so it doesn't get played:
             lha.x(os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
             name, = os.listdir(self.tmpdir)
             self.f = open(os.path.join(self.tmpdir, name), 'rb')
-        except:
-            self.clean()
-            raise
 
     def clean(self):
         log.debug("Deleting temporary folder: %s", self.tmpdir)
