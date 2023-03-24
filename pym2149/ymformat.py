@@ -24,6 +24,7 @@ from contextlib import contextmanager
 from diapyr import types
 from diapyr.util import singleton
 from lagoon.util import onerror
+from pathlib import Path
 import logging, os, shutil, struct, sys, tempfile
 
 log = logging.getLogger(__name__)
