@@ -346,14 +346,14 @@ class UnpackedFile:
 
     def __init__(self, path):
         self.tmpdir = tempfile.mkdtemp()
-        with onerror(self.clean):
+        with onerror(self._clean):
             from lagoon import lha
             # Observe we redirect stdout so it doesn't get played:
             lha.x(os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
             name, = os.listdir(self.tmpdir)
             self.f = open(os.path.join(self.tmpdir, name), 'rb')
 
-    def clean(self):
+    def _clean(self):
         log.debug("Deleting temporary folder: %s", self.tmpdir)
         shutil.rmtree(self.tmpdir)
 
@@ -362,4 +362,4 @@ class UnpackedFile:
 
     def close(self):
         self.f.close()
-        self.clean()
+        self._clean()
