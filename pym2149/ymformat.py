@@ -313,7 +313,7 @@ class YMOpen(YMFile):
 
     @types(Config)
     def __init__(self, config):
-        self.path = config.inpath
+        self.path = Path(config.inpath)
         self.once = config.ignoreloop
 
     def start(self):
@@ -324,7 +324,7 @@ class YMOpen(YMFile):
         self.pianorollheight = self.updaterate = self.ym.framefreq
 
     def startimpl(self):
-        self.f = open(self.path, 'rb')
+        self.f = self.path.open('rb')
         with onerror(self.f.close):
             if self.magic == self.f.read(2):
                 self.ym = self.impls[self.magic + self.f.read(2)](self.f, self.once)
