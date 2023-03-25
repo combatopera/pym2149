@@ -18,11 +18,13 @@
 from .clock import stclock
 from .dac import DigiDrumEffect, NullEffect, PWMEffect, SinusEffect
 from .iface import Config, YMFile
+from .lha import unlha
 from .shapes import makesample5shape
 from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
 from diapyr.util import singleton
+from io import BytesIO
 from lagoon.util import onerror
 from pathlib import Path
 import logging, os, shutil, struct, sys, tempfile
@@ -316,6 +318,7 @@ class YMOpen(YMFile):
     def __init__(self, config):
         self.path = Path(config.inpath)
         self.once = config.ignoreloop
+        self.unpackedfactory = _builtin_lha if config.builtin_lha else UnpackedFile
 
     def start(self):
         self.startimpl()
@@ -331,7 +334,7 @@ class YMOpen(YMFile):
                 self.ym = self.impls[self.magic + self.f.read(2)](self.f, self.once)
                 return
         self.f.close()
-        self.f = UnpackedFile(self.path)
+        self.f = self.unpackedfactory(self.path)
         with onerror(self.f.close):
             self.ym = self.impls[self.f.read(4)](self.f, self.once)
 
@@ -364,3 +367,6 @@ class UnpackedFile:
     def close(self):
         self.f.close()
         self._clean()
+
+def _builtin_lha(path):
+    return BytesIO(unlha(path.read_bytes()))

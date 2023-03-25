@@ -127,3 +127,6 @@ SID clock = $pyref(pym2149.resid PAL)
 
 Lurlene lazy = false
 : If true Lurlene will lookup objects in globals at runtime, so you don't have to update sections and everything in-between for your changes to be audible. This feature is currently experimental, it's usable but there are many bugs.
+
+builtin_lha = false
+: If true, attempt to unpack LHA-compressed YM files without requiring the lha executable.
