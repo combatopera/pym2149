@@ -20,7 +20,7 @@ from unittest import TestCase
 
 class TestTree(TestCase):
 
-    def test_works(self):
+    def test_canonical(self):
         tree = Tree.canonical([2, 3, 0, 0, 0, 0, 7, 6, 5, 4, 3, 3, 3, 3, 7])
         self.assertEqual({
             0b100: 0,
@@ -41,4 +41,13 @@ class TestTree(TestCase):
         self.assertEqual(13, tree.readvalue(s))
         self.assertEqual(9, tree.readvalue(s))
         self.assertEqual(2, s.cursor)
+        self.assertEqual(8, s.remaining)
+
+    def test_degenerate(self):
+        tree = Tree.degenerate(100)
+        self.assertEqual({1: 100}, tree.lookup)
+        s = Stream(b'')
+        self.assertEqual(100, tree.readvalue(s))
+        self.assertEqual(100, tree.readvalue(s))
+        self.assertEqual(0, s.cursor)
         self.assertEqual(8, s.remaining)

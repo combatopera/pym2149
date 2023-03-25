@@ -60,6 +60,10 @@ class Tree:
             key += 1
         return cls(lookup)
 
+    @classmethod
+    def degenerate(cls, value):
+        return cls({1: value})
+
     def __init__(self, lookup):
         self.lookup = lookup
 
@@ -79,7 +83,7 @@ class Interpreter(Tree):
     def readtree(cls, stream, prefix = 3):
         size = stream.read(5)
         if not size:
-            raise UnsupportedFormatException # TODO: Support degenerate.
+            return cls.degenerate(stream.read(5))
         if prefix < size:
             lens = [stream.readcodelen() for _ in range(prefix)]
             zeros = stream.read(2) # XXX: When prefix == size should this be done redundantly?
@@ -110,7 +114,7 @@ class Main(Tree):
         interpreter = Interpreter.readtree(stream)
         size = stream.read(9)
         if not size:
-            raise UnsupportedFormatException # TODO: Support degenerate.
+            return cls.degenerate(stream.read(9))
         lens = []
         while len(lens) < size:
             lens.extend(interpreter.mainlens(stream))
@@ -129,7 +133,7 @@ class Offset(Tree):
     def readtree(cls, stream):
         size = stream.read(4)
         if not size:
-            raise UnsupportedFormatException # TODO: Support degenerate.
+            return cls.degenerate(stream.read(4))
         return cls.canonical(stream.readcodelen() for _ in range(size))
 
     def copy(self, pair, n):
