@@ -71,11 +71,9 @@ class Tree:
 
     def readvalue(self, stream):
         k = self.trivialkey
-        while True:
-            try:
-                return self.lookup[k]
-            except KeyError:
-                k = k << 1 | stream.read(1)
+        while k not in self.lookup:
+            k = k << 1 | stream.read(1)
+        return self.lookup[k]
 
 class UnsupportedFormatException(Exception): pass
 
