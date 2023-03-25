@@ -99,9 +99,8 @@ class Interpreter(Tree):
         2: lambda s: 20 + s.read(9),
     }):
         instruction = self.readvalue(stream)
-        try:
-            readzeros = lookup[instruction]
-        except KeyError:
+        readzeros = lookup.get(instruction)
+        if readzeros is None:
             yield instruction - 2
         else:
             for _ in range(readzeros(stream)):
