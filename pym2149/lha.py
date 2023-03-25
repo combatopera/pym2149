@@ -48,10 +48,12 @@ class Stream:
 
 class Tree:
 
+    trivialkey = 1 # The empty code prefixed with a 1.
+
     @classmethod
     def canonical(cls, codelens):
         lookup = {}
-        key = 1 # The code prefixed with a 1.
+        key = cls.trivialkey
         currentlen = 0
         for l, value in sorted((l, x) for x, l in enumerate(codelens) if l):
             key <<= l - currentlen
@@ -62,13 +64,13 @@ class Tree:
 
     @classmethod
     def degenerate(cls, value):
-        return cls({1: value})
+        return cls({cls.trivialkey: value})
 
     def __init__(self, lookup):
         self.lookup = lookup
 
     def readvalue(self, stream):
-        k = 1
+        k = self.trivialkey
         while True:
             try:
                 return self.lookup[k]
