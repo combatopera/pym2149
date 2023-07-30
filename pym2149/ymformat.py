@@ -271,10 +271,15 @@ class Frame5(Frame56):
             yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
         if self.data[0x3] & 0x30:
             chan = ((self.data[0x3] & 0x30) >> 4) - 1
-            sample = self.flags.samples[self.data[0x8 + chan] & 0x1f]
-            tcr = (self.data[0x8] & 0xe0) >> 5
-            tdr = self.data[0xF]
-            yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
+            index = self.data[0x8 + chan] & 0x1f
+            try:
+                sample = self.flags.samples[index]
+            except IndexError:
+                log.warning("Bad sample index: %s", index)
+            else:
+                tcr = (self.data[0x8] & 0xe0) >> 5
+                tdr = self.data[0xF]
+                yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
 
 class Frame6(Frame56):
 
