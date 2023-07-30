@@ -24,10 +24,12 @@ from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
 from diapyr.util import singleton
-from io import BytesIO
+from functools import partial
 from lagoon.util import onerror
 from pathlib import Path
-import logging, os, shutil, struct, sys, tempfile
+from shutil import rmtree
+from tempfile import mkdtemp
+import logging, os, struct, sys
 
 log = logging.getLogger(__name__)
 
@@ -318,7 +320,7 @@ class YMOpen(YMFile):
     def __init__(self, config):
         self.path = Path(config.inpath)
         self.once = config.ignoreloop
-        self.unpackedfactory = _builtin_lha if config.builtin_lha else UnpackedFile
+        self.unpackedfactory = partial(UnpackedFile, _builtin_lha if config.builtin_lha else _real_lha)
 
     def start(self):
         self.startimpl()
@@ -348,18 +350,16 @@ class YMOpen(YMFile):
 
 class UnpackedFile:
 
-    def __init__(self, path):
-        self.tmpdir = tempfile.mkdtemp()
+    def __init__(self, lhaimpl, path):
+        self.tmpdir = Path(mkdtemp())
         with onerror(self._clean):
-            from lagoon import lha
-            # Observe we redirect stdout so it doesn't get played:
-            lha.x(os.path.abspath(path), cwd = self.tmpdir, stdout = sys.stderr)
-            name, = os.listdir(self.tmpdir)
-            self.f = open(os.path.join(self.tmpdir, name), 'rb')
+            lhaimpl(path, self.tmpdir)
+            p, = self.tmpdir.iterdir()
+            self.f = p.open('rb')
 
     def _clean(self):
         log.debug("Deleting temporary folder: %s", self.tmpdir)
-        shutil.rmtree(self.tmpdir)
+        rmtree(self.tmpdir)
 
     def __getattr__(self, name):
         return getattr(self.f, name)
@@ -368,5 +368,10 @@ class UnpackedFile:
         self.f.close()
         self._clean()
 
-def _builtin_lha(path):
-    return BytesIO(unlha(path.read_bytes()))
+def _builtin_lha(path, dirpath):
+    (dirpath / 'unlha').write_bytes(unlha(path.read_bytes()))
+
+def _real_lha(path, dirpath):
+    from lagoon import lha
+    # Observe we redirect stdout so it doesn't get played:
+    lha.x(os.path.abspath(path), cwd = dirpath, stdout = sys.stderr)
