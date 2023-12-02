@@ -261,6 +261,13 @@ class Frame56(PlainFrame):
                 timerttls[chan] = ttl
         super().applydata(chip)
 
+    def sampleornone(self, chan):
+        index = self.data[0x8 + chan] & 0x1f
+        try:
+            return self.flags.samples[index]
+        except IndexError:
+            log.warning("Bad sample index: %s", index)
+
 class Frame5(Frame56):
 
     def updatetimers(self, chip):
@@ -271,12 +278,8 @@ class Frame5(Frame56):
             yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
         if self.data[0x3] & 0x30:
             chan = ((self.data[0x3] & 0x30) >> 4) - 1
-            index = self.data[0x8 + chan] & 0x1f
-            try:
-                sample = self.flags.samples[index]
-            except IndexError:
-                log.warning("Bad sample index: %s", index)
-            else:
+            sample = self.sampleornone(chan)
+            if sample is not None:
                 tcr = (self.data[0x8] & 0xe0) >> 5
                 tdr = self.data[0xF]
                 yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
@@ -293,10 +296,11 @@ class Frame6(Frame56):
                     tdr = self.data[rrr]
                     yield chan, tcr, tdr, PWMEffect, FramesTTL(1)
                 if 0x40 == fx:
-                    sample = self.flags.samples[self.data[0x8 + chan] & 0x1f]
-                    tcr = (self.data[rr] & 0xe0) >> 5
-                    tdr = self.data[rrr]
-                    yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
+                    sample = self.sampleornone(chan)
+                    if sample is not None:
+                        tcr = (self.data[rr] & 0xe0) >> 5
+                        tdr = self.data[rrr]
+                        yield chan, tcr, tdr, DigiDrumEffect(sample), SampleTTL(chip.timers[chan].repeat)
                 if 0x80 == fx:
                     tcr = (self.data[rr] & 0xe0) >> 5
                     tdr = self.data[rrr]
