@@ -50,7 +50,7 @@ class RollImpl(Roll):
         self.tuning = tuning
 
     def _pitchstr(self, freq):
-        return self.tuning.pitch(freq).str(self.mincents)
+        return self.tuning.pitch(freq).str(self.mincents) if freq else '....   '
 
     def _effectstartstr(self, c):
         return self.wavestartstr if self.effects[c] is not self.chip.timers[c].effect.value else ''

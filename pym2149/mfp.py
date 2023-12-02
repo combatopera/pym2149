@@ -62,4 +62,4 @@ class MFPTimer:
         return prescalers[self.control.value] * self.effectivedata.value * self.effect.value.wavelength
 
     def getfreq(self): # Currently only called when effect is not None.
-        return mfpclock / self._getnormperiod()
+        return mfpclock / self._getnormperiod() if self.control.value else 0
