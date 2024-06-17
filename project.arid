@@ -16,7 +16,19 @@
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
 author = Andrzej Cichocki
+build requires += numpy
+buildbot enabled = true
+devel
+    packages += alsa-lib-devel
+    scripts += $.[curl http://www.zimmers.net/anonftp/pub/cbm/crossplatform/emulators/resid/resid-0.16.tar.gz | tar -xzv && cd resid-0.16 && ./configure --enable-shared && make && sudo make install]
+flakes exclude globs +=
+    ymtests/dosound*.py
+    ymtests/q*.py
+github account = combatopera
+licheck exclude globs += contrib/*
 name = pym2149
+pypi account = combatopera
+pyversions += 3
 requires +=
     aridity>=48
     diapyr>=18
@@ -27,22 +39,12 @@ requires +=
     pyrbo>=5
     splut>=4
     timelyOSC>=4
-build requires += numpy
+tagline = YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
 test requires += Pillow>=7.2.0
+upstream devel packages += sox
+warmups += pym2149.warmup:warmup
 years +=
     2014
     2018
     2019
     2020
-pyversions += 3
-executable = true
-licheck exclude globs += contrib/*
-devel
-    packages += alsa-lib-devel
-    scripts += $.[curl http://www.zimmers.net/anonftp/pub/cbm/crossplatform/emulators/resid/resid-0.16.tar.gz | tar -xzv && cd resid-0.16 && ./configure --enable-shared && make && sudo make install]
-warmups += pym2149.warmup:warmup
-flakes exclude globs +=
-    ymtests/dosound*.py
-    ymtests/q*.py
-upstream devel packages += sox
-buildbot enabled = true
