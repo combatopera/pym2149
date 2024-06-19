@@ -20,7 +20,7 @@ build requires += numpy
 buildbot enabled = true
 devel
     packages += alsa-lib-devel
-    scripts += $.[curl http://www.zimmers.net/anonftp/pub/cbm/crossplatform/emulators/resid/resid-0.16.tar.gz | tar -xzv && cd resid-0.16 && ./configure --enable-shared && make && sudo make install]
+    scripts += $.[curl http://www.zimmers.net/anonftp/pub/cbm/crossplatform/emulators/resid/resid-0.16.tar.gz | tar -xzv && cd resid-0.16 && ./configure --enable-shared && make && make install]
 flakes exclude globs +=
     ymtests/dosound*.py
     ymtests/q*.py
