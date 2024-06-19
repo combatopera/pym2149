@@ -15,6 +15,7 @@ pip3 install --user pym2149
 If you prefer to keep .local clean, install to a virtualenv:
 ```
 python3 -m venv venvname
+venvname/bin/pip install -U pip
 venvname/bin/pip install pym2149
 . venvname/bin/activate
 ```
