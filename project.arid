@@ -27,6 +27,7 @@ flakes exclude globs +=
 github account = combatopera
 licheck exclude globs += contrib/*
 name = pym2149
+native = true
 pypi account = combatopera
 pyversions += 3
 requires +=
