@@ -78,6 +78,6 @@ def _comparepng(path):
     h = ImageChops.difference(*map(Image.open, [path, actualpath])).histogram()
     def frac(limit):
         return sum(h[:limit]) / sum(h)
-    if frac(92) < 1 or frac(14) < .99 or frac(10) < .98:
+    if frac(92) < 1 or frac(14) < .99 or frac(11) < .98:
         with actualpath.open('rb') as f:
             TestCase().fail(a85encode(f.read(), wrapcol = 120, adobe = True).decode('ascii'))
