@@ -1,4 +1,3 @@
-#gclean
 /actual/
 *.pyc
 pym2149/native/*.pyxbldc
