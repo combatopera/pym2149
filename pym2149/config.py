@@ -19,7 +19,7 @@ from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
-from aridity.model import wrap
+from aridity.model import Boolean, wrap
 from diapyr import DI, types, UnsatisfiableRequestException
 from importlib import import_module
 from pathlib import Path
@@ -43,7 +43,7 @@ class ConfigName:
     @types(DI, this = Config)
     def loadconfig(self, di):
         cc = ConfigCtrl()
-        cc.w.enter = enter
+        cc.w.istry = istry
         cc.w.py = py
         cc.w.pyattr = pyattr
         cc.w.diref = DIRef(di)
@@ -79,8 +79,13 @@ class DIRef:
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
-def enter(scope, scoperesolvable, resolvable):
-    return resolvable.resolve(scoperesolvable.resolve(scope))
+def istry(scope, resolvable):
+    try:
+        resolvable.resolve(scope)
+        val = True
+    except NoSuchPathException:
+        val = False
+    return Boolean(val)
 
 def py(scope, coderesolvable):
     return wrap(eval(coderesolvable.resolve(scope).cat(), {}))

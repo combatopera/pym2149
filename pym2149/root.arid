@@ -57,7 +57,7 @@ maxpan = .75
 systemchannelcount = 2
 : The number of system output channels when using JACK.
 
-ignoreloop = $try($enter($(outpath) true) false)
+ignoreloop = $istry$(outpath)
 : If true playback will not loop.
 
 updaterate = $try($pyattr($(ymfile) updaterate) 50)
