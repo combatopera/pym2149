@@ -43,7 +43,7 @@ class ConfigName:
     @types(DI, this = Config)
     def loadconfig(self, di):
         cc = ConfigCtrl()
-        cc.put('enter', function = enter)
+        cc.w.enter = enter
         cc.w.py = py
         cc.put('resolve', function = lambda *args: AsScope.resolve(di, *args))
         cc.printf("cwd = %s", self.path.parent)
@@ -91,5 +91,5 @@ def _getglobal(scope, resolvable):
 def enter(scope, scoperesolvable, resolvable):
     return resolvable.resolve(scoperesolvable.resolve(scope))
 
-def py(scope, resolvable):
-    return wrap(eval(resolvable.resolve(scope).cat(), {}))
+def py(scope, coderesolvable):
+    return wrap(eval(coderesolvable.resolve(scope).cat(), {}))
