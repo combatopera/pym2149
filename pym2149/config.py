@@ -42,27 +42,27 @@ class ConfigName:
 
     @types(DI, this = Config)
     def loadconfig(self, di):
-        config = ConfigCtrl()
-        config.put('enter', function = enter)
-        config.put('py', function = lambda *args: py(getattr(config.node, self.namespace), *args))
-        config.put('resolve', function = lambda *args: AsScope.resolve(di, *args))
-        config.printf("cwd = %s", self.path.parent)
-        config.printf("%s . %s", self.namespace, self.path.name)
+        cc = ConfigCtrl()
+        cc.put('enter', function = enter)
+        cc.put('py', function = lambda *args: py(getattr(cc.node, self.namespace), *args))
+        cc.put('resolve', function = lambda *args: AsScope.resolve(di, *args))
+        cc.printf("cwd = %s", self.path.parent)
+        cc.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
             try:
-                config.loadsettings()
+                cc.loadsettings()
             except FileNotFoundError as e:
                 log.warning("Settings not found: %s", e)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
-                with config.repl() as repl:
+                with cc.repl() as repl:
                     for text in value:
                         repl.printf("%s", self.namespace)
                         for line in text.splitlines():
                             repl(f"\t{line}")
             else:
-                setattr(getattr(config.node, self.namespace), name, value)
-        return getattr(config.node, self.namespace)
+                setattr(getattr(cc.node, self.namespace), name, value)
+        return getattr(cc.node, self.namespace)
 
 class AsScope:
 
