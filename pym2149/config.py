@@ -53,6 +53,7 @@ class ConfigName:
                 cc.loadsettings()
             except FileNotFoundError as e:
                 log.warning("Settings not found: %s", e)
+        config = getattr(cc.node, self.namespace)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
                 with cc.repl() as repl:
@@ -61,8 +62,8 @@ class ConfigName:
                         for line in text.splitlines():
                             repl(f"\t{line}")
             else:
-                setattr(getattr(cc.node, self.namespace), name, value)
-        return getattr(cc.node, self.namespace)
+                setattr(config, name, value)
+        return config
 
 class DIRef:
 
