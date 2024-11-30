@@ -15,8 +15,8 @@
 : You should have received a copy of the GNU General Public License
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-prerecorded = $diref(.iface.Prerecorded)
-ymfile = $diref(.iface.YMFile)
+prerecorded = $diref$pyref(pym2149.iface Prerecorded)
+ymfile = $diref$pyref(pym2149.iface YMFile)
 
 referencefrequency = 440
 : The frequency of referencemidinote.

@@ -21,7 +21,6 @@ from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
 from aridity.model import Boolean, wrap
 from diapyr import DI, types, UnsatisfiableRequestException
-from importlib import import_module
 from pathlib import Path
 import logging, sys
 
@@ -71,11 +70,8 @@ class DIRef:
         self.di = di
 
     def __call__(self, scope, resolvable):
-        spec = resolvable.resolve(scope).cat()
-        lastdot = spec.rindex('.')
-        cls = getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:])
         try:
-            return wrap(self.di(cls))
+            return wrap(self.di(resolvable.resolve(scope).scalar))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
