@@ -57,8 +57,7 @@ def _comparetxt(path):
         config = []
     with _scriptpath(relpath) as scriptpath, open(actualpath, 'w') as stream, threadlocals(stream = stream):
         lc2txt.main(['--ignore-settings', *config,
-                '--config', 'local = $pyref(lurlene.util local)',
-                '--config', 'rollstream = $pyattr($(local) stream)',
+                '--config', 'rollstream = $pyref(lurlene.util local.stream)',
                 scriptpath])
     tc = TestCase()
     tc.maxDiff = None
