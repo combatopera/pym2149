@@ -45,6 +45,7 @@ class ConfigName:
         cc = ConfigCtrl()
         cc.w.enter = enter
         cc.w.py = py
+        cc.w.pyattr = pyattr
         cc.w.diref = lambda *args: AsScope.resolve(di, *args)
         cc.printf("cwd = %s", self.path.parent)
         cc.printf("%s . %s", self.namespace, self.path.name)
@@ -93,3 +94,6 @@ def enter(scope, scoperesolvable, resolvable):
 
 def py(scope, coderesolvable):
     return wrap(eval(coderesolvable.resolve(scope).cat(), {}))
+
+def pyattr(scope, objresolvable, attrresolvable):
+    return wrap(getattr(objresolvable.resolve(scope).scalar, attrresolvable.resolve(scope).cat()))
