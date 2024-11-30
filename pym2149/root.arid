@@ -15,6 +15,10 @@
 : You should have received a copy of the GNU General Public License
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
+istry = $pyref(pym2149.config istry)
+pyattr = $pyref(pym2149.config pyattr)
+py = $pyref(pym2149.config py)
+
 prerecorded = $diref$pyref(pym2149.iface Prerecorded)
 ymfile = $diref$pyref(pym2149.iface YMFile)
 

@@ -42,10 +42,6 @@ class ConfigName:
     @types(DI, this = Config)
     def loadconfig(self, di):
         cc = ConfigCtrl()
-        cc.w.istry = istry
-        cc.w.pyattr = pyattr
-        cc.w.py = py
-        cc.w.diref = DIRef(di)
         cc.printf("cwd = %s", self.path.parent)
         cc.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
@@ -54,6 +50,7 @@ class ConfigName:
             except FileNotFoundError as e:
                 log.warning("Settings not found: %s", e)
         config = getattr(cc.node, self.namespace)
+        config.diref = DIRef(di)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
                 with cc.repl() as repl:
