@@ -19,9 +19,8 @@ from .iface import Config
 from argparse import ArgumentParser
 from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
-from aridity.model import Boolean, wrap
+from aridity.model import Boolean, Resource, wrap
 from diapyr import DI, types, UnsatisfiableRequestException
-from pathlib import Path
 import logging, sys
 
 log = logging.getLogger(__name__)
@@ -37,19 +36,17 @@ class ConfigName:
         for param in params:
             parser.add_argument(param)
         self.additems = parser.parse_args(args)
-        self.path = Path(__file__).resolve().parent / f"{name}.arid"
+        self.resource = Resource(__name__, f"{name}.arid")
 
     @types(DI, this = Config)
     def loadconfig(self, di):
         cc = ConfigCtrl()
-        cc.printf("cwd = %s", self.path.parent)
-        cc.printf("%s . %s", self.namespace, self.path.name)
+        config = cc._loadappconfig(self.namespace, self.resource)
         if not self.additems.ignore_settings:
             try:
                 cc.loadsettings()
             except FileNotFoundError as e:
                 log.warning("Settings not found: %s", e)
-        config = getattr(cc.node, self.namespace)
         config.diref = DIRef(di)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
