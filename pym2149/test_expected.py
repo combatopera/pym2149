@@ -17,6 +17,7 @@
 
 from .power import batterypower
 from .scripts import lc2txt, lc2wav
+from aridity.model import wrap
 from base64 import a85encode
 from contextlib import contextmanager
 from lagoon import sox
@@ -45,6 +46,9 @@ def _scriptpath(relpath):
         f.flush()
         yield f.name
 
+def pyattr(scope, objresolvable, attrresolvable):
+    return wrap(getattr(objresolvable.resolve(scope).scalar, attrresolvable.resolve(scope).cat()))
+
 def _comparetxt(path):
     relpath = path.relative_to(expecteddir)
     actualpath = actualdir / relpath
@@ -57,8 +61,9 @@ def _comparetxt(path):
         config = []
     with _scriptpath(relpath) as scriptpath, open(actualpath, 'w') as stream, threadlocals(stream = stream):
         lc2txt.main(['--ignore-settings', *config,
+                '--config', 'pyattr = $pyref(pym2149.test_expected pyattr)',
                 '--config', 'local = $pyref(lurlene.util local)',
-                '--config', 'rollstream = $py[config.local.stream]',
+                '--config', 'rollstream = $pyattr($(local) stream)',
                 scriptpath])
     tc = TestCase()
     tc.maxDiff = None
