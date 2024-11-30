@@ -21,6 +21,7 @@ from aridity import NoSuchPathException
 from aridity.config import ConfigCtrl
 from aridity.model import Boolean, Resource, wrap
 from diapyr import DI, types, UnsatisfiableRequestException
+from io import StringIO
 import logging, sys
 
 log = logging.getLogger(__name__)
@@ -50,11 +51,8 @@ class ConfigName:
         config.diref = DIRef(di)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
-                with cc.repl() as repl:
-                    for text in value:
-                        repl.printf("%s", self.namespace)
-                        for line in text.splitlines():
-                            repl(f"\t{line}")
+                for text in value:
+                    (-config).load(StringIO(text))
             else:
                 setattr(config, name, value)
         return config
