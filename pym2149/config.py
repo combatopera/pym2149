@@ -46,7 +46,7 @@ class ConfigName:
         cc.w.enter = enter
         cc.w.py = py
         cc.w.pyattr = pyattr
-        cc.w.diref = lambda *args: AsScope.resolve(di, *args)
+        cc.w.diref = DIRef(di)
         cc.printf("cwd = %s", self.path.parent)
         cc.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
@@ -65,29 +65,19 @@ class ConfigName:
                 setattr(getattr(cc.node, self.namespace), name, value)
         return getattr(cc.node, self.namespace)
 
-class AsScope:
+class DIRef:
 
-    @classmethod
-    def resolve(cls, di, scope, resolvable):
+    def __init__(self, di):
+        self.di = di
+
+    def __call__(self, scope, resolvable):
+        spec = resolvable.resolve(scope).cat()
+        lastdot = spec.rindex('.')
+        cls = getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:])
         try:
-            return cls(scope, di(_getglobal(scope, resolvable).scalar))
+            return wrap(self.di(cls))
         except UnsatisfiableRequestException:
             raise NoSuchPathException
-
-    def __init__(self, parent, obj):
-        self.parent = parent
-        self.obj = obj
-
-    def resolved(self, name):
-        try:
-            return wrap(getattr(self.obj, name))
-        except AttributeError:
-            return self.parent.resolved(name)
-
-def _getglobal(scope, resolvable):
-    spec = resolvable.resolve(scope).cat()
-    lastdot = spec.rindex('.')
-    return wrap(getattr(import_module(spec[:lastdot], __package__), spec[lastdot + 1:]))
 
 def enter(scope, scoperesolvable, resolvable):
     return resolvable.resolve(scoperesolvable.resolve(scope))

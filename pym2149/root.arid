@@ -36,7 +36,7 @@ underclock = 8
 oscpause = false
 : Whether an oscillator is paused when turned off in the mixer. Setting to true doesn't significantly help performance and is likely not authentic so this option is a bit useless.
 
-nominalclock = $try($enter($(ymfile) $(nominalclock)) $pyref(pym2149.clock stclock))
+nominalclock = $try($pyattr($(ymfile) nominalclock) $pyref(pym2149.clock stclock))
 : You can specify your own clock here, which overrides any other value.
 
 maxtoneperiod = $py[0xfff]
@@ -60,13 +60,13 @@ systemchannelcount = 2
 ignoreloop = $try($enter($(outpath) true) false)
 : If true playback will not loop.
 
-updaterate = $try($enter($(ymfile) $(updaterate)) 50)
+updaterate = $try($pyattr($(ymfile) updaterate) 50)
 : The rate at which chip params are updated.
 
 linesperbeat = 4
 : bpmtool.py uses this.
 
-pianorollheight = $enter($(prerecorded) $(pianorollheight))
+pianorollheight = $pyattr($(prerecorded) pianorollheight)
 : You can override the deduced piano roll height here.
 
 pianorollenabled = true
