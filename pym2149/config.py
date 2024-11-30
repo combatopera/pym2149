@@ -43,8 +43,8 @@ class ConfigName:
     def loadconfig(self, di):
         cc = ConfigCtrl()
         cc.w.istry = istry
-        cc.w.py = py
         cc.w.pyattr = pyattr
+        cc.w.py = py
         cc.w.diref = DIRef(di)
         cc.printf("cwd = %s", self.path.parent)
         cc.printf("%s . %s", self.namespace, self.path.name)
@@ -83,8 +83,8 @@ def istry(scope, resolvable):
         val = False
     return Boolean(val)
 
-def py(scope, coderesolvable):
-    return wrap(eval(coderesolvable.resolve(scope).cat(), {}))
-
 def pyattr(scope, objresolvable, attrresolvable):
     return wrap(getattr(objresolvable.resolve(scope).scalar, attrresolvable.resolve(scope).cat()))
+
+def py(scope, coderesolvable):
+    return wrap(eval(coderesolvable.resolve(scope).cat(), {}))
