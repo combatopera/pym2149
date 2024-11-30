@@ -28,8 +28,6 @@ log = logging.getLogger(__name__)
 
 class ConfigName:
 
-    namespace = 'pym2149'
-
     def __init__(self, *params, args = sys.argv[1:], name = 'root'):
         parser = ArgumentParser()
         parser.add_argument('--config', action = 'append', default = [])
@@ -42,7 +40,7 @@ class ConfigName:
     @types(DI, this = Config)
     def loadconfig(self, di):
         cc = ConfigCtrl()
-        config = cc._loadappconfig(self.namespace, self.resource)
+        config = cc._loadappconfig('pym2149', self.resource)
         if not self.additems.ignore_settings:
             try:
                 cc.loadsettings()
