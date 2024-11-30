@@ -41,12 +41,12 @@ class ConfigName:
     def loadconfig(self, di):
         cc = ConfigCtrl()
         config = cc._loadappconfig('pym2149', self.resource)
+        config.diref = DIRef(di)
         if not self.additems.ignore_settings:
             try:
                 cc.loadsettings()
             except FileNotFoundError as e:
                 log.warning("Settings not found: %s", e)
-        config.diref = DIRef(di)
         for name, value in self.additems.__dict__.items():
             if 'config' == name:
                 for text in value:
