@@ -45,7 +45,7 @@ class ConfigName:
         cc = ConfigCtrl()
         cc.w.enter = enter
         cc.w.py = py
-        cc.put('resolve', function = lambda *args: AsScope.resolve(di, *args))
+        cc.w.diref = lambda *args: AsScope.resolve(di, *args)
         cc.printf("cwd = %s", self.path.parent)
         cc.printf("%s . %s", self.namespace, self.path.name)
         if not self.additems.ignore_settings:
