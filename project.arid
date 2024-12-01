@@ -17,7 +17,9 @@
 
 author = Andrzej Cichocki
 author_email = 3613868+combatopera@users.noreply.github.com
-build requires += numpy
+build requires +=
+    Cython==3.0.11
+    numpy==$(numpy_version)
 buildbot enabled = true
 devel
     packages += alsa-lib-devel
@@ -28,7 +30,7 @@ flakes exclude globs +=
 github account = combatopera
 licheck exclude globs += contrib/*
 name = pym2149
-native = true
+numpy_version = 2.1.3
 pydoc_enabled = false
 pypi account = combatopera
 pyversions += 3
@@ -38,6 +40,7 @@ requires +=
     lagoon>=31
     Lurlene>=13
     minBlepy>=13
+    numpy>=$(numpy_version)
     outjack>=15
     pyrbo>=5
     splut>=4
