@@ -30,7 +30,6 @@ flakes exclude globs +=
 github account = combatopera
 licheck exclude globs += contrib/*
 name = pym2149
-numpy_build_version = 2.0.2
 pydoc_enabled = false
 pypi account = combatopera
 pyversions += 3
