@@ -45,7 +45,7 @@ requires +=
     splut>=4
     timelyOSC>=4
 tagline = YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
-test requires += Pillow>=7.2.0
+test requires += Pillow==11.0.0
 upstream devel packages += sox
 warmups += pym2149.warmup:warmup
 years +=
