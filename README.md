@@ -22,12 +22,9 @@ venvname/bin/pip install pym2149
 
 ## Usage
 ```
-# GitHub trick to download some files to play:
-svn export https://github.com/combatopera/pym2149/trunk/contrib
-
 # Play a tune written in the Lurlene live coding language:
-lc2jack 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
 lc2portaudio 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
+lc2jack 'contrib/Jochen Hippel - 7 Gates of Jambala Level 9.py'
 
 # Play a Dosound sound effect:
 dosound2jack contrib/sounds.s snd19
