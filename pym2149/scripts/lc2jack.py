@@ -17,7 +17,7 @@
 
 'Play a Lurlene song via JACK.'
 from . import boot
-from .. import jackclient
+from ..client import jack
 from ..config import ConfigName
 from ..lurlene import loadcontext, LurleneBridge
 from ..timerimpl import SyncTimer
@@ -35,7 +35,7 @@ def main():
         lurlene.osc.configure(di)
         di.add(SyncTimer)
         di.add(LogicalBundle)
-        jackclient.configure(di)
+        jack.configure(di)
         di.add(Player)
         di.all(Started)
         di(MainThread).sleep()

@@ -17,7 +17,7 @@
 
 'Play a YM file via JACK.'
 from . import boot
-from .. import jackclient
+from ..client import jack
 from ..config import ConfigName
 from ..timerimpl import SyncTimer
 from ..util import initlogging, MainThread
@@ -30,7 +30,7 @@ def main():
     config, di = boot(ConfigName('inpath'))
     with di:
         di.add(YMOpen)
-        jackclient.configure(di)
+        jack.configure(di)
         di.add(SyncTimer)
         di.add(PhysicalBundle)
         di.add(Player)

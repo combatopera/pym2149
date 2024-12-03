@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-from .const import clientname
-from .iface import AmpScale, Config, Platform, Stream
-from .nod import Node
-from .out import FloatStream, StereoInfo
+from . import BufferFiller
+from ..const import clientname
+from ..iface import AmpScale, Config, Platform, Stream
+from ..nod import Node
+from ..out import FloatStream, StereoInfo
 from diapyr import types
 import outjack.jackclient as jc, logging
 
@@ -69,32 +70,6 @@ class JackStream(Stream, Node, metaclass = AmpScale):
 
     def stop(self):
         self.client.deactivate()
-
-class BufferFiller:
-
-    def __init__(self, portcount, buffersize, init, flip):
-        self.portcount = portcount
-        self.buffersize = buffersize
-        self._newbuf(init)
-        self.flip = flip
-
-    def __call__(self, outbufs):
-        n = len(outbufs[0])
-        i = 0
-        while i < n:
-            m = min(n - i, self.buffersize - self.cursor)
-            for portindex in range(self.portcount):
-                self.outbuf[portindex, self.cursor:self.cursor + m] = outbufs[portindex].buf[i:i + m]
-            self.cursor += m
-            i += m
-            if self.cursor == self.buffersize:
-                self._newbuf(self.flip)
-
-    def _newbuf(self, factory):
-        outbuf = factory().view()
-        outbuf.shape = self.portcount, self.buffersize
-        self.outbuf = outbuf
-        self.cursor = 0
 
 def configure(di):
     di.add(JackClient)

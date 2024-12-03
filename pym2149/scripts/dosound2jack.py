@@ -17,7 +17,7 @@
 
 'Play a Dosound script via JACK.'
 from . import boot, srcbytecodefactory
-from .. import jackclient
+from ..client import jack
 from ..config import ConfigName
 from ..timerimpl import SyncTimer
 from ..util import initlogging, MainThread
@@ -29,7 +29,7 @@ def main():
     config, di = boot(ConfigName('inpath', 'srclabel'))
     with di:
         di.add(srcbytecodefactory)
-        jackclient.configure(di)
+        jack.configure(di)
         di.add(SyncTimer)
         di.add(PhysicalBundle)
         di.add(Player)

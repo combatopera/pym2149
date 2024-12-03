@@ -17,7 +17,7 @@
 
 'Play a YM file via PortAudio.'
 from . import boot
-from .. import portaudioclient
+from ..client import portaudio
 from ..config import ConfigName
 from ..timerimpl import SyncTimer
 from ..util import initlogging, MainThread
@@ -30,7 +30,7 @@ def main():
     config, di = boot(ConfigName('inpath'))
     with di:
         di.add(YMOpen)
-        portaudioclient.configure(di)
+        portaudio.configure(di)
         di.add(SyncTimer)
         di.add(PhysicalBundle)
         di.add(Player)
