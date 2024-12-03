@@ -46,7 +46,9 @@ requires +=
     timelyOSC>=4
 tagline = YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
 test requires += Pillow==11.0.0
-upstream devel packages += sox
+upstream devel
+    packages += sox
+    scripts += $.[curl -L https://github.com/jackaudio/jack2/archive/v1.9.22.tar.gz | tar -xzv && cd jack2-1.9.22 && ./waf configure && ./waf && ./waf install]
 warmups += pym2149.warmup:warmup
 years +=
     2014
