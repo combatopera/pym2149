@@ -169,7 +169,7 @@ class WavBuf(Node):
         # Paste in the carry followed by the carried dc level:
         outbuf.copyasprefix(self.overflowsize, self.carrybuf)
         outbuf.fillpart(self.overflowsize, outsize, self.dc)
-        self.minbleps.paste(naivex, diffbuf, outbuf)
+        self.minbleps.paste(naivex, diffbuf.buf, outbuf.buf)
         self.carrybuf.copywindow(outbuf, outcount, outsize)
         self.dc = naivebuf.last()
         return self.outmaster.ensureandcrop(outcount)
