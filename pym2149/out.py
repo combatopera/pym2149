@@ -26,6 +26,7 @@ from .wav import Wave16
 from .ym2149 import YM2149
 from diapyr import types
 from diapyr.util import singleton
+from minBlepy.minblep import Translator
 import logging, numpy as np
 
 log = logging.getLogger(__name__)
@@ -118,20 +119,6 @@ class YMStream(FloatStream):
         naives = [IdealMixer(chip, ampscale.log2maxpeaktopeak, outchan) for outchan in stereoinfo.getoutchans()]
         for naive in naives:
             self.append(WavBuf(clockinfo, naive, minbleps))
-
-class Translator: # TODO: Convert to Node.
-
-    naivex = 0
-
-    def __init__(self, naiverate, minbleps):
-        self.naiverate = naiverate
-        self.minbleps = minbleps
-
-    def step(self, framecount):
-        naivex = self.naivex
-        outcount = self.minbleps.getoutcount(naivex, framecount)
-        self.naivex = (naivex + framecount) % self.naiverate
-        return naivex, outcount
 
 class WavBuf(Node):
 

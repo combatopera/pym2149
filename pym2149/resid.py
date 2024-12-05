@@ -22,10 +22,11 @@ from .lurlene import convenient
 from .minblep import MinBleps
 from .native.resid import NativeSID
 from .nod import Node
-from .out import FloatStream, Translator
+from .out import FloatStream
 from .reg import Reg, regproperty
 from diapyr import types
 from lurlene import topitch
+from minBlepy.minblep import Translator
 
 PAL = 4.43361875e6 * 4 / 18
 NTSC = 3.579545e6 * 4 / 14
