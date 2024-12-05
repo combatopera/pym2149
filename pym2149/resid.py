@@ -105,7 +105,7 @@ class SIDBuf(Node):
 
     def __init__(self, clockinfo, ampscale, sid, minbleps):
         super().__init__()
-        self.translator = Translator(clockinfo, minbleps)
+        self.translator = Translator(clockinfo.implclock, minbleps)
         self.shortmaster = BufType.short()
         self.outmaster = BufType.float()
         self.ampscale = 2 ** (ampscale.log2maxpeaktopeak - sid.log2maxpeaktopeak)

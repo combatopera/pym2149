@@ -123,8 +123,8 @@ class Translator: # TODO: Convert to Node.
 
     naivex = 0
 
-    def __init__(self, clockinfo, minbleps):
-        self.naiverate = clockinfo.implclock
+    def __init__(self, naiverate, minbleps):
+        self.naiverate = naiverate
         self.minbleps = minbleps
 
     def step(self, framecount):
@@ -151,7 +151,7 @@ class WavBuf(Node):
         # Need space for a whole mixin in case it is rooted at sample outcount:
         self.overflowsize = minbleps.mixinsize
         self.carrybuf = BufType.float().ensureandcrop(self.overflowsize)
-        self.translator = Translator(clockinfo, minbleps)
+        self.translator = Translator(clockinfo.implclock, minbleps)
         self.dc = floatdtype(0) # Last naive value of previous block.
         self.carrybuf.fill_same(self.dc) # Initial carry can be the initial dc level.
         self.naive = naive
