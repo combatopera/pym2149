@@ -15,7 +15,7 @@
 : You should have received a copy of the GNU General Public License
 : along with pym2149.  If not, see <http://www.gnu.org/licenses/>.
 
-istry = $pyref(pym2149.config istry)
+isvalue = $pyref(pym2149.config isvalue)
 pyattr = $pyref(pym2149.config pyattr)
 py = $pyref(pym2149.config py)
 
@@ -61,7 +61,7 @@ maxpan = .75
 systemchannelcount = 2
 : The number of system output channels when using JACK.
 
-ignoreloop = $istry$(outpath)
+ignoreloop = $isvalue$(outpath)
 : If true playback will not loop.
 
 updaterate = $try($pyattr($(ymfile) updaterate) 50)

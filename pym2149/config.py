@@ -66,7 +66,7 @@ class DIRef:
         except UnsatisfiableRequestException:
             raise NoSuchPathException
 
-def istry(scope, resolvable):
+def isvalue(scope, resolvable):
     try:
         resolvable.resolve(scope)
         val = True
