@@ -1,0 +1,10 @@
+aridity>=78
+diapyr>=26
+lagoon>=31
+Lurlene>=13
+minBlepy>=16
+numpy>=2.0.2
+outjack>=15
+pyrbo>=13
+splut>=4
+timelyOSC>=4

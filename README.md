@@ -4,21 +4,33 @@ YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
 ## Install
 These are generic installation instructions.
 
-### To use, permanently
-The quickest way to get started is to install the current release from PyPI:
-```
-# Tested on Linux and Mac:
-pip3 install --user pym2149
-```
-
-### To use, temporarily
-If you prefer to keep .local clean, install to a virtualenv:
+### To use, disposably
+Install the current release from PyPI to a virtual environment:
 ```
 python3 -m venv venvname
 venvname/bin/pip install -U pip
 venvname/bin/pip install pym2149
 . venvname/bin/activate
 ```
+
+### To use, permanently
+```
+# Tested on Linux and Mac:
+pip3 install --user pym2149
+```
+See `~/.local/bin` for executables.
+
+### To develop
+First install venvpool to get the `motivate` command:
+```
+pip3 install --user venvpool
+```
+Get codebase and install executables:
+```
+git clone git@github.com:combatopera/pym2149.git
+motivate pym2149
+```
+Requirements will be satisfied just in time, using sibling projects with matching .egg-info if any.
 
 ## Usage
 ```
