@@ -8,7 +8,9 @@ pym2149/native/*.so
 *.dsd
 /build/
 /dist/
-/pym2149.egg-info/
+pym2149.egg-info/*
+!pym2149.egg-info/PKG-INFO
+!pym2149.egg-info/requires.txt
 /setup.cfg
 /setup.py
 /pyproject.toml
