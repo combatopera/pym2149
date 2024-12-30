@@ -32,7 +32,6 @@ licheck exclude globs += contrib/*
 name = pym2149
 pydoc_enabled = false
 pypi account = combatopera
-pyversions += 3
 requires +=
     aridity>=78
     diapyr>=26
