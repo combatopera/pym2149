@@ -22,7 +22,7 @@ statetobatterypower = {'charging': False, 'fully-charged': False, 'discharging':
 
 def batterypower():
     try:
-        from lagoon import upower
+        from lagoon.text import upower
     except ImportError:
         return # Run all tests.
     def states():

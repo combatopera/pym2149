@@ -381,6 +381,6 @@ def _builtin_lha(path, dirpath):
     (dirpath / 'unlha').write_bytes(unlha(path.read_bytes()))
 
 def _real_lha(path, dirpath):
-    from lagoon import lha
+    from lagoon.text import lha
     # Observe we redirect stdout so it doesn't get played:
     lha.x(os.path.abspath(path), cwd = dirpath, stdout = sys.stderr)

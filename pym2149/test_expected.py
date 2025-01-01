@@ -19,7 +19,7 @@ from .power import batterypower
 from .scripts import lc2txt, lc2wav
 from base64 import a85encode
 from contextlib import contextmanager
-from lagoon import sox
+from lagoon.text import sox
 from lurlene.util import threadlocals
 from pathlib import Path
 from PIL import Image, ImageChops
