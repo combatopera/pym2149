@@ -36,14 +36,14 @@ venvname/bin/pip install pym2149
 ### To use, permanently
 ```
 # Tested on Linux and Mac:
-pip3 install --user pym2149
+pip3 install --break-system-packages --user pym2149
 ```
 See `~/.local/bin` for executables.
 
 ### To develop
 First install venvpool to get the `motivate` command:
 ```
-pip3 install --user venvpool
+pip3 install --break-system-packages --user venvpool
 ```
 Get codebase and install executables:
 ```
