@@ -75,7 +75,7 @@ def isvalue(scope, resolvable):
     return Boolean(val)
 
 def pyattr(scope, objresolvable, attrresolvable):
-    return wrap(getattr(objresolvable.resolve(scope).scalar, attrresolvable.resolve(scope).cat()))
+    return wrap(getattr(objresolvable.resolve(scope).scalar, attrresolvable.resolve(scope).textvalue))
 
 def py(scope, coderesolvable):
-    return wrap(eval(coderesolvable.resolve(scope).cat(), {}))
+    return wrap(eval(coderesolvable.resolve(scope).textvalue, {}))
