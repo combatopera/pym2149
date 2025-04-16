@@ -1,5 +1,5 @@
 # pym2149
-YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
+YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV.
 
 ## Install
 These are generic installation instructions.
