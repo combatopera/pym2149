@@ -14,7 +14,7 @@ Requires-Dist: Lurlene>=13
 Requires-Dist: minBlepy>=16
 Requires-Dist: numpy>=2.0.2
 Requires-Dist: outjack>=15
-Requires-Dist: pyrbo>=13
+Requires-Dist: pyrbo>=18
 Requires-Dist: splut>=4
 Requires-Dist: timelyOSC>=4
 
