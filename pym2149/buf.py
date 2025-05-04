@@ -145,7 +145,7 @@ class Buf(metaclass = generic):
 class MasterBuf:
 
     def __init__(self, dtype):
-        self.bufcls = Buf[T, dtype]
+        self.bufcls = Buf[T:dtype]
         self.dtype = dtype
         self.setsize(0)
 

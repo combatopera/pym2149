@@ -24,4 +24,4 @@ def warmup():
         del osc2
         for param, groupset in groupsets.items():
             for group in groupset:
-                Buf[param, next(iter(group))]
+                Buf[param:next(iter(group))]
