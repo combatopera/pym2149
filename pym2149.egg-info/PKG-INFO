@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pym2149
-Version: 37.dev0
+Version: 38.dev0
 Summary: YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
 Home-page: https://github.com/combatopera/pym2149
 Author: Andrzej Cichocki
