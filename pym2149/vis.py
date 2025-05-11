@@ -20,7 +20,7 @@ from .dac import DigiDrumEffect, NullEffect, PWMEffect, SinusEffect
 from .iface import Config, Roll, Tuning
 from .ym2149 import LogicalRegisters
 from diapyr import types
-from diapyr.util import singleton
+from foyndation import singleton
 
 @singleton
 class NullRoll(Roll):

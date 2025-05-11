@@ -25,7 +25,7 @@ from .shapes import floatdtype
 from .wav import Wave16
 from .ym2149 import YM2149
 from diapyr import types
-from diapyr.util import singleton
+from foyndation import singleton
 from minBlepy.minblep import Translator
 import logging, numpy as np
 

@@ -9,6 +9,7 @@ Description-Content-Type: text/markdown
 License-File: COPYING
 Requires-Dist: aridity>=84
 Requires-Dist: diapyr>=26
+Requires-Dist: foyndation>=10
 Requires-Dist: lagoon>=49
 Requires-Dist: Lurlene>=13
 Requires-Dist: minBlepy>=16

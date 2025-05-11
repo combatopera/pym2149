@@ -18,7 +18,7 @@
 from .buf import BufType
 from .nod import BufNode
 from .shapes import level4to5, level5toamp, level4tosinus5shape, level4totone5shape
-from diapyr.util import singleton
+from foyndation import singleton
 import numpy as np
 
 class Level(BufNode):

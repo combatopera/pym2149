@@ -23,7 +23,7 @@ from .shapes import makesample5shape
 from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
-from diapyr.util import singleton
+from foyndation import singleton
 from functools import partial
 from lagoon.util import onerror
 from pathlib import Path

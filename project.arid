@@ -35,6 +35,7 @@ pypi account = combatopera
 requires +=
     aridity>=84
     diapyr>=26
+    foyndation>=10
     lagoon>=49
     Lurlene>=13
     minBlepy>=16
