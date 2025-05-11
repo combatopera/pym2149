@@ -22,10 +22,11 @@ from ..config import ConfigName
 from ..dosound import Bytecode
 from ..iface import Config
 from ..timerimpl import ChipTimer
-from ..util import initlogging, MainThread
+from ..util import MainThread
 from ..ymplayer import PhysicalBundle, Player
 from diapyr import types
 from diapyr.start import Started
+from foyndation import initlogging
 import logging
 
 log = logging.getLogger(__name__)

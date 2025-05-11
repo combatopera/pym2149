@@ -21,9 +21,10 @@ from .. import txt
 from ..config import ConfigName
 from ..lurlene import loadcontext, LurleneBridge
 from ..timerimpl import SimpleChipTimer
-from ..util import initlogging, MainThread
+from ..util import MainThread
 from ..ymplayer import LogicalBundle, Player
 from diapyr.start import Started
+from foyndation import initlogging
 import sys
 
 def main(args = sys.argv[1:]):

@@ -56,6 +56,3 @@ class EMA:
 
 def ceildiv(numerator, denominator):
     return (numerator + denominator - 1) // denominator
-
-def initlogging():
-    logging.basicConfig(format = "[%(levelname)s] %(message)s", level = logging.DEBUG)

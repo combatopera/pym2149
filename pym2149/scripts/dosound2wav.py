@@ -20,9 +20,10 @@ from . import boot, srcbytecodefactory
 from .. import out
 from ..config import ConfigName
 from ..timerimpl import ChipTimer
-from ..util import initlogging, MainThread
+from ..util import MainThread
 from ..ymplayer import PhysicalBundle, Player
 from diapyr.start import Started
+from foyndation import initlogging
 
 def main():
     initlogging()
