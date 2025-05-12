@@ -22,7 +22,7 @@ from .reg import Reg, regproperty
 from .ym2149 import LogicalRegisters
 from diapyr import types
 from diapyr.start import Started
-from diapyr.util import innerclass
+from foyndation import innerclass
 from lurlene import topitch
 from lurlene.bridge import LiveCodingBridge
 from lurlene.context import Context
