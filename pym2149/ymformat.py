@@ -23,9 +23,8 @@ from .shapes import makesample5shape
 from .ym2149 import PhysicalRegisters
 from contextlib import contextmanager
 from diapyr import types
-from foyndation import singleton
+from foyndation import onerror, singleton
 from functools import partial
-from lagoon.util import onerror
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
