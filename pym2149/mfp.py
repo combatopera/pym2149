@@ -17,6 +17,7 @@
 
 from .dac import NullEffect
 from .reg import Reg
+from foyndation import inf
 
 prescalers = {1 + i: v for i, v in enumerate([4, 10, 16, 50, 64, 100, 200])}
 mfpclock = 2457600
@@ -47,7 +48,7 @@ class MFPTimer:
     def _findtcrtdr(self, freq):
         if not freq:
             return 0, self.data.value # Stop timer.
-        diff = float('inf')
+        diff = inf
         for tcr, prescaler in prescalers.items():
             prescaler *= self.effect.value.wavelength # Avoid having to multiply twice.
             etdr = int(round(mfpclock / (freq * prescaler)))
