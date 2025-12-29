@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: pym2149
 Version: 40.dev0
 Summary: YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
@@ -18,6 +18,13 @@ Requires-Dist: outjack>=15
 Requires-Dist: pyrbo>=18
 Requires-Dist: splut>=4
 Requires-Dist: timelyOSC>=4
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
 
 # pym2149
 YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV.
