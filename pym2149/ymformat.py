@@ -382,4 +382,4 @@ def _builtin_lha(path, dirpath):
 def _real_lha(path, dirpath):
     from lagoon.text import lha
     # Observe we redirect stdout so it doesn't get played:
-    lha.x(os.path.abspath(path), cwd = dirpath, stdout = sys.stderr)
+    lha.x[:sys.stderr](os.path.abspath(path), cwd = dirpath)
