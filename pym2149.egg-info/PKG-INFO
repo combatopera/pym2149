@@ -10,7 +10,7 @@ License-File: COPYING
 Requires-Dist: aridity>=84
 Requires-Dist: diapyr>=26
 Requires-Dist: foyndation>=16
-Requires-Dist: lagoon>=49
+Requires-Dist: lagoon>=63
 Requires-Dist: Lurlene>=13
 Requires-Dist: minBlepy>=16
 Requires-Dist: numpy>=2.0.2
