@@ -7,7 +7,7 @@ Author: Andrzej Cichocki
 Author-email: 3613868+combatopera@users.noreply.github.com
 Description-Content-Type: text/markdown
 License-File: COPYING
-Requires-Dist: aridity>=84
+Requires-Dist: aridity>=97
 Requires-Dist: diapyr>=26
 Requires-Dist: foyndation>=16
 Requires-Dist: lagoon>=63
