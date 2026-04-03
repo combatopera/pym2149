@@ -24,7 +24,7 @@ import numpy as np
 
 class Counter(BufNode):
 
-    buftype = BufType(None, np.int64) # Closest thing to int.
+    buftype = BufType(np.int64) # Closest thing to int.
 
     def __init__(self, x = 0):
         super().__init__(self.buftype)

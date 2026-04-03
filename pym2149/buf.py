@@ -17,25 +17,29 @@
 
 from .const import u4
 from .shapes import floatdtype, signaldtype
-from diapyr.util import enum
+from foyndation import singleton
 from pyrbo import generic, LOCAL, turbo, T
 import numpy as np
 
-@enum(
-    ['float', floatdtype],
-    ['int16', np.int16],
-    ['short', np.short],
-    ['signal', signaldtype],
-)
 class BufType:
 
-    def __init__(self, _, dtype):
+    def __init__(self, dtype):
         self.dtype = dtype
 
     def __call__(self):
         return MasterBuf(self.dtype)
 
-groupsets = {T: [{t.dtype for t in BufType.enum}]}
+@singleton
+def groupsets():
+    dtypes = dict(
+        float = floatdtype,
+        int16 = np.int16,
+        short = np.short,
+        signal = signaldtype,
+    )
+    for name, dtype in dtypes.items():
+        setattr(BufType, name, BufType(dtype))
+    return {T: [set(dtypes.values())]}
 
 class Buf(metaclass = generic):
 
