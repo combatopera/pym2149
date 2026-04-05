@@ -19,7 +19,7 @@ author = Andrzej Cichocki
 author_email = 3613868+combatopera@users.noreply.github.com
 build requires +=
     Cython==$(cython_build_version)
-    numpy==$(numpy_build_version)
+    $*$(numpy build_requires)
 buildbot enabled = true
 devel
     packages += alsa-lib-devel
@@ -39,7 +39,7 @@ requires +=
     lagoon>=63
     Lurlene>=13
     minBlepy>=16
-    numpy>=$(numpy_build_version)
+    $(numpy lower_bound)
     outjack>=23
     pyrbo>=18
     splut>=4
