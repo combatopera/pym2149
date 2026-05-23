@@ -46,7 +46,7 @@ class TestWavWriter(TestCase, CmpTime):
         blocksize = clock // (1000, 10)[bigblocks]
         tone = MinPeriodTone()
         outrate = 44100
-        w = WavBuf(SimpleNamespace(implclock = clock), tone, MinBleps.create(clock, outrate, None))
+        w = WavBuf(SimpleNamespace(implclock = clock), tone, MinBleps.create(MinBleps.Params(clock, outrate)))
         config = SimpleNamespace(outpath = os.devnull)
         platform = SimpleNamespace(outputrate = outrate)
         w = WavWriter(

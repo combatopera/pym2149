@@ -22,4 +22,4 @@ from minBlepy.minblep import MinBleps
 
 @types(Platform, ClockInfo, this = MinBleps)
 def loadorcreate(platform, clockinfo):
-    return MinBleps.loadorcreate(clockinfo.implclock, platform.outputrate, None)
+    return MinBleps.loadorcreate(MinBleps.Params(clockinfo.implclock, platform.outputrate))

@@ -38,7 +38,7 @@ requires +=
     foyndation>=16
     lagoon>=63
     Lurlene>=13
-    minBlepy>=16
+    minBlepy>=44
     $(numpy lower_bound)
     outjack>=23
     pyrbo>=18
