@@ -15,7 +15,7 @@ Requires-Dist: Lurlene>=13
 Requires-Dist: minBlepy>=44
 Requires-Dist: numpy>=2.2.6
 Requires-Dist: outjack>=23
-Requires-Dist: pyrbo>=18
+Requires-Dist: pyrbo>=19
 Requires-Dist: splut>=4
 Requires-Dist: timelyOSC>=4
 Dynamic: author

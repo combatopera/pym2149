@@ -41,7 +41,7 @@ requires +=
     minBlepy>=44
     $(numpy lower_bound)
     outjack>=23
-    pyrbo>=18
+    pyrbo>=19
     splut>=4
     timelyOSC>=4
 tagline = YM2149 emulator supporting YM files, OSC to JACK, PortAudio, WAV
